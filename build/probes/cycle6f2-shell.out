@@ -1,0 +1,9 @@
+{"type": "thread.started", "thread_id": "0b3e0502371b"}
+{"type": "turn.started", "thread_id": "0b3e0502371b"}
+{"type": "turn.completed", "usage": {"prompt_tokens": 1137, "completion_tokens": 51, "total_tokens": 1188}}
+{"type": "item.started", "thread_id": "0b3e0502371b", "item": {"id": "item_3ffadd37", "type": "command_execution", "tool": "shell"}}
+{"type": "item.completed", "thread_id": "0b3e0502371b", "item": {"id": "item_3ffadd37", "type": "command_execution", "tool": "shell"}}
+{"type": "turn.started", "thread_id": "0b3e0502371b"}
+{"type": "turn.completed", "usage": {"prompt_tokens": 1190, "completion_tokens": 25, "total_tokens": 1215, "prompt_tokens_details": {"cached_tokens": 896}}}
+{"type": "item.completed", "thread_id": "0b3e0502371b", "item": {"id": "item_e738ef7f", "type": "reasoning", "text": "The output is: codemonkey_tool_test_9f2"}}
+{"type": "item.completed", "thread_id": "0b3e0502371b", "item": {"id": "item_e71ac71a", "type": "agent_message", "text": "codemonkey_tool_test_9f2"}}

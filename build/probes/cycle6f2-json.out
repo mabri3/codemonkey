@@ -1,0 +1,5 @@
+{"type": "thread.started", "thread_id": "5be439f232a4"}
+{"type": "turn.started", "thread_id": "5be439f232a4"}
+{"type": "turn.completed", "usage": {"prompt_tokens": 1133, "completion_tokens": 17, "total_tokens": 1150, "prompt_tokens_details": {"cached_tokens": 128}, "completion_tokens_details": {"reasoning_tokens": 13}}}
+{"type": "item.completed", "thread_id": "5be439f232a4", "item": {"id": "item_f8a0d43c", "type": "reasoning", "text": "The user wants exactly the word \"pong\" and nothing else."}}
+{"type": "item.completed", "thread_id": "5be439f232a4", "item": {"id": "item_17e19ef6", "type": "agent_message", "text": "pong"}}

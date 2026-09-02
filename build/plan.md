@@ -222,12 +222,32 @@ against build/spec.md. Findings become the unchecked fix cycles below
   denies shell. | est: 20m |
   verify: `uv run pytest tests/test_sandbox.py tests/test_tools.py -q` →
   exit 0 incl. new workspace-write-shell-allowed case; full suite green.
-- [ ] CYCLE 6F2 — exec resume becomes a real Typer subcommand sharing the
+- [x] CYCLE 6F2 — exec resume becomes a real Typer subcommand sharing the
   full exec flag set (sandbox/add-dir/timeout/etc.); `--json` JSONL items
   renamed to spec contract `item.started`/`item.completed` (exec.py); drop
   the synthetic pre-loop `turn.started` + emit `turn.started` around the
   schema retry (one per turn, 1:1 with turn.completed); persisted session
   messages strip schema instructions/retry scaffolding. | est: 30m |
+  status: DONE 2026-09-02 (resumed mid-cycle after prior-worker death).
+  exec is now a Typer GROUP (`exec_app`, invoke_without_command) whose
+  callback is the prompt-mode default command; `resume` is a real
+  subcommand with the full exec flag set; `_dispatch_exec_resume`
+  rewrites argv `exec resume ...` → hidden top-level `exec-resume` before
+  Typer parse (Click otherwise binds `resume` as the prompt positional).
+  events renamed thread.item.* → item.*/item.completed; synthetic
+  turn.started deleted; retry turn wrapped (turn.started ✕2 ==
+  turn.completed ✕2 on a retry); loop emits `persist.drop` with
+  drop_tail + replace_with (good retry answer swapped in); exec strips
+  history + scaffolding and restores the PRISTINE first user prompt
+  in-place (mutating the same list the loop froze into all_messages).
+  LIVE via unblock: real exec --json transcript
+  build/probes/cycle6f2-json.* (all-valid JSON, thread.started first,
+  turn markers 1:1, agent_message item) + A9-style shell-tool transcript
+  build/probes/cycle6f2-shell.* (command_execution items, exit 0, echo
+  output in final message) + end-to-end resume probe (seed armadillo →
+  exec resume <tid> --skip-git-repo-check --ephemeral → `armadillo`,
+  flags-after-subcommand parse verified; build/probes/cycle6f2-resume.*).
+  Full suite 110/110.
   verify: `uv run pytest -q` → exit 0 incl. updated event-name + turn
   counting tests; LIVE (via unblock while home server wedged): a real
   `exec --json` transcript committed to build/probes/ plus an A9-style

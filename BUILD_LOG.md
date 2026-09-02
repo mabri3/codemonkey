@@ -422,3 +422,78 @@ for this cycle).
 event names to spec contract item.started/item.completed; turn.started
 1:1 with turn.completed around schema retry; persisted sessions strip
 schema scaffolding).
+
+---
+
+## 2026-09-02 (resumed tick) — CYCLE 6F2 (review-gate fix): exec resume surface + JSONL event contract + schema-scaffold pruning
+
+**Resumed mid-cycle:** a prior worker (or died-errored tick) left the 6F2
+implementation uncommitted with a stale `build/.tick.lock` (mtime 30+ min old;
+>20 min expiry). Per the uncommitted-work rule this tick FINISHED the same
+cycle instead of re-implementing: inspected the diff, fixed two real defects
+it contained (see below), completed its verify probes, committed under the
+cycle's own message.
+
+**Files changed:** `src/codemonkey/cli.py` (exec → Typer group with a real
+`resume` subcommand carrying the FULL exec flag set; hidden top-level
+`exec-resume` landing command; `_dispatch_exec_resume` argv rewrite;
+`_resume_dispatch` shared tail), `src/codemonkey/events.py` (item events
+renamed to spec contract `item.started`/`item.completed`),
+`src/codemonkey/exec.py` (synthetic pre-loop `turn.started` removed;
+`emit_fn` test hook; `persist.drop` handler: history strip + pristine-prompt
+restore + drop_tail + replace_with), `src/codemonkey/loop.py` (schema retry
+wrapped in its own turn markers; emits `persist.drop`),
+`tests/test_exec.py` (+event-name + 1:1 turn-count tests),
+`tests/test_cycle6.py` (+persisted-session-strip + retry turn-count tests),
+`build/probes/cycle6f2-{json,shell,resume,seed}.*`.
+
+**Defects found + fixed while resuming:**
+1. Prior worker's `_exec_resume_from_words` helper called
+   `exec_resume.make_context(...)` on the decorated FUNCTION (Typer attaches
+   the Command to the Typer app, not the function) → `exec resume --help`
+   / any resume crashed AttributeError. Replaced with an argv rewrite to a
+   hidden top-level `exec-resume` command (Click parsing + full flags +
+   `--help` all work; no try/except-UsageError hacks).
+2. `persist.drop` drop_tail over-counted: on retry SUCCESS it dropped the
+   good retry answer too (persisting the initial bad answer as final), and
+   its error-path formula was backwards. Now drop_tail = 3 (success — drop
+   bad answer + retry prompt + retry answer, then append retry content via
+   new `replace_with`) or 2 (error — the retry answer was never appended).
+
+**Tests / probes run (literal):**
+- `uv run pytest -q` → **110 passed, 0 failed** (2.08s) — incl. new
+  `test_exec_json_every_line_parses_with_markers` (item.* names),
+  `test_exec_turn_markers_one_to_one`,
+  `test_persisted_session_strips_schema_instructions_and_retry` (proves the
+  model saw the schema instructions while the store keeps only the pristine
+  prompt + good answer), `test_retry_turn_markers_one_to_one`.
+- LIVE (temporary `unblock` provider — home llama.cpp inference still
+  wedged): `exec --json --ephemeral "Reply … pong"` → exit 0; every line
+  valid JSON; first line `thread.started`; `turn.started`/`turn.completed`
+  1:1; `item.completed` agent_message carries `pong` (build/probes/
+  cycle6f2-json.*).
+- LIVE A9-style: `exec --json --sandbox workspace-write
+  --ask-for-approval never "Use the shell tool to run: echo
+  codemonkey_tool_test_9f2 …"` → exit 0; transcript shows
+  `item.started`/`item.completed` with `type: command_execution` (tool
+  shell) and final agent_message `codemonkey_tool_test_9f2`
+  (build/probes/cycle6f2-shell.*) — cements critic finding #2's missing
+  tool-loop ground truth.
+- LIVE end-to-end resume through the NEW surface: seeded thread
+  `e1d61c3147ed` ("Remember the token word: armadillo."), then
+  `codemonkey exec resume e1d61c3147ed "What was the token word…"
+  --skip-git-repo-check --ephemeral` → exit 0, stdout exactly `armadillo`
+  (build/probes/cycle6f2-resume.*) — proves flags-after-subcommand parse +
+  full flag forwarding.
+- `codemonkey exec resume --help` → exit 0, full flag set rendered.
+- `codemonkey exec --help` / plain `codemonkey exec "…"` → unchanged.
+
+**Known issues:** home llama.cpp still wedged — `unblock` provider remains
+TEMPORARY (removal guard = CYCLE 6F4). The exec group help line
+(`exec [OPTIONS] [prompt]... COMMAND [ARGS]...`) shows Click's group usage
+shape; cosmetic only. `exec resume` currently routes through a hidden
+top-level `exec-resume` command — an argv-compatibility shim, documented in
+cli.py; a future cycle could teach the exec group real subcommand parsing.
+
+**Next step:** CYCLE 6F3 (web_fetch config gate + fnmatch search fallback +
+probe transcripts), then 6F4 (unblock removal guard + session meta floor).

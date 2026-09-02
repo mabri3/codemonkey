@@ -133,12 +133,64 @@ def models(
             typer.echo(n)
 
 
-@app.command()
+class _ExecTyperGroup(typer.core.TyperGroup):
+    """Exec group: `resume` is the ONLY real subcommand. Everything else after
+    the group's own params is prompt-mode input (this group doubles as the
+    `exec [PROMPT]` default command), so unknown first tokens fall through to
+    `invoke_without_command` instead of failing with "No such command"."""
+
+    def resolve_command(self, ctx, args):  # noqa: ANN001
+        try:
+            return super().resolve_command(ctx, args)
+        except Exception:
+            # Fall through to prompt mode: make the resolution look empty so
+            # invoke()'s `if not ctx._protected_args` branch runs the
+            # invoke_without_command path with the group's parsed values.
+            ctx._protected_args = []
+            ctx.args = []
+            ctx.invoked_subcommand = None
+            return "", None, []
+
+
+exec_app = typer.Typer(
+    name="exec",
+    invoke_without_command=True,
+    no_args_is_help=False,
+    # allow_interspersed_args=False: the group parser STOPS at the subcommand
+    # token (`resume`), leaving [thread, PROMPT, resume-flags...] in the
+    # command stream so the subcommand sees its full own flag set
+    # (MultiCommand base behavior requires this once the group takes args).
+    # ignore_unknown_options keeps unparsable leftovers in ctx.args.
+    context_settings={
+        "ignore_unknown_options": True,
+        "allow_extra_args": True,
+        "allow_interspersed_args": False,
+    },
+    help=(
+        "Non-interactive exec: run the agent once, print the final response. "
+        "Use `exec resume [--last|THREAD_ID] [PROMPT]` to continue a session."
+    ),
+)
+app.add_typer(exec_app, name="exec", cls=_ExecTyperGroup)
+_EXEC_FLAG_NAMES = (
+    "--json", "--output-last-message", "--output-schema", "--sandbox",
+    "--ask-for-approval", "--provider", "--model", "--cd", "--add-dir",
+    "--skip-git-repo-check", "--ephemeral", "--max-turns", "--timeout",
+    "--dangerously-bypass-approvals-and-sandbox", "--ignore-user-config",
+    "-o", "-a", "-C",
+)
+
+
+@exec_app.callback()
 def exec(
+    ctx: typer.Context,
     prompt: Annotated[
-        Optional[str],
+        Optional[list[str]],
         typer.Argument(
-            help="Prompt text, or '-' to read the whole prompt from stdin.",
+            help=(
+                "Prompt text (quoted string recommended; unquoted words are "
+                "joined), or '-' to read the whole prompt from stdin."
+            ),
         ),
     ] = None,
     json_out: Annotated[
@@ -209,7 +261,12 @@ def exec(
 
     stdout (text mode) carries ONLY the final response; diagnostics go to
     stderr. With --json, stdout carries ONLY the JSONL event stream.
+    `codemonkey exec resume ...` is pre-dispatched to the real `resume`
+    subcommand before Typer parsing (see _dispatch_exec_resume / main).
     """
+    if ctx.invoked_subcommand is not None:
+        return  # a real subcommand (resume) handles itself
+    prompt = " ".join(list(prompt or [])) or None
     from .exec import ExecUsageError, run_exec
     from .providers.base import AuthError, ProviderError
 
@@ -258,6 +315,298 @@ def exec(
     raise typer.Exit(code)
 
 
+def _run_exec_or_exit(prompt, **kwargs) -> None:
+    """Shared tail for exec + exec resume: run_exec with the CLI's exit-code
+    mapping (usage/auth → 2, provider → 1, success code → typer.Exit)."""
+    from .exec import ExecUsageError, run_exec
+    from .providers.base import AuthError, ProviderError
+
+    try:
+        code = run_exec(prompt, **kwargs)
+    except ExecUsageError as exc:
+        typer.secho(f"error: {exc}", err=True, fg=typer.colors.RED)
+        raise typer.Exit(2) from None
+    except AuthError as exc:
+        typer.secho(f"error: {exc}", err=True, fg=typer.colors.RED)
+        raise typer.Exit(2) from None
+    except ProviderError as exc:
+        typer.secho(f"error: {exc}", err=True, fg=typer.colors.RED)
+        raise typer.Exit(1) from None
+    except KeyboardInterrupt:
+        typer.secho("interrupted", err=True)
+        raise typer.Exit(1) from None
+    raise typer.Exit(code)
+
+
+@exec_app.command(name="resume")
+def exec_resume(
+    thread: Annotated[
+        str,
+        typer.Argument(help="Thread id to resume, or '--last' for the most recent."),
+    ] = "--last",
+    prompt: Annotated[
+        Optional[str],
+        typer.Argument(help="Follow-up prompt (falls back to piped stdin)."),
+    ] = None,
+    json_out: Annotated[
+        bool,
+        typer.Option("--json", help="Emit the JSONL event stream on stdout."),
+    ] = False,
+    output_last_message: Annotated[
+        Optional[Path],
+        typer.Option("-o", "--output-last-message", help="Also write the final message to FILE."),
+    ] = None,
+    output_schema: Annotated[
+        Optional[Path],
+        typer.Option("--output-schema", help="JSON Schema file; validate the final response (one retry)."),
+    ] = None,
+    sandbox: Annotated[
+        Optional[str],
+        typer.Option("--sandbox", help="read-only | workspace-write | danger-full-access"),
+    ] = None,
+    ask_for_approval: Annotated[
+        Optional[str],
+        typer.Option("-a", "--ask-for-approval", help="untrusted | on-request | never"),
+    ] = None,
+    provider: Annotated[
+        Optional[str],
+        typer.Option("--provider", help="Provider name from config."),
+    ] = None,
+    model: Annotated[
+        Optional[str],
+        typer.Option("--model", help="Model id override for the active provider."),
+    ] = None,
+    cd: Annotated[
+        Optional[Path],
+        typer.Option("-C", "--cd", help="Working directory for the run."),
+    ] = None,
+    add_dir: Annotated[
+        Optional[list[str]],
+        typer.Option("--add-dir", help="Extra writable roots (repeatable)."),
+    ] = None,
+    skip_git_repo_check: Annotated[
+        bool,
+        typer.Option("--skip-git-repo-check", help="Allow running outside a git repo."),
+    ] = False,
+    ephemeral: Annotated[
+        bool,
+        typer.Option("--ephemeral", help="Do not persist the session."),
+    ] = False,
+    max_turns: Annotated[
+        Optional[int],
+        typer.Option("--max-turns", help="Maximum agent loop turns."),
+    ] = None,
+    timeout: Annotated[
+        Optional[int],
+        typer.Option("--timeout", help="Shell/tool timeout in seconds."),
+    ] = None,
+    dangerously_bypass: Annotated[
+        bool,
+        typer.Option(
+            "--dangerously-bypass-approvals-and-sandbox",
+            help="Lift sandbox + approval policy entirely.",
+        ),
+    ] = False,
+    ignore_user_config: Annotated[
+        bool,
+        typer.Option("--ignore-user-config", help="Skip ~/.codemonkey/config.yaml."),
+    ] = False,
+) -> None:
+    """Continue a persisted session (same flag set as `exec`)."""
+    _resume_dispatch(
+        thread=thread,
+        prompt=prompt,
+        json_out=json_out,
+        output_last_message=output_last_message,
+        output_schema=output_schema,
+        sandbox=sandbox,
+        ask_for_approval=ask_for_approval,
+        provider=provider,
+        model=model,
+        cd=cd,
+        add_dir=add_dir,
+        skip_git_repo_check=skip_git_repo_check,
+        ephemeral=ephemeral,
+        max_turns=max_turns,
+        timeout=timeout,
+        dangerously_bypass=dangerously_bypass,
+        ignore_user_config=ignore_user_config,
+    )
+
+
+def _resume_dispatch(
+    *,
+    thread: str,
+    prompt: Optional[str],
+    json_out: bool,
+    output_last_message: Optional[Path],
+    output_schema: Optional[Path],
+    sandbox: Optional[str],
+    ask_for_approval: Optional[str],
+    provider: Optional[str],
+    model: Optional[str],
+    cd: Optional[Path],
+    add_dir: Optional[list],
+    skip_git_repo_check: bool,
+    ephemeral: bool,
+    max_turns: Optional[int],
+    timeout: Optional[int],
+    dangerously_bypass: bool,
+    ignore_user_config: bool,
+) -> None:
+    """Shared resume implementation for the `exec resume` surface: the exec
+    group's real `resume` subcommand and the hidden top-level `exec-resume`
+    landing command (the _dispatch_exec_resume argv rewrite) both end here."""
+    import sys
+
+    from .config import ConfigError, load_config
+    from .sessions import get_store
+
+    if thread in _EXEC_FLAG_NAMES:
+        # A leading `--flag VALUE` after `resume` would be swallowed into the
+        # thread slot by the group parse; normalize to `--last`.
+        thread = "--last"
+
+    if prompt is None and not sys.stdin.isatty():
+        prompt = sys.stdin.read().rstrip("\n")
+
+    try:
+        cfg = load_config(cwd=Path(cd).resolve() if cd else Path.cwd())
+    except ConfigError as exc:
+        typer.secho(f"error: {exc}", err=True, fg=typer.colors.RED)
+        raise typer.Exit(2) from None
+
+    store = get_store(cfg)
+    if thread == "--last":
+        thread_id = store.latest()
+        if thread_id is None:
+            typer.secho(
+                "error: no persisted sessions to resume (--last)",
+                err=True,
+                fg=typer.colors.RED,
+            )
+            raise typer.Exit(2)
+    else:
+        thread_id = thread
+
+    _run_exec_or_exit(
+        prompt,
+        json_mode=json_out,
+        cwd=cd,
+        add_dirs=add_dir or [],
+        sandbox=sandbox,
+        approval=ask_for_approval,
+        provider_name=provider,
+        model=model,
+        skip_git_repo_check=skip_git_repo_check,
+        ephemeral=ephemeral,
+        resume_thread=thread_id,
+        max_turns=max_turns,
+        timeout=timeout,
+        output_last_message=output_last_message,
+        output_schema=output_schema,
+        ignore_user_config=ignore_user_config,
+        bypass=dangerously_bypass,
+    )
+
+
+@app.command(name="exec-resume", hidden=True)
+def exec_resume_alias(
+    thread: Annotated[
+        str,
+        typer.Argument(help="Thread id to resume, or '--last' for the most recent."),
+    ] = "--last",
+    prompt: Annotated[
+        Optional[str],
+        typer.Argument(help="Follow-up prompt (falls back to piped stdin)."),
+    ] = None,
+    json_out: Annotated[
+        bool,
+        typer.Option("--json", help="Emit the JSONL event stream on stdout."),
+    ] = False,
+    output_last_message: Annotated[
+        Optional[Path],
+        typer.Option("-o", "--output-last-message", help="Also write the final message to FILE."),
+    ] = None,
+    output_schema: Annotated[
+        Optional[Path],
+        typer.Option("--output-schema", help="JSON Schema file; validate the final response (one retry)."),
+    ] = None,
+    sandbox: Annotated[
+        Optional[str],
+        typer.Option("--sandbox", help="read-only | workspace-write | danger-full-access"),
+    ] = None,
+    ask_for_approval: Annotated[
+        Optional[str],
+        typer.Option("-a", "--ask-for-approval", help="untrusted | on-request | never"),
+    ] = None,
+    provider: Annotated[
+        Optional[str],
+        typer.Option("--provider", help="Provider name from config."),
+    ] = None,
+    model: Annotated[
+        Optional[str],
+        typer.Option("--model", help="Model id override for the active provider."),
+    ] = None,
+    cd: Annotated[
+        Optional[Path],
+        typer.Option("-C", "--cd", help="Working directory for the run."),
+    ] = None,
+    add_dir: Annotated[
+        Optional[list[str]],
+        typer.Option("--add-dir", help="Extra writable roots (repeatable)."),
+    ] = None,
+    skip_git_repo_check: Annotated[
+        bool,
+        typer.Option("--skip-git-repo-check", help="Allow running outside a git repo."),
+    ] = False,
+    ephemeral: Annotated[
+        bool,
+        typer.Option("--ephemeral", help="Do not persist the session."),
+    ] = False,
+    max_turns: Annotated[
+        Optional[int],
+        typer.Option("--max-turns", help="Maximum agent loop turns."),
+    ] = None,
+    timeout: Annotated[
+        Optional[int],
+        typer.Option("--timeout", help="Shell/tool timeout in seconds."),
+    ] = None,
+    dangerously_bypass: Annotated[
+        bool,
+        typer.Option(
+            "--dangerously-bypass-approvals-and-sandbox",
+            help="Lift sandbox + approval policy entirely.",
+        ),
+    ] = False,
+    ignore_user_config: Annotated[
+        bool,
+        typer.Option("--ignore-user-config", help="Skip ~/.codemonkey/config.yaml."),
+    ] = False,
+) -> None:
+    """Hidden landing command for `codemonkey exec resume ...` after the
+    _dispatch_exec_resume argv rewrite. Shares the full exec flag set."""
+    _resume_dispatch(
+        thread=thread,
+        prompt=prompt,
+        json_out=json_out,
+        output_last_message=output_last_message,
+        output_schema=output_schema,
+        sandbox=sandbox,
+        ask_for_approval=ask_for_approval,
+        provider=provider,
+        model=model,
+        cd=cd,
+        add_dir=add_dir,
+        skip_git_repo_check=skip_git_repo_check,
+        ephemeral=ephemeral,
+        max_turns=max_turns,
+        timeout=timeout,
+        dangerously_bypass=dangerously_bypass,
+        ignore_user_config=ignore_user_config,
+    )
+
+
 @app.command(name="sessions")
 def sessions(  # noqa: A001 - command name shadows builtin intentionally
     json_out: Annotated[
@@ -295,105 +644,16 @@ def main() -> None:  # pragma: no cover - convenience
 
 
 def _dispatch_exec_resume() -> None:
-    """`codemonkey exec resume ...` is dispatched before Typer parses argv:
-    click would treat `resume` as the (only) positional prompt argument and
-    reject the remaining tokens. This shim handles only the resume form and
-    leaves all other invocations untouched."""
+    """`codemonkey exec resume ...` rewrites argv to `codemonkey exec-resume ...`
+    BEFORE Typer parses it. Click would otherwise treat `resume` as the exec
+    (default) command's prompt positional and reject the resume-specific
+    positionals/flags. Forwarded verbatim -- Click parses the full flag set as
+    the ordinary `resume` subcommand, including `--help`."""
     import sys
 
     argv = sys.argv[1:]
     if len(argv) >= 2 and argv[0] == "exec" and argv[1] == "resume":
-        _exec_resume_main(argv[2:])
-        raise SystemExit(0)
-
-
-def _exec_resume_main(args: list) -> None:
-    """Parse a small, explicit subset of exec flags for the resume form:
-    --json / -o FILE / --ephemeral / --skip-git-repo-check / --provider /
-    --model; positionals: [--last|THREAD_ID] [PROMPT] (any order; words after
-    the thread spec become the prompt)."""
-    import sys
-    from .config import ConfigError, load_config
-    from .exec import ExecUsageError, run_exec
-    from .providers.base import AuthError, ProviderError
-    from .sessions import get_store
-
-    json_out = False
-    output_last_message = None
-    ephemeral = False
-    skip_git = False
-    provider = None
-    model = None
-    positionals: list[str] = []
-    i = 0
-    while i < len(args):
-        a = args[i]
-        if a == "--json":
-            json_out = True
-        elif a in ("-o", "--output-last-message"):
-            i += 1
-            if i >= len(args):
-                print("error: -o/--output-last-message needs a value", file=sys.stderr)
-                raise SystemExit(2)
-            output_last_message = Path(args[i])
-        elif a == "--ephemeral":
-            ephemeral = True
-        elif a == "--skip-git-repo-check":
-            skip_git = True
-        elif a == "--provider":
-            i += 1
-            provider = args[i] if i < len(args) else None
-        elif a == "--model":
-            i += 1
-            model = args[i] if i < len(args) else None
-        else:
-            positionals.append(a)
-        i += 1
-
-    thread_spec = positionals[0] if positionals else "--last"
-    prompt = " ".join(positionals[1:]) or None
-    if prompt is None:
-        import sys as _sys
-
-        if not _sys.stdin.isatty():
-            prompt = _sys.stdin.read().rstrip("\n")
-
-    try:
-        cfg = load_config(cwd=Path.cwd())
-    except ConfigError as exc:
-        print(f"error: {exc}", file=sys.stderr)
-        raise SystemExit(2)
-
-    store = get_store(cfg)
-    if thread_spec in ("--last", "last"):
-        thread_id = store.latest()
-        if thread_id is None:
-            print("error: no persisted sessions to resume (--last)", file=sys.stderr)
-            raise SystemExit(2)
-    else:
-        thread_id = thread_spec
-
-    try:
-        code = run_exec(
-            prompt,
-            json_mode=json_out,
-            resume_thread=thread_id,
-            ephemeral=ephemeral,
-            skip_git_repo_check=skip_git,
-            provider_name=provider,
-            model=model,
-            output_last_message=output_last_message,
-        )
-    except ExecUsageError as exc:
-        print(f"error: {exc}", file=sys.stderr)
-        raise SystemExit(2)
-    except AuthError as exc:
-        print(f"error: {exc}", file=sys.stderr)
-        raise SystemExit(2)
-    except ProviderError as exc:
-        print(f"error: {exc}", file=sys.stderr)
-        raise SystemExit(1)
-    raise SystemExit(code)
+        sys.argv = [sys.argv[0], "exec-resume", *argv[2:]]
 
 
 if __name__ == "__main__":

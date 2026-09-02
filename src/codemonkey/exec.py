@@ -9,7 +9,7 @@ Contract (build/spec.md):
 - git guard          cwd must be inside a git repo → else exit 2 naming
                      `--skip-git-repo-check`
 - exit codes         0 success · 1 run error · 2 usage/auth error
-- events             thread.started{thread_id} → turn.* / thread.item.* →
+- events             thread.started{thread_id} → turn.* / item.* →
                      turn.completed{usage} (see events.py)
 """
 
@@ -109,6 +109,7 @@ def run_exec(
     bypass: bool = False,
     stream_deltas: bool = True,
     stdin_cm: Optional[str] = None,  # test/dev override: skip reading sys.stdin
+    emit_fn=None,  # override for tests: (event_dict) -> None
 ) -> int:
     """Run one non-interactive exec turn-group. Returns the exit code."""
     from .config import ConfigError, load_config
@@ -170,19 +171,24 @@ def run_exec(
         extra={"approval": eff_approval},
     )
 
-    # -- schema (cycle 6) ------------------------------------------------
+    # -- schema (cycle 6) -----------------------------------------------
+    # The schema instructions are injected for the MODEL, but the pristine
+    # prompt is what gets persisted to the session store (resumed threads
+    # must not replay stale schema scaffolding — critic finding 6F2).
     schema = _read_schema(output_schema)
+    persist_prompt = full_prompt
     if schema is not None:
         from . import schema as schema_mod
 
         full_prompt = full_prompt + "\n\n" + schema_mod.schema_instructions(schema)
 
     thread_id = events.new_thread_id()
-    emit = lambda ev: events.emit(ev, json_mode=json_mode)  # noqa: E731
+    emit = emit_fn or (lambda ev: events.emit(ev, json_mode=json_mode))
     emit({"type": "thread.started", "thread_id": thread_id})
 
     # -- event translation: loop events -> codex-style items ------------
     open_items: dict = {}
+    history_len = 0  # set after session load; used by the persist.drop hook
 
     def on_event(ev: dict) -> None:
         etype = ev.get("type", "")
@@ -195,7 +201,7 @@ def run_exec(
                 "update_plan": "plan",
             }.get(name, "command_execution")
             item = {"id": f"item_{uuid.uuid4().hex[:8]}", "type": itype, "tool": name}
-            emit({"type": "thread.item.started", "thread_id": thread_id, "item": item})
+            emit({"type": "item.started", "thread_id": thread_id, "item": item})
             open_items[item["id"]] = item
         elif etype == "tool.completed":
             # close the most recent still-open item for this tool
@@ -207,19 +213,36 @@ def run_exec(
             if item is not None:
                 emit(
                     {
-                        "type": "thread.item.completed",
+                        "type": "item.completed",
                         "thread_id": thread_id,
                         "item": item,
                     }
                 )
         elif etype == "turn.started":
-            emit({"type": "turn.started"})
+            emit({"type": "turn.started", "thread_id": thread_id})
         elif etype == "turn.completed":
             emit({"type": "turn.completed", "usage": ev.get("usage") or {}})
         elif etype == "notice":
             emit({"type": "notice", "message": ev.get("message", "")})
         elif etype == "error":
             emit({"type": "error", "message": ev.get("message", "")})
+        elif etype == "persist.drop":
+            # 6F2: pruning hook emitted by the loop right before
+            # all_messages is frozen; carries the first-run messages by
+            # reference so exec can strip pre-run history + retry scaffolding
+            # and persist only the pristine first user prompt.
+            msgs = ev.get("messages")
+            if isinstance(msgs, list):
+                del msgs[: history_len]
+                if msgs and msgs[0].get("content") == full_prompt:
+                    msgs[0] = {**msgs[0], "content": persist_prompt}
+                meta = ev.get("meta") or {}
+                drop = meta.get("drop_tail") or 0
+                if drop:
+                    del msgs[-drop:]
+                replacement = meta.get("replace_with")
+                if replacement is not None:
+                    msgs.append({"role": "assistant", "content": replacement})
 
     on_token = None
     if stream_deltas and not json_mode:
@@ -237,8 +260,6 @@ def run_exec(
             "Write files only inside the working directory."
         )
 
-    emit({"type": "turn.started"})  # opening turn marker (json mode contract)
-
     # -- session history (resume / new) ----------------------------------
     from . import sessions as sessions_mod
 
@@ -251,6 +272,7 @@ def run_exec(
             raise ExecUsageError(str(exc)) from exc
         history = data["messages"]
         thread_id = resume_thread
+        history_len = len(history)
     elif not ephemeral:
         store.append_meta(
             thread_id,
@@ -284,7 +306,7 @@ def run_exec(
     if turn.reasoning:
         emit(
             {
-                "type": "thread.item.completed",
+                "type": "item.completed",
                 "thread_id": thread_id,
                 "item": {
                     "id": f"item_{uuid.uuid4().hex[:8]}",
@@ -295,7 +317,7 @@ def run_exec(
         )
     emit(
         {
-            "type": "thread.item.completed",
+            "type": "item.completed",
             "thread_id": thread_id,
             "item": {
                 "id": f"item_{uuid.uuid4().hex[:8]}",

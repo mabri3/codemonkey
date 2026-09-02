@@ -75,6 +75,7 @@ def run_turns(
     messages: list[dict] = list(history or [])
     if user_prompt:
         messages.append({"role": "user", "content": user_prompt})
+    pre_run_len = len(messages)
     last_turn = ChatTurn()
 
     for _turn_no in range(1, max_turns + 1):
@@ -160,6 +161,10 @@ def run_turns(
                         })
                     messages.append({"role": "assistant", "content": turn.content or ""})
                     messages.append({"role": "user", "content": schema_mod.retry_prompt(errors_text)})
+                    # 6F2: the retry is its OWN turn — wrap provider call with
+                    # turn markers so turn.started/turn.completed stay 1:1.
+                    if on_event:
+                        on_event({"type": "turn.started"})
                     try:
                         if use_prompt:
                             retry = provider.chat(messages, system=system, stream=stream, on_token=on_token)
@@ -195,6 +200,27 @@ def run_turns(
                                     "type": "error",
                                     "message": "schema validation failed after retry: " + errors2,
                                 })
+                    # 6F2: strip the retry scaffolding from the tail of the
+                    # same messages list before it is persisted — resumed
+                    # threads must not replay the injected schema turn or the
+                    # retry meta-dialogue.
+                    #   error path: drop the bad assistant answer + retry
+                    #     prompt (the final-answer emissions still write the
+                    #     initial answer as the closing message);
+                    #   success path: additionally swap the good retry answer
+                    #     into the bad-answer slot so the store keeps exactly
+                    #     [pristine user prompt, final answer].
+                    if on_event:
+                        drop_tail = 3 if retry is not None else 2
+                        on_event({
+                            "type": "persist.drop",
+                            "messages": messages,
+                            "meta": {"pre_run_len": pre_run_len,
+                                     "drop_tail": drop_tail,
+                                     "replace_with": (
+                                         retry.content if retry is not None else None
+                                     )},
+                        })
             last_turn.all_messages = messages
             return last_turn
 

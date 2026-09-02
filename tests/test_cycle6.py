@@ -314,3 +314,119 @@ def test_exec_schema_validation_fail_exits_1(tmp_sessions, monkeypatch, tmp_path
         stdin_cm="",
     )
     assert code == 1
+
+
+# -- 6F2: persisted sessions strip schema scaffolding ---------------------
+
+def test_persisted_session_strips_schema_instructions_and_retry(tmp_sessions, monkeypatch, tmp_path):
+    """6F2: after a schema run with one retry, the persisted thread contains
+    ONLY the pristine user prompt + final answer — no injected schema
+    instructions, no retry meta-dialogue, even though the MODEL saw both."""
+    import json as _json
+
+    from codemonkey import exec as exec_mod
+    from codemonkey.providers.base import ChatTurn
+
+    calls = {"n": 0}
+    seen_first_prompts = []
+
+    class FP:
+        protocol = "openai"
+        model = "fake"
+
+        def chat(self, messages, **kw):
+            calls["n"] += 1
+            if calls["n"] == 1:
+                seen_first_prompts.append(messages[-1]["content"])
+                return ChatTurn(content='{"project_name": 123}', usage={})
+            return ChatTurn(
+                content='{"project_name": "codemonkey", "programming_languages": ["python"]}',
+                usage={},
+            )
+
+        def close(self):
+            pass
+
+    monkeypatch.setattr(
+        exec_mod, "_provider_from_config", lambda cfg, name, model: ("local", FP())
+    )
+    schema_file = tmp_path / "s.json"
+    schema_file.write_text(_json.dumps(SCHEMA))
+    code = exec_mod.run_exec(
+        "state the project",
+        cwd=REPO,
+        skip_git_repo_check=True,
+        stream_deltas=False,
+        output_schema=schema_file,
+        stdin_cm="",
+    )
+    assert code == 0
+    assert calls["n"] == 2  # initial + retry
+
+    # the model DID see the injected schema instructions (send-side intact)
+    assert "JSON Schema" in seen_first_prompts[0]
+
+    items = tmp_sessions.list()
+    assert len(items) == 1
+    tid = items[0]["thread_id"]
+    msgs = tmp_sessions.load(tid)["messages"]
+    # persisted: pristine first user prompt + final assistant answer only
+    assert len(msgs) == 2
+    assert msgs[0]["role"] == "user"
+    assert msgs[0]["content"] == "state the project"  # NOT the schema-augmented prompt
+    assert msgs[1]["role"] == "assistant"
+    assert "codemonkey" in msgs[1]["content"]
+    # none of the scaffolding leaked into the store
+    blob = _json.dumps(msgs)
+    assert "JSON Schema" not in blob
+    assert "failed JSON Schema validation" not in blob
+
+
+def test_retry_turn_markers_one_to_one(tmp_sessions, monkeypatch, tmp_path):
+    """6F2: a schema retry is its own turn — the emitted event stream keeps
+    turn.started/turn.completed strictly 1:1 (no unbalanced retry turn)."""
+    import json as _json
+
+    from codemonkey import exec as exec_mod
+    from codemonkey.providers.base import ChatTurn
+
+    calls = {"n": 0}
+
+    class FP:
+        protocol = "openai"
+        model = "fake"
+
+        def chat(self, messages, **kw):
+            calls["n"] += 1
+            if calls["n"] == 1:
+                return ChatTurn(content='{"project_name": 123}', usage={})
+            return ChatTurn(
+                content='{"project_name": "codemonkey", "programming_languages": ["python"]}',
+                usage={},
+            )
+
+        def close(self):
+            pass
+
+    monkeypatch.setattr(
+        exec_mod, "_provider_from_config", lambda cfg, name, model: ("local", FP())
+    )
+    emitted = []
+    schema_file = tmp_path / "s.json"
+    schema_file.write_text(_json.dumps(SCHEMA))
+    code = exec_mod.run_exec(
+        "state the project",
+        cwd=REPO,
+        skip_git_repo_check=True,
+        ephemeral=True,
+        stream_deltas=False,
+        output_schema=schema_file,
+        stdin_cm="",
+        emit_fn=emitted.append,
+    )
+    assert code == 0
+    types = [e.get("type") for e in emitted]
+    assert calls["n"] == 2
+    assert types.count("turn.started") == 2  # initial turn + retry turn
+    assert types.count("turn.completed") == 2
+

@@ -92,7 +92,26 @@ def test_exec_json_every_line_parses_with_markers():
     assert "thread.started" in types
     assert "turn.started" in types
     assert "turn.completed" in types
+    # 6F2: spec contract names item.started / item.completed for tool-call
+    # items; the final assistant message closes as an agent_message item.
+    assert "item.started" not in types  # no tool calls from FakeProvider
+    assert "item.completed" in types    # final agent_message item
+    assert "thread.item.started" not in types and "thread.item.completed" not in types
     assert types.index("thread.started") == 0  # first line
+
+
+def test_exec_turn_markers_one_to_one():
+    """6F2: exactly one turn.started per turn.completed (no synthetic extra)."""
+    r = run_cli(
+        ["exec", "--skip-git-repo-check", "--json", PONG], env_provider=FakeProvider("pong")
+    )
+    assert r.exit_code == 0, r.stderr
+    events = [json.loads(l) for l in r.stdout.splitlines() if l.strip()]
+    types = [e.get("type") for e in events]
+    assert types.count("turn.started") == 1
+    assert types.count("turn.completed") == 1
+    # ordering: thread.started → turn.started → … → turn.completed
+    assert types.index("thread.started") < types.index("turn.started") < types.index("turn.completed")
 
 
 def test_exec_json_thread_started_has_thread_id():

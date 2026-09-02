@@ -6,10 +6,9 @@ stdout purity rule (exec.py):
               notices, errors) goes to stderr.
 
 Item types: agent_message | reasoning | command_execution | file_change | plan
-Line types: thread.started, thread.item.started, thread.item.completed,
-            turn.started, turn.completed, error
-(We emit codex-compatible `"thread.item.*"` type strings while also keeping
-thread.started / turn.started / turn.completed / error which plan.md names.)
+Line types (spec §JSONL contract): thread.started{thread_id},
+            turn.started, item.started, item.completed,
+            turn.completed{usage}, error{message}
 """
 
 from __future__ import annotations
@@ -46,7 +45,7 @@ def emit(event: dict, *, json_mode: bool, stream=None) -> None:
         if etype == "error":
             print(f"error: {event.get('message')}", file=sink, flush=True)
             return
-        if etype == "thread.item.started":
+        if etype == "item.started":
             item = event.get("item", {})
             itype, tool = item.get("type", ""), item.get("tool", "")
             if itype == "command_execution":
@@ -56,7 +55,7 @@ def emit(event: dict, *, json_mode: bool, stream=None) -> None:
             elif itype == "reasoning":
                 print("[reasoning…]", file=sink, flush=True)
             return
-        if etype == "thread.item.completed":
+        if etype == "item.completed":
             item = event.get("item", {})
             itype = item.get("type", "")
             if itype == "agent_message":
