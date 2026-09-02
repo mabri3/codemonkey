@@ -521,7 +521,7 @@ map to an A-criterion, a loop selection, or a cited research selection).
 
 ### loop5: cycles (selected from build/research-loop5.md, cycle R5)
 
-- [ ] CYCLE 24 — `loop5:` eval harness core: `codemonkey eval <suite.yaml>` runs
+- [x] CYCLE 24 — `loop5:` eval harness core: `codemonkey eval <suite.yaml>` runs
   YAML golden tasks (prompt, expected stdout-contains, expected exit code,
   required tool trajectory) against the real exec path; scores pass rate +
   tokens + wall time; writes build/eval/results.json | est: 30m |

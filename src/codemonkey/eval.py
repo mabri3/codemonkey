@@ -1,0 +1,163 @@
+"""codemonkey eval (loop5, cycle 24): golden-task evaluation harness.
+
+Runs YAML golden suites against the REAL exec path and scores:
+  - stdout contract (expected contains / not-contains)
+  - exit code
+  - required tool trajectory (tool names in call order, subset match)
+Results land in build/eval/results.json (pass rate, per-task detail, tokens,
+wall time).
+
+Suite shape:
+  name: my-suite
+  tasks:
+    - id: pong
+      prompt: "Reply with exactly: pong"
+      expect_stdout_contains: ["pong"]
+      expect_exit: 0
+      expect_tools: []            # subset of tool names, in order
+      sandbox: workspace-write    # optional exec kwargs
+      approval: never
+      provider: local             # optional; default from config
+      ephemeral: true
+"""
+
+from __future__ import annotations
+
+import json
+import re
+import time
+from pathlib import Path
+from typing import Optional
+
+import yaml
+
+
+def load_suite(path: Path) -> dict:
+    """Load + validate a YAML suite. Raises ValueError on malformed input."""
+    try:
+        data = yaml.safe_load(Path(path).read_text())
+    except (OSError, yaml.YAMLError) as exc:
+        raise ValueError(f"cannot read suite {path}: {exc}") from exc
+    if not isinstance(data, dict) or not isinstance(data.get("tasks"), list):
+        raise ValueError(f"suite {path} must be a mapping with a 'tasks' list")
+    for i, task in enumerate(data["tasks"]):
+        if not isinstance(task, dict) or not task.get("id") or not task.get("prompt"):
+            raise ValueError(f"suite task #{i} needs 'id' and 'prompt'")
+    return data
+
+
+def _trajectory_from_events(events: list) -> list[str]:
+    """Tool names in first-call order from a --json event list."""
+    seen: list[str] = []
+    for ev in events:
+        if ev.get("type") == "tool.started":
+            name = ev.get("name")
+            if name and name not in seen:
+                seen.append(name)
+    return seen
+
+
+def _score_task(task: dict, *, exit_code: int, stdout: str,
+                events: list, wall: float) -> dict:
+    checks = {"stdout": True, "exit": True, "trajectory": True}
+    detail = {}
+
+    for needle in task.get("expect_stdout_contains") or []:
+        if needle not in stdout:
+            checks["stdout"] = False
+            detail.setdefault("missing_stdout", []).append(needle)
+    for needle in task.get("expect_stdout_not_contains") or []:
+        if needle in stdout:
+            checks["stdout"] = False
+            detail.setdefault("forbidden_stdout_found", []).append(needle)
+
+    want_exit = task.get("expect_exit", 0)
+    if exit_code != want_exit:
+        checks["exit"] = False
+        detail["exit_code"] = {"want": want_exit, "got": exit_code}
+
+    want_tools = task.get("expect_tools") or []
+    if want_tools:
+        got = _trajectory_from_events(events)
+        # subset in order
+        it = iter(got)
+        if not all(t in it for t in want_tools):
+            checks["trajectory"] = False
+            detail["trajectory"] = {"want": want_tools, "got": got}
+
+    ok = all(checks.values())
+    return {
+        "id": task["id"],
+        "ok": ok,
+        "checks": checks,
+        "detail": detail,
+        "tokens": _tokens_from_events(events),
+        "wall_seconds": round(wall, 2),
+    }
+
+
+def _tokens_from_events(events: list) -> int:
+    total = 0
+    for ev in events:
+        if ev.get("type") == "turn.completed":
+            usage = ev.get("usage") or {}
+            total += int(usage.get("total_tokens") or 0)
+    return total
+
+
+def run_suite(suite_path: Path, *, exec_fn=None,
+              out_dir: Optional[Path] = None) -> dict:
+    """Run every task through the real exec path and score it.
+
+    `exec_fn` defaults to codemonkey.exec.run_exec; tests may inject a fake
+    with the same signature. Returns the results dict and (if out_dir given)
+    writes results.json there.
+    """
+    if exec_fn is None:
+        from .exec import run_exec as exec_fn
+
+    suite = load_suite(suite_path)
+    results = {"suite": suite.get("name", Path(suite_path).stem),
+               "tasks": [], "started": time.time()}
+    for task in suite["tasks"]:
+        events: list = []
+        started = time.time()
+
+        def collect(ev, _events=events):
+            events.append(ev)
+
+        code = exec_fn(
+            task["prompt"],
+            json_mode=True,
+            event_sink=events,
+            sandbox=task.get("sandbox"),
+            approval=task.get("approval"),
+            provider_name=task.get("provider"),
+            ephemeral=task.get("ephemeral", True),
+        )
+        wall = time.time() - started
+        # stdout in json mode = the event stream; the graded answer text lives
+        # in item.completed agent_message entries.
+        stdout_text = "\n".join(
+            str(ev.get("item", {}).get("text") or "")
+            for ev in events
+            if ev.get("type") == "item.completed"
+            and ev.get("item", {}).get("type") == "agent_message"
+        )
+        scored = _score_task(task, exit_code=code, stdout=stdout_text,
+                             events=events, wall=wall)
+        scored["stdout"] = stdout_text[:2000]
+        results["tasks"].append(scored)
+
+    results["pass_rate"] = round(
+        sum(1 for t in results["tasks"] if t["ok"]) / max(1, len(results["tasks"])), 3
+    )
+    results["total_tokens"] = sum(t["tokens"] for t in results["tasks"])
+    results["wall_seconds"] = round(sum(t["wall_seconds"] for t in results["tasks"]), 2)
+    results["finished"] = time.time()
+
+    if out_dir is not None:
+        out_dir = Path(out_dir)
+        out_dir.mkdir(parents=True, exist_ok=True)
+        (out_dir / "results.json").write_text(json.dumps(results, indent=2))
+    return results

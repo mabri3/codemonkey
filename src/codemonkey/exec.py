@@ -111,6 +111,7 @@ def run_exec(
     project_instructions: Optional[bool] = None,
     stream_deltas: bool = True,
     stdin_cm: Optional[str] = None,  # test/dev override: skip reading sys.stdin
+    event_sink=None,  # test/dev: collect JSONL events into a list
     emit_fn=None,  # override for tests: (event_dict) -> None
 ) -> int:
     """Run one non-interactive exec turn-group. Returns the exit code."""
@@ -205,14 +206,24 @@ def run_exec(
         full_prompt = full_prompt + "\n\n" + schema_mod.schema_instructions(schema)
 
     thread_id = events.new_thread_id()
-    emit = emit_fn or (lambda ev: events.emit(ev, json_mode=json_mode))
+    _emit_base = emit_fn or (lambda ev: events.emit(ev, json_mode=json_mode))
+
+    def emit(ev: dict) -> None:
+        if event_sink is not None:
+            event_sink.append(ev)
+        _emit_base(ev)
+
     emit({"type": "thread.started", "thread_id": thread_id})
 
     # -- event translation: loop events -> codex-style items ------------
     open_items: dict = {}
     history_len = 0  # set after session load; used by the persist.drop hook
 
+    _external_events = event_sink if event_sink is not None else None
+
     def on_event(ev: dict) -> None:
+        if _external_events is not None:
+            _external_events.append(ev)
         etype = ev.get("type", "")
         if etype == "tool.started":
             name = ev.get("name", "")

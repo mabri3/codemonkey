@@ -1,0 +1,36 @@
+{
+  "suite": "live-smoke",
+  "tasks": [
+    {
+      "id": "pong",
+      "ok": true,
+      "checks": {
+        "stdout": true,
+        "exit": true,
+        "trajectory": true
+      },
+      "detail": {},
+      "tokens": 0,
+      "wall_seconds": 1.13,
+      "stdout": "pong"
+    },
+    {
+      "id": "banana-stdin",
+      "ok": true,
+      "checks": {
+        "stdout": true,
+        "exit": true,
+        "trajectory": true
+      },
+      "detail": {},
+      "tokens": 0,
+      "wall_seconds": 1.0,
+      "stdout": "banana"
+    }
+  ],
+  "started": 1788383233.3073149,
+  "pass_rate": 1.0,
+  "total_tokens": 0,
+  "wall_seconds": 2.13,
+  "finished": 1788383235.4409049
+}

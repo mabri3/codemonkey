@@ -1231,3 +1231,19 @@ per AGENTS.md — user decision required before either is built. MCP deferred a
 fourth time (fixed 11-tool surface is a deliberate small-model optimization).
 
 **Next step:** CYCLE 24 — eval harness core.
+
+## 2026-09-02 — CYCLE 24 (loop5): eval harness core
+
+**Completed:** `src/codemonkey/eval.py` — YAML golden suites (id, prompt,
+expect_stdout_contains/not_contains, expect_exit, expect_tools subset-in-order
+trajectory, optional exec kwargs); runs the REAL exec path; scores pass rate +
+per-task checks + tokens + wall; results.json in build/eval/.
+exec.run_exec gains `event_sink` (test/dev + harness): the emit() path now
+feeds BOTH stdout-JSONL and the sink — this closed a real observability gap
+(item.completed emissions previously never reached external collectors).
+
+**Files changed:** src/codemonkey/eval.py (new), src/codemonkey/exec.py
+(event_sink), tests/test_eval.py (new, 6 tests), build/probes/cycle24-eval.md.
+
+**Tests:** test_eval 6/6; suite 277/277. LIVE: 2-task smoke suite vs home
+server -> pass_rate 1.0, wall 2.13s.
