@@ -216,6 +216,41 @@ def review(
 
 
 @app.command()
+def undo(
+    list_only: Annotated[
+        bool,
+        typer.Option("--list", help="List checkpoints without restoring."),
+    ] = False,
+) -> None:
+    """Undo: restore the most recent checkpoint (files snapshotted pre-mutation)."""
+    from . import checkpoints as cp_mod
+
+    cwd = Path.cwd()
+    if list_only:
+        cps = cp_mod.list_checkpoints()
+        if not cps:
+            typer.echo("(no checkpoints)")
+            return
+        for c in cps[:10]:
+            import datetime
+            ts = datetime.datetime.fromtimestamp(c["ts"]).strftime("%m-%d %H:%M:%S")
+            typer.echo(f"{ts}  {len(c['files'])} file(s): " + ", ".join(c["files"][:4])
+                       + (" ..." if len(c["files"]) > 4 else ""))
+        return
+    try:
+        result = cp_mod.restore_latest(cwd)
+    except LookupError as exc:
+        typer.secho(f"error: {exc}", err=True, fg=typer.colors.RED)
+        raise typer.Exit(1) from None
+    except OSError as exc:
+        typer.secho(f"error: restore failed: {exc}", err=True, fg=typer.colors.RED)
+        raise typer.Exit(1) from None
+    typer.echo(f"restored {len(result['restored'])} file(s) from checkpoint")
+    for rel in result["restored"]:
+        typer.echo(f"  {rel}")
+
+
+@app.command()
 def models(
     provider: Annotated[
         str,

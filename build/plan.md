@@ -194,7 +194,7 @@ end.
   atomic write) | est: 30m |
   verify: `uv run pytest tests/test_patch_edit.py -q` → exit 0 (≥6 tests incl. exact,
   fuzzy, no-match error, atomicity on failure, multi-block); live exec edit probe green.
-- [ ] CYCLE 14 — `loop2:` checkpoints/rollback (snapshot before mutating tools;
+- [x] CYCLE 14 — `loop2:` checkpoints/rollback (snapshot before mutating tools;
   `codemonkey undo [--list]` restores last checkpoint byte-identical) | est: 30m |
   verify: `uv run pytest tests/test_checkpoints.py -q` → exit 0 (≥5 tests: snapshot
   on write/edit/shell, restore byte-identical, --list ordering, no-snapshot no-op,

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Optional
 
 MAX_OUTPUT = 20_000  # tool output truncation (spec)
@@ -37,6 +38,18 @@ def _load(path, ctx) -> bytes:
 def _save(path, data, ctx) -> str:
     from ..sandbox import validate_root
     rp = validate_root(ctx, path)
+    # Checkpoint PRIOR contents before mutation (loop2 cycle 14). Fails soft:
+    # a checkpoint error must never block the write itself.
+    try:
+        from .. import checkpoints as cp_mod
+
+        if rp.is_file():
+            cp = cp_mod.new_checkpoint()
+            cp.snapshot_file(Path(ctx.workdir).resolve(),
+                             str(rp.relative_to(Path(ctx.workdir).resolve())),
+                             rp.read_bytes())
+    except Exception:
+        pass
     rp.parent.mkdir(parents=True, exist_ok=True)
     if isinstance(data, str):
         data = data.encode("utf-8")

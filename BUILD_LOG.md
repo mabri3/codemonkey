@@ -757,3 +757,24 @@ untouched (no torn intermediate). Classic form keeps its cycle-3 contract wordin
 fresh temp repo, model applied the SREP patch to app.py (old_fn/v1 -> new_fn/v2, DONE).
 
 **Next step:** CYCLE 14 — checkpoints/rollback.
+
+## 2026-09-02 — CYCLE 14 (loop2): checkpoints / rollback
+
+**Completed:** `src/codemonkey/checkpoints.py` — before any mutating tool write
+(_save choke point: write_file + edit_file), the file's PRIOR bytes are copied to
+~/.codemonkey/checkpoints/<ts>-<rand>/<rel-path> with a manifest. Snapshotting is
+fail-soft (a checkpoint error never blocks the write) and fires only for files that
+already existed. `codemonkey undo` restores the newest checkpoint byte-identical;
+`--list` shows newest-first with file counts. list_checkpoints sorts
+chronologically (manifest ts), returns Path dirs, and treats a missing dir as empty.
+
+**Files changed:** src/codemonkey/checkpoints.py (new), src/codemonkey/tools/base.py
+(_save snapshot hook), src/codemonkey/cli.py (undo command), .gitignore (+.codemonkey/),
+tests/test_checkpoints.py (new, 6 tests).
+
+**Tests:** test_checkpoints 6/6 (prior-content snapshot, byte-identical restore incl.
+binary, chronological ordering, edit_file coverage, no-snapshot for new files, empty
+raises). Suite 183/183. Live probe: model clobbered data.txt via write_file ->
+`codemonkey undo` restored the original three lines byte-identical.
+
+**Next step:** CYCLE 15 — auto-compaction in the loop.

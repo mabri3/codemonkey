@@ -47,6 +47,7 @@ llama.cpp server (<code>http://192.168.50.113:8080/v1</code>,
   <li class="done">Loop 1 acceptance sweep: all 20 spec criteria (A1&ndash;A20) pass live &mdash; incl. full tool loop (A9), live review (A16, 3087 chars + verdict), strategy selectors (A19/A20); robustness fixes: tool-call JSON tolerates trailing special tokens, <code>--approval</code> flag alias, rich sessions contract unified across jsonl/sqlite <span class="badge">LOOP 1 ✓</span></li>
   <li class="done">Parallel tool execution: independent tool calls within one turn run concurrently (ThreadPool), results re-ordered to call order, per-call events, sibling isolation on failure <span class="badge">CYCLE 12</span></li>
   <li class="done">Search/replace patch editing: <code>edit_file</code> accepts SREP blocks (&lt;&lt;&lt;&lt; SEARCH / &gt;&gt;&gt;&gt; REPLACE [ALL]) with exact &rarr; whitespace-tolerant fallback &rarr; near-miss anchor errors; multi-block patches are atomic<span class="badge">CYCLE 13</span></li>
+  <li class="done">Checkpoints / rollback: prior file contents snapshotted before every mutating write; <code>codemonkey undo</code> (and <code>--list</code>) restores byte-identical<span class="badge">CYCLE 14</span></li>
   <li class="done"><code>codemonkey review</code>: LLM review of the repo's uncommitted diff (<code>--base &lt;ref&gt;</code>, <code>--staged</code> variants), read-only reviewer turn, verdict line (&nbsp;APPROVE / APPROVE WITH NITS / CHANGES REQUESTED); reported via A16 live probe when inference is available<span class="badge">CYCLE 8</span></li>
 </ul>
 
