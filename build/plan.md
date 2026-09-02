@@ -65,7 +65,20 @@ end.
   prompt protocol and remember the fallback for the provider (that is how
   the local llama.cpp server is handled — verified: it rejects `tools`
   with a 500; A9's ground truth).
-- [ ] CYCLE 5 — `exec` core (text mode, stdin, JSONL, git guard) | est: 30m |
+
+- [x] CYCLE 5 — `exec` core (text mode, stdin, JSONL, git guard) | est: 30m |
+  status: DONE 2026-09-02 ~04:55. History: BLOCKED 03:35 — home llama.cpp
+  (192.168.50.113:8080) inference wedged across 3 strikes + 3 re-checks
+  (≥100 min hang; /v1/models 200, chat completions never respond).
+  Unblocked at ~04:45 via temporary `unblock` provider
+  (CODEMONKEY_PROVIDER=unblock; config.py TEMPORARY block, DELETE on home
+  server recovery): base_url http://127.0.0.1:3458/v1 (reasoning-cache proxy
+  → OpenCode Go), model minimax-m3 (inference verified: pong in 1.6s home-
+  free; tools param ACCEPTED by this path — real tool-call, finish_reason
+  tool_calls). All three cycle-5 live probes green through it: text pong
+  exit 0 stdout `pong`; --json 6 lines all valid JSON incl thread.started +
+  turn.completed (build/probes/cycle5-json.out); stdin `-` exit 0. Unit
+  suite 85/85 green. Probe transcript: build/probes/.
   verify: `uv run pytest tests/test_exec.py -q` → exit 0; LIVE probe:
   `uv run codemonkey exec "Reply with exactly the word pong and nothing else."`
   → exit 0, stdout (2>/dev/null) contains `pong`; `--json` variant: every

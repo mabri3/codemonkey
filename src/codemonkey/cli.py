@@ -133,6 +133,126 @@ def models(
             typer.echo(n)
 
 
+@app.command()
+def exec(
+    prompt: Annotated[
+        Optional[str],
+        typer.Argument(
+            help="Prompt text, or '-' to read the whole prompt from stdin.",
+        ),
+    ] = None,
+    json_out: Annotated[
+        bool,
+        typer.Option("--json", help="Emit the JSONL event stream on stdout."),
+    ] = False,
+    output_last_message: Annotated[
+        Optional[Path],
+        typer.Option("-o", "--output-last-message", help="Also write the final message to FILE."),
+    ] = None,
+    output_schema: Annotated[
+        Optional[Path],
+        typer.Option("--output-schema", help="JSON Schema file; validate the final response (one retry)."),
+    ] = None,
+    sandbox: Annotated[
+        Optional[str],
+        typer.Option("--sandbox", help="read-only | workspace-write | danger-full-access"),
+    ] = None,
+    ask_for_approval: Annotated[
+        Optional[str],
+        typer.Option("-a", "--ask-for-approval", help="untrusted | on-request | never"),
+    ] = None,
+    provider: Annotated[
+        Optional[str],
+        typer.Option("--provider", help="Provider name from config."),
+    ] = None,
+    model: Annotated[
+        Optional[str],
+        typer.Option("--model", help="Model id override for the active provider."),
+    ] = None,
+    cd: Annotated[
+        Optional[Path],
+        typer.Option("-C", "--cd", help="Working directory for the run."),
+    ] = None,
+    add_dir: Annotated[
+        Optional[list[str]],
+        typer.Option("--add-dir", help="Extra writable roots (repeatable)."),
+    ] = None,
+    skip_git_repo_check: Annotated[
+        bool,
+        typer.Option("--skip-git-repo-check", help="Allow running outside a git repo."),
+    ] = False,
+    ephemeral: Annotated[
+        bool,
+        typer.Option("--ephemeral", help="Do not persist the session."),
+    ] = False,
+    max_turns: Annotated[
+        Optional[int],
+        typer.Option("--max-turns", help="Maximum agent loop turns."),
+    ] = None,
+    timeout: Annotated[
+        Optional[int],
+        typer.Option("--timeout", help="Shell/tool timeout in seconds."),
+    ] = None,
+    dangerously_bypass: Annotated[
+        bool,
+        typer.Option(
+            "--dangerously-bypass-approvals-and-sandbox",
+            help="Lift sandbox + approval policy entirely.",
+        ),
+    ] = False,
+    ignore_user_config: Annotated[
+        bool,
+        typer.Option("--ignore-user-config", help="Skip ~/.codemonkey/config.yaml."),
+    ] = False,
+) -> None:
+    """Non-interactive exec: run the agent once, print the final response.
+
+    stdout (text mode) carries ONLY the final response; diagnostics go to
+    stderr. With --json, stdout carries ONLY the JSONL event stream.
+    """
+    from .exec import ExecUsageError, run_exec
+    from .providers.base import AuthError, ProviderError
+
+    if output_schema is not None:
+        typer.secho(
+            "error: --output-schema is wired in cycle 6 (structured output)",
+            err=True,
+            fg=typer.colors.RED,
+        )
+        raise typer.Exit(2)
+    try:
+        code = run_exec(
+            prompt,
+            json_mode=json_out,
+            cwd=cd,
+            add_dirs=add_dir or [],
+            sandbox=sandbox,
+            approval=ask_for_approval,
+            provider_name=provider,
+            model=model,
+            skip_git_repo_check=skip_git_repo_check,
+            ephemeral=ephemeral,
+            max_turns=max_turns,
+            timeout=timeout,
+            output_last_message=output_last_message,
+            ignore_user_config=ignore_user_config,
+            bypass=dangerously_bypass,
+        )
+    except ExecUsageError as exc:
+        typer.secho(f"error: {exc}", err=True, fg=typer.colors.RED)
+        raise typer.Exit(2) from None
+    except AuthError as exc:
+        typer.secho(f"error: {exc}", err=True, fg=typer.colors.RED)
+        raise typer.Exit(2) from None
+    except ProviderError as exc:
+        typer.secho(f"error: {exc}", err=True, fg=typer.colors.RED)
+        raise typer.Exit(1) from None
+    except KeyboardInterrupt:
+        typer.secho("interrupted", err=True)
+        raise typer.Exit(1) from None
+    raise typer.Exit(code)
+
+
 def main() -> None:  # pragma: no cover - convenience
     app()
 

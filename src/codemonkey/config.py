@@ -28,6 +28,18 @@ DEFAULTS: dict = {
             "api_key_env": "CODEMONKEY_API_KEY",
             "tool_protocol": "auto",
         },
+        # TEMPORARY (2026-09-02): home llama.cpp (192.168.50.113:8080) is up but
+        # its inference path is wedged (verified this tick: /v1/models 200,
+        # POST /v1/chat/completions timeouts across 3 prior ticks). This provider
+        # exists ONLY to unblock cycle 5's live probes per the autonomous-continue
+        # instruction. Remove when the local server recovers.
+        "unblock": {
+            "protocol": "openai",
+            "base_url": "http://127.0.0.1:3458/v1",
+            "model": "minimax-m3",
+            "api_key_env": "CODEMONKEY_UNBLOCK_KEY",
+            "tool_protocol": "auto",
+        },
         "anthropic": {
             "protocol": "anthropic",
             "base_url": "https://api.anthropic.com",

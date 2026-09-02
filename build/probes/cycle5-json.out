@@ -1,0 +1,6 @@
+{"type": "thread.started", "thread_id": "2561e51ac0d6"}
+{"type": "turn.started"}
+{"type": "turn.started"}
+{"type": "turn.completed", "usage": {"prompt_tokens": 1133, "completion_tokens": 33, "total_tokens": 1166, "prompt_tokens_details": {"cached_tokens": 1132}, "completion_tokens_details": {"reasoning_tokens": 29}}}
+{"type": "thread.item.completed", "thread_id": "2561e51ac0d6", "item": {"id": "item_d05c8631", "type": "reasoning", "text": "The user is asking me to reply with exactly the word \"pong\" and nothing else. This is a simple request. I should comply directly."}}
+{"type": "thread.item.completed", "thread_id": "2561e51ac0d6", "item": {"id": "item_a0d90f97", "type": "agent_message", "text": "pong"}}

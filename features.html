@@ -13,6 +13,8 @@
   .next{color:#e3b341} code{background:#161b22;padding:.1rem .35rem;border-radius:4px}
   li.done{list-style:none} li.done::before{content:"\2714  ";color:#7ee2a8}
   li.todo::before{content:"\2610  ";color:#8b949e} li.todo{list-style:none}
+  li.wip{list-style:none} li.wip::before{content:"\25D4  ";color:#e3b341}
+  li.wip .badge{background:#4a3b12;color:#e3b341}
   pre{background:#161b22;padding:.8rem;border-radius:6px;overflow-x:auto}
 </style>
 </head>
@@ -32,6 +34,7 @@ llama.cpp server (<code>http://192.168.50.113:8080/v1</code>,
   <li class="done">Tool protocol: prompt protocol (<code>TOOL_CALL:</code> parser, fence/garbage tolerant) + native extraction (OpenAI <code>tools</code>, Anthropic <code>tool_use</code>, streaming incl. <code>input_json_delta</code>)<span class="badge">CYCLE 4</span></li>
   <li class="done">Agent loop: model → tool calls → sandbox-gated execution → result feedback, max_turns bail, per-turn events<span class="badge">CYCLE 4</span></li>
   <li class="done"><code>tool_protocol: auto</code> catches the llama.cpp <code>tools</code>-parameter HTTP 500 and retries the same turn with the prompt protocol, remembering the fallback per provider (A9 mechanic)<span class="badge">CYCLE 4</span></li>
+  <li class="done"><code>exec</code> core: stdout purity (text mode stdout = final answer only), <code>--json</code> JSONL event stream (<code>thread.started</code>/<code>turn.started</code>/<code>thread.item.*</code>/<code>turn.completed</code>/<code>error</code>), stdin <code>-</code> prompt + piped-stdin context, git-repo guard (exit 2 + <code>--skip-git-repo-check</code> hint), exit codes 0/1/2, <code>-o/--output-last-message</code> tee, streaming deltas to stderr. Live probes green via temporary <code>unblock</code> provider (3458 OpenCode Go proxy, minimax-m3)<span class="badge">CYCLE 5</span></li>
 </ul>
 
 <h2>How to run</h2>
@@ -39,19 +42,25 @@ llama.cpp server (<code>http://192.168.50.113:8080/v1</code>,
 uv run codemonkey --version
 uv run codemonkey config          # effective merged config (secrets masked)
 uv run codemonkey models          # list models from the active provider
-uv run pytest -q                  # unit suite (73 tests, no network)
+uv run pytest -q                  # unit suite (85 tests, no network)
+uv run codemonkey exec "your prompt"          # non-interactive exec (text mode)
+uv run codemonkey exec --json "your prompt"   # JSONL event stream on stdout
+echo "your prompt" | uv run codemonkey exec - # prompt from stdin
+# While the home llama.cpp inference is wedged (2026-09-02), live run:
+CODEMONKEY_PROVIDER=unblock CODEMONKEY_UNBLOCK_KEY=... uv run codemonkey exec "..."
+
 </pre>
 
 <h2>Known limitations</h2>
 <ul>
-  <li><code>exec</code> / <code>review</code> / <code>sessions</code> / REPL commands are not wired yet (cycles 5–9).</li>
+  <li><code>review</code> / <code>sessions</code> / REPL commands are not wired yet (cycles 6–9). <code>--output-schema</code> is a deliberate exit-2 stub until cycle 6.</li>
   <li>Structured output (<code>--output-schema</code>), session persistence, and pluggable strategies land in cycles 6–7.</li>
-  <li>Live-LLM probes require the local llama.cpp server to be up.</li>
+  <li>Live-LLM probes need a live endpoint. 2026-09-02: the home llama.cpp server (192.168.50.113:8080) is reachable but its inference path is wedged &mdash; until it is restarted, live probes run through the temporary <code>unblock</code> provider (<code>CODEMONKEY_PROVIDER=unblock</code>, 127.0.0.1:3458 OpenCode Go proxy, model minimax-m3; needs <code>CODEMONKEY_UNBLOCK_KEY</code>).</li>
 </ul>
 
 <h2>Next planned features</h2>
 <ul>
-  <li class="todo">CYCLE 5 — <code>exec</code> core (text mode, stdin, JSONL event stream, git guard)</li>
+
   <li class="todo">CYCLE 6 — Structured output + sessions/resume</li>
   <li class="todo">CYCLE 7 — Pluggable compaction / memory / session-state strategies</li>
   <li class="todo">CYCLES 8–10 — review + approvals, REPL, loop-1 acceptance sweep (A1–A20)</li>
