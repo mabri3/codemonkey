@@ -700,3 +700,23 @@ fallback; A16 live review 3087 chars + verdict; A9 full tool loop live).
 providers guarded by 6F4 test); cron loop still stale-gateway-blocked.
 
 **Loop 1 complete. Next:** CYCLE 11 — loop 2 research (pick 10x improvements).
+
+## 2026-09-02 — CYCLE 11: Loop 2 research — 10x improvements selected
+
+**Completed:** `build/research-loop2.md` (committed) — 6 capabilities researched via
+live web search with cited URLs (parallel tool calls, search/replace patch editing,
+checkpoints/rollback, token-budget auto-compaction, MCP-style extensions, agentic
+sub-review); ranked by leverage for a local 27B model + headless CLI.
+
+**SELECTED (→ loop2: cycles 12–15 appended to plan.md):**
+1. CYCLE 12 — parallel tool execution
+2. CYCLE 13 — search/replace patch editing
+3. CYCLE 14 — checkpoints/rollback (`codemonkey undo`)
+4. CYCLE 15 — auto-compaction in the loop
+Then CYCLE loop2-final (re-sweep + report section).
+(Not selected: MCP extension points — surface area, not core-loop leverage for a
+small local model; agentic self-review — 2x token cost per headless run.)
+
+**Tests:** n/a (research cycle). Suite remains 164/164.
+
+**Next step:** CYCLE 12 — parallel tool execution.

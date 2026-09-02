@@ -165,7 +165,7 @@ end.
 
 ## Cycle checklist — loop 2 (research + build)
 
-- [ ] CYCLE 11 — Loop 2 research: pick the 10x improvements | est: 30m |
+- [x] CYCLE 11 — Loop 2 research: pick the 10x improvements | est: 30m |
   verify: `build/research-loop2.md` exists (committed) with ≥5 researched
   capabilities (each: name, source URL, why it's high-leverage for a local-
   model coding CLI) and a "SELECTED" section listing ≥3, each mapped to a
@@ -179,6 +179,34 @@ end.
   CYCLE 12.. with `loop2:` tags + exact verify probes. Then the loop keeps
   going cycle by cycle until all loop2 cycles are checked, then CYCLE
   `loop2-final` (acceptance re-sweep A1-A20 + report section, commit).
+
+
+### loop2: cycles (selected from build/research-loop2.md, cycle 11)
+
+- [ ] CYCLE 12 — `loop2:` parallel tool execution (independent calls in one turn run
+  concurrently, results re-ordered; per-call events) | est: 30m |
+  verify: `uv run pytest tests/test_parallel.py -q` → exit 0 (≥4 tests: 3 calls with
+  2 slow ones finish < serial sum; results in call order; per-call events emitted;
+  failure in one call doesn't kill siblings); live A9-style tool probe green; full
+  suite green.
+- [ ] CYCLE 13 — `loop2:` search/replace patch editing (`edit_file` SREP blocks:
+  exact match → whitespace-tolerant fallback → explicit error w/ near-miss anchors;
+  atomic write) | est: 30m |
+  verify: `uv run pytest tests/test_patch_edit.py -q` → exit 0 (≥6 tests incl. exact,
+  fuzzy, no-match error, atomicity on failure, multi-block); live exec edit probe green.
+- [ ] CYCLE 14 — `loop2:` checkpoints/rollback (snapshot before mutating tools;
+  `codemonkey undo [--list]` restores last checkpoint byte-identical) | est: 30m |
+  verify: `uv run pytest tests/test_checkpoints.py -q` → exit 0 (≥5 tests: snapshot
+  on write/edit/shell, restore byte-identical, --list ordering, no-snapshot no-op,
+  checkpoint dir gitignored); live destructive-edit-then-undo probe green.
+- [ ] CYCLE 15 — `loop2:` auto-compaction in the loop (estimate tokens pre-call;
+  trigger strategy maybe_compact; re-inject system prompt post-compaction) | est: 30m |
+  verify: `uv run pytest tests/test_autocompact.py -q` → exit 0 (≥4 tests: trigger on
+  over-budget fake history, under-budget no-op, post-compaction system re-injection,
+  registry-selected strategy honored); suite green.
+- [ ] CYCLE loop2-final — Loop 2 acceptance: full A1–A20 re-sweep + new loop2 probes;
+  BUILD_REPORT loop-2 section | est: 30m |
+  verify: `bash build/acceptance_sweep.sh` all green; report updated; committed.
 
 ## Cycle checklist — loop 3 (research + build)
 
