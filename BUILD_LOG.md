@@ -1149,3 +1149,34 @@ build/critic-loop4.md (new), build/plan.md (19F1 + 22F1 appended), features.html
 
 **Next step:** CYCLE 22F1 — thread `cache_prompt` through the remaining four
 `provider.chat` call sites.
+
+## 2026-09-02 — CYCLE 22F1 (loop4 critic fix): cache_prompt on every call site
+
+Source: `build/critic-loop4.md` findings #5 and #7. CYCLE 22 threaded
+`cache_prompt=prompt_cache` into 3 of the 7 `provider.chat` call sites in
+`run_turns`. The other four fell back to the provider default (`True`) — and
+one of them is the A9 tools-rejection fallback turn, i.e. the path EVERY local
+llama.cpp run takes, so `prompt_cache: false` was silently ignored precisely
+where cycle 22 was aimed. The three schema-retry sites leaked the same way.
+
+**Completed:** all 7 call sites thread the flag; the dead second docstring in
+`run_turns` (which hid the `on_event` / `all_messages` contract from `help()`)
+was folded into the real one.
+
+**Files changed:** src/codemonkey/loop.py, tests/test_prefix_stability.py
+(+4 tests), build/plan.md, features.html, BUILD_LOG.md.
+
+**Tests (literal):** `uv run pytest tests/test_prefix_stability.py -q` →
+**10 passed** (new: with `prompt_cache=False` a tools-rejecting provider records
+`cache_prompt=False` on BOTH the native attempt and the fallback turn; with
+`True` both carry True; the schema-retry turn honors False; a source guard
+asserts `provider.chat(` count == `cache_prompt=prompt_cache` count so a future
+call site cannot forget it). `grep -c "cache_prompt=prompt_cache"
+src/codemonkey/loop.py` → **7**. `uv run pytest -q` → **271 passed, 0 failed**.
+
+**LIVE re-probe (fallback path unchanged):** `build/probes/with_unblock.sh uv
+run codemonkey exec --sandbox workspace-write --approval never "Use the shell
+tool to run: echo codemonkey_22f1. …"` → exit 0, stdout `codemonkey_22f1`.
+
+**Next step:** CYCLE loop4-final (A1–A20 re-sweep + report section) remains
+unchecked; Gate 2 is still open, so it waits on the user.

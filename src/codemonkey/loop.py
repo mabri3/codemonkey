@@ -66,10 +66,11 @@ def run_turns(
     memory_enabled: bool = True,
     prompt_cache: bool = True,
 ) -> ChatTurn:
-    """Run agent turns. `approval` (None disables the gate) is a policy name;
-    `approval_notice_stream` overrides where soft-deny notices go (default:
-    sys.stderr resolved at call time)."""
     """Drive the model until a final text answer or max_turns.
+
+    `approval` (None disables the gate) is a policy name;
+    `approval_notice_stream` overrides where soft-deny notices go (default:
+    sys.stderr resolved at call time).
 
     on_event receives dicts: {type: turn.started}, {type: tool.started, name},
     {type: tool.completed, name, ok}, {type: turn.completed, usage},
@@ -178,7 +179,8 @@ def run_turns(
                               "message": "tools parameter rejected; using prompt protocol"})
                 try:
                     turn = provider.chat(
-                        messages, system=system, stream=stream, on_token=on_token
+                        messages, system=system, stream=stream, on_token=on_token,
+                        cache_prompt=prompt_cache,
                     )
                 except ProviderError as exc2:
                     if on_event:
@@ -243,14 +245,21 @@ def run_turns(
                         on_event({"type": "turn.started"})
                     try:
                         if use_prompt:
-                            retry = provider.chat(messages, system=system, stream=stream, on_token=on_token)
+                            retry = provider.chat(
+                                messages, system=system, stream=stream,
+                                on_token=on_token, cache_prompt=prompt_cache,
+                            )
                         elif native_first:
                             retry = provider.chat(
                                 messages, system=system, stream=stream,
                                 tools=_native_specs(specs), on_token=on_token,
+                                cache_prompt=prompt_cache,
                             )
                         else:
-                            retry = provider.chat(messages, system=system, stream=stream, on_token=on_token)
+                            retry = provider.chat(
+                                messages, system=system, stream=stream,
+                                on_token=on_token, cache_prompt=prompt_cache,
+                            )
                     except ProviderError:
                         retry = None
                         if on_event:

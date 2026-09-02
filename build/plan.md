@@ -486,7 +486,7 @@ map to an A-criterion, a loop selection, or a cited research selection).
   `verify_command="exit 7"` → the `verify.completed` event carries
   `exit_code == 7`; a passing command carries `exit_code == 0`; a timeout
   carries a non-zero code and does not claim 1); `uv run pytest -q` → exit 0.
-- [ ] CYCLE 22F1 — `loop4:` critic fix (build/critic-loop4.md #5, #7): thread
+- [x] CYCLE 22F1 — `loop4:` critic fix (build/critic-loop4.md #5, #7): thread
   `cache_prompt=prompt_cache` through ALL `provider.chat` call sites in
   `run_turns` — the A9 tools-rejection fallback turn and the three schema-retry
   turns currently drop it, so `prompt_cache: false` is ignored on the primary

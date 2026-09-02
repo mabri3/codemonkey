@@ -137,3 +137,85 @@ def test_anthropic_body_unchanged_by_cache_flag(tmp_path, monkeypatch):
 
     src = inspect.getsource(ant)
     assert "cache_prompt" not in src
+
+
+# -- 22F1: cache_prompt must reach EVERY provider.chat call site ---------
+
+
+class RejectsToolsProvider:
+    """openai-protocol provider that rejects the `tools` parameter (A9).
+
+    Records the `cache_prompt` value of every chat call so the fallback turn —
+    the path every local llama.cpp run takes — can be inspected.
+    """
+
+    protocol = "openai"
+
+    def __init__(self):
+        self.cache_flags = []
+        self.native_attempts = 0
+
+    def chat(self, messages, system=None, tools=None, stream=False,
+             on_token=None, cache_prompt=True, **kw):
+        self.cache_flags.append(cache_prompt)
+        if tools is not None:
+            self.native_attempts += 1
+            from codemonkey.providers.base import ProviderError
+
+            raise ProviderError(
+                "HTTP 500 from http://x/v1: unsupported 'tools' parameter",
+                status=500,
+            )
+        return Turn("done")
+
+
+def test_fallback_turn_honors_prompt_cache_false(tmp_path):
+    prov = RejectsToolsProvider()
+    run_turns(prov, "go", _ctx(tmp_path), tool_protocol="auto",
+              max_turns=2, prompt_cache=False)
+    assert prov.native_attempts == 1          # native tried, rejected
+    assert len(prov.cache_flags) == 2         # native attempt + fallback turn
+    assert prov.cache_flags == [False, False]  # neither leaks cache_prompt
+
+
+def test_fallback_turn_carries_prompt_cache_true(tmp_path):
+    prov = RejectsToolsProvider()
+    run_turns(prov, "go", _ctx(tmp_path), tool_protocol="auto",
+              max_turns=2, prompt_cache=True)
+    assert prov.cache_flags == [True, True]
+
+
+class BadJSONThenGood:
+    """Fails schema validation once, so the schema-retry turn is exercised."""
+
+    protocol = "openai"
+
+    def __init__(self):
+        self.calls = 0
+        self.cache_flags = []
+
+    def chat(self, messages, system=None, tools=None, stream=False,
+             on_token=None, cache_prompt=True, **kw):
+        self.calls += 1
+        self.cache_flags.append(cache_prompt)
+        if self.calls == 1:
+            return Turn("not json at all")
+        return Turn('{"answer": "ok"}')
+
+
+def test_schema_retry_turn_honors_prompt_cache_false(tmp_path):
+    prov = BadJSONThenGood()
+    schema = {"type": "object", "required": ["answer"],
+              "properties": {"answer": {"type": "string"}}}
+    run_turns(prov, "go", _ctx(tmp_path), tool_protocol="prompt",
+              max_turns=2, schema=schema, prompt_cache=False)
+    assert prov.calls == 2                      # answer + schema retry
+    assert prov.cache_flags == [False, False]   # the retry does not leak
+
+
+def test_every_chat_call_site_threads_the_flag():
+    """Guard against a new provider.chat call site forgetting the flag."""
+    import pathlib
+
+    src = pathlib.Path("src/codemonkey/loop.py").read_text()
+    assert src.count("provider.chat(") == src.count("cache_prompt=prompt_cache")
