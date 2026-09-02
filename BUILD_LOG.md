@@ -927,3 +927,23 @@ and approved three builds: CYCLE 18 (project-instruction loader), CYCLE 19
 stability), 23 (retry/backoff). plan.md carries [APPROVED-R4]/[PARKED-R4] tags.
 
 **Next step:** CYCLE 18 build.
+
+## 2026-09-02 — CYCLE 18 (loop4): project-instruction loader
+
+**Completed:** `src/codemonkey/instructions.py` — nearest-first discovery from the
+workdir up to the git root (AGENTS.md > CLAUDE.md > .codemonkey/instructions.md;
+nearest directory wins over repo root; walk stops at .git so sibling trees never
+leak in). 32KB cap with an explicit `[truncated at 32KB]` marker. Gates: config
+`project_instructions` (default true) > env `CODEMONKEY_PROJECT_INSTRUCTIONS` >
+CLI `--no-project-instructions`. Merges with memory into ONE stable
+project-context block (`build_project_context_block` — 7F1 groundwork, order:
+instructions then memory; empty inputs produce no block so the prompt stays
+byte-stable otherwise). exec prepends the block to system_extra; CLI flag plumbed.
+
+**Files changed:** src/codemonkey/instructions.py (new), src/codemonkey/exec.py,
+src/codemonkey/config.py (default + env map), src/codemonkey/cli.py (--flag),
+tests/test_instructions.py (new, 10 tests), build/probes/cycle18-instructions.md.
+
+**Tests:** test_instructions 10/10; suite 207/207. LIVE probe: temp repo whose
+AGENTS.md says end replies with "pineapple" -> exec output ends pineapple;
+--no-project-instructions -> no pineapple (both directions on the record).

@@ -392,7 +392,7 @@ map to an A-criterion, a loop selection, or a cited research selection).
 > Parked cycles stay unchecked and are NOT built until the user approves them.
 
 
-- [ ] CYCLE 18 — `loop4:` [APPROVED-R4] project-instruction loader (AGENTS.md → CLAUDE.md →
+- [x] CYCLE 18 — `loop4:` [APPROVED-R4] project-instruction loader (AGENTS.md → CLAUDE.md →
   `.codemonkey/instructions.md`, nearest-first from the workdir up to the repo
   root; 32KB cap with a truncation marker; config `project_instructions: true`
   + `--no-project-instructions`; merged with memory into ONE stable

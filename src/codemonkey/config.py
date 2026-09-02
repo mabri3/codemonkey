@@ -67,6 +67,7 @@ DEFAULTS: dict = {
     "add_dirs": [],
     "web_fetch": False,
     "context_limit": 32000,
+    "project_instructions": True,
     "strategies": {
         "compaction": "summarizing",
         "memory": "file",
@@ -82,6 +83,7 @@ ENV_MAP: dict[str, str] = {
     "CODEMONKEY_MAX_TURNS": "max_turns",
     "CODEMONKEY_TIMEOUT": "timeout_seconds",
     "CODEMONKEY_TIMEOUT_SECONDS": "timeout_seconds",
+    "CODEMONKEY_PROJECT_INSTRUCTIONS": "project_instructions",
     "CODEMONKEY_STRATEGY_COMPACTION": "strategies.compaction",
     "CODEMONKEY_STRATEGY_MEMORY": "strategies.memory",
     "CODEMONKEY_STRATEGY_SESSION_STATE": "strategies.session_state",

@@ -430,6 +430,13 @@ def exec(
             help="Lift sandbox + approval policy entirely.",
         ),
     ] = False,
+    no_project_instructions: Annotated[
+        bool,
+        typer.Option(
+            "--no-project-instructions",
+            help="Skip AGENTS.md/CLAUDE.md project-instruction loading for this run.",
+        ),
+    ] = False,
     ignore_user_config: Annotated[
         bool,
         typer.Option("--ignore-user-config", help="Skip ~/.codemonkey/config.yaml."),
@@ -477,6 +484,7 @@ def exec(
             output_schema=output_schema,
             ignore_user_config=ignore_user_config,
             bypass=dangerously_bypass,
+            project_instructions=(False if no_project_instructions else None),
         )
     except ExecUsageError as exc:
         typer.secho(f"error: {exc}", err=True, fg=typer.colors.RED)

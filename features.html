@@ -54,6 +54,7 @@ llama.cpp server (<code>http://192.168.50.113:8080/v1</code>,
   <li class="done">Self-heal edit retries: failed edit_file results feed back as a corrective re-prompt (one retry default) so the model recovers from bad SEARCH blocks autonomously <span class="badge">CYCLE 16</span></li>
   <li class="done">Observation budget: per-run tool-output ledger with the PARTIAL signal pattern (prefix + [PARTIAL: N chars elided] + continuation hint); native-mode replies carrying prompt-protocol TOOL_CALL text are now bridged back into the tool loop <span class="badge">CYCLE 17</span></li>
   <li class="done">Loop 3 acceptance: all A1&ndash;A20 re-verified green + self-heal &amp; observation-budget probes; <strong>BUILD COMPLETE &mdash; user acceptance (Gate 2) requested</strong> <span class="badge">LOOP 3 ✓</span></li>
+  <li class="done">Project-instruction loader: AGENTS.md &rarr; CLAUDE.md &rarr; .codemonkey/instructions.md (nearest-first to the git root), 32KB cap + marker, config/env/CLI gates, merged with memory into one stable project-context block<span class="badge">CYCLE 18</span></li>
   <li class="done"><code>codemonkey review</code>: LLM review of the repo's uncommitted diff (<code>--base &lt;ref&gt;</code>, <code>--staged</code> variants), read-only reviewer turn, verdict line (&nbsp;APPROVE / APPROVE WITH NITS / CHANGES REQUESTED); reported via A16 live probe when inference is available<span class="badge">CYCLE 8</span></li>
 </ul>
 

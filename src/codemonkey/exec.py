@@ -107,6 +107,7 @@ def run_exec(
     output_schema: Optional[Path] = None,
     ignore_user_config: bool = False,
     bypass: bool = False,
+    project_instructions: Optional[bool] = None,
     stream_deltas: bool = True,
     stdin_cm: Optional[str] = None,  # test/dev override: skip reading sys.stdin
     emit_fn=None,  # override for tests: (event_dict) -> None
@@ -259,6 +260,22 @@ def run_exec(
             f"Working directory: {workdir}. Sandbox: {eff_sandbox}. "
             "Write files only inside the working directory."
         )
+
+    # -- project instructions (loop4, cycle 18) --------------------------
+    # Gate precedence: CLI flag (--no-project-instructions) > env > config
+    # (load_config already applied env). None = no CLI override.
+    pi_enabled = cfg.get("project_instructions", True)
+    if project_instructions is not None:
+        pi_enabled = project_instructions
+    if pi_enabled:
+        from .instructions import build_project_context_block, load_instructions
+
+        instr_text = load_instructions(Path(workdir), enabled=True)
+        if instr_text:
+            block = build_project_context_block(
+                Path(workdir), instructions=instr_text
+            )
+            system_extra = system_extra + "\n\n" + block
 
     # -- session history (resume / new) ----------------------------------
     from . import sessions as sessions_mod
