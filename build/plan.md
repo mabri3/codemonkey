@@ -222,7 +222,7 @@ end.
 
 ### loop3: cycles (selected from build/research-loop3.md, cycle R3)
 
-- [ ] CYCLE 16 — `loop3:` self-heal edit retries (edit/SREP failure with structured
+- [x] CYCLE 16 — `loop3:` self-heal edit retries (edit/SREP failure with structured
   error -> ONE corrective re-prompt turn feeding the failure text back;
   `max_edit_retries`, default 1) | est: 30m |
   verify: `uv run pytest tests/test_selfheal.py -q` → exit 0 (>=4 tests: retry on

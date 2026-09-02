@@ -825,3 +825,20 @@ Then CYCLE loop3-final + REQUEST USER ACCEPTANCE (Gate 2).
 mode — overlaps approvals+checkpoints; streaming partial JSON — headless UX.)
 
 **Next step:** CYCLE 16 — self-heal edit retries.
+
+## 2026-09-02 — CYCLE 16 (loop3): self-heal edit retries
+
+**Completed:** loop.run_turns gains `max_edit_retries` (default 1): when an edit_file
+tool result comes back failed with a structured error (unmatched SEARCH / near-miss
+anchors / ambiguity), the loop schedules ONE corrective turn — a coach user message
+carrying the exact failure text and instructions (re-read via read_file if unsure,
+retry once, else report and stop). Retry counter decrements model-wide; non-edit
+failures never trigger it; events carry a "self-heal" notice.
+
+**Files changed:** src/codemonkey/loop.py, tests/test_selfheal.py (new, 4 tests).
+
+**Tests:** test_selfheal 4/4 (feedback delivered + success, no-retry on success,
+limit respected with single retry, shell failures exempt). Suite 193/193.
+Live probe: forced bad-SEARCH edit → self-heal → correct rename (calc→compute), DONE-RECOVERED.
+
+**Next step:** CYCLE 17 — observation budget for tool outputs.

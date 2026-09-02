@@ -61,6 +61,7 @@ def run_turns(
     approval_notice_stream=None,
     context_limit: Optional[int] = None,
     compaction=None,
+    max_edit_retries: int = 1,
 ) -> ChatTurn:
     """Run agent turns. `approval` (None disables the gate) is a policy name;
     `approval_notice_stream` overrides where soft-deny notices go (default:
@@ -79,6 +80,7 @@ def run_turns(
         system = system_extra + "\n\n" + system
 
     mode = tool_protocol if tool_protocol in ("native", "prompt") else "auto"
+    edit_retries_left = max(0, int(max_edit_retries))
     messages: list[dict] = list(history or [])
     if user_prompt:
         messages.append({"role": "user", "content": user_prompt})
@@ -324,6 +326,7 @@ def run_turns(
             outcomes = [_run_one(0, calls[0])] if calls else []
 
         outcomes.sort(key=lambda o: o[0])  # deterministic call order
+        edit_retry_hint = None
         for idx, name, ok, result_output, meta in outcomes:
             if on_event:
                 ev = {"type": "tool.completed", "name": name, "ok": ok}
@@ -336,6 +339,26 @@ def run_turns(
                     "content": f"TOOL_RESULT {name}:\n{result_output}",
                 }
             )
+            # ---- self-heal edit retries (loop3, cycle 16) ----------------
+            # edit_file failure with a structured error (near-miss anchors /
+            # match counts) is actionable: schedule ONE corrective re-prompt.
+            if (not ok and name == "edit_file"
+                    and edit_retries_left > 0
+                    and result_output.startswith("error:")):
+                edit_retry_hint = (
+                    "Your edit_file call failed with:\n"
+                    f"{result_output}\n"
+                    "Retry ONCE with a corrected SEARCH block: copy the exact "
+                    "current file text for SEARCH (re-read the file with "
+                    "read_file if unsure). If it still fails, report and stop."
+                )
+        if edit_retry_hint is not None:
+            edit_retries_left -= 1
+            messages.append({"role": "user", "content": edit_retry_hint})
+            if on_event:
+                on_event({"type": "notice",
+                          "message": "self-heal: edit failed — retrying with error feedback"})
+            continue
         last_turn = turn
 
     # max_turns bail
