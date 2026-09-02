@@ -62,6 +62,7 @@ def run_turns(
     context_limit: Optional[int] = None,
     compaction=None,
     max_edit_retries: int = 1,
+    observation_budget: int = 24000,
 ) -> ChatTurn:
     """Run agent turns. `approval` (None disables the gate) is a policy name;
     `approval_notice_stream` overrides where soft-deny notices go (default:
@@ -81,6 +82,7 @@ def run_turns(
 
     mode = tool_protocol if tool_protocol in ("native", "prompt") else "auto"
     edit_retries_left = max(0, int(max_edit_retries))
+    obs_spent = 0
     messages: list[dict] = list(history or [])
     if user_prompt:
         messages.append({"role": "user", "content": user_prompt})
@@ -191,6 +193,20 @@ def run_turns(
 
         if on_event:
             on_event({"type": "turn.completed", "usage": turn.usage})
+
+        # loop3 bridge: native call returned TEXT that still looks like prompt-
+        # protocol output (some models wrap tool calls in text even when native
+        # tools are accepted — kimi/3459 emits TOOL_CALL + special tokens). Parse
+        # the prompt protocol from the content so those calls aren't lost.
+        calls = calls or []
+        if (not calls and not use_prompt and turn.content
+                and "TOOL_CALL:" in (turn.content or "")):
+            p_calls, _p_prose = prompt_protocol.parse_tool_calls(turn.content)
+            if p_calls and not any(c.get("error") for c in p_calls):
+                calls = p_calls
+                if on_event:
+                    on_event({"type": "notice",
+                              "message": "native turn carried prompt-protocol tool call(s); parsing them"})
 
         if not calls:
             last_turn = turn
@@ -333,6 +349,24 @@ def run_turns(
                 if meta:
                     ev.update(meta)
                 on_event(ev)
+            # ---- observation budget (loop3, cycle 17) --------------------
+            # Keep the PARTIAL signal pattern: useful prefix + structurally
+            # distinct marker + continuation hint. Ledger shared across the
+            # whole run so 3 fat outputs can't silently evict the task.
+            if observation_budget > 0 and len(result_output) > observation_budget - obs_spent:
+                allowance = max(0, observation_budget - obs_spent)
+                elided = len(result_output) - allowance
+                result_output = (
+                    result_output[:allowance]
+                    + f"\n\n[PARTIAL: {elided} chars elided by the observation budget "
+                    f"({observation_budget} per run) — rerun the tool with narrower args]"
+                )
+                obs_spent = observation_budget
+                if on_event:
+                    on_event({"type": "notice",
+                              "message": f"observation budget: {name} output truncated ({elided} chars elided)"})
+            else:
+                obs_spent += len(result_output)
             messages.append(
                 {
                     "role": "user",

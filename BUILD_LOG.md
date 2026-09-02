@@ -842,3 +842,28 @@ limit respected with single retry, shell failures exempt). Suite 193/193.
 Live probe: forced bad-SEARCH edit → self-heal → correct rename (calc→compute), DONE-RECOVERED.
 
 **Next step:** CYCLE 17 — observation budget for tool outputs.
+
+## 2026-09-02 — CYCLE 17 (loop3): observation budget + native->prompt bridge
+
+**Bonus real bug found & fixed:** in `tool_protocol: auto`, a native-mode reply that
+carries the tool call as TEXT (kimi/3459 wraps TOOL_CALL in content even though the
+server accepts the tools param) was returned to the user as the final answer with the
+tool never executed. The loop now bridges: a native turn with no native tool_calls but
+TOOL_CALL: in the content is re-parsed with the prompt protocol (notice emitted).
+
+**Completed:** loop.run_turns gains `observation_budget` (default 24k chars/run): the
+ledger spans the whole run, so multiple fat outputs share it; over-budget results are
+truncated to the remaining allowance + a `[PARTIAL: N chars elided by the observation
+budget (24000 per run) — rerun the tool with narrower args]` marker (PARTIAL signal
+pattern: prefix + distinct marker + continuation hint); under-budget outputs untouched;
+notice event per truncation. Defense in depth with the cycle-3 MAX_OUTPUT=20000
+per-tool cap (which fires first at default settings).
+
+**Files changed:** src/codemonkey/loop.py (budget ledger + bridge), tests/test_obsbudget.py (new, 4 tests).
+
+**Tests:** test_obsbudget 4/4 (marker on over-budget, under-budget untouched, elided
+count reported, shared ledger across calls). Suite 197/197. Live: seq-1-20000 exec run
+ends BUDGET-OK (tool cap first at 24k default; bridge notice fired; PARTIAL verified at
+5k budget in-process).
+
+**Next step:** CYCLE loop3-final — full re-sweep + final report + USER ACCEPTANCE (Gate 2).

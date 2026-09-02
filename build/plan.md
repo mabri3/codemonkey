@@ -228,7 +228,7 @@ end.
   verify: `uv run pytest tests/test_selfheal.py -q` → exit 0 (>=4 tests: retry on
   failure consults anchors, success-after-retry transcript, no-retry when ok,
   retry limit respected); suite green; live EDL probe (fuzzy-edit then self-heal).
-- [ ] CYCLE 17 — `loop3:` observation budget for tool outputs (per-run budget,
+- [x] CYCLE 17 — `loop3:` observation budget for tool outputs (per-run budget,
   default 24k chars; over-budget -> prefix + [PARTIAL: N chars elided] marker;
   per-call accounting) | est: 30m |
   verify: `uv run pytest tests/test_obsbudget.py -q` → exit 0 (>=4 tests: budget
