@@ -323,8 +323,9 @@ def test_unknown_tool_is_soft_error(ws):
     assert not r.ok and "unknown tool" in r.output
 
 
-def test_registry_has_all_nine():
+def test_registry_has_all_ten():
+    # cycle 20 (loop4) added repo_map
     assert set(names()) == {
         "read_file", "write_file", "edit_file", "list_dir",
-        "glob", "search", "shell", "update_plan", "web_fetch",
+        "glob", "search", "shell", "update_plan", "web_fetch", "repo_map",
     }

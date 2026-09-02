@@ -966,3 +966,25 @@ tests/test_verify_gate.py (new, 6 tests), build/probes/cycle19-live.sh (committe
 passing adds no turn; retry cap exactly 2; fat output budget-charged; event order).
 Suite 213/213. LIVE: model broke calc.py per instruction -> pytest verify FAILED ->
 corrective turn repaired it -> suite passing, GATE-OK (transcript probe committed).
+
+## 2026-09-02 — CYCLE 20 (loop4): repo map part 1 — def-scan + cache + tool
+
+**Completed:** `src/codemonkey/repomap.py` — dependency-free symbol scan for
+py/js/ts/tsx/jsx/go/rs/java/rb (def/class/func/const-arrow/struct/method) with
+1-based line numbers; mtime+size cache at .codemonkey/repomap.json (unchanged
+files skip the scanner entirely; a touch invalidates only that file); ignore
+dirs (.git/.venv/node_modules/__pycache__/.codemonkey/dist/build); deterministic
+`limit` truncation counting symbol entries; binary/unreadable files skipped.
+`repo_map` tool registered (read-only set), spec string added; format: file ->
+L<line> kind symbol.
+
+**Files changed:** src/codemonkey/repomap.py (new), src/codemonkey/tools/repo_map.py (new),
+src/codemonkey/tools/__init__.py (registry), src/codemonkey/sandbox.py (read set),
+tests/test_repomap.py (new, 9 tests), tests/test_tools.py (registry now ten),
+build/probes/cycle20-repomap.md.
+
+**Tests:** test_repomap 9/9; suite 222/222. LIVE: exec answered protocol.py
+correctly; in-process forced tool use: repo_map executed, result delivered
+with protocol.py symbols. (Registry test renamed to all_ten for the new tool.)
+
+**Next step:** loop4 part 2 cycles (21-23) remain PARKED pending user approval.

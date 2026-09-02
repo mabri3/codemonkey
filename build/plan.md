@@ -421,7 +421,7 @@ map to an A-criterion, a loop selection, or a cited research selection).
   breaks it, `verify_command="uv run pytest -q"` → run ends with the test
   suite passing (verify.completed ok=true in the `--json` stream); transcript
   to `build/probes/`.
-- [ ] CYCLE 20 — `loop4:` [APPROVED-R4] repo map, part 1: `repomap.py` dependency-free
+- [x] CYCLE 20 — `loop4:` [APPROVED-R4] repo map, part 1: `repomap.py` dependency-free
   def-scan (py/js/ts/go/rs/java/rb) producing file → [symbol, kind, line]
   entries; cache at `.codemonkey/repomap.json` keyed by path+mtime+size;
   skips `.git`, `.venv`, `node_modules`, `__pycache__`; new `repo_map` tool
