@@ -189,7 +189,7 @@ end.
   2 slow ones finish < serial sum; results in call order; per-call events emitted;
   failure in one call doesn't kill siblings); live A9-style tool probe green; full
   suite green.
-- [ ] CYCLE 13 — `loop2:` search/replace patch editing (`edit_file` SREP blocks:
+- [x] CYCLE 13 — `loop2:` search/replace patch editing (`edit_file` SREP blocks:
   exact match → whitespace-tolerant fallback → explicit error w/ near-miss anchors;
   atomic write) | est: 30m |
   verify: `uv run pytest tests/test_patch_edit.py -q` → exit 0 (≥6 tests incl. exact,

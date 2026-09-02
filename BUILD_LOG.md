@@ -736,3 +736,24 @@ per-call events, sibling-survives-failure, single-call path). Suite 169/169.
 Live probe: one-turn 3x shell calls -> "alpha beta gamma" in order via unblock2.
 
 **Next step:** CYCLE 13 — search/replace patch editing.
+
+## 2026-09-02 — CYCLE 13 (loop2): search/replace patch editing
+
+**Completed:** edit_file now accepts SREP patch blocks (<<<< SEARCH / >>>> REPLACE
+[ALL]) in addition to the classic old_string/new_string form. Per block matching:
+exact -> whitespace-tolerant fuzzy (strip + internal-whitespace-normalized compare,
+anchored on the first normalized line) -> explicit error with near-miss anchor line
+numbers. MULTI-BLOCK PATCHES ARE ATOMIC: any failed block aborts with the file
+untouched (no torn intermediate). Classic form keeps its cycle-3 contract wording
+("replaced N occurrence(s)") and gains the same fuzzy fallback.
+
+**Fixes during cycle:** anchor gate normalized inner-whitespace before comparing
+("def  spaced():" vs "def spaced():"); REPLACE-ALL block newline capture normalized.
+
+**Files changed:** src/codemonkey/tools/edit_file.py (rewritten), tests/test_patch_edit.py
+(new, 8 tests).
+
+**Tests:** test_patch_edit 8/8; tools suite 38/38; full suite 177/177. Live probe:
+fresh temp repo, model applied the SREP patch to app.py (old_fn/v1 -> new_fn/v2, DONE).
+
+**Next step:** CYCLE 14 — checkpoints/rollback.
