@@ -210,7 +210,7 @@ end.
 
 ## Cycle checklist — loop 3 (research + build)
 
-- [ ] CYCLE R3 — Loop 3 research: pick the next 10x improvements | est: 30m |
+- [x] CYCLE R3 — Loop 3 research: pick the next 10x improvements | est: 30m |
   verify: `build/research-loop3.md` committed (same shape as cycle 11);
   `loop3:`-tagged cycles appended; then built cycle-by-cycle until checked,
   then CYCLE `loop3-final`: full acceptance re-sweep A1-A20 (+ any new
