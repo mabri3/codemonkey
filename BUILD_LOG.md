@@ -646,3 +646,34 @@ inference returns.)
 **Known issues:** A16 pending live provider (see above); ASK path awaiting REPL (cycle 9).
 
 **Next step:** CYCLE 9 — interactive REPL + flag wiring + polish.
+
+## 2026-09-02 — CYCLE 9: interactive REPL + flag wiring + polish
+
+**Completed:**
+- `src/codemonkey/repl.py` — `codemonkey` with no subcommand opens the REPL:
+  interactive input() loop or piped-stdin mode (cycle-9 probe path); streaming
+  deltas go to STDERR, final message to STDOUT (stdout stays clean); slash
+  commands `/quit /exit /clear /model /provider /usage /sessions /help`;
+  reasoning blocks (`<think>…</think>`, Kimi reasoning field tolerated) hidden
+  by default, `--show-reasoning` reveals; provider errors keep the session
+  alive (notice on stderr, history un-polluted).
+- Root callback (`invoke_without_command`) with the full flag set wired into
+  config: `--provider/-p --model/-m --sandbox --ask-for-approval/-a
+  --add-dir/-C (repeatable) --max-turns --timeout --ignore-user-config
+  --dangerously-bypass-approvals-and-sandbox --show-reasoning --ephemeral`.
+- TEMPORARY `unblock2` provider added to defaults (127.0.0.1:3459, kimi-k2.7-code,
+  key via CODEMONKEY_UNBLOCK2_KEY env only) — same removal contract as `unblock`;
+  home llama.cpp still wedged. No secret touches the repo (key injected per-process).
+
+**Files changed:** `src/codemonkey/repl.py` (new), `src/codemonkey/cli.py` (REPL
+entry + flags), `src/codemonkey/config.py` (unblock2), `tests/test_repl.py` (new, 12 tests).
+
+**Tests:** `uv run pytest -q` -> 164 passed (was 152). LIVE cycle-9 probe:
+`printf 'Reply with exactly: fig\n/quit\n' | CODEMONKEY_PROVIDER=unblock2
+CODEMONKEY_UNBLOCK2_KEY=$KEY codemonkey` -> exit 0, stdout `fig` (deltas on stderr
+confirmed separately). `codemonkey --help` lists exec/review/sessions/config/models.
+
+**Known issues:** `unblock`/`unblock2` TEMPORARY providers pending home-server
+recovery (6F4 guard test enforces removal); A16 live review re-probe still earned.
+
+**Next step:** CYCLE 10 — Loop 1 final acceptance sweep (A1-A20).

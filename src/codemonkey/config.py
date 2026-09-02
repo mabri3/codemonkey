@@ -40,6 +40,17 @@ DEFAULTS: dict = {
             "api_key_env": "CODEMONKEY_UNBLOCK_KEY",
             "tool_protocol": "auto",
         },
+        # TEMPORARY (2026-09-02): second unblock provider — keyless /v1/models,
+        # requires Bearer key via CODEMONKEY_UNBLOCK2_KEY for chat. Used for the
+        # cycle-9 live probes while home llama.cpp is wedged. Same removal
+        # contract as the 3458 `unblock` provider (guard test 6F4 pattern).
+        "unblock2": {
+            "protocol": "openai",
+            "base_url": "http://127.0.0.1:3459/v1",
+            "model": "kimi-k2.7-code",
+            "api_key_env": "CODEMONKEY_UNBLOCK2_KEY",
+            "tool_protocol": "auto",
+        },
         "anthropic": {
             "protocol": "anthropic",
             "base_url": "https://api.anthropic.com",

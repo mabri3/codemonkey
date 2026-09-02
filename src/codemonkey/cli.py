@@ -26,8 +26,9 @@ def _version_callback(value: bool) -> None:
         raise typer.Exit(0)
 
 
-@app.callback()
+@app.callback(invoke_without_command=True)
 def _callback(
+    ctx: typer.Context,
     version: Annotated[
         bool,
         typer.Option(
@@ -37,8 +38,90 @@ def _callback(
             is_eager=True,
         ),
     ] = False,
+    provider: Annotated[
+        str,
+        typer.Option("--provider", "-p", help="Provider for the interactive session."),
+    ] = "",
+    model: Annotated[
+        str,
+        typer.Option("--model", "-m", help="Model override for the interactive session."),
+    ] = "",
+    sandbox: Annotated[
+        str,
+        typer.Option("--sandbox", help="Sandbox level for the session (read-only | workspace-write | danger-full-access)."),
+    ] = "",
+    approval: Annotated[
+        str,
+        typer.Option("--ask-for-approval", "-a", help="Approval policy (untrusted | on-request | never)."),
+    ] = "",
+    add_dir: Annotated[
+        list[str],
+        typer.Option("--add-dir", "-C", help="Additional writable directory (repeatable)."),
+    ] = [],
+    max_turns: Annotated[
+        int,
+        typer.Option("--max-turns", help="Max agent turns per prompt."),
+    ] = 0,
+    timeout: Annotated[
+        int,
+        typer.Option("--timeout", help="Per-tool timeout seconds."),
+    ] = 0,
+    ignore_user_config: Annotated[
+        bool,
+        typer.Option("--ignore-user-config", help="Skip ~/.codemonkey/config.yaml."),
+    ] = False,
+    bypass: Annotated[
+        bool,
+        typer.Option(
+            "--dangerously-bypass-approvals-and-sandbox",
+            help="Lift the sandbox and approval gates entirely.",
+        ),
+    ] = False,
+    show_reasoning: Annotated[
+        bool,
+        typer.Option("--show-reasoning", help="Print model reasoning blocks in the REPL."),
+    ] = False,
+    ephemeral: Annotated[
+        bool,
+        typer.Option("--ephemeral", help="Do not persist this session."),
+    ] = False,
 ) -> None:
-    """codemonkey CLI."""
+    """codemonkey CLI. Run with no subcommand for the interactive REPL."""
+    if ctx.invoked_subcommand is None:
+        overrides = {}
+        if max_turns:
+            overrides["max_turns"] = max_turns
+        if timeout:
+            overrides["timeout_seconds"] = timeout
+        if add_dir:
+            overrides["add_dirs"] = list(add_dir)
+        from .config import ConfigError, load_config
+
+        try:
+            cfg = load_config(
+                cwd=Path.cwd(),
+                overrides=overrides or None,
+                ignore_user_config=ignore_user_config,
+            )
+        except ConfigError as exc:
+            typer.secho(f"error: {exc}", err=True, fg=typer.colors.RED)
+            raise typer.Exit(2) from None
+        if model:
+            cfg.setdefault("providers", {}).setdefault(
+                provider or cfg.get("default_provider", "local"), {}
+            )["model"] = model
+        from .repl import run_repl
+
+        code = run_repl(
+            cfg,
+            provider_name=provider,
+            show_reasoning=show_reasoning,
+            approval=approval,
+            sandbox=sandbox,
+            bypass=bypass,
+            ephemeral=ephemeral,
+        )
+        raise typer.Exit(code)
 
 
 def _cfg() -> dict:

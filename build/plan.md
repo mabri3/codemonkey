@@ -145,7 +145,7 @@ end.
   prompt; `approvals.py` — policy evaluation + soft-deny (stderr notice:
   tool + how to allow), interactive prompt path for REPL; `update_plan` +
   `web_fetch` tools (config `web_fetch: true`, bounded GET 60s/512KB).
-- [ ] CYCLE 9 — Interactive REPL + flag wiring + polish | est: 30m |
+- [x] CYCLE 9 — Interactive REPL + flag wiring + polish | est: 30m |
   verify: `printf 'Reply with exactly: fig\n/quit\n' | uv run codemonkey` →
   exit 0, stdout contains `fig`; `uv run codemonkey --help` → exit 0, lists
   exec/review/sessions/config/models; full suite `uv run pytest -q` → exit 0.
