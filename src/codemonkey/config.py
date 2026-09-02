@@ -74,6 +74,7 @@ DEFAULTS: dict = {
     "observation_budget": 24000,
     "repo_map": False,
     "repo_map_budget": 4000,
+    "max_retries": 3,
     "prompt_cache": True,
     "strategies": {
         "compaction": "summarizing",
@@ -97,8 +98,7 @@ ENV_MAP: dict[str, str] = {
     "CODEMONKEY_OBSERVATION_BUDGET": "observation_budget",
     "CODEMONKEY_REPO_MAP": "repo_map",
     "CODEMONKEY_REPO_MAP_BUDGET": "repo_map_budget",
-    "CODEMONKEY_REPO_MAP": "repo_map",
-    "CODEMONKEY_REPO_MAP_BUDGET": "repo_map_budget",
+    "CODEMONKEY_MAX_RETRIES": "max_retries",
     "CODEMONKEY_STRATEGY_COMPACTION": "strategies.compaction",
     "CODEMONKEY_STRATEGY_MEMORY": "strategies.memory",
     "CODEMONKEY_STRATEGY_SESSION_STATE": "strategies.session_state",

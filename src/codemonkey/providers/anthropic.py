@@ -12,6 +12,7 @@ from typing import Optional
 
 import httpx
 
+from .. import retry
 from .base import AuthError, ChatTurn, ProviderBase, ProviderError
 
 ANTHROPIC_VERSION = "2023-06-01"
@@ -37,12 +38,14 @@ class AnthropicProvider(ProviderBase):
         api_key: Optional[str] = None,
         timeout: float = 300.0,
         client: Optional[httpx.Client] = None,
+        max_retries: int = 3,
     ):
         self.base_url = base_url.rstrip("/")
         self.model = model
         self.api_key = api_key
         self.timeout = timeout
         self._client = client or httpx.Client(timeout=timeout)
+        self.max_retries = max(0, int(max_retries))
         self._owns_client = client is None
 
     def _messages(self, messages: list, system: Optional[str]) -> tuple[list, Optional[str]]:
@@ -87,41 +90,50 @@ class AnthropicProvider(ProviderBase):
         return body
 
     def _post(self, body: dict, stream: bool = False):
+        """POST /v1/messages with the shared retry policy.
+
+        Streaming retries on the response STATUS only: once the body is being
+        consumed a retry would duplicate tokens."""
         url = f"{self.base_url}/v1/messages"
         headers = _headers(self.api_key)
-        try:
-            if stream:
-                req = self._client.build_request(
-                    "POST", url, json=body, headers=headers
-                )
-                resp = self._client.send(req, stream=True)
-                if resp.status_code in (401, 403):
-                    resp.read()
-                    raise AuthError(
-                        f"auth failed ({resp.status_code}) from {url}: {resp.read()[:200]}",
-                        status=resp.status_code,
-                    )
-                if resp.status_code >= 400:
-                    resp.read()
-                    raise ProviderError(
-                        f"HTTP {resp.status_code} from {url}: {resp.read()[:300]}",
-                        status=resp.status_code,
-                    )
-                return ("stream", resp)
-            resp = self._client.post(url, json=body, headers=headers)
-            if resp.status_code in (401, 403):
-                raise AuthError(
-                    f"auth failed ({resp.status_code}) from {url}: {resp.text[:200]}",
-                    status=resp.status_code,
-                )
+        attempts = retry.attempts_for(self.max_retries)
+        last: ProviderError | None = None
+        for attempt in range(1, attempts + 1):
+            try:
+                if stream:
+                    req = self._client.build_request("POST", url, json=body, headers=headers)
+                    resp = self._client.send(req, stream=True)
+                else:
+                    resp = self._client.post(url, json=body, headers=headers)
+            except httpx.HTTPError as exc:
+                last = ProviderError(f"transport error contacting {url}: {exc}")
+                if retry.backoff_transport(attempt=attempt, attempts=attempts):
+                    continue
+                raise retry.annotate(last, attempt) from exc
+
             if resp.status_code >= 400:
-                raise ProviderError(
-                    f"HTTP {resp.status_code} from {url}: {resp.text[:300]}",
+                if stream:
+                    resp.read()
+                text = resp.text[:300]
+                if resp.status_code in (401, 403):
+                    raise AuthError(
+                        f"auth failed ({resp.status_code}) from {url}: {text[:200]}",
+                        status=resp.status_code,
+                    )
+                last = ProviderError(
+                    f"HTTP {resp.status_code} from {url}: {text}",
                     status=resp.status_code,
                 )
-            return ("json", resp)
-        except httpx.HTTPError as exc:
-            raise ProviderError(f"transport error contacting {url}: {exc}") from exc
+                if retry.backoff_http(
+                    attempt=attempt, attempts=attempts,
+                    status=resp.status_code, text=text, headers=getattr(resp, "headers", None),
+                ):
+                    if stream:
+                        resp.close()
+                    continue
+                raise retry.annotate(last, attempt)
+            return ("stream", resp) if stream else ("json", resp)
+        raise retry.annotate(last or ProviderError(f"no response from {url}"), attempts)
 
     @staticmethod
     def _block_text(block: dict) -> str:

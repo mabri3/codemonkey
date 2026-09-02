@@ -464,7 +464,7 @@ map to an A-criterion, a loop selection, or a cited research selection).
   (best-effort, BLOCKED-tolerant): two identical-prefix runs against the
   active provider, record both wall-clock times raw in `build/probes/` — no
   claim is made if the numbers do not separate.
-- [ ] CYCLE 23 — `loop4:` provider resilience: retry with exponential backoff
+- [x] CYCLE 23 — `loop4:` provider resilience: retry with exponential backoff
   + full jitter honoring `Retry-After` on 429/502/503/504/529 and on 500s that
   are NOT the tools-parameter rejection; `max_retries` (default 3, config +
   `CODEMONKEY_MAX_RETRIES`); `AuthError` never retried | est: 30m |

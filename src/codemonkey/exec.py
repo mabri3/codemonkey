@@ -85,6 +85,7 @@ def _provider_from_config(cfg: dict, provider_name: Optional[str], model: Option
         model=pconf.get("model", ""),
         api_key=key,
         timeout=float(cfg.get("timeout_seconds", 300)),
+        max_retries=int(cfg.get("max_retries", 3) or 0),
     )
 
 

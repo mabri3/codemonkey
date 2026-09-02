@@ -12,6 +12,7 @@ from typing import Optional
 
 import httpx
 
+from .. import retry
 from .base import (
     AuthError,
     ChatTurn,
@@ -73,12 +74,14 @@ class OpenAIProvider(ProviderBase):
         api_key: Optional[str] = None,
         timeout: float = 300.0,
         client: Optional[httpx.Client] = None,
+        max_retries: int = 3,
     ):
         self.base_url = base_url.rstrip("/")
         self.model = model
         self.api_key = api_key
         self.timeout = timeout
         self._client = client or httpx.Client(timeout=timeout)
+        self.max_retries = max(0, int(max_retries))
         self._owns_client = client is None
 
     # -- low-level -----------------------------------------------------
@@ -92,57 +95,92 @@ class OpenAIProvider(ProviderBase):
 
     def _request(self, path: str, body: dict) -> dict:
         url = self._url(path)
-        try:
-            resp = self._client.post(url, json=body, headers=_auth_headers(self.api_key))
-        except httpx.HTTPError as exc:
-            raise ProviderError(f"transport error contacting {url}: {exc}") from exc
-        if resp.status_code in (401, 403):
-            raise AuthError(
-                f"auth failed ({resp.status_code}) from {url}: {resp.text[:200]}",
-                status=resp.status_code,
-            )
-        if resp.status_code >= 400:
-            raise ProviderError(
-                f"HTTP {resp.status_code} from {url}: {resp.text[:300]}",
-                status=resp.status_code,
-            )
-        return resp.json()
+        attempts = retry.attempts_for(self.max_retries)
+        last: ProviderError | None = None
+        for attempt in range(1, attempts + 1):
+            try:
+                resp = self._client.post(url, json=body, headers=_auth_headers(self.api_key))
+            except httpx.HTTPError as exc:
+                last = ProviderError(f"transport error contacting {url}: {exc}")
+                if retry.backoff_transport(attempt=attempt, attempts=attempts):
+                    continue
+                raise retry.annotate(last, attempt) from exc
+            if resp.status_code in (401, 403):
+                raise AuthError(
+                    f"auth failed ({resp.status_code}) from {url}: {resp.text[:200]}",
+                    status=resp.status_code,
+                )
+            if resp.status_code >= 400:
+                text = resp.text[:300]
+                last = ProviderError(
+                    f"HTTP {resp.status_code} from {url}: {text}",
+                    status=resp.status_code,
+                )
+                if retry.backoff_http(
+                    attempt=attempt, attempts=attempts,
+                    status=resp.status_code, text=text, headers=getattr(resp, "headers", None),
+                ):
+                    continue
+                raise retry.annotate(last, attempt)
+            return resp.json()
+        raise retry.annotate(last or ProviderError(f"no response from {url}"), attempts)
 
     def _request_stream(self, path: str, body: dict) -> list[dict]:
+        """Streaming request. Retries apply to the response STATUS only —
+        once bytes have been handed to the caller a retry would duplicate
+        tokens, so a mid-stream transport failure propagates."""
         url = self._url(path)
         body = dict(body)
         body["stream"] = True
-        try:
-            with self._client.stream(
-                "POST", url, json=body, headers=_auth_headers(self.api_key)
-            ) as resp:
-                if resp.status_code in (401, 403):
-                    resp.read()
-                    raise AuthError(
-                        f"auth failed ({resp.status_code}) from {url}: {resp.read()[:200]}",
-                        status=resp.status_code,
-                    )
-                if resp.status_code >= 400:
-                    resp.read()
-                    raise ProviderError(
-                        f"HTTP {resp.status_code} from {url}: {resp.read()[:300]}",
-                        status=resp.status_code,
-                    )
-                events: list[dict] = []
-                for line in resp.iter_lines():
-                    line = line.strip()
-                    if not line.startswith("data:"):
-                        continue
-                    payload = line[len("data:"):].strip()
-                    if not payload or payload == "[DONE]":
-                        continue
-                    try:
-                        events.append(json.loads(payload))
-                    except json.JSONDecodeError:
-                        continue
-                return events
-        except httpx.HTTPError as exc:
-            raise ProviderError(f"transport error contacting {url}: {exc}") from exc
+        attempts = retry.attempts_for(self.max_retries)
+        last: ProviderError | None = None
+        for attempt in range(1, attempts + 1):
+            started = False
+            try:
+                with self._client.stream(
+                    "POST", url, json=body, headers=_auth_headers(self.api_key)
+                ) as resp:
+                    if resp.status_code in (401, 403):
+                        resp.read()
+                        raise AuthError(
+                            f"auth failed ({resp.status_code}) from {url}: {resp.text[:200]}",
+                            status=resp.status_code,
+                        )
+                    if resp.status_code >= 400:
+                        resp.read()
+                        text = resp.text[:300]
+                        last = ProviderError(
+                            f"HTTP {resp.status_code} from {url}: {text}",
+                            status=resp.status_code,
+                        )
+                        if retry.backoff_http(
+                            attempt=attempt, attempts=attempts,
+                            status=resp.status_code, text=text, headers=getattr(resp, "headers", None),
+                        ):
+                            continue
+                        raise retry.annotate(last, attempt)
+                    started = True
+                    events: list[dict] = []
+                    for line in resp.iter_lines():
+                        line = line.strip()
+                        if not line.startswith("data:"):
+                            continue
+                        payload = line[len("data:"):].strip()
+                        if not payload or payload == "[DONE]":
+                            continue
+                        try:
+                            events.append(json.loads(payload))
+                        except json.JSONDecodeError:
+                            continue
+                    return events
+            except httpx.HTTPError as exc:
+                last = ProviderError(f"transport error contacting {url}: {exc}")
+                if not started and retry.backoff_transport(
+                    attempt=attempt, attempts=attempts
+                ):
+                    continue
+                raise retry.annotate(last, attempt) from exc
+        raise retry.annotate(last or ProviderError(f"no response from {url}"), attempts)
 
     # -- interface -----------------------------------------------------
 

@@ -21,16 +21,17 @@ def build_provider(
     api_key: Optional[str] = None,
     timeout: float = 300.0,
     client=None,
+    max_retries: int = 3,
 ) -> ProviderBase:
     proto = (protocol or "openai").lower()
+    kwargs = dict(
+        base_url=base_url, model=model, api_key=api_key,
+        timeout=timeout, client=client, max_retries=max_retries,
+    )
     if proto == "openai":
-        return OpenAIProvider(
-            base_url=base_url, model=model, api_key=api_key, timeout=timeout, client=client
-        )
+        return OpenAIProvider(**kwargs)
     if proto == "anthropic":
-        return AnthropicProvider(
-            base_url=base_url, model=model, api_key=api_key, timeout=timeout, client=client
-        )
+        return AnthropicProvider(**kwargs)
     raise ValueError(f"unknown protocol '{protocol}' (openai | anthropic)")
 
 

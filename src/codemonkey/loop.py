@@ -13,15 +13,13 @@
 
 from __future__ import annotations
 
-import re
 from typing import Callable, Optional
 
 from . import protocol as prompt_protocol
 from . import tools as tool_registry
 from .providers.base import ChatTurn, ProviderBase, ProviderError
+from .retry import TOOLS_RE as _TOOLS_RE
 from .sandbox import ToolContext
-
-_TOOLS_RE = re.compile(r"(?i)tools")
 
 
 class FallbackRecorded:

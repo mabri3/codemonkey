@@ -1,0 +1,6 @@
+[usage] prompt=2414 completion=52
+$ 
+[exit None] 
+codemonkey_tool_test[usage] prompt=2474 completion=79
+[agent] codemonkey_tool_test
+

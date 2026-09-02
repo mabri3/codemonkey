@@ -1072,3 +1072,59 @@ kwarg), build/probes/cycle22-live.sh + cycle22-timings.txt + cycle22-prefix.md.
 
 **Tests:** test_prefix_stability 6/6. Suite 245/245. LIVE best-effort timings
 recorded raw (2s/1s/1s/1s — no performance claim, per probe spec).
+
+## 2026-09-02 — CYCLE 23 (loop4): provider resilience — retry + backoff
+
+Recovery note: this tick started with uncommitted CYCLE-23 work (a partial
+`retry.py` + tests wired into the openai non-streaming path only). Per the
+uncommitted-work rule it was finished rather than re-implemented, and its
+review found four real defects, all fixed here before the commit:
+
+1. **The default exec path had no retry at all.** `exec` runs with
+   `stream_deltas=True`, so live turns go through `_request_stream`, which the
+   partial work left untouched. Retry now wraps the streaming status check too
+   (status only — replaying after tokens were emitted would duplicate output).
+2. **`max_retries` never reached the anthropic provider.** `build_provider`
+   set the attribute post-construction on the openai branch alone; both
+   providers now take `max_retries` as a constructor parameter and
+   `AnthropicProvider._post` runs the same policy.
+3. **Transport errors were not retried** — a connection reset, the most likely
+   flake against a local server, failed the run on the first try.
+4. **Duplicated tools-rejection regex.** `loop._TOOLS_RE` and
+   `retry._TOOLS_RE` were separate copies; if they drifted, a tools-500 would
+   be retried by one classifier and treated as a fallback trigger by the other.
+   `loop.py` now imports `TOOLS_RE` from `retry.py` (single source of truth).
+   Also removed a duplicated 3-line block in `config.ENV_MAP`, and made the
+   exhaustion error carry the attempt count the probe asks for.
+
+**Completed:** `retry.py` — `should_retry` (429/500/502/503/504/529, tools-500
+excluded), `sleep_delay` (full jitter, base 0.5s, cap 20s, `Retry-After`
+honored exactly), `parse_retry_after`, and the shared driver
+(`attempts_for` / `backoff_http` / `backoff_transport` / `annotate`) used by
+every provider request path. `max_retries` (default 3) in config + `ENV_MAP`
+(`CODEMONKEY_MAX_RETRIES`), threaded exec → `build_provider` → both providers.
+`AuthError` and the tools-parameter 500 are never retried, so A9's prompt
+fallback is untouched.
+
+**Files changed:** src/codemonkey/retry.py (new), src/codemonkey/providers/openai.py,
+src/codemonkey/providers/anthropic.py, src/codemonkey/providers/__init__.py,
+src/codemonkey/loop.py, src/codemonkey/config.py, src/codemonkey/exec.py,
+tests/test_retry.py (new, 19 tests), features.html (CYCLE 23 badge; retired the
+stale 7F1/17F1/loop-4 limitation entries), build/probes/cycle23-retry.md,
+build/probes/cycle23-a9-live.err.
+
+**Tests (literal):** `uv run pytest tests/test_retry.py -q` → **19 passed**
+(probe requires ≥6). `uv run pytest -q` → **264 passed, 0 failed**.
+A18 docs guard: `uv run codemonkey --help` lists exec/review/sessions/config/models.
+
+**LIVE A9 re-probe:** `build/probes/with_unblock.sh uv run codemonkey exec
+--sandbox workspace-write --approval never "Use the shell tool to run: echo
+codemonkey_tool_test. …"` → exit 0, stdout `codemonkey_tool_test`. Home
+llama.cpp still unreachable (curl /v1/models → 000); probe run through the
+`unblock` provider, as recorded in build/probes/cycle23-retry.md.
+
+**Known issues:** streaming retries cover the response status only;
+`Retry-After` HTTP-date form falls back to jittered backoff.
+
+**Next step:** CYCLE loop4-final — full A1–A20 re-sweep + BUILD_REPORT loop-4
+section. Then CYCLE R5 (loop-5 research), which ends by asking the user.
