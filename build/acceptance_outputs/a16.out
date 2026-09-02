@@ -1,62 +1,137 @@
-Review comments:
+## Review
 
-- **Do not commit scratch text to `README.md`**
-  ```diff
-  +# acceptance sweep scratch
-  ```
-  This line is clearly temporary/scratch content and should be removed before merging.
+**Overall:** This diff is almost entirely regenerated acceptance-output snapshots plus a one-line README scratch marker. It contains no source or test files, so I can’t verify the actual code changes that caused the snapshot drift.
 
-- **`a16.out` is emptied without resolving the issues it recorded**
-  ```diff
-  --- a/build/acceptance_outputs/a16.out
-  +++ b/build/acceptance_outputs/a16.out
-  @@ -1,55 +0,0 @@
-  -- **README.md contains scratch text**
-  -  ```diff
-  -  +# acceptance sweep scratch
-  -  ```
-  -  This line is clearly temporary/scratch content and should not be committed.
-  ...
-  -- **Source fixes are not in the diff**
-  -  This PR only regenerates acceptance-output snapshots and adds a scratch README line.
-  ```
-  Deleting the previous review artifact does not fix the bugs it described (e.g., unreachable/duplicate `except` branch, type/docstring mismatch in `_extract_json_object`, `KeyError` risk from `data["messages"]`, broader exception handling in `list()`, stale `sorted()` usage). Either implement those source fixes or explain why each is not needed.
+### 1. `README.md` contains scratch text
 
-- **A17–A20 acceptance checks disappeared from the summary without explanation**
-  ```diff
-  ---- A17: sandbox unit tests (incl. read-only denies write_file+shell) ---
-  -A17 exit=0  13 passed in 0.10s  (denial coverage: 9 assertion sites)
-  ---- A18: help lists the five commands ---
-  -A18 exit=0
-  ---- A19: strategy selector + invalid exit 2 ---
-  -A19 valid_exit=0 invalid_exit2=2  stderr=
-  ---- A20: strategy unit tests ---
-  -A20 exit=0  18 passed in 0.02s
-  -=== sweep complete ===
-  ```
-  If these checks were consolidated or removed intentionally, document why; otherwise restore them.
+```diff
+diff --git a/README.md b/README.md
+@@ -5,3 +5,4 @@ for OpenAI-style and Anthropic-style endpoints, defaulting to a local llama.cpp
+ Status: under autonomous construction — see `build/plan.md`, `build/spec.md`,
+ `BUILD_LOG.md`.
++# acceptance sweep scratch
+```
 
-- **No source-test files are included, so the new test coverage is unreviewable**
-  ```diff
-  -A15 exit=0  189 passed in 13.13s
-  +A15 exit=0  197 passed in 13.02s
-  ```
-  Test count went up, but no test files appear in the diff, so the changes cannot be reviewed.
+Do not commit temporary “scratch” comments to the project README.
 
-- **`a12.out` now contains many session metadata rows**
-  ```diff
-  +eed2bec0bb4d  2026-09-02 10:56  unblock2/kimi-k2.7-code  3 msgs  Remember the token word: zebra. Reply with ok.
-  +c2896375ce30  2026-09-02 10:55  unblock2/kimi-k2.7-code  7 msgs  Fill the schema for a repository named codemonkey ...
-  ...
-  ```
-  Confirm this is expected and does not leak sensitive context, user prompts, or internal endpoint names.
+### 2. `a16.out` is emptied without evidence of fixes
 
-- **The README and snapshot changes alone are insufficient**
-  ```diff
-  diff --git a/README.md b/README.md
-  ...
-  +# acceptance sweep scratch
-  ```
-  The PR should contain actual code/test changes, not just regenerated acceptance snapshots and a scratch comment.
+```diff
+diff --git a/build/acceptance_outputs/a16.out b/build/acceptance_outputs/a16.out
+@@ -1,62 +0,0 @@
+-Review comments:
+-...
+-CHANGES REQUESTED
+```
+
+The previous `a16.out` listed a number of source-level concerns (unreachable/duplicate `except` branch, `KeyError` risk, type/docstring mismatch in `_extract_json_object`, etc.). Emptying that file does not resolve them. If they are fixed, include the source diff so the fixes can be reviewed.
+
+### 3. Acceptance checks A17–A20 disappeared
+
+```diff
+diff --git a/build/acceptance_outputs/summary.txt b/build/acceptance_outputs/summary.txt
+@@ -31,15 +30,5 @@
+ --- A15: full suite ---
+-A15 exit=0  197 passed in 13.02s
++A15 exit=0  271 passed in 13.05s
+ --- A16: live review of uncommitted diff ---
+-A16 exit=0 chars=2622 (verdict check: 0)
+---- A17: sandbox unit tests (incl. read-only denies write_file+shell) ---
+-A17 exit=0  13 passed in 0.10s  (denial coverage: 9 assertion sites)
+---- A18: help lists the five commands ---
+-A18 exit=0
+---- A19: strategy selector + invalid exit 2 ---
+-A19 valid_exit=0 invalid_exit2=2  stderr=
+---- A20: strategy unit tests ---
+-A20 exit=0  18 passed in 0.04s
+-=== sweep complete ===
+```
+
+These checks were present in the previous summary and are now gone. If they were intentionally removed/consolidated, document why; otherwise restore them.
+
+### 4. Test count increased without any test-file diff
+
+```diff
+-A15 exit=0  197 passed in 13.02s
++A15 exit=0  271 passed in 13.05s
+```
+
+74 additional tests passed, but no test files are in this diff. Please include the test/source changes so the new coverage can be reviewed.
+
+### 5. Prompt-token costs jumped dramatically for trivial tasks
+
+```diff
+- pong[usage] prompt=632 completion=48
++ pong[usage] prompt=3178 completion=24
+```
+
+```diff
+- banana[usage] prompt=632 completion=30
++ banana[usage] prompt=3178 completion=22
+```
+
+A ~5× increase in prompt tokens for a one-word reply suggests the default context now includes far more prompt prefix / repo-map / project-instructions text than before. Confirm this is intentional and isn’t wasteful.
+
+### 6. A11 now returns verbose text instead of the expected short reply
+
+```diff
+-A11 exit=0  out= zebra 
++A11 exit=0  out= ok. The token word you gave me was zebra. I have stored that in memory. 
+```
+
+The original prompt (per `a12.out`) says “Reply with ok.” The new output is not a minimal/expected response, indicating the model is no longer tightly following the instruction.
+
+### 7. `a12.out` now contains many leaked/local session rows
+
+The output grew from a few lines to 270+ lines, e.g.:
+
+```diff
++3b4d1ddad6af  2026-09-02 13:50  unblock2/kimi-k2.7-code  3 msgs  Remember the token word: zebra. Reply with ok.
++d301af8fa36c  2026-09-02 13:50  unblock2/kimi-k2.7-code  1 msgs  Fill the schema for a repository named codemonkey whose lang
+...
+```
+
+If these artifacts are committed, this leaks internal endpoint names, session IDs, and user prompts. Either sanitize the test state before capturing snapshots or explain why this is acceptable.
+
+### 8. `a9.err` contains unexpected stray characters
+
+```diff
+- TOOL_CALL: {"name": "shell", "arguments": {"command": "echo codemonkey_tool_test"}}[usage] prompt=644 completion=57
++ TOOL_CALL: {"name": "shell", "arguments": {"command": "echo codemonkey_tool_test"}}  <|tool_call_end|>   <|tool_calls_section_end|> [usage] prompt=3190 completion=54
+```
+
+The ` <|tool_call_end|>   <|tool_calls_section_end|> ` characters embedded in the tool-call stream look like unfiltered output/tokens. This may indicate a parsing or streaming bug.
+
+### 9. Model list output changed drastically
+
+```diff
+diff --git a/build/acceptance_outputs/a4.out b/build/acceptance_outputs/a4.out
+@@ -1,21 +1 @@
+-kimi-k2.7-code
+-kimi-k2.7-code-fast
+-...
++Qwen3.8-27B-NVFP4-MTP-VERY-HIGH.gguf
+```
+
+The previous multi-provider list collapsed into a single local GGUF filename. The summary claims “live local,” which is fine, but `a4.out` should probably still reflect a stable, expected listing.
+
+### 10. New config fields appear without source context
+
+```diff
+ context_limit: 32000
++project_instructions: true
++verify_command: ''
++max_verify_retries: 1
++max_edit_retries: 1
++observation_budget: 24000
++repo_map: true
++repo_map_budget: 4000
++max_retries: 3
++prompt_cache: true
+```
+
+New defaults like `project_instructions: true` and `repo_map: true` explain the token-cost jump. Because the source changes that add these fields are absent, I can’t review their validation, security implications, or default sanity.
+
+---
 
 CHANGES REQUESTED

@@ -3,5 +3,5 @@
   "programming_languages": [
     "Python"
   ],
-  "summary": "codemonkey is a scriptable coding-agent CLI (Python 3.11, uv, Typer, Rich, httpx) for OpenAI-style and Anthropic-style endpoints, defaulting to a local llama.cpp server. It supports exec/review/sessions workflows and is currently under autonomous construction."
+  "summary": "codemonkey is a Python-based, scriptable coding-agent CLI built around a file-driven state machine, supporting both OpenAI-style and Anthropic-style LLM endpoints using uv, Typer, Rich, and httpx."
 }

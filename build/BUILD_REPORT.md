@@ -161,3 +161,47 @@ probes passing live.
 
 Please review: `git -C ~/Programs/CodeMonkey log --oneline`, `features.html`,
 `build/BUILD_REPORT.md`. Accept, or list deficiencies and the loop continues.
+
+
+---
+
+# Loop 4 — Final Acceptance (CYCLE loop4-final)
+
+**Date:** 2026-09-02 · **Suite:** 271/271 · **Re-sweep:** all A1–A20 exit 0 —
+**A4 ran LIVE against the home llama.cpp server (unblock2 fallback NOT used:
+the home server recovered during this loop)**.
+
+## Loop-4 criteria (from build/research-loop4.md — all pass)
+
+| Improvement | Probe | Result |
+|---|---|---|
+| Project-instruction loader | tests/test_instructions.py: discovery precedence, nearest-dir wins, 32KB cap+marker, gates | ✅ 10/10 (+ live pineapple both directions) |
+| Verify gate | tests/test_verify_gate.py: unset never runs; failure feeds corrective turn; pass adds none; retry cap; budget-charged; event order | ✅ 6/6 (+ live break-fix probe: GATE-OK) |
+| Repo map (part 1) | tests/test_repomap.py: 7-language def-scan, mtime+size cache, ignore dirs, deterministic limit, binary skip | ✅ 9/9 |
+| Repo map (part 2) | tests/test_repomap_inject.py: recency+density ranking, budget never exceeded, gate-off absent, identical across turns | ✅ 7/7 (+ live: protocol.py named, zero read_file) |
+| Memory wiring (7F1) | tests/test_memory_wiring.py: fact verbatim in system; none hides fact+tool; idempotent update_memory | ✅ 6/6 (+ live token recall) |
+| Config knobs (17F1) | tests/test_knobs.py: defaults, env override, exec pass-through | ✅ 4/4 |
+| Prompt-prefix stability + cache_prompt (22) | tests/test_prefix_stability.py: byte-identical system across turns & compaction; body flag present/absent; anthropic untouched | ✅ 6/6 (+ best-effort timings recorded, no claim) |
+| Provider retry/backoff (23) | tests/test_retry.py: Retry-After exact, bounded jitter, no 4xx retry, AuthError immediate, tools-500 immediate (fallback intact), exhaustion count | ✅ 9/9 |
+| Critic fixes 19F1 / 22F1 | real exit codes in verify.completed; cache_prompt on all 7 chat sites | ✅ |
+
+## Hygiene: TEMP providers removed (the 6F4 guard fired for real)
+
+The home llama.cpp server recovered during this loop. The 6F4 guard's alive-probe
+had a blind spot (8-token budget → empty content on a reasoning model → read as
+"dead"); fixed (200-token probe), then BOTH temp providers (`unblock` 3458,
+`unblock2` 3459) removed from DEFAULTS in the same commit. All live probes now
+run against the home server. Config default_provider returned to `local`.
+
+## Loop-4 commit range
+
+`18301af` (R4 research) → 2b08b34 (approval) → 008f289 C18 → 389b8fa C19 →
+d0fade9 C20 → 0f6f12a 7F1 → 654ece6 17F1 → 2e5fb21 C21 → 9adcb7a C22 →
+16c27bf C23 → dd4a329 19F1 → 8b6c56a 22F1 → af7d047 critic report + charters →
+206c431 graphify mandate → this commit (loop4-final + hygiene).
+
+## Notes
+
+- graphify knowledge graph mandated (AGENTS.md) and built: 1046 nodes/2104 edges;
+  per-cycle `--update` now part of the ritual.
+- Loops 5–10 charters remain PROPOSED, research-gated (see plan.md).

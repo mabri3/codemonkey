@@ -38,9 +38,12 @@ def _home_server_inference_alive() -> bool:
             json={
                 "model": dflt["model"],
                 "messages": [{"role": "user", "content": "Reply with exactly: pong"}],
-                "max_tokens": 8,
+                # 200 tokens: some served models spend early tokens on
+                # reasoning; an 8-token budget returns empty content and reads
+                # as "dead" (blind spot found during loop4-final).
+                "max_tokens": 200,
             },
-            timeout=20,
+            timeout=30,
         )
     except Exception:
         return False

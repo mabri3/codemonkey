@@ -497,7 +497,7 @@ map to an A-criterion, a loop selection, or a cited research selection).
   fallback turn; the schema-retry turn likewise; with `prompt_cache=True` the
   fallback turn does carry it); `grep -c "cache_prompt=prompt_cache"
   src/codemonkey/loop.py` → `7`; `uv run pytest -q` → exit 0.
-- [ ] CYCLE loop4-final — Loop 4 acceptance: full A1–A20 re-sweep + the loop-4
+- [x] CYCLE loop4-final — Loop 4 acceptance: full A1–A20 re-sweep + the loop-4
   probes above; `build/BUILD_REPORT.md` loop-4 section (criteria table, git
   range, gaps); commit | est: 30m |
   verify: `bash build/acceptance_sweep.sh` → all green; `uv run pytest -q` →

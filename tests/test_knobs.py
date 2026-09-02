@@ -47,12 +47,11 @@ def test_exec_passes_knobs_to_run_turns(tmp_path, monkeypatch):
         return turn
 
     monkeypatch.setattr(loop_mod, "run_turns", fake_run_turns)
-    monkeypatch.setenv("CODEMONKEY_PROVIDER", "unblock2")
-    monkeypatch.setenv("CODEMONKEY_UNBLOCK2_KEY", "test-key")
+    monkeypatch.setenv("CODEMONKEY_PROVIDER", "local")
     monkeypatch.setenv("CODEMONKEY_MAX_EDIT_RETRIES", "4")
     monkeypatch.setenv("CODEMONKEY_OBSERVATION_BUDGET", "12345")
 
-    exec_mod.run_exec("say ok", provider_name="unblock2", ephemeral=True, stdin_cm="")
+    exec_mod.run_exec("say ok", ephemeral=True, stdin_cm="")
 
     assert recorded.get("max_edit_retries") == 4
     assert recorded.get("observation_budget") == 12345

@@ -1207,3 +1207,17 @@ build/plan.md (R6–R10 + loop10-final appended, all unchecked), SPRINT.md
 
 **Authorization state:** NOTHING in loops 5–10 is authorized. Gate 2 (user
 acceptance of loop 3) is still open, and CYCLE loop4-final has not been run.
+
+## 2026-09-02 — CYCLE loop4-final: Loop 4 acceptance — ALL GREEN — HOME SERVER RECOVERED
+
+**Completed:** full A1–A20 re-sweep all exit 0 — A4 LIVE on home llama.cpp (server
+recovered; fallback not needed). Suite 271/271. BUILD_REPORT loop-4 section written.
+
+**Hygiene (the 6F4 guard earned its keep):** home inference alive -> guard requires
+TEMP provider removal. Fixed the guard's blind spot first (8-token probe returned
+empty content on the reasoning model and misread as dead; now 200 tokens), then
+removed `unblock` (3458) and `unblock2` (3459) from DEFAULTS. Live exec + models
+re-verified on the home server. Shell env CODEMONKEY_PROVIDER=unblock2 leak
+untracked; test_knobs switched to local.
+
+**Loop 4 COMPLETE. Loops 5-10 charters await user authorization (R5 first).**

@@ -1,3 +1,3 @@
- zebra[usage] prompt=645 completion=34
-[agent]  zebra
+ ok. The token word you gave me was zebra. I have stored that in memory.[usage] prompt=3191 completion=77
+[agent]  ok. The token word you gave me was zebra. I have stored that in memory.
 
