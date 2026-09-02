@@ -1,0 +1,20 @@
+{
+  "type": "object",
+  "properties": {
+    "project_name": {
+      "type": "string",
+      "description": "Top-level project name of the repository"
+    },
+    "programming_languages": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Programming languages present in the repository"
+    },
+    "summary": {
+      "type": "string",
+      "description": "One-paragraph summary of the repository purpose"
+    }
+  },
+  "required": ["project_name", "programming_languages"],
+  "additionalProperties": false
+}

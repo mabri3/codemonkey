@@ -1,0 +1,27 @@
+[project]
+name = "codemonkey"
+version = "0.1.0"
+description = "codemonkey — a scriptable coding-agent CLI (exec/review/sessions) for OpenAI-style and Anthropic-style endpoints"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "typer>=0.12",
+    "rich>=13.7",
+    "httpx>=0.27",
+    "pyyaml>=6.0",
+    "python-dotenv>=1.0",
+    "jsonschema>=4.21",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[project.scripts]
+codemonkey = "codemonkey.cli:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/codemonkey"]
