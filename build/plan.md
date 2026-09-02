@@ -3,7 +3,7 @@
 ```
 cycles: 11 (loop 1 base, before loops 2-3 appends)
 cap: none
-heartbeat: 15m          # 25–50% of smallest cycle (30m), clamped [5m, 2h]
+heartbeat: 5m           # tightened per user 2026-09-02 (was 15m); single-worker lease in SPRINT.md
 review_every: 3        # fresh-context critic every 3rd cycle + final
 workdir: ~/Programs/CodeMonkey
 python: 3.11 (uv)      # system python is 3.9 — always `uv run`

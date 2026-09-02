@@ -85,18 +85,45 @@ list" — its findings become new unchecked cycles appended to plan.md
 (preserve checked boxes; cap stays none). The critic sees spec + diff
 only.
 
-## Ticks (every 15 min)
-1. Read `build/plan.md`. If `build/STOP` exists → stop, report.
+## Ticks (every 5 min)
+
+Heartbeats are ~12/h but most are no-ops (check state, exit); cost is
+trivial, benefit is hung/errored ticks detected and resumed ~3× faster.
+
+**Step 0 — single-worker lease (MUST run before any cycle work):**
+- If `build/.tick.lock` exists AND its mtime is < 20 min old → another
+  worker is mid-cycle: print "lease held, skipping tick" and STOP.
+- Else write the current epoch (seconds) to `build/.tick.lock` (overwrite).
+- If you COMPLETE the cycle (commit + docs): delete `build/.tick.lock`.
+- If you exited early for any other reason (blocked, STOP file): LEAVE the
+  lock — it expires after 20 min, and the next tick resumes the in-flight
+  cycle per the uncommitted-work rule below.
+- A stale lock is never an error: it just means a prior worker died
+  mid-cycle, which the uncommitted-work rule already handles.
+
+**Then act:**
+1. Read `build/plan.md`. If `build/STOP` exists → delete the lock, stop, report.
 2. If all cycles are checked AND loop3-final has passed → the run is done;
    report final acceptance and stop working (the job may be deleted by the
    user; do not create new work).
 3. Else take the first unchecked cycle. If uncommitted work exists, resume
-   it (rule 4). Implement → run its exact probe → commit → mark `[x]` in
-   plan.md → BUILD_LOG.md entry → review gate if it's cycle 3/6/9 →
-   report concisely (cycle, probe output, commit hash, next cycle).
+   it (uncommitted-work rule). Implement → run its exact probe → commit →
+   mark `[x]` in plan.md → BUILD_LOG.md entry → delete the lock → review
+   gate if it's cycle 3/6/9 → report concisely (cycle, probe output, commit
+   hash, next cycle).
 4. Research cycles (11, R3): MUST use web search (web_search/web_extract)
    with real citations; write `build/research-loopN.md`; append the
    selected `loopN:` cycles to plan.md with exact verify probes; commit.
+
+## Uncommitted-work rule
+
+If a tick starts with uncommitted work (dirty `git status`) and a held or
+stale lease — a prior worker died mid-cycle: identify the interrupted cycle
+from the latest `BUILD_LOG.md` entry + `git diff`, FINISH it (implement the
+remainder, run its probe), commit as ONE commit with the interrupted cycle's
+original message, mark it `[x]`, append the BUILD_LOG entry, and stop the
+tick. Never commit another cycle's work under your own cycle's message, and
+never discard another cycle's uncommitted work.
 
 ## Stop conditions
 - `build/STOP` file → immediate halt after current checkpoint.
