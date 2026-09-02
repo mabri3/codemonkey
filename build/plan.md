@@ -219,6 +219,26 @@ end.
   gaps, and the loops' selected improvements. THIS IS THE END OF THE RUN:
   final report asks the user to accept.
 
+
+### loop3: cycles (selected from build/research-loop3.md, cycle R3)
+
+- [ ] CYCLE 16 — `loop3:` self-heal edit retries (edit/SREP failure with structured
+  error -> ONE corrective re-prompt turn feeding the failure text back;
+  `max_edit_retries`, default 1) | est: 30m |
+  verify: `uv run pytest tests/test_selfheal.py -q` → exit 0 (>=4 tests: retry on
+  failure consults anchors, success-after-retry transcript, no-retry when ok,
+  retry limit respected); suite green; live EDL probe (fuzzy-edit then self-heal).
+- [ ] CYCLE 17 — `loop3:` observation budget for tool outputs (per-run budget,
+  default 24k chars; over-budget -> prefix + [PARTIAL: N chars elided] marker;
+  per-call accounting) | est: 30m |
+  verify: `uv run pytest tests/test_obsbudget.py -q` → exit 0 (>=4 tests: budget
+  enforcement, marker format, isolation across calls, under-budget untouched);
+  suite green.
+- [ ] CYCLE loop3-final — Loop 3 acceptance: full A1–A20 re-sweep + loop3 probes;
+  final BUILD_REPORT section (all three loops); REQUEST USER ACCEPTANCE (Gate 2)
+  | est: 30m |
+  verify: `bash build/acceptance_sweep.sh` all green; report updated; committed.
+
 ## Notes for the loop
 
 - Live probes hit http://192.168.50.113:8080/v1 — if the server is down,

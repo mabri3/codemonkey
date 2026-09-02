@@ -810,3 +810,18 @@ improvement probes + commits. Loop-2 criteria all pass (parallel tools, SREP pat
 editing, checkpoints/undo, auto-compaction).
 
 **Next step:** CYCLE R3 — Loop 3 research (pick the next 10x improvements).
+
+## 2026-09-02 — CYCLE R3: Loop 3 research — next 10x improvements selected
+
+**Completed:** `build/research-loop3.md` (committed) — 5 capabilities researched with
+cited URLs (self-heal edit retries, observation budget/truncation with PARTIAL
+continuation, repo map/symbol index, dry-run plan mode, streaming partial JSON).
+
+**SELECTED (→ loop3: cycles 16–17 + loop3-final):**
+1. CYCLE 16 — self-heal edit retries (error feedback → corrective re-prompt)
+2. CYCLE 17 — observation budget for tool outputs (PARTIAL markers)
+Then CYCLE loop3-final + REQUEST USER ACCEPTANCE (Gate 2).
+(Deferred: repo map/symbol index — tree-sitter deps heavy for now; dry-run plan
+mode — overlaps approvals+checkpoints; streaming partial JSON — headless UX.)
+
+**Next step:** CYCLE 16 — self-heal edit retries.
