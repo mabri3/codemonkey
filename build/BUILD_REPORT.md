@@ -72,3 +72,38 @@ Key commits since the last report: `220f69d` C4, `e8e3bae` C5, `29629ad` C6,
 
 **Loop 1 COMPLETE — proceeding to CYCLE 11 (loop 2 research) per the signed
 autonomous-build contract; next user review point is after loop 3.**
+
+
+---
+
+# Loop 2 — Final Acceptance (CYCLE loop2-final)
+
+**Date:** 2026-09-02 · **Suite:** 189/189 · **Re-sweep:** all A1–A20 exit 0 (same
+probe wall as loop 1; A4 unblock2 fallback note unchanged; A9 live with the new
+trailing-token-tolerant parser — model-special-tokens handled; A16 live review
+2,573 chars).
+
+## Loop-2 criteria (from build/research-loop2.md — all pass)
+
+| Improvement | Probe | Result |
+|---|---|---|
+| Parallel tool execution | tests/test_parallel.py: 3 slow calls finish < serial; call-order results; per-call events; sibling isolation | ✅ 5/5 (+ live 3-call one-turn probe: "alpha beta gamma") |
+| SREP patch editing | tests/test_patch_edit.py: exact/fuzzy/anchors/atomicity/multi-block | ✅ 8/8 (+ live SREP patch applied to a fresh repo) |
+| Checkpoints/rollback | tests/test_checkpoints.py: prior-content snapshot, byte-identical restore, ordering, no-snapshot-for-new-files | ✅ 6/6 (+ live clobber→`codemonkey undo` → byte-identical) |
+| Auto-compaction | tests/test_autocompact.py: trigger/no-op/system re-injection/notice/registry selection/summarizing flow | ✅ 6/6 (+ in-process 25→11 message compaction with marker) |
+
+## Loop-2 commits
+
+`8d40ebb` (research) → `bc15fdd` (parallel) → `12db920` (patch edit) →
+`6a2123d` (checkpoints) → `9f4eb67` (auto-compaction) → this commit (loop2-final).
+
+## Loop-2 notes
+
+- Selected-but-deferred (recorded in research-loop2.md): MCP-style extension
+  points (surface area > core-loop leverage for a 27B local model) and agentic
+  self-review (2x token cost per headless run).
+- `strategies.compaction_keep` knob added (was hardcoded 10).
+- Anti-governance-decay invariant enforced: post-compaction turns always carry
+  exactly one deduped `[prior context]` brief + the full system prompt.
+
+**Loop 2 COMPLETE — proceeding to CYCLE R3 (loop 3 research).**

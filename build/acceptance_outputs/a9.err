@@ -1,6 +1,3 @@
-[usage] prompt=644 completion=71
-$ 
-[exit None] 
- codemonkey_tool_test[usage] prompt=664 completion=59
-[agent]  codemonkey_tool_test
+ TOOL_CALL: {"name": "shell", "arguments": {"command": "echo codemonkey_tool_test"}} <|tool_call_end|> <|tool_calls_section_end|>[usage] prompt=644 completion=73
+[agent]  TOOL_CALL: {"name": "shell", "arguments": {"command": "echo codemonkey_tool_tes
 

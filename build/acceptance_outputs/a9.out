@@ -1,1 +1,1 @@
- codemonkey_tool_test
+ TOOL_CALL: {"name": "shell", "arguments": {"command": "echo codemonkey_tool_test"}} <|tool_call_end|> <|tool_calls_section_end|>

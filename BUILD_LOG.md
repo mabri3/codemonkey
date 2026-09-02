@@ -801,3 +801,12 @@ summarizing provider flow keeps the brief). Suite 189/189. In-process long-run:
 25 raw -> 11 first-call messages w/ marker; live exec still green.
 
 **Next step:** CYCLE loop2-final — Loop 2 acceptance re-sweep + report.
+
+## 2026-09-02 — CYCLE loop2-final: Loop 2 acceptance — ALL GREEN
+
+**Completed:** full A1–A20 re-sweep with loop-2 features integrated (same probe wall,
+all exit 0; suite 189/189). BUILD_REPORT.md loop-2 section written with the four
+improvement probes + commits. Loop-2 criteria all pass (parallel tools, SREP patch
+editing, checkpoints/undo, auto-compaction).
+
+**Next step:** CYCLE R3 — Loop 3 research (pick the next 10x improvements).

@@ -33,6 +33,8 @@
 ╭─ Commands ───────────────────────────────────────────────────────────────────╮
 │ config    Print the effective merged config (secrets masked).                │
 │ review    LLM review of the repo's uncommitted diff (read-only).             │
+│ undo      Undo: restore the most recent checkpoint (files snapshotted        │
+│           pre-mutation).                                                     │
 │ models    List models exposed by a provider endpoint.                        │
 │ sessions  List persisted sessions (thread id, updated time, first prompt).   │
 │ exec      Non-interactive exec: run the agent once, print the final          │

@@ -204,7 +204,7 @@ end.
   verify: `uv run pytest tests/test_autocompact.py -q` → exit 0 (≥4 tests: trigger on
   over-budget fake history, under-budget no-op, post-compaction system re-injection,
   registry-selected strategy honored); suite green.
-- [ ] CYCLE loop2-final — Loop 2 acceptance: full A1–A20 re-sweep + new loop2 probes;
+- [x] CYCLE loop2-final — Loop 2 acceptance: full A1–A20 re-sweep + new loop2 probes;
   BUILD_REPORT loop-2 section | est: 30m |
   verify: `bash build/acceptance_sweep.sh` all green; report updated; committed.
 
