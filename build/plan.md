@@ -436,7 +436,7 @@ map to an A-criterion, a loop selection, or a cited research selection).
   `uv run codemonkey exec --ephemeral --approval never "Use the repo_map tool
   on src/codemonkey and tell me which file defines parse_tool_calls."` →
   exit 0, stdout contains `protocol.py`.
-- [ ] CYCLE 21 — `loop4:` repo map, part 2: ranking (files touched in the last
+- [x] CYCLE 21 — `loop4:` repo map, part 2: ranking (files touched in the last
   N commits first, then symbol density) + budget (`repo_map_budget`, default
   4000 chars) + injection into the project-context block behind config
   `repo_map: false` (opt-in) | est: 30m |

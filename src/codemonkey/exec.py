@@ -287,13 +287,28 @@ def run_exec(
     pi_enabled = cfg.get("project_instructions", True)
     if project_instructions is not None:
         pi_enabled = project_instructions
-    if pi_enabled or memory_text:
+    repo_map_text = ""
+    if cfg.get("repo_map", False):
+        try:
+            from . import repomap as _rm
+
+            rmap = _rm.scan_repo(Path(workdir))
+            repo_map_text = _rm.render_injection(
+                rmap, Path(workdir),
+                budget=int(cfg.get("repo_map_budget", 4000) or 4000),
+            )
+        except Exception:
+            repo_map_text = ""
+
+    if pi_enabled or memory_text or repo_map_text:
         from .instructions import build_project_context_block, load_instructions
 
         instr_text = load_instructions(Path(workdir), enabled=pi_enabled) if pi_enabled else ""
         block = build_project_context_block(
             Path(workdir), instructions=instr_text, memory_text=memory_text
         )
+        if repo_map_text:
+            block = (block + "\n\n" if block else "") + repo_map_text
         if block:
             system_extra = system_extra + "\n\n" + block
 

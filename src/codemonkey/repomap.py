@@ -150,3 +150,65 @@ def format_map(repo_map: dict, *, pattern: str | None = None,
             lines.append(f"  L{e['line']:>5}  {e['kind']:>8}  {e['symbol']}")
             count += 1
     return "\n".join(lines) if lines else "(no symbols found)"
+
+def rank_files(repo_map: dict, workdir: Path, *, recent_commits: int = 30) -> list[str]:
+    """Rank files: recently committed (last N commits, newest commit wins)
+    first by recency, then by symbol density (count), then name. Deterministic."""
+    import subprocess
+
+    workdir = Path(workdir).resolve()
+    recency: dict[str, int] = {}
+    try:
+        r = subprocess.run(
+            ["git", "log", f"--max-count={recent_commits}", "--name-only",
+             "--pretty=format:"],
+            cwd=str(workdir), capture_output=True, text=True, timeout=10,
+        )
+        order = [ln.strip() for ln in r.stdout.splitlines() if ln.strip()]
+        # first occurrence = most recent touch
+        for i, path in enumerate(order):
+            if path not in recency:
+                recency[path] = len(order) - i  # higher = more recent
+    except Exception:
+        recency = {}
+
+    def key(rel: str):
+        syms = repo_map.get(rel) or []
+        return (
+            recency.get(rel, 0),      # recency first (0 = never touched)
+            len(syms),                # then density
+            rel,                      # stable name order
+        )
+
+    return sorted(repo_map.keys(), key=key, reverse=False) if False else sorted(
+        repo_map.keys(),
+        key=lambda rel: (-recency.get(rel, 0), -len(repo_map.get(rel) or []), rel),
+    )
+
+
+def render_injection(repo_map: dict, workdir: Path, *, budget: int = 4000,
+                     recent_commits: int = 30) -> str:
+    """Render the ranked map within `budget` chars (never exceeds).
+
+    Files are added in rank order until the budget is hit; the header states
+    the constraint. Empty map -> "".
+    """
+    if not repo_map:
+        return ""
+    ranked = rank_files(repo_map, workdir, recent_commits=recent_commits)
+    lines = ["[repo map: symbols per file, ranked by recent commits then density]"]
+    used = len(lines[0]) + 1
+    omitted = 0
+    for rel in ranked:
+        entries = sorted(repo_map[rel], key=lambda e: e["line"])
+        summary = ", ".join(f"{e['kind']} {e['symbol']}:{e['line']}" for e in entries)
+        candidate = f"{rel}: {summary}"
+        marker = f"...[{len(ranked) - ranked.index(rel) - omitted} more files omitted by budget]"
+        if used + len(candidate) + 1 > budget:
+            omitted += 1
+            if used + len(marker) + 1 <= budget:
+                lines.append(marker)
+            break
+        lines.append(candidate)
+        used += len(candidate) + 1
+    return "\n".join(lines)

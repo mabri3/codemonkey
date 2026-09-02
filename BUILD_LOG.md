@@ -1032,3 +1032,22 @@ src/codemonkey/repl.py, tests/test_knobs.py (new, 4 tests).
 
 **Tests:** test_knobs 4/4 (defaults, env override, exec pass-through via patched
 run_turns recording kwargs, config surface). Suite 232/232.
+
+## 2026-09-02 — CYCLE 21 (loop4): repo map part 2 — ranking, budget, opt-in injection
+
+**Completed:** `rank_files` (git-log recency over last 30 commits first, then
+symbol density, then name — deterministic); `render_injection` (ranked files
+until `repo_map_budget` [default 4000 chars]; omission marker counts remaining
+files and never overflows the budget — fixed a 4023>4000 overflow where the
+marker itself exceeded the cap); config `repo_map: false` (opt-in) +
+`repo_map_budget` + env gates CODEMONKEY_REPO_MAP / CODEMONKEY_REPO_MAP_BUDGET;
+exec injects the rendered map into the project-context block when gated on.
+
+**Files changed:** src/codemonkey/repomap.py (rank + render), src/codemonkey/config.py,
+src/codemonkey/exec.py, tests/test_repomap_inject.py (new, 7 tests),
+build/probes/cycle21-repomap-inject.md.
+
+**Tests:** test_repomap_inject 7/7 (budget never exceeded, gate off -> absent,
+recent-before-stale on fixture repo, identical across consecutive turns, density
+tiebreak, omission marker, empty map). Suite 239/239. LIVE: repo_map=true answered
+protocol.py with zero read_file calls.
