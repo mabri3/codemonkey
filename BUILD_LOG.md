@@ -988,3 +988,14 @@ correctly; in-process forced tool use: repo_map executed, result delivered
 with protocol.py symbols. (Registry test renamed to all_ten for the new tool.)
 
 **Next step:** loop4 part 2 cycles (21-23) remain PARKED pending user approval.
+
+## 2026-09-02 — SIGN-OFF CORRECTION + LOOP 4 UN-PARKED
+
+**Correction:** the user's "approved 3" meant LOOP 3 SIGN-OFF (not a 3-cycle
+selection). Loops 1-3 gates are now formally satisfied. The user directed:
+"finish everything through loop 4" — all parked cycles (7F1, 17F1, 21, 22, 23)
+are un-parked and approved, followed by loop4-final.
+
+**Build order:** 7F1 (memory wiring) -> 17F1 (config knobs) -> 21 (repo-map
+ranking/injection) -> 22 (prefix stability + cache_prompt) -> 23 (retry/
+backoff) -> loop4-final (full re-sweep + report).
