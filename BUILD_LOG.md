@@ -1265,3 +1265,17 @@ build/eval/golden-core.yaml (new), tests/test_golden.py (new, 5 tests).
 
 **Tests:** test_golden 5/5 incl. live CLI flow: green run -> baseline written ->
 broken expectation -> --check exit 1 naming the regression. Suite 282/282.
+
+## 2026-09-02 — CYCLE 26 (loop5): token/cost telemetry
+
+**Completed:** `src/codemonkey/cost.py` — summarize() (turns, total/prompt/
+completion tokens, per-tool-call counts, wall), append_to_ledger() (cumulative
+~/.codemonkey/cost.json with per-run entries), render_summary(). exec gains
+`cost_summary` param; `--cost-summary` CLI flag prints the block to stderr and
+appends the ledger. Telemetry collector auto-allocates when --cost-summary is
+set (previously silent without --json because event_sink was None).
+
+**Files changed:** src/codemonkey/cost.py (new), src/codemonkey/exec.py,
+src/codemonkey/cli.py, tests/test_cost.py (new, 5 tests), build/probes/cycle26-cost.md.
+
+**Tests:** test_cost 5/5 incl. live exec --cost-summary end-to-end vs home server.

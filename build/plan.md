@@ -537,7 +537,7 @@ map to an A-criterion, a loop selection, or a cited research selection).
   verify: baseline written from a green run; deliberately broken task
   (wrong expectation) → `eval --check` exit 1 naming the regression; restored →
   exit 0; `uv run pytest -q` → exit 0.
-- [ ] CYCLE 26 — `loop5:` token/cost telemetry: per-turn usage aggregated into
+- [x] CYCLE 26 — `loop5:` token/cost telemetry: per-turn usage aggregated into
   the JSONL stream (turn.completed already carries usage; add run total +
   per-tool-call counts), `exec --cost-summary` prints tokens/wall-time/tool
   calls; cumulative ~/.codemonkey/cost.json ledger | est: 30m |

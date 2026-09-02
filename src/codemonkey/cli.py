@@ -487,6 +487,10 @@ def exec(
             help="Skip AGENTS.md/CLAUDE.md project-instruction loading for this run.",
         ),
     ] = False,
+    cost_summary: Annotated[
+        bool,
+        typer.Option("--cost-summary", help="Print a token/cost summary to stderr after the run."),
+    ] = False,
     ignore_user_config: Annotated[
         bool,
         typer.Option("--ignore-user-config", help="Skip ~/.codemonkey/config.yaml."),
@@ -535,6 +539,7 @@ def exec(
             ignore_user_config=ignore_user_config,
             bypass=dangerously_bypass,
             project_instructions=(False if no_project_instructions else None),
+            cost_summary=cost_summary,
         )
     except ExecUsageError as exc:
         typer.secho(f"error: {exc}", err=True, fg=typer.colors.RED)

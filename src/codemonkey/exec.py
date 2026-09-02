@@ -111,7 +111,8 @@ def run_exec(
     project_instructions: Optional[bool] = None,
     stream_deltas: bool = True,
     stdin_cm: Optional[str] = None,  # test/dev override: skip reading sys.stdin
-    event_sink=None,  # test/dev: collect JSONL events into a list
+    event_sink=None,  # test/dev: collect JSONL events into a list,
+    cost_summary: bool = False,
     emit_fn=None,  # override for tests: (event_dict) -> None
 ) -> int:
     """Run one non-interactive exec turn-group. Returns the exit code."""
@@ -219,6 +220,8 @@ def run_exec(
     open_items: dict = {}
     history_len = 0  # set after session load; used by the persist.drop hook
 
+    if cost_summary and event_sink is None:
+        event_sink = []  # telemetry needs a collector even without --json
     _external_events = event_sink if event_sink is not None else None
 
     def on_event(ev: dict) -> None:
@@ -409,6 +412,20 @@ def run_exec(
             },
         }
     )
+
+    # -- cost telemetry (loop5, cycle 26) --------------------------------
+    if cost_summary and event_sink is not None:
+        import time as _t
+
+        from .cost import append_to_ledger, render_summary, summarize
+
+        wall = getattr(events, "wall", 0.0)
+        summary = summarize(event_sink, wall_seconds=wall)
+        sys.stderr.write(render_summary(summary) + "\n")
+        try:
+            append_to_ledger(summary, thread_id=thread_id)
+        except OSError as exc:
+            sys.stderr.write(f"[warn] cost ledger write failed: {exc}\n")
 
     # -- stdout: final message (text mode) only -------------------------
     if json_mode:
