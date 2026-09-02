@@ -529,7 +529,7 @@ map to an A-criterion, a loop selection, or a cited research selection).
   task run via patched exec, stdout-contract scoring, trajectory scoring,
   results.json shape); `uv run pytest -q` → exit 0; LIVE: a 2-task suite runs
   green against the home server (transcript to build/probes/).
-- [ ] CYCLE 25 — `loop5:` golden suite + regression baseline: ~8 tasks covering
+- [x] CYCLE 25 — `loop5:` golden suite + regression baseline: ~8 tasks covering
   the A-probes (pong, tool loop, structured output, resume recall, patch edit,
   verify-gate fix, sessions listing, help contract); versioned baseline
   (build/eval/baseline.json); `codemonkey eval --check` exits 1 on regression |

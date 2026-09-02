@@ -1247,3 +1247,21 @@ feeds BOTH stdout-JSONL and the sink — this closed a real observability gap
 
 **Tests:** test_eval 6/6; suite 277/277. LIVE: 2-task smoke suite vs home
 server -> pass_rate 1.0, wall 2.13s.
+
+## 2026-09-02 — CYCLE 25 (loop5): golden suite + regression baseline
+
+**Completed:** committed golden suite `build/eval/golden-core.yaml` (pong/banana/
+memory-recall); `eval.write_baseline` + `eval.check_regression` (task-level pass
+regressions + pass_rate drops; improvements never fail); CLI `codemonkey eval
+SUITE [--check] [--baseline] [--write-baseline]` with per-task PASS/FAIL lines
+and exit 1 naming regressions.
+
+**Real bugs fixed:** (1) `write_baseline` parameter shadowed by the imported
+function of the same name — truthy function object made EVERY run write the
+baseline and skip the check; (2) missing module-level `json` import in cli.py.
+
+**Files changed:** src/codemonkey/eval.py, src/codemonkey/cli.py,
+build/eval/golden-core.yaml (new), tests/test_golden.py (new, 5 tests).
+
+**Tests:** test_golden 5/5 incl. live CLI flow: green run -> baseline written ->
+broken expectation -> --check exit 1 naming the regression. Suite 282/282.
