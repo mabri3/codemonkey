@@ -199,7 +199,7 @@ end.
   verify: `uv run pytest tests/test_checkpoints.py -q` → exit 0 (≥5 tests: snapshot
   on write/edit/shell, restore byte-identical, --list ordering, no-snapshot no-op,
   checkpoint dir gitignored); live destructive-edit-then-undo probe green.
-- [ ] CYCLE 15 — `loop2:` auto-compaction in the loop (estimate tokens pre-call;
+- [x] CYCLE 15 — `loop2:` auto-compaction in the loop (estimate tokens pre-call;
   trigger strategy maybe_compact; re-inject system prompt post-compaction) | est: 30m |
   verify: `uv run pytest tests/test_autocompact.py -q` → exit 0 (≥4 tests: trigger on
   over-budget fake history, under-budget no-op, post-compaction system re-injection,

@@ -778,3 +778,26 @@ raises). Suite 183/183. Live probe: model clobbered data.txt via write_file ->
 `codemonkey undo` restored the original three lines byte-identical.
 
 **Next step:** CYCLE 15 — auto-compaction in the loop.
+
+## 2026-09-02 — CYCLE 15 (loop2): auto-compaction in the agent loop
+
+**Completed:** loop.run_turns now estimates the message stack (char/4 heuristic) against
+`context_limit` BEFORE every provider call; when over budget it runs the registry-selected
+compaction strategy (exec resolves it via `strategies.compaction` + env override, fail-soft)
+and guarantees anti-governance-decay invariants: exactly one deduped `[prior context]`
+brief at the head (strategy brief kept, or a policy marker inserted if none), and the
+system prompt still rides every call. Notice event emitted on compaction.
+Also: `strategies.compaction_keep` config knob for sliding-window (was hardcoded 10);
+SummarizingCompaction no longer double-wraps a brief that already starts with the marker.
+
+**Files changed:** src/codemonkey/loop.py (pre-call trigger + invariants),
+src/codemonkey/exec.py (strategy resolution + pass-through),
+src/codemonkey/strategies/compaction.py (keep knob, no double-wrap),
+tests/test_autocompact.py (new, 6 tests).
+
+**Tests:** test_autocompact 6/6 (over-budget trigger, under-budget no-op, system
+re-injection held post-compaction, notice event, registry/env-selected strategy,
+summarizing provider flow keeps the brief). Suite 189/189. In-process long-run:
+25 raw -> 11 first-call messages w/ marker; live exec still green.
+
+**Next step:** CYCLE loop2-final — Loop 2 acceptance re-sweep + report.

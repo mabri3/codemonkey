@@ -80,7 +80,10 @@ class SummarizingCompaction:
             # aborting the run.
             return recent
 
-        brief = {"role": "system", "content": f"[prior context]\n{summary}"}
+        if summary.startswith("[prior context]"):
+            brief = {"role": "system", "content": summary}
+        else:
+            brief = {"role": "system", "content": f"[prior context]\n{summary}"}
         return [brief] + recent
 
 
@@ -117,5 +120,7 @@ def get_compactor(name: str, cfg=None):
     if name == "summarizing":
         limit = (cfg or {}).get("context_limit", 32000)
         return SummarizingCompaction(context_limit=int(limit or 32000))
-    return SlidingWindowCompaction(keep=10)
+    strategies = (cfg or {}).get("strategies", {}) or {}
+    keep = int(strategies.get("compaction_keep", 10) or 10)
+    return SlidingWindowCompaction(keep=keep)
 

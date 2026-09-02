@@ -263,6 +263,16 @@ def run_exec(
     # -- session history (resume / new) ----------------------------------
     from . import sessions as sessions_mod
 
+    # loop2 cycle 15: registry-selected compaction strategy for auto-compaction
+    from .strategies import select_strategy as _sel_strat
+    from .strategies.compaction import get_compactor as _get_compactor
+
+    try:
+        _comp_name = _sel_strat("compaction", cfg)
+        compaction = _get_compactor(_comp_name, cfg)
+    except Exception:
+        compaction = None  # fail-soft: never block exec on strategy wiring
+
     store = sessions_mod.store(cfg)
     history: list[dict] = []
     if resume_thread:
@@ -295,6 +305,8 @@ def run_exec(
             on_token=on_token,
             schema=schema,
             approval=eff_approval,
+            context_limit=int(cfg.get("context_limit", 32000) or 0) or None,
+            compaction=compaction,
         )
     finally:
         try:

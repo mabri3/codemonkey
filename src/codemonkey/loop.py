@@ -59,6 +59,8 @@ def run_turns(
     schema: Optional[dict] = None,
     approval: Optional[str] = None,
     approval_notice_stream=None,
+    context_limit: Optional[int] = None,
+    compaction=None,
 ) -> ChatTurn:
     """Run agent turns. `approval` (None disables the gate) is a policy name;
     `approval_notice_stream` overrides where soft-deny notices go (default:
@@ -93,6 +95,51 @@ def run_turns(
         native_first = mode == "native" or (
             mode == "auto" and not use_prompt and provider.protocol == "openai"
         )
+
+        # ---- auto-compaction (loop2, cycle 15) --------------------------
+        # Estimate the message stack against the context budget before every
+        # provider call; when over budget, run the registry-selected
+        # compaction strategy and re-inject the system prompt (anti
+        # "governance decay": post-compaction turns ALWAYS carry the system).
+        if compaction is not None and context_limit and len(messages) > 1:
+            from .strategies.compaction import _estimate_tokens
+
+            if _estimate_tokens(messages) > int(context_limit):
+                try:
+                    compacted = compaction.maybe_compact(
+                        messages, budget_tokens=context_limit,
+                        provider=provider,
+                    )
+                except Exception:
+                    compacted = None
+                if compacted and len(compacted) < len(messages):
+                    n_dropped = len(messages) - len(compacted)
+                    kept = list(compacted)
+                    # Dedupe multiple briefs; guarantee at least one
+                    # "[prior context]" marker (anti governance-decay: the
+                    # model must KNOW earlier context was condensed).
+                    briefs = [
+                        m for m in kept
+                        if m.get("role") == "system" and str(m.get("content", "")).startswith("[prior context]")
+                    ]
+                    if briefs:
+                        first_brief = briefs[0]
+                        kept = [
+                            m for m in kept
+                            if not (m.get("role") == "system" and str(m.get("content", "")).startswith("[prior context]"))
+                        ]
+                        kept.insert(0, first_brief)
+                    else:
+                        kept.insert(0, {
+                            "role": "system",
+                            "content": "[prior context] Earlier conversation was condensed by policy; the system prompt still fully applies.",
+                        })
+                    messages = kept
+                    if on_event:
+                        on_event({
+                            "type": "notice",
+                            "message": f"auto-compaction dropped {n_dropped} message(s) to fit the context budget",
+                        })
 
         try:
             if use_prompt:
