@@ -70,6 +70,8 @@ DEFAULTS: dict = {
     "project_instructions": True,
     "verify_command": "",
     "max_verify_retries": 1,
+    "max_edit_retries": 1,
+    "observation_budget": 24000,
     "strategies": {
         "compaction": "summarizing",
         "memory": "file",
@@ -88,6 +90,8 @@ ENV_MAP: dict[str, str] = {
     "CODEMONKEY_PROJECT_INSTRUCTIONS": "project_instructions",
     "CODEMONKEY_VERIFY_COMMAND": "verify_command",
     "CODEMONKEY_MAX_VERIFY_RETRIES": "max_verify_retries",
+    "CODEMONKEY_MAX_EDIT_RETRIES": "max_edit_retries",
+    "CODEMONKEY_OBSERVATION_BUDGET": "observation_budget",
     "CODEMONKEY_STRATEGY_COMPACTION": "strategies.compaction",
     "CODEMONKEY_STRATEGY_MEMORY": "strategies.memory",
     "CODEMONKEY_STRATEGY_SESSION_STATE": "strategies.session_state",

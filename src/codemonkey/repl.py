@@ -146,6 +146,8 @@ def run_repl(
                 # deltas stream to stderr live; only the final message goes to stdout
                 on_token=lambda tok: (err.write(tok), err.flush()),
                 approval=eff_approval,
+                max_edit_retries=int(cfg.get("max_edit_retries", 1) or 0),
+                observation_budget=int(cfg.get("observation_budget", 24000) or 0),
             )
         except ProviderError as exc:
             print(f"[provider error: {exc}]", file=err)
