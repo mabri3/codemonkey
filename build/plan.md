@@ -505,7 +505,7 @@ map to an A-criterion, a loop selection, or a cited research selection).
 
 ## Cycle checklist — loop 5 (research-gated forward look)
 
-- [ ] CYCLE R5 — Loop 5 research: re-research and re-rank the carried-forward
+- [x] CYCLE R5 — Loop 5 research: re-research and re-rank the carried-forward
   shortlist with FRESH citations (subagents / delegated context isolation;
   hooks + rule-based command allow/deny permissions; a local eval harness for
   the agent itself; MCP client extension points; token/cost accounting), then
@@ -517,6 +517,53 @@ map to an A-criterion, a loop selection, or a cited research selection).
   architecture; sandbox + approval semantics). AGENTS.md requires stop-and-ask
   before building either — R5 therefore ENDS by asking the user, and does not
   hand its selections to a build tick automatically.
+
+
+### loop5: cycles (selected from build/research-loop5.md, cycle R5)
+
+- [ ] CYCLE 24 — `loop5:` eval harness core: `codemonkey eval <suite.yaml>` runs
+  YAML golden tasks (prompt, expected stdout-contains, expected exit code,
+  required tool trajectory) against the real exec path; scores pass rate +
+  tokens + wall time; writes build/eval/results.json | est: 30m |
+  verify: `uv run pytest tests/test_eval.py -q` → exit 0 (≥5 tests: YAML load,
+  task run via patched exec, stdout-contract scoring, trajectory scoring,
+  results.json shape); `uv run pytest -q` → exit 0; LIVE: a 2-task suite runs
+  green against the home server (transcript to build/probes/).
+- [ ] CYCLE 25 — `loop5:` golden suite + regression baseline: ~8 tasks covering
+  the A-probes (pong, tool loop, structured output, resume recall, patch edit,
+  verify-gate fix, sessions listing, help contract); versioned baseline
+  (build/eval/baseline.json); `codemonkey eval --check` exits 1 on regression |
+  est: 30m |
+  verify: baseline written from a green run; deliberately broken task
+  (wrong expectation) → `eval --check` exit 1 naming the regression; restored →
+  exit 0; `uv run pytest -q` → exit 0.
+- [ ] CYCLE 26 — `loop5:` token/cost telemetry: per-turn usage aggregated into
+  the JSONL stream (turn.completed already carries usage; add run total +
+  per-tool-call counts), `exec --cost-summary` prints tokens/wall-time/tool
+  calls; cumulative ~/.codemonkey/cost.json ledger | est: 30m |
+  verify: `uv run pytest tests/test_cost.py -q` → exit 0 (≥4 tests: run totals
+  in JSONL, ledger append, ledger cumulative across runs, --cost-summary
+  output shape); `uv run pytest -q` → exit 0.
+- [ ] CYCLE 27 — `loop5:` repo-map relevance ranking: task-conditioned selection
+  folded into the cycle-21 injection — query terms (from the user prompt) match
+  symbol/file names via the existing search index; still budget-capped, still
+  opt-in (`repo_map: true`) | est: 30m |
+  verify: `uv run pytest tests/test_repomap_relevance.py -q` → exit 0 (≥4 tests:
+  relevance overrides recency for matching symbols; non-matching fallback keeps
+  cycle-21 order; budget still enforced; injection stays deterministic across
+  two calls); `uv run pytest -q` → exit 0.
+- [ ] CYCLE loop5-final — Loop 5 acceptance: full A1–A20 re-sweep + loop-5
+  probes; BUILD_REPORT loop-5 section | est: 30m |
+  verify: `bash build/acceptance_sweep.sh` → all green; `uv run pytest -q` →
+  exit 0; report updated and committed. (R6 entry condition: eval harness
+  shipped by 24/25.)
+
+## ⚠️ CORE-DESIGN DECISIONS (from R5, awaiting user)
+
+- Subagents / delegated context isolation (candidate 4) — 3+ cycles, changes
+  loop architecture + session semantics. Build or defer?
+- Hooks + rule-based command permissions (candidate 5) — 2 cycles, changes
+  approval/sandbox semantics. Build or defer?
 
 ## Cycle checklists — loops 6-10 (PROPOSED 2026-09-02, NOT AUTHORIZED)
 

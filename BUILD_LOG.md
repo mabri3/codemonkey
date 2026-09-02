@@ -1221,3 +1221,13 @@ re-verified on the home server. Shell env CODEMONKEY_PROVIDER=unblock2 leak
 untracked; test_knobs switched to local.
 
 **Loop 4 COMPLETE. Loops 5-10 charters await user authorization (R5 first).**
+
+## 2026-09-02 — CYCLE R5: Loop 5 research — 6 candidates, 4 selected, 2 core-design asks
+
+**Completed:** `build/research-loop5.md` (committed) — eval harness, token/cost
+telemetry, repo-map relevance ranking selected as build cycles 24-27; subagents
+and hooks/permissions re-researched with fresh citations and flagged CORE DESIGN
+per AGENTS.md — user decision required before either is built. MCP deferred a
+fourth time (fixed 11-tool surface is a deliberate small-model optimization).
+
+**Next step:** CYCLE 24 — eval harness core.
