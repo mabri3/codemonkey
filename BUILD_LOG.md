@@ -917,3 +917,13 @@ reaches it to report and stop instead of taking the first unchecked cycle.
 
 **Next step:** user decision — accept loop 3 and authorize loop 4 (optionally
 amending the cycle list), or reject with deficiencies.
+
+## 2026-09-02 — R4 APPROVAL: "approved 3" — cycles 18/19/20 green-lit
+
+**Recorded:** user reviewed build/research-loop4.md (Claude R4, commit 18301af)
+and approved three builds: CYCLE 18 (project-instruction loader), CYCLE 19
+(verify gate), CYCLE 20 (repo map part 1). PARKED pending later approval:
+7F1 (memory wiring), 17F1 (config knobs), 21 (repo-map ranking), 22 (prefix
+stability), 23 (retry/backoff). plan.md carries [APPROVED-R4]/[PARKED-R4] tags.
+
+**Next step:** CYCLE 18 build.

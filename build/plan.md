@@ -358,7 +358,7 @@ against build/spec.md. Findings become the unchecked fix cycles below
 Both findings map to `build/spec.md`, not to new research (AGENTS.md: work must
 map to an A-criterion, a loop selection, or a cited research selection).
 
-- [ ] CYCLE 7F1 — memory strategy is built but never wired (spec.md "Modular
+- [ ] CYCLE 7F1 [PARKED-R4] — memory strategy is built but never wired (spec.md "Modular
   strategy architecture → Memory"): inject `memory.load()` into the system
   prompt as part of a single project-context block, register `update_memory`
   in `tools/__init__.py::_MODULES` + `SPECS`, and make `memory: none` disable
@@ -373,7 +373,7 @@ map to an A-criterion, a loop selection, or a cited research selection).
   `uv run codemonkey exec --ephemeral "What probe token is in your memory?"`
   → exit 0, stdout contains `codemonkey_memory_probe_token` (transcript to
   `build/probes/`).
-- [ ] CYCLE 17F1 — loop-3 knobs are function defaults, not knobs: add
+- [ ] CYCLE 17F1 [PARKED-R4] — loop-3 knobs are function defaults, not knobs: add
   `max_edit_retries` (1) and `observation_budget` (24000) to `config.DEFAULTS`,
   to `ENV_MAP` (`CODEMONKEY_MAX_EDIT_RETRIES`, `CODEMONKEY_OBSERVATION_BUDGET`)
   and pass them from `exec.py`/`repl.py` into `run_turns`. | est: 20m |
@@ -386,8 +386,13 @@ map to an A-criterion, a loop selection, or a cited research selection).
   `uv run pytest -q` → exit 0.
 
 ### loop4: cycles (selected from build/research-loop4.md, cycle R4)
+> **USER R4 DECISION (2026-09-02): "approved 3"** — CYCLE 18, 19, 20 are approved
+> to build now. CycLES 7F1, 17F1, 21, 22, 23 (spec-gap fixes; repo-map part 2;
+> prefix stability; retry/backoff) are PARKED pending a later approval round.
+> Parked cycles stay unchecked and are NOT built until the user approves them.
 
-- [ ] CYCLE 18 — `loop4:` project-instruction loader (AGENTS.md → CLAUDE.md →
+
+- [ ] CYCLE 18 — `loop4:` [APPROVED-R4] project-instruction loader (AGENTS.md → CLAUDE.md →
   `.codemonkey/instructions.md`, nearest-first from the workdir up to the repo
   root; 32KB cap with a truncation marker; config `project_instructions: true`
   + `--no-project-instructions`; merged with memory into ONE stable
@@ -400,7 +405,7 @@ map to an A-criterion, a loop selection, or a cited research selection).
   "Always end your reply with the word pineapple", then
   `uv run codemonkey exec --ephemeral "Say hello."` → exit 0, stdout contains
   `pineapple` (transcript to `build/probes/`).
-- [ ] CYCLE 19 — `loop4:` verify gate (verification inside the loop): config
+- [ ] CYCLE 19 — `loop4:` [APPROVED-R4] verify gate (verification inside the loop): config
   `verify_command` (default unset = disabled) + `max_verify_retries`
   (default 1); after any turn whose mutating tool calls succeeded, run the
   command once under the sandbox/timeout; on non-zero exit feed the trimmed
@@ -416,7 +421,7 @@ map to an A-criterion, a loop selection, or a cited research selection).
   breaks it, `verify_command="uv run pytest -q"` → run ends with the test
   suite passing (verify.completed ok=true in the `--json` stream); transcript
   to `build/probes/`.
-- [ ] CYCLE 20 — `loop4:` repo map, part 1: `repomap.py` dependency-free
+- [ ] CYCLE 20 — `loop4:` [APPROVED-R4] repo map, part 1: `repomap.py` dependency-free
   def-scan (py/js/ts/go/rs/java/rb) producing file → [symbol, kind, line]
   entries; cache at `.codemonkey/repomap.json` keyed by path+mtime+size;
   skips `.git`, `.venv`, `node_modules`, `__pycache__`; new `repo_map` tool
@@ -431,7 +436,7 @@ map to an A-criterion, a loop selection, or a cited research selection).
   `uv run codemonkey exec --ephemeral --approval never "Use the repo_map tool
   on src/codemonkey and tell me which file defines parse_tool_calls."` →
   exit 0, stdout contains `protocol.py`.
-- [ ] CYCLE 21 — `loop4:` repo map, part 2: ranking (files touched in the last
+- [ ] CYCLE 21 [PARKED-R4] — `loop4:` repo map, part 2: ranking (files touched in the last
   N commits first, then symbol density) + budget (`repo_map_budget`, default
   4000 chars) + injection into the project-context block behind config
   `repo_map: false` (opt-in) | est: 30m |
@@ -444,7 +449,7 @@ map to an A-criterion, a loop selection, or a cited research selection).
   implements the prompt tool-call parser?"` → exit 0, stdout names
   `protocol.py`; the `--json` transcript shows zero `read_file` calls
   (transcript to `build/probes/`).
-- [ ] CYCLE 22 — `loop4:` prompt-prefix stability for KV-cache reuse:
+- [ ] CYCLE 22 [PARKED-R4] — `loop4:` prompt-prefix stability for KV-cache reuse:
   deterministic tool-spec ordering, project-context block emitted once in a
   fixed position, compaction constrained to rewrite only the tail (system
   prefix bytes never change mid-run); `cache_prompt: true` passthrough in the
@@ -459,7 +464,7 @@ map to an A-criterion, a loop selection, or a cited research selection).
   (best-effort, BLOCKED-tolerant): two identical-prefix runs against the
   active provider, record both wall-clock times raw in `build/probes/` — no
   claim is made if the numbers do not separate.
-- [ ] CYCLE 23 — `loop4:` provider resilience: retry with exponential backoff
+- [ ] CYCLE 23 [PARKED-R4] — `loop4:` provider resilience: retry with exponential backoff
   + full jitter honoring `Retry-After` on 429/502/503/504/529 and on 500s that
   are NOT the tools-parameter rejection; `max_retries` (default 3, config +
   `CODEMONKEY_MAX_RETRIES`); `AuthError` never retried | est: 30m |
