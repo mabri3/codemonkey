@@ -35,6 +35,8 @@ llama.cpp server (<code>http://192.168.50.113:8080/v1</code>,
   <li class="done">Agent loop: model → tool calls → sandbox-gated execution → result feedback, max_turns bail, per-turn events<span class="badge">CYCLE 4</span></li>
   <li class="done"><code>tool_protocol: auto</code> catches the llama.cpp <code>tools</code>-parameter HTTP 500 and retries the same turn with the prompt protocol, remembering the fallback per provider (A9 mechanic)<span class="badge">CYCLE 4</span></li>
   <li class="done"><code>exec</code> core: stdout purity (text mode stdout = final answer only), <code>--json</code> JSONL event stream (<code>thread.started</code>/<code>turn.started</code>/<code>thread.item.*</code>/<code>turn.completed</code>/<code>error</code>), stdin <code>-</code> prompt + piped-stdin context, git-repo guard (exit 2 + <code>--skip-git-repo-check</code> hint), exit codes 0/1/2, <code>-o/--output-last-message</code> tee, streaming deltas to stderr. Live probes green via temporary <code>unblock</code> provider (3458 OpenCode Go proxy, minimax-m3)<span class="badge">CYCLE 5</span></li>
+  <li class="done">Structured output: <code>--output-schema FILE</code> injects the JSON Schema into the final turn, extracts JSON from the reply (fence-tolerant), validates with jsonschema, one auto-retry appending validation errors; <code>-o</code> receives the normalized JSON<span class="badge">CYCLE 6</span></li>
+  <li class="done">Sessions: append-only JSONL store (<code>~/.codemonkey/sessions/&lt;id&gt;.jsonl</code>), <code>exec resume --last|THREAD_ID [prompt]</code>, <code>codemonkey sessions</code> listing (human or <code>--json</code>), <code>--ephemeral</code> skip. Live token-echo resume verified<br>(seeded thread, recalled <code>zebra</code>)<span class="badge">CYCLE 6</span></li>
 </ul>
 
 <h2>How to run</h2>
@@ -42,9 +44,12 @@ llama.cpp server (<code>http://192.168.50.113:8080/v1</code>,
 uv run codemonkey --version
 uv run codemonkey config          # effective merged config (secrets masked)
 uv run codemonkey models          # list models from the active provider
-uv run pytest -q                  # unit suite (85 tests, no network)
+uv run pytest -q                  # unit suite (103 tests, no network)
 uv run codemonkey exec "your prompt"          # non-interactive exec (text mode)
 uv run codemonkey exec --json "your prompt"   # JSONL event stream on stdout
+uv run codemonkey exec --output-schema s.json -o out.json "..."  # validated structured output
+uv run codemonkey exec resume --last "follow-up"   # resume the latest session
+uv run codemonkey sessions        # list persisted sessions
 echo "your prompt" | uv run codemonkey exec - # prompt from stdin
 # While the home llama.cpp inference is wedged (2026-09-02), live run:
 CODEMONKEY_PROVIDER=unblock CODEMONKEY_UNBLOCK_KEY=... uv run codemonkey exec "..."
@@ -53,15 +58,14 @@ CODEMONKEY_PROVIDER=unblock CODEMONKEY_UNBLOCK_KEY=... uv run codemonkey exec ".
 
 <h2>Known limitations</h2>
 <ul>
-  <li><code>review</code> / <code>sessions</code> / REPL commands are not wired yet (cycles 6–9). <code>--output-schema</code> is a deliberate exit-2 stub until cycle 6.</li>
-  <li>Structured output (<code>--output-schema</code>), session persistence, and pluggable strategies land in cycles 6–7.</li>
+  <li><code>review</code> and the interactive REPL are not wired yet (cycles 8–9).</li>
+  <li>Pluggable strategy registries (compaction/memory/session-state) land in cycle 7 &mdash; sessions currently always use the JSONL backend.</li>
   <li>Live-LLM probes need a live endpoint. 2026-09-02: the home llama.cpp server (192.168.50.113:8080) is reachable but its inference path is wedged &mdash; until it is restarted, live probes run through the temporary <code>unblock</code> provider (<code>CODEMONKEY_PROVIDER=unblock</code>, 127.0.0.1:3458 OpenCode Go proxy, model minimax-m3; needs <code>CODEMONKEY_UNBLOCK_KEY</code>).</li>
 </ul>
 
 <h2>Next planned features</h2>
 <ul>
 
-  <li class="todo">CYCLE 6 — Structured output + sessions/resume</li>
   <li class="todo">CYCLE 7 — Pluggable compaction / memory / session-state strategies</li>
   <li class="todo">CYCLES 8–10 — review + approvals, REPL, loop-1 acceptance sweep (A1–A20)</li>
 </ul>

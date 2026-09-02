@@ -213,13 +213,17 @@ def exec(
     from .exec import ExecUsageError, run_exec
     from .providers.base import AuthError, ProviderError
 
+    schema = None
     if output_schema is not None:
-        typer.secho(
-            "error: --output-schema is wired in cycle 6 (structured output)",
-            err=True,
-            fg=typer.colors.RED,
-        )
-        raise typer.Exit(2)
+        from .schema import SchemaError, load_schema_file
+
+        try:
+            schema = load_schema_file(output_schema)
+        except SchemaError as exc:
+            typer.secho(f"error: {exc}", err=True, fg=typer.colors.RED)
+            raise typer.Exit(2) from None
+    # Note: run_exec re-loads + validates the schema inside (cheap); passing
+    # the path keeps a single code path from flag to validation.
     try:
         code = run_exec(
             prompt,
@@ -235,6 +239,7 @@ def exec(
             max_turns=max_turns,
             timeout=timeout,
             output_last_message=output_last_message,
+            output_schema=output_schema,
             ignore_user_config=ignore_user_config,
             bypass=dangerously_bypass,
         )
@@ -253,8 +258,142 @@ def exec(
     raise typer.Exit(code)
 
 
+@app.command(name="sessions")
+def sessions(  # noqa: A001 - command name shadows builtin intentionally
+    json_out: Annotated[
+        bool, typer.Option("--json", help="Emit one JSON object per session.")
+    ] = False,
+) -> None:
+    """List persisted sessions (thread id, updated time, first prompt)."""
+    import json as _json
+    from datetime import datetime
+
+    from .config import ConfigError, load_config
+    from .sessions import get_store
+
+    try:
+        cfg = load_config(cwd=Path.cwd())
+    except ConfigError as exc:
+        typer.secho(f"error: {exc}", err=True, fg=typer.colors.RED)
+        raise typer.Exit(2) from None
+    items = get_store(cfg).list()
+    for it in items:
+        if json_out:
+            typer.echo(_json.dumps(it))
+        else:
+            when = datetime.fromtimestamp(it["updated"]).strftime("%Y-%m-%d %H:%M")
+            first = (it["first_prompt"] or "").replace("\n", " ")[:60]
+            typer.echo(
+                f"{it['thread_id']}  {when}  {it['provider']}/{it['model']}  "
+                f"{it['n_messages']} msgs  {first}"
+            )
+
+
 def main() -> None:  # pragma: no cover - convenience
+    _dispatch_exec_resume()
     app()
+
+
+def _dispatch_exec_resume() -> None:
+    """`codemonkey exec resume ...` is dispatched before Typer parses argv:
+    click would treat `resume` as the (only) positional prompt argument and
+    reject the remaining tokens. This shim handles only the resume form and
+    leaves all other invocations untouched."""
+    import sys
+
+    argv = sys.argv[1:]
+    if len(argv) >= 2 and argv[0] == "exec" and argv[1] == "resume":
+        _exec_resume_main(argv[2:])
+        raise SystemExit(0)
+
+
+def _exec_resume_main(args: list) -> None:
+    """Parse a small, explicit subset of exec flags for the resume form:
+    --json / -o FILE / --ephemeral / --skip-git-repo-check / --provider /
+    --model; positionals: [--last|THREAD_ID] [PROMPT] (any order; words after
+    the thread spec become the prompt)."""
+    import sys
+    from .config import ConfigError, load_config
+    from .exec import ExecUsageError, run_exec
+    from .providers.base import AuthError, ProviderError
+    from .sessions import get_store
+
+    json_out = False
+    output_last_message = None
+    ephemeral = False
+    skip_git = False
+    provider = None
+    model = None
+    positionals: list[str] = []
+    i = 0
+    while i < len(args):
+        a = args[i]
+        if a == "--json":
+            json_out = True
+        elif a in ("-o", "--output-last-message"):
+            i += 1
+            if i >= len(args):
+                print("error: -o/--output-last-message needs a value", file=sys.stderr)
+                raise SystemExit(2)
+            output_last_message = Path(args[i])
+        elif a == "--ephemeral":
+            ephemeral = True
+        elif a == "--skip-git-repo-check":
+            skip_git = True
+        elif a == "--provider":
+            i += 1
+            provider = args[i] if i < len(args) else None
+        elif a == "--model":
+            i += 1
+            model = args[i] if i < len(args) else None
+        else:
+            positionals.append(a)
+        i += 1
+
+    thread_spec = positionals[0] if positionals else "--last"
+    prompt = " ".join(positionals[1:]) or None
+    if prompt is None:
+        import sys as _sys
+
+        if not _sys.stdin.isatty():
+            prompt = _sys.stdin.read().rstrip("\n")
+
+    try:
+        cfg = load_config(cwd=Path.cwd())
+    except ConfigError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        raise SystemExit(2)
+
+    store = get_store(cfg)
+    if thread_spec in ("--last", "last"):
+        thread_id = store.latest()
+        if thread_id is None:
+            print("error: no persisted sessions to resume (--last)", file=sys.stderr)
+            raise SystemExit(2)
+    else:
+        thread_id = thread_spec
+
+    try:
+        code = run_exec(
+            prompt,
+            json_mode=json_out,
+            resume_thread=thread_id,
+            ephemeral=ephemeral,
+            skip_git_repo_check=skip_git,
+            provider_name=provider,
+            model=model,
+            output_last_message=output_last_message,
+        )
+    except ExecUsageError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        raise SystemExit(2)
+    except AuthError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        raise SystemExit(2)
+    except ProviderError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        raise SystemExit(1)
+    raise SystemExit(code)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,7 @@
+{
+  "project_name": "codemonkey",
+  "programming_languages": [
+    "Python"
+  ],
+  "summary": "codemonkey is a scriptable coding-agent CLI built in Python 3.11 (using Typer, Rich, httpx, PyYAML, and jsonschema) that drives OpenAI-style and Anthropic-style LLM endpoints \u2014 defaulting to a local llama.cpp server \u2014 to perform tool-mediated exec/review/session workflows over a sandboxed workspace."
+}

@@ -48,6 +48,7 @@ def run_turns(
     user_prompt: str,
     ctx: ToolContext,
     *,
+    history: Optional[list] = None,
     tool_protocol: str = "auto",
     system_extra: str = "",
     max_turns: int = 30,
@@ -55,12 +56,14 @@ def run_turns(
     on_event: Optional[Callable[[dict], None]] = None,
     on_token: Optional[Callable[[str], None]] = None,
     fallback: Optional[FallbackRecorded] = None,
+    schema: Optional[dict] = None,
 ) -> ChatTurn:
     """Drive the model until a final text answer or max_turns.
 
     on_event receives dicts: {type: turn.started}, {type: tool.started, name},
     {type: tool.completed, name, ok}, {type: turn.completed, usage},
-    {type: error, message}. Returns the final ChatTurn.
+    {type: error, message}. Returns the final ChatTurn, whose
+    ``all_messages`` attribute is the full conversation (history + this run).
     """
     fallback = fallback or FallbackRecorded()
     specs = tool_registry.SPECS
@@ -69,7 +72,9 @@ def run_turns(
         system = system_extra + "\n\n" + system
 
     mode = tool_protocol if tool_protocol in ("native", "prompt") else "auto"
-    messages: list[dict] = [{"role": "user", "content": user_prompt}]
+    messages: list[dict] = list(history or [])
+    if user_prompt:
+        messages.append({"role": "user", "content": user_prompt})
     last_turn = ChatTurn()
 
     for _turn_no in range(1, max_turns + 1):
@@ -134,7 +139,64 @@ def run_turns(
 
         if not calls:
             last_turn = turn
-            return turn
+            # Cycle 6: structured-output schema validation with one retry.
+            if schema is not None:
+                from . import schema as schema_mod
+
+                extracted = schema_mod.extract_json(turn.content or "")
+                ok = False
+                errors_text = ""
+                if extracted is not None:
+                    ok, errors_text = schema_mod.validate(extracted, schema)
+                    if not ok:
+                        errors_text = "extracted JSON failed validation:\n" + errors_text
+                else:
+                    errors_text = "- (root): response did not contain a JSON object"
+                if not ok:
+                    if on_event:
+                        on_event({
+                            "type": "notice",
+                            "message": "schema validation failed; retrying once",
+                        })
+                    messages.append({"role": "assistant", "content": turn.content or ""})
+                    messages.append({"role": "user", "content": schema_mod.retry_prompt(errors_text)})
+                    try:
+                        if use_prompt:
+                            retry = provider.chat(messages, system=system, stream=stream, on_token=on_token)
+                        elif native_first:
+                            retry = provider.chat(
+                                messages, system=system, stream=stream,
+                                tools=_native_specs(specs), on_token=on_token,
+                            )
+                        else:
+                            retry = provider.chat(messages, system=system, stream=stream, on_token=on_token)
+                    except ProviderError:
+                        retry = None
+                        if on_event:
+                            on_event({"type": "error", "message": "schema retry: provider error"})
+                    if retry is not None:
+                        if on_event:
+                            on_event({"type": "turn.completed", "usage": retry.usage})
+                        messages.append({"role": "assistant", "content": retry.content or ""})
+                        extracted2 = schema_mod.extract_json(retry.content or "")
+                        ok2 = False
+                        errors2 = ""
+                        if extracted2 is not None:
+                            ok2, errors2 = schema_mod.validate(extracted2, schema)
+                        else:
+                            errors2 = "- (root): retry response did not contain a JSON object"
+                        if ok2:
+                            last_turn = retry
+                            if on_event:
+                                on_event({"type": "notice", "message": "schema validation passed on retry"})
+                        else:
+                            if on_event:
+                                on_event({
+                                    "type": "error",
+                                    "message": "schema validation failed after retry: " + errors2,
+                                })
+            last_turn.all_messages = messages
+            return last_turn
 
         messages.append({"role": "assistant", "content": turn.content or ""})
         for call in calls:
@@ -162,6 +224,7 @@ def run_turns(
     if on_event:
         on_event({"type": "error",
                   "message": f"max_turns ({max_turns}) reached without a final answer"})
+    last_turn.all_messages = messages
     return last_turn
 
 

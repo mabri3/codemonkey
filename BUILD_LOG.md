@@ -345,3 +345,49 @@ tick's docs/config-only delta (no code re-implementation — rule 4 honored).
 **Next step:** CYCLE 6 — structured output + sessions/resume; live probes
 continue via `unblock` until the home server is restarted.
 Lock released (cycle complete).
+
+## 2026-09-02 ~05:25 — CYCLE 6: structured output + sessions/resume (resumed in-flight)
+
+Lease state: tick started with a dirty tree (cycle 6 ~90% implemented by an
+interrupted worker, no lock file). Per SPRINT.md rule 4 / uncommitted-work
+rule, resumed rather than re-implemented.
+
+**Files changed (was uncommitted at tick start):** `src/codemonkey/schema.py`
+(new — load/extract/validate + retry prompt), `src/codemonkey/sessions.py`
+(new — JSONL session store, list/latest, strategy seam),
+`src/codemonkey/loop.py` (history injection, schema validation + one
+auto-retry inside run_turns, all_messages on ChatTurn),
+`src/codemonkey/exec.py` (schema wiring + normalized `-o` output, session
+persist/resume, --ephemeral), `src/codemonkey/cli.py` (`sessions` command,
+`exec resume` argv dispatch shim), `pyproject.toml`,
+`tests/test_cycle6.py` (new), `build/probes/` (transcripts + tick_health.py
+health prober + with_unblock.sh wrapper).
+
+**Tests / probes run (literal results, this tick):**
+- `uv run pytest -q` → **103 passed, 0 failed** (1.94s, no network).
+- Tick-start health (`build/probes/tick_health.py`): home llama.cpp
+  `/models` 200 (0.1s) but inference **ReadTimeout (still wedged)**;
+  `unblock` proxy `/models` 200 — live probes continue via `unblock`.
+- A10 (re-run for verbatim output):
+  `codemonkey exec --output-schema build/schema-repo.json
+  --output-last-message build/probes/cycle6-repo.json "State the project
+  name and programming languages for this repository."` → **exit 0**;
+  output parses + jsonschema-validates; `project_name="codemonkey"`
+  (non-empty), `programming_languages=["Python"]` (non-empty). Transcript:
+  `build/probes/cycle6-schema.rerun.out`, artifact `cycle6-repo.json`.
+- A11/A12: seeded a thread with "Remember the token word: zebra"
+  (thread `317e50eee52c`); `codemonkey exec resume 317e50eee52c "What was
+  the token word..."` → **exit 0, stdout exactly `zebra`**
+  (`build/probes/cycle6-resume.rerun2.out`). (First `--last` re-run
+  targeted the schema thread instead of the zebra thread — operator error,
+  not product: resumed the correct thread by explicit id for the verdict.)
+- `codemonkey sessions` → exit 0, lists 10 threads incl. `317e50eee52c`.
+
+**Known issues:** (1) home llama.cpp still wedged — `unblock` remains
+TEMPORARY, key never printed/committed. (2) `exec resume` is an argv shim
+before Typer parse (documented in cli.py). (3) cycle 7 must route
+sessions.get_store through the strategies registry.
+
+**Next step:** cycle-6 review gate — fresh-context critic on
+`git diff db4fa9a..HEAD` vs build/spec.md; findings become new unchecked
+cycles. Then CYCLE 7 (strategies).

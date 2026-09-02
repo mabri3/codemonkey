@@ -26,6 +26,14 @@ from typing import Optional
 from . import events
 
 
+def _read_schema(schema_path: Optional[Path]) -> Optional[dict]:
+    if schema_path is None:
+        return None
+    from . import schema as schema_mod
+
+    return schema_mod.load_schema_file(schema_path)
+
+
 class ExecUsageError(Exception):
     """Exit-2 (usage/auth) errors."""
 
@@ -36,6 +44,22 @@ def find_git_root(cwd: Path) -> Optional[Path]:
         if (cand / ".git").exists():
             return cand
     return None
+
+
+def _schema_turn_check(turn, schema: Optional[dict]):
+    """(ok, normalized_json_or_None). When the schema validates, the second
+    element is the extracted value serialized without fences/prose."""
+    if schema is None:
+        return True, None
+    from . import schema as schema_mod
+
+    extracted = schema_mod.extract_json(getattr(turn, "content", "") or "")
+    if extracted is None:
+        return False, None
+    ok, _errs = schema_mod.validate(extracted, schema)
+    if ok:
+        return True, json.dumps(extracted, indent=2)
+    return False, None
 
 
 def _provider_from_config(cfg: dict, provider_name: Optional[str], model: Optional[str]):
@@ -76,12 +100,15 @@ def run_exec(
     model: Optional[str] = None,
     skip_git_repo_check: bool = False,
     ephemeral: bool = False,
+    resume_thread: Optional[str] = None,
     max_turns: Optional[int] = None,
     timeout: Optional[int] = None,
     output_last_message: Optional[Path] = None,
+    output_schema: Optional[Path] = None,
     ignore_user_config: bool = False,
     bypass: bool = False,
     stream_deltas: bool = True,
+    stdin_cm: Optional[str] = None,  # test/dev override: skip reading sys.stdin
 ) -> int:
     """Run one non-interactive exec turn-group. Returns the exit code."""
     from .config import ConfigError, load_config
@@ -92,8 +119,13 @@ def run_exec(
     workdir = Path(cwd or Path.cwd()).resolve()
 
     # -- stdin & prompt resolution ------------------------------------
+    # stdin_cm special values: None (default) = real sys.stdin handling;
+    # "" = treat stdin as an already-empty/captured stream (tests); any
+    # other string = that string IS the piped context.
     piped = ""
-    if prompt == "-":
+    if stdin_cm is not None:
+        piped = stdin_cm
+    elif prompt == "-":
         piped = sys.stdin.read()
         prompt = None
     elif not sys.stdin.isatty():
@@ -137,6 +169,13 @@ def run_exec(
         timeout=float(eff_timeout),
         extra={"approval": eff_approval},
     )
+
+    # -- schema (cycle 6) ------------------------------------------------
+    schema = _read_schema(output_schema)
+    if schema is not None:
+        from . import schema as schema_mod
+
+        full_prompt = full_prompt + "\n\n" + schema_mod.schema_instructions(schema)
 
     thread_id = events.new_thread_id()
     emit = lambda ev: events.emit(ev, json_mode=json_mode)  # noqa: E731
@@ -199,17 +238,40 @@ def run_exec(
         )
 
     emit({"type": "turn.started"})  # opening turn marker (json mode contract)
+
+    # -- session history (resume / new) ----------------------------------
+    from . import sessions as sessions_mod
+
+    store = sessions_mod.store(cfg)
+    history: list[dict] = []
+    if resume_thread:
+        try:
+            data = store.load(resume_thread)
+        except FileNotFoundError as exc:
+            raise ExecUsageError(str(exc)) from exc
+        history = data["messages"]
+        thread_id = resume_thread
+    elif not ephemeral:
+        store.append_meta(
+            thread_id,
+            provider=p_name,
+            model=getattr(provider, "model", "") or "",
+            cwd=str(workdir),
+        )
+
     try:
         turn = run_turns(
             provider,
             full_prompt,
             ctx,
+            history=history,
             tool_protocol=tool_protocol,
             system_extra=system_extra,
             max_turns=eff_max_turns,
             stream=stream_deltas,
             on_event=on_event,
             on_token=on_token,
+            schema=schema,
         )
     finally:
         try:
@@ -217,7 +279,8 @@ def run_exec(
         except Exception:
             pass
 
-    final_text = turn.content or ""
+    schema_ok, normalized = _schema_turn_check(turn, schema)
+    final_text = normalized if (schema_ok and normalized is not None) else (turn.content or "")
     if turn.reasoning:
         emit(
             {
@@ -258,4 +321,23 @@ def run_exec(
         except OSError as exc:
             sys.stderr.write(f"[warn] could not write {output_last_message}: {exc}\n")
 
-    return 0
+    # -- persist session (unless --ephemeral) ------------------------------
+    if not ephemeral:
+        all_msgs = getattr(turn, "all_messages", None) or history + [
+            {"role": "user", "content": full_prompt},
+            {"role": "assistant", "content": final_text},
+        ]
+        try:
+            store.append_meta(
+                thread_id,
+                provider=p_name,
+                model=getattr(provider, "model", "") or "",
+                cwd=str(workdir),
+            )
+            for m in all_msgs:
+                if m.get("role") in ("user", "assistant") and isinstance(m.get("content"), str):
+                    store.append_message(thread_id, m["role"], m["content"])
+        except OSError as exc:
+            sys.stderr.write(f"[warn] could not persist session: {exc}\n")
+
+    return 0 if schema_ok else 1

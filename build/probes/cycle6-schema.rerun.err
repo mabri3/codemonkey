@@ -1,0 +1,30 @@
+[usage] prompt=1293 completion=41
+$ 
+[exit None] 
+[usage] prompt=1349 completion=44
+$ 
+[exit None] 
+[usage] prompt=1466 completion=60
+$ 
+[exit None] 
+$ 
+[exit None] 
+[usage] prompt=1899 completion=84
+$ 
+[exit None] 
+$ 
+[exit None] 
+[usage] prompt=4357 completion=238
+$ 
+[exit None] 
+$ 
+[exit None] 
+```json
+{
+  "project_name": "codemonkey",
+  "programming_languages": ["Python"],
+  "summary": "codemonkey is a scriptable coding-agent CLI built in Python 3.11 (using Typer, Rich, httpx, PyYAML, and jsonschema) that drives OpenAI-style and Anthropic-style LLM endpoints — defaulting to a local llama.cpp server — to perform tool-mediated exec/review/session workflows over a sandboxed workspace."
+}
+```[usage] prompt=5151 completion=316
+[agent] {   "project_name": "codemonkey",   "programming_languages": [     "Python"   ],
+

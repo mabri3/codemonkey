@@ -1,0 +1,6 @@
+{"type": "thread.started", "thread_id": "317e50eee52c"}
+{"type": "turn.started"}
+{"type": "turn.started"}
+{"type": "turn.completed", "usage": {"prompt_tokens": 1134, "completion_tokens": 41, "total_tokens": 1175, "prompt_tokens_details": {"cached_tokens": 1103}, "completion_tokens_details": {"reasoning_tokens": 40}}}
+{"type": "thread.item.completed", "thread_id": "317e50eee52c", "item": {"id": "item_61c70aab", "type": "reasoning", "text": "The user is asking me to remember a token word \"zebra\" and reply with \"ok\". This is a simple acknowledgment task. I should just reply with \"ok\" as requested."}}
+{"type": "thread.item.completed", "thread_id": "317e50eee52c", "item": {"id": "item_7cfaa505", "type": "agent_message", "text": "ok"}}

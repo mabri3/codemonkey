@@ -90,7 +90,16 @@ end.
   naming `--skip-git-repo-check`), JSONL emitter (thread.started /
   turn.started / item.* / turn.completed / error), exit codes 0/1/2,
   `--output-last-message` tee.
-- [ ] CYCLE 6 — Structured output + sessions/resume | est: 30m |
+- [x] CYCLE 6 — Structured output + sessions/resume | est: 30m |
+  status: DONE 2026-09-02. Live probes via temporary `unblock` provider
+  (home llama.cpp still wedged — inference ReadTimeout at tick start).
+  A10: `--output-schema build/schema-repo.json` → exit 0, output JSON
+  validates (project_name="codemonkey", languages=["Python"]);
+  build/probes/cycle6-schema.rerun.out + cycle6-repo.json. A11/A12:
+  token-seeded thread 317e50eee52c, `exec resume <id> "What was the token
+  word..."` → exit 0, stdout exactly `zebra`
+  (build/probes/cycle6-resume.rerun2.out). `codemonkey sessions` lists the
+  thread. Unit suite 103/103.
   verify: LIVE A10: `uv run codemonkey exec --output-schema
   build/schema-repo.json --output-last-message /tmp/cm-repo.json "State the
   project name and programming languages for this repository."` → exit 0,
