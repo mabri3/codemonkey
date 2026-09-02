@@ -63,6 +63,8 @@ def run_turns(
     compaction=None,
     max_edit_retries: int = 1,
     observation_budget: int = 24000,
+    verify_command: Optional[str] = None,
+    max_verify_retries: int = 1,
 ) -> ChatTurn:
     """Run agent turns. `approval` (None disables the gate) is a policy name;
     `approval_notice_stream` overrides where soft-deny notices go (default:
@@ -83,6 +85,7 @@ def run_turns(
     mode = tool_protocol if tool_protocol in ("native", "prompt") else "auto"
     edit_retries_left = max(0, int(max_edit_retries))
     obs_spent = 0
+    verify_retries_left = max(0, int(max_verify_retries))
     messages: list[dict] = list(history or [])
     if user_prompt:
         messages.append({"role": "user", "content": user_prompt})
@@ -393,6 +396,47 @@ def run_turns(
                 on_event({"type": "notice",
                           "message": "self-heal: edit failed — retrying with error feedback"})
             continue
+
+        # ---- verify gate (loop4, cycle 19) ------------------------------
+        # After any turn whose MUTATING tool calls succeeded, run the
+        # configured verify command under the sandbox; on failure, feed the
+        # trimmed output back for a bounded corrective turn.
+        if (verify_command and verify_retries_left > 0
+                and any(name in ("write_file", "edit_file", "shell") and ok
+                        for _i, name, ok, _o, _m in outcomes)):
+            if on_event:
+                on_event({"type": "verify.started", "command": verify_command})
+            import subprocess as _sp
+
+            try:
+                vr = _sp.run(
+                    verify_command, shell=True, cwd=str(ctx.workdir),
+                    capture_output=True, text=True,
+                    timeout=max(5, int(ctx.timeout or 30)),
+                )
+                v_ok = vr.returncode == 0
+                v_text = (vr.stdout or "") + (("\n" + vr.stderr) if vr.stderr else "")
+            except _sp.TimeoutExpired as exc:
+                v_ok = False
+                v_text = f"verify command timed out after {exc.timeout}s"
+            if len(v_text) > 4000:
+                v_text = v_text[:4000] + "\n[verify output trimmed]"
+            if on_event:
+                on_event({"type": "verify.completed",
+                          "ok": v_ok, "exit_code": 0 if v_ok else 1})
+            obs_spent += len(v_text)
+            if not v_ok:
+                verify_retries_left -= 1
+                messages.append({
+                    "role": "user",
+                    "content": ("VERIFY FAILED (exit != 0). Output:\n" + v_text
+                                + "\nFix the code so the verify command passes, "
+                                "then briefly confirm."),
+                })
+                if on_event:
+                    on_event({"type": "notice",
+                              "message": "verify gate: failed — corrective turn granted"})
+                continue
         last_turn = turn
 
     # max_turns bail

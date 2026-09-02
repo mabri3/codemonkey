@@ -947,3 +947,22 @@ tests/test_instructions.py (new, 10 tests), build/probes/cycle18-instructions.md
 **Tests:** test_instructions 10/10; suite 207/207. LIVE probe: temp repo whose
 AGENTS.md says end replies with "pineapple" -> exec output ends pineapple;
 --no-project-instructions -> no pineapple (both directions on the record).
+
+## 2026-09-02 — CYCLE 19 (loop4): verify gate — verification inside the loop
+
+**Completed:** loop.run_turns gains `verify_command` + `max_verify_retries` (default 1):
+after any turn whose MUTATING tool calls (write_file/edit_file/shell) succeeded, the
+command runs once under the sandbox cwd + timeout; on non-zero exit the trimmed output
+is fed back as a user message ("VERIFY FAILED ... fix the code") for a bounded
+corrective turn. Events: verify.started{command} / verify.completed{ok, exit_code}.
+Verify output is charged to the observation budget. Config: `verify_command` (default
+unset = disabled), `max_verify_retries`; env CODEMONKEY_VERIFY_COMMAND /
+CODEMONKEY_MAX_VERIFY_RETRIES; exec passes both through.
+
+**Files changed:** src/codemonkey/loop.py, src/codemonkey/exec.py, src/codemonkey/config.py,
+tests/test_verify_gate.py (new, 6 tests), build/probes/cycle19-live.sh (committed live probe).
+
+**Tests:** test_verify_gate 6/6 (unset never runs; failure feeds text + corrective turn;
+passing adds no turn; retry cap exactly 2; fat output budget-charged; event order).
+Suite 213/213. LIVE: model broke calc.py per instruction -> pytest verify FAILED ->
+corrective turn repaired it -> suite passing, GATE-OK (transcript probe committed).

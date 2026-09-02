@@ -68,6 +68,8 @@ DEFAULTS: dict = {
     "web_fetch": False,
     "context_limit": 32000,
     "project_instructions": True,
+    "verify_command": "",
+    "max_verify_retries": 1,
     "strategies": {
         "compaction": "summarizing",
         "memory": "file",
@@ -84,6 +86,8 @@ ENV_MAP: dict[str, str] = {
     "CODEMONKEY_TIMEOUT": "timeout_seconds",
     "CODEMONKEY_TIMEOUT_SECONDS": "timeout_seconds",
     "CODEMONKEY_PROJECT_INSTRUCTIONS": "project_instructions",
+    "CODEMONKEY_VERIFY_COMMAND": "verify_command",
+    "CODEMONKEY_MAX_VERIFY_RETRIES": "max_verify_retries",
     "CODEMONKEY_STRATEGY_COMPACTION": "strategies.compaction",
     "CODEMONKEY_STRATEGY_MEMORY": "strategies.memory",
     "CODEMONKEY_STRATEGY_SESSION_STATE": "strategies.session_state",

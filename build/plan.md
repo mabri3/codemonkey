@@ -405,7 +405,7 @@ map to an A-criterion, a loop selection, or a cited research selection).
   "Always end your reply with the word pineapple", then
   `uv run codemonkey exec --ephemeral "Say hello."` → exit 0, stdout contains
   `pineapple` (transcript to `build/probes/`).
-- [ ] CYCLE 19 — `loop4:` [APPROVED-R4] verify gate (verification inside the loop): config
+- [x] CYCLE 19 — `loop4:` [APPROVED-R4] verify gate (verification inside the loop): config
   `verify_command` (default unset = disabled) + `max_verify_retries`
   (default 1); after any turn whose mutating tool calls succeeded, run the
   command once under the sandbox/timeout; on non-zero exit feed the trimmed

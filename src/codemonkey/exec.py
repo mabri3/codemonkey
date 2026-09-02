@@ -324,6 +324,8 @@ def run_exec(
             approval=eff_approval,
             context_limit=int(cfg.get("context_limit", 32000) or 0) or None,
             compaction=compaction,
+            verify_command=(str(cfg.get("verify_command") or "").strip() or None),
+            max_verify_retries=int(cfg.get("max_verify_retries", 1) or 0),
         )
     finally:
         try:
