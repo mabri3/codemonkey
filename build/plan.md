@@ -208,3 +208,38 @@ end.
 - Loops 2/3 cycle appends extend the run; the cap stays none. The only stop
   conditions are `build/STOP`, 3 consecutive failed probes on one cycle, or
   loop3-final acceptance passing.
+
+## Review-gate findings — cycle 6 critic (2026-09-02) → fix cycles
+
+Fresh-context critic (build/critic-cycle6.md) reviewed the cycles 1–6 diff
+against build/spec.md. Findings become the unchecked fix cycles below
+(inserted before CYCLE 7 per append rule; checked boxes preserved).
+
+- [ ] CYCLE 6F1 — Sandbox: `workspace-write` must ALLOW shell per policy
+  (spec:97) instead of denying it; approval-gated, cwd-bound. Fix
+  `sandbox.py`/`tools/__init__.py`, update the two denying tests, add a
+  test: workspace-write + approval never → shell executes, read-only still
+  denies shell. | est: 20m |
+  verify: `uv run pytest tests/test_sandbox.py tests/test_tools.py -q` →
+  exit 0 incl. new workspace-write-shell-allowed case; full suite green.
+- [ ] CYCLE 6F2 — exec resume becomes a real Typer subcommand sharing the
+  full exec flag set (sandbox/add-dir/timeout/etc.); `--json` JSONL items
+  renamed to spec contract `item.started`/`item.completed` (exec.py); drop
+  the synthetic pre-loop `turn.started` + emit `turn.started` around the
+  schema retry (one per turn, 1:1 with turn.completed); persisted session
+  messages strip schema instructions/retry scaffolding. | est: 30m |
+  verify: `uv run pytest -q` → exit 0 incl. updated event-name + turn
+  counting tests; LIVE (via unblock while home server wedged): a real
+  `exec --json` transcript committed to build/probes/ plus an A9-style
+  shell-tool transcript showing `command_execution` items and exit 0.
+- [ ] CYCLE 6F3 — web_fetch honors `web_fetch: true` config gate (default
+  off; off → ToolResult error, no network); search Python fallback uses
+  fnmatch not re.match; live stdin-`-` + git-guard probe transcripts
+  committed to build/probes/. | est: 15m |
+  verify: `uv run pytest -q` → exit 0 incl. new web_fetch-gated + fnmatch
+  fork tests; probe files exist in the commit.
+- [ ] CYCLE 6F4 — hygiene sweep: temp `unblock` provider removal guard
+  test (fails when shipped in defaults on live home server); session meta
+  append fresh `created` only on first write (floor, not drift). |
+  est: 15m |
+  verify: `uv run pytest -q` → exit 0.
