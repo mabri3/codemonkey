@@ -720,3 +720,19 @@ small local model; agentic self-review — 2x token cost per headless run.)
 **Tests:** n/a (research cycle). Suite remains 164/164.
 
 **Next step:** CYCLE 12 — parallel tool execution.
+
+## 2026-09-02 — CYCLE 12 (loop2): parallel tool execution
+
+**Completed:** loop.py tool block rebuilt: all parsed calls in a turn are gathered
+then executed concurrently (ThreadPoolExecutor, <=8 workers); outcomes re-sorted to
+call order for a deterministic transcript; per-call tool.started/tool.completed
+events preserved; per-call isolation — a parse/approval/dispatch failure yields an
+error TOOL_RESULT for that call only, siblings run and report normally.
+
+**Files changed:** src/codemonkey/loop.py (execution block), tests/test_parallel.py (new, 5 tests).
+
+**Tests:** tests/test_parallel.py 5/5 (parallel < serial timing, call-order results,
+per-call events, sibling-survives-failure, single-call path). Suite 169/169.
+Live probe: one-turn 3x shell calls -> "alpha beta gamma" in order via unblock2.
+
+**Next step:** CYCLE 13 — search/replace patch editing.

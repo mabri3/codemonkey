@@ -230,47 +230,59 @@ def run_turns(
             return last_turn
 
         messages.append({"role": "assistant", "content": turn.content or ""})
-        for call in calls:
+
+        # ---- parallel tool execution (loop2, cycle 12) --------------------
+        # All calls in this turn are gathered first; independent calls run
+        # concurrently in a thread pool; results are re-ordered to call order
+        # so the transcript is deterministic. Errors (parse/approval/exec)
+        # are isolated per call: one failure never kills its siblings.
+        def _run_one(idx: int, call: dict):
+            """Execute one parsed call. Returns (idx, name, ok, output, meta)."""
             name = call.get("name", "")
             if on_event:
                 on_event({"type": "tool.started", "name": name})
             if call.get("error"):
-                result_output = f"error: {call['error']}"
-                ok = False
-            else:
-                # Approval gate (cycle 8): evaluate policy BEFORE dispatch.
-                decision = None
-                if approval:
-                    from . import approvals as approvals_mod
+                return (idx, name, False, f"error: {call['error']}", None)
+            # Approval gate (cycle 8): evaluate policy BEFORE dispatch.
+            if approval:
+                from . import approvals as approvals_mod
 
-                    decision = approvals_mod.decide(
-                        name, approval, sandbox=ctx.sandbox
-                    )
-                    if decision.action == approvals_mod.SOFT_DENY:
-                        approvals_mod.notice_to_stderr(
-                            decision, approval_notice_stream
-                        )
-                        result_output = approvals_mod.tool_result_notice(
-                            name, decision
-                        )
-                        ok = False
-                        if on_event:
-                            on_event({
-                                "type": "tool.completed",
-                                "name": name,
-                                "ok": False,
-                                "approval": "soft-deny",
-                            })
-                        messages.append(
-                            {"role": "user",
-                             "content": f"TOOL_RESULT {name}:\n{result_output}"}
-                        )
-                        continue
+                decision = approvals_mod.decide(name, approval, sandbox=ctx.sandbox)
+                if decision.action == approvals_mod.SOFT_DENY:
+                    approvals_mod.notice_to_stderr(decision, approval_notice_stream)
+                    if on_event:
+                        on_event({
+                            "type": "tool.completed",
+                            "name": name,
+                            "ok": False,
+                            "approval": "soft-deny",
+                        })
+                    return (idx, name, False,
+                            approvals_mod.tool_result_notice(name, decision),
+                            {"approval": "soft-deny"})
+            try:
                 result = tool_registry.dispatch(name, call.get("args") or {}, ctx)
-                result_output = result.output
-                ok = result.ok
+            except Exception as exc:  # isolation: sibling calls must survive
+                return (idx, name, False, f"error: {exc}", {"raised": True})
+            return (idx, name, result.ok, result.output, None)
+
+        max_workers = min(len(calls), 8) if len(calls) > 1 else 1
+        if max_workers > 1:
+            from concurrent.futures import ThreadPoolExecutor
+
+            with ThreadPoolExecutor(max_workers=max_workers) as pool:
+                outcomes = list(pool.map(lambda pair: _run_one(*pair),
+                                         list(enumerate(calls))))
+        else:
+            outcomes = [_run_one(0, calls[0])] if calls else []
+
+        outcomes.sort(key=lambda o: o[0])  # deterministic call order
+        for idx, name, ok, result_output, meta in outcomes:
             if on_event:
-                on_event({"type": "tool.completed", "name": name, "ok": ok})
+                ev = {"type": "tool.completed", "name": name, "ok": ok}
+                if meta:
+                    ev.update(meta)
+                on_event(ev)
             messages.append(
                 {
                     "role": "user",

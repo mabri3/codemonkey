@@ -183,7 +183,7 @@ end.
 
 ### loop2: cycles (selected from build/research-loop2.md, cycle 11)
 
-- [ ] CYCLE 12 — `loop2:` parallel tool execution (independent calls in one turn run
+- [x] CYCLE 12 — `loop2:` parallel tool execution (independent calls in one turn run
   concurrently, results re-ordered; per-call events) | est: 30m |
   verify: `uv run pytest tests/test_parallel.py -q` → exit 0 (≥4 tests: 3 calls with
   2 slow ones finish < serial sum; results in call order; per-call events emitted;
