@@ -1,0 +1,6 @@
+# cycle22 identical-prefix wall-clock (best-effort; no claim implied)
+# prompt: identical short prompt, same model (kimi-k2.7-code via 3459)
+run 1 wall: 2s
+run 2 wall: 1s
+run 3 wall: 1s
+run 4 wall: 1s

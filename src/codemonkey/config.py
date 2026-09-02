@@ -74,6 +74,7 @@ DEFAULTS: dict = {
     "observation_budget": 24000,
     "repo_map": False,
     "repo_map_budget": 4000,
+    "prompt_cache": True,
     "strategies": {
         "compaction": "summarizing",
         "memory": "file",

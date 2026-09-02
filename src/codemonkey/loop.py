@@ -66,6 +66,7 @@ def run_turns(
     verify_command: Optional[str] = None,
     max_verify_retries: int = 1,
     memory_enabled: bool = True,
+    prompt_cache: bool = True,
 ) -> ChatTurn:
     """Run agent turns. `approval` (None disables the gate) is a policy name;
     `approval_notice_stream` overrides where soft-deny notices go (default:
@@ -152,7 +153,8 @@ def run_turns(
         try:
             if use_prompt:
                 turn = provider.chat(
-                    messages, system=system, stream=stream, on_token=on_token
+                    messages, system=system, stream=stream, on_token=on_token,
+                    cache_prompt=prompt_cache,
                 )
             elif native_first:
                 turn = provider.chat(
@@ -161,10 +163,12 @@ def run_turns(
                     stream=stream,
                     tools=_native_specs(specs),
                     on_token=on_token,
+                    cache_prompt=prompt_cache,
                 )
             else:
                 turn = provider.chat(
-                    messages, system=system, stream=stream, on_token=on_token
+                    messages, system=system, stream=stream, on_token=on_token,
+                    cache_prompt=prompt_cache,
                 )
         except ProviderError as exc:
             if mode == "auto" and native_first and looks_like_tools_rejection(exc):

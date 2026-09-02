@@ -364,6 +364,7 @@ def run_exec(
             memory_enabled=memory_enabled,
             max_edit_retries=int(cfg.get("max_edit_retries", 1) or 0),
             observation_budget=int(cfg.get("observation_budget", 24000) or 0),
+            prompt_cache=bool(cfg.get("prompt_cache", True)),
         )
     finally:
         try:

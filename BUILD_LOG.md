@@ -1051,3 +1051,24 @@ build/probes/cycle21-repomap-inject.md.
 recent-before-stale on fixture repo, identical across consecutive turns, density
 tiebreak, omission marker, empty map). Suite 239/239. LIVE: repo_map=true answered
 protocol.py with zero read_file calls.
+
+## 2026-09-02 — CYCLE 22 (loop4): prompt-prefix stability + cache_prompt
+
+**Completed:** prompt_block renders tool specs SORTED (deterministic prefix bytes
+regardless of registry insertion order); loop.run_turns threads `prompt_cache`
+(default true from config `prompt_cache`) into every provider.chat call; the
+openai provider adds `cache_prompt: true` to the request body when enabled
+(harmless/ignored by servers that do not know it) and omits it when disabled;
+anthropic provider untouched (no cache_prompt in its body — verified by source
+assertion). The system prompt never changes mid-run: compaction rewrites only
+the message tail (existing invariant, now regression-tested byte-identically
+across turns incl. after tool results and after forced compaction).
+
+**Files changed:** src/codemonkey/protocol.py (sorted specs), src/codemonkey/loop.py
+(prompt_cache threading), src/codemonkey/providers/openai.py (cache_prompt body),
+src/codemonkey/exec.py (config gate), src/codemonkey/config.py (prompt_cache default
+true), tests/test_prefix_stability.py (new, 6 tests), tests/test_protocol.py (mock
+kwarg), build/probes/cycle22-live.sh + cycle22-timings.txt + cycle22-prefix.md.
+
+**Tests:** test_prefix_stability 6/6. Suite 245/245. LIVE best-effort timings
+recorded raw (2s/1s/1s/1s — no performance claim, per probe spec).

@@ -162,12 +162,18 @@ class OpenAIProvider(ProviderBase):
         temperature: Optional[float] = None,
         tools: Optional[list] = None,
         on_token=None,
+        cache_prompt: bool = True,
     ) -> ChatTurn:
         body: dict = {
             "model": self.model,
             "messages": self._messages(messages, system),
             "stream": bool(stream),
         }
+        # llama.cpp KV-cache reuse: cache_prompt hints the server to reuse the
+        # prefix over a stable system + earlier turns. Harmless/ignored by
+        # servers that do not know the field.
+        if cache_prompt:
+            body["cache_prompt"] = True
         if max_tokens is not None:
             body["max_tokens"] = max_tokens
         if temperature is not None:

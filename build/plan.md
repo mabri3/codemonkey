@@ -449,7 +449,7 @@ map to an A-criterion, a loop selection, or a cited research selection).
   implements the prompt tool-call parser?"` → exit 0, stdout names
   `protocol.py`; the `--json` transcript shows zero `read_file` calls
   (transcript to `build/probes/`).
-- [ ] CYCLE 22 — `loop4:` prompt-prefix stability for KV-cache reuse:
+- [x] CYCLE 22 — `loop4:` prompt-prefix stability for KV-cache reuse:
   deterministic tool-spec ordering, project-context block emitted once in a
   fixed position, compaction constrained to rewrite only the tail (system
   prefix bytes never change mid-run); `cache_prompt: true` passthrough in the

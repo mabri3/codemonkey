@@ -25,6 +25,7 @@ def prompt_block(specs: dict, *, memory_enabled: bool = True) -> str:
     """
     if not memory_enabled:
         specs = {k: v for k, v in specs.items() if k != "update_memory"}
+    specs = dict(sorted(specs.items()))  # deterministic prefix bytes
     lines = [
         "You have tools. To call one, output a line starting with TOOL_CALL: "
         "followed by a single JSON object on the SAME line:",

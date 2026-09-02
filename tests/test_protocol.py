@@ -132,7 +132,7 @@ class FakeProvider:
         self.calls: list[dict] = []
 
     def chat(self, messages, *, system=None, stream=False, max_tokens=None,
-             temperature=None, tools=None, on_token=None):
+             temperature=None, tools=None, on_token=None, cache_prompt=True):
         self.calls.append({"tools": tools, "messages": list(messages)})
         item = self.script.pop(0)
         if isinstance(item, Exception):
