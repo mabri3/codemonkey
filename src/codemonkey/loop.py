@@ -65,6 +65,7 @@ def run_turns(
     observation_budget: int = 24000,
     verify_command: Optional[str] = None,
     max_verify_retries: int = 1,
+    memory_enabled: bool = True,
 ) -> ChatTurn:
     """Run agent turns. `approval` (None disables the gate) is a policy name;
     `approval_notice_stream` overrides where soft-deny notices go (default:
@@ -78,7 +79,7 @@ def run_turns(
     """
     fallback = fallback or FallbackRecorded()
     specs = tool_registry.SPECS
-    system = prompt_protocol.prompt_block(specs)
+    system = prompt_protocol.prompt_block(specs, memory_enabled=memory_enabled)
     if system_extra:
         system = system_extra + "\n\n" + system
 

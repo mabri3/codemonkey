@@ -16,11 +16,15 @@ import json
 MARKER = "TOOL_CALL:"
 
 
-def prompt_block(specs: dict) -> str:
+def prompt_block(specs: dict, *, memory_enabled: bool = True) -> str:
     """Build the tool-advertising block for the system prompt.
 
     `specs` is the {name: one_line_spec} map from the tool registry.
+    `memory_enabled=False` hides update_memory entirely (strategies.memory=none):
+    the tool stays registered (calls soft-error honestly) but is not advertised.
     """
+    if not memory_enabled:
+        specs = {k: v for k, v in specs.items() if k != "update_memory"}
     lines = [
         "You have tools. To call one, output a line starting with TOOL_CALL: "
         "followed by a single JSON object on the SAME line:",

@@ -9,6 +9,7 @@ from . import (
     search,
     shell,
     repo_map,
+    update_memory,
     update_plan,
     web_fetch,
     write_file,
@@ -24,6 +25,7 @@ _MODULES = {
     "search": search,
     "shell": shell,
     "repo_map": repo_map,
+    "update_memory": update_memory,
     "update_plan": update_plan,
     "web_fetch": web_fetch,
 }
@@ -38,6 +40,7 @@ SPECS = {
     "search": "search(pattern, path='.', file_glob, limit=50) -> file:line: text matches (rg-backed)",
     "shell": "shell(command) -> bash -lc in workdir, timeout ctx.timeout (sandbox-gated)",
     "repo_map": "repo_map(path='.', pattern=None, limit=200) -> symbol index (file, kind, line) of the repo",
+    "update_memory": "update_memory(fact) -> append a durable fact to memory (disabled when strategies.memory=none)",
     "update_plan": "update_plan(mode=append|replace|clear, content, id, status=pending|in_progress|completed) -> renders plan",
     "web_fetch": "web_fetch(url) -> bounded GET (60s, 512KB) of a doc page",
 }

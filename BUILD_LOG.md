@@ -999,3 +999,23 @@ are un-parked and approved, followed by loop4-final.
 **Build order:** 7F1 (memory wiring) -> 17F1 (config knobs) -> 21 (repo-map
 ranking/injection) -> 22 (prefix stability + cache_prompt) -> 23 (retry/
 backoff) -> loop4-final (full re-sweep + report).
+
+## 2026-09-02 — CYCLE 7F1: memory strategy wired into the loop
+
+**Completed:** `update_memory(fact)` tool registered (11 tools; read-class);
+memory store resolved in exec BEFORE ctx creation and attached via ctx.extra
+(update_memory reads ctx.extra.memory; disabled memory -> honest error);
+FileMemory text injected into the ONE project-context block (instructions then
+memory, empty inputs skipped for byte-stability); `strategies.memory=none`
+disables BOTH the injection and the prompt advertisement (protocol.prompt_block
+gains memory_enabled gate — tool stays registered but unadvertised).
+
+**Fix during cycle:** memory resolution moved ahead of ctx construction
+(UnboundLocalError); registry test renamed all_eleven.
+
+**Files changed:** tools/update_memory.py (new), tools/__init__.py, sandbox.py,
+protocol.py, loop.py, exec.py, tests/test_memory_wiring.py (new, 6 tests),
+tests/test_tools.py, build/probes/cycle7f1-memory.md.
+
+**Tests:** test_memory_wiring 6/6; suite 228/228. LIVE: seeded temp memory with
+codemonkey_memory_probe_token -> exec recalled the token verbatim.

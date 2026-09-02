@@ -164,12 +164,32 @@ def run_exec(
     eff_timeout = timeout or int(cfg.get("timeout_seconds", 300))
     tool_protocol = pconf.get("tool_protocol", "auto")
 
+    # memory (7F1): resolve before ctx so update_memory can reach the store
+    try:
+        from .strategies import select_strategy as _sel_mem
+
+        mem_name = _sel_mem("memory", cfg)
+    except Exception:
+        mem_name = "file"
+    memory_enabled = mem_name != "none"
+    memory_obj = None
+    memory_text = ""
+    if memory_enabled:
+        try:
+            from .strategies.memory import get_memory as _get_memory
+
+            memory_obj = _get_memory(mem_name)
+            memory_text = memory_obj.load() or ""
+        except Exception:
+            memory_obj = None
+            memory_text = ""
+
     ctx = ToolContext(
         workdir=workdir,
         sandbox=eff_sandbox,
         add_dirs=[str(Path(d).resolve()) for d in (add_dirs or [])],
         timeout=float(eff_timeout),
-        extra={"approval": eff_approval, "config": cfg},
+        extra={"approval": eff_approval, "config": cfg, "memory": memory_obj},
     )
 
     # -- schema (cycle 6) -----------------------------------------------
@@ -267,14 +287,14 @@ def run_exec(
     pi_enabled = cfg.get("project_instructions", True)
     if project_instructions is not None:
         pi_enabled = project_instructions
-    if pi_enabled:
+    if pi_enabled or memory_text:
         from .instructions import build_project_context_block, load_instructions
 
-        instr_text = load_instructions(Path(workdir), enabled=True)
-        if instr_text:
-            block = build_project_context_block(
-                Path(workdir), instructions=instr_text
-            )
+        instr_text = load_instructions(Path(workdir), enabled=pi_enabled) if pi_enabled else ""
+        block = build_project_context_block(
+            Path(workdir), instructions=instr_text, memory_text=memory_text
+        )
+        if block:
             system_extra = system_extra + "\n\n" + block
 
     # -- session history (resume / new) ----------------------------------
@@ -326,6 +346,7 @@ def run_exec(
             compaction=compaction,
             verify_command=(str(cfg.get("verify_command") or "").strip() or None),
             max_verify_retries=int(cfg.get("max_verify_retries", 1) or 0),
+            memory_enabled=memory_enabled,
         )
     finally:
         try:

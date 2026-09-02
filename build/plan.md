@@ -358,7 +358,7 @@ against build/spec.md. Findings become the unchecked fix cycles below
 Both findings map to `build/spec.md`, not to new research (AGENTS.md: work must
 map to an A-criterion, a loop selection, or a cited research selection).
 
-- [ ] CYCLE 7F1 — memory strategy is built but never wired (spec.md "Modular
+- [x] CYCLE 7F1 — memory strategy is built but never wired (spec.md "Modular
   strategy architecture → Memory"): inject `memory.load()` into the system
   prompt as part of a single project-context block, register `update_memory`
   in `tools/__init__.py::_MODULES` + `SPECS`, and make `memory: none` disable
