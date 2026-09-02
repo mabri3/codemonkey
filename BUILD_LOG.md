@@ -539,3 +539,40 @@ guard = CYCLE 6F4).
 
 **Next step:** CYCLE 6F4 (unblock removal guard test + session meta
 created-floor fix), then CYCLE 7 (strategy layer).
+
+## 2026-09-02 — CYCLE 6F4 (hygiene sweep: unblock guard test + meta created floor)
+
+**Cycle:** 6F4 (review-gate fix per cycle-6 critic, appended in e609ba8).
+
+**Files changed:**
+- `src/codemonkey/sessions.py` — `SessionStore.append_meta` now stamps a fresh
+  `created` only on a thread's FIRST meta write; later appends (post-loop
+  refresh, resume) reuse the earliest recorded `created` as a floor via new
+  `_prior_created()` (parses the thread's jsonl, first meta wins). `updated`
+  still drifts with each write, and other meta fields (provider/model/cwd)
+  still update.
+- `tests/test_hygiene_6f4.py` (new) — 3 tests:
+  1. `test_temp_unblock_provider_removed_when_home_serves_inference` — guard:
+     fails if the temp `unblock` provider ships in DEFAULTS while the home
+     llama.cpp (:8080) actually ANSWERS a chat completion (inference, not just
+     /v1/models); also fails if the provider is removed early while home is
+     still wedged. Home/wedged state probed live in-test (20s timeout).
+  2. `test_meta_created_fresh_on_first_write` — created ∈ [before, after].
+  3. `test_meta_created_does_not_drift_across_updates` — backdates the first
+     meta by 1h, appends a second meta, asserts `created` stays at the floor
+     (not now()) while `model` still updates.
+- `features.html` — CYCLE 6F4 badge entry; suite count 107→118.
+
+**Tests run + results (literal):**
+`uv run pytest -q` → **118 passed in 22.23s** (was 115; +3 new). The guard
+test ran its live home-server probe inside the suite: inference still wedged
+(so `temp_present == True` branch passed), confirming the TEMPORARY provider
+stays for now; the moment :8080 serves a completion, this test goes RED and
+forces the removal commit.
+
+**Known issues:** home llama.cpp inference still wedged — temp `unblock`
+provider retained, now with an automated tripwire. No user-facing behavior
+change otherwise.
+
+**Next step:** CYCLE 7 (strategy layer: pluggable compaction / memory /
+session-state; A19/A20 probes).

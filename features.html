@@ -40,6 +40,7 @@ llama.cpp server (<code>http://192.168.50.113:8080/v1</code>,
   <li class="done">Review-gate fix: sandbox spec compliance &mdash; <code>workspace-write</code> now ALLOWS <code>shell</code> per policy (spec:97, approval-gated + cwd-bound; approvals layer lands in CYCLE 8); <code>read-only</code> still denies shell + writes<span class="badge">CYCLE 6F1</span></li>
   <li class="done">Review-gate fix: exec surface + JSONL event contract + schema hygiene &mdash; <code>exec</code> is now a Typer group with a real <code>resume</code> subcommand (full exec flag set, <code>--help</code> works; argv rewrite keeps <code>exec resume ...</code> compatible); JSONL item events renamed to the spec contract <code>item.started</code>/<code>item.completed</code>; <code>turn.started</code> is 1:1 with <code>turn.completed</code> incl. schema retries; persisted sessions strip injected schema instructions + retry meta-dialogue (resumed threads see only the pristine history). Live transcripts: <code>build/probes/cycle6f2-*</code><span class="badge">CYCLE 6F2</span></li>
   <li class="done">Review-gate fix: <code>web_fetch</code> config gate hardened (default OFF, gated calls return an honest <code>ok=False</code> error without touching the network; <code>web_fetch: true</code> enables bounded GET) + Python search fallback now treats <code>file_glob</code> as a glob via <code>fnmatch</code> (was a bogus regex match). Missing live stdin-<code>-</code> + git-guard probe transcripts committed (<code>build/probes/cycle6f3-*</code>)<span class="badge">CYCLE 6F3</span></li>
+  <li class="done">Review-gate fix: hygiene sweep &mdash; guard test forces removal of the temporary <code>unblock</code> provider the moment the home llama.cpp server serves inference again (it fails BOTH if the provider ships while home is alive AND if it is removed while home is still wedged); session meta <code>created</code> is now a floor &mdash; stamped fresh only on a thread's first write, later meta appends reuse it instead of drifting<span class="badge">CYCLE 6F4</span></li>
 </ul>
 
 <h2>How to run</h2>
@@ -47,7 +48,7 @@ llama.cpp server (<code>http://192.168.50.113:8080/v1</code>,
 uv run codemonkey --version
 uv run codemonkey config          # effective merged config (secrets masked)
 uv run codemonkey models          # list models from the active provider
-uv run pytest -q                  # unit suite (107 tests, no network)
+uv run pytest -q                  # unit suite (118 tests, no network)
 uv run codemonkey exec "your prompt"          # non-interactive exec (text mode)
 uv run codemonkey exec --json "your prompt"   # JSONL event stream on stdout
 uv run codemonkey exec --output-schema s.json -o out.json "..."  # validated structured output

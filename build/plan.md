@@ -270,8 +270,14 @@ against build/spec.md. Findings become the unchecked fix cycles below
   fnmatch fork ×2). Full suite 115/115.
   verify: `uv run pytest -q` → exit 0 incl. new web_fetch-gated + fnmatch
   fork tests; probe files exist in the commit.
-- [ ] CYCLE 6F4 — hygiene sweep: temp `unblock` provider removal guard
+- [x] CYCLE 6F4 — hygiene sweep: temp `unblock` provider removal guard
   test (fails when shipped in defaults on live home server); session meta
   append fresh `created` only on first write (floor, not drift). |
   est: 15m |
+  status: DONE 2026-09-02. sessions.py append_meta now reuses earliest
+  recorded `created` via _prior_created() (first meta write stamps now(),
+  later appends keep the floor; updated/other fields still refresh).
+  tests/test_hygiene_6f4.py: 3 tests — live guard fails if `unblock` ships
+  while :8080 answers chat completions (or if removed early), created-floor
+  fresh + no-drift (1h backdate) cases. Full suite 118/118 (was 115).
   verify: `uv run pytest -q` → exit 0.

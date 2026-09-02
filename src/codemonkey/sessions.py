@@ -41,9 +41,38 @@ class SessionStore:
             "provider": provider,
             "model": model,
             "cwd": cwd,
-            "created": time.time(),
+            # `created` is a FLOOR: on the first append_meta for a brand-new
+            # thread it stamps now(), but every later meta append (post-loop
+            # refresh, resume run) reuses the earliest recorded `created` so
+            # the field never drifts across the thread's life (cycle 6F4).
+            "created": self._prior_created(thread_id) or time.time(),
             "updated": time.time(),
         })
+
+    @staticmethod
+    def _prior_created(thread_id: str) -> Optional[float]:
+        """Earliest `created` from any existing meta event for this thread.
+
+        First-write returns None (fresh thread); subsequent appends reuse the
+        floor so `created` is stamped exactly once per thread.
+        """
+        p = _path(thread_id)
+        if not p.exists():
+            return None
+        try:
+            for line in p.read_text().splitlines():
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    ev = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                if ev.get("type") == "meta" and isinstance(ev.get("created"), (int, float)):
+                    return ev["created"]
+        except OSError:
+            return None
+        return None
 
     def append_message(self, thread_id: str, role: str, content: str) -> None:
         self._append(thread_id, {"type": "message", "role": role, "content": content, "ts": time.time()})
