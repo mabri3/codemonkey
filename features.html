@@ -78,13 +78,25 @@ CODEMONKEY_PROVIDER=unblock CODEMONKEY_UNBLOCK_KEY=... uv run codemonkey exec ".
 <ul>
 
   <li>Live-LLM probes need a live endpoint. 2026-09-02: the home llama.cpp server (192.168.50.113:8080) is reachable but its inference path is wedged &mdash; until it is restarted, live probes run through the temporary <code>unblock</code> provider (<code>CODEMONKEY_PROVIDER=unblock</code>, 127.0.0.1:3458 OpenCode Go proxy, model minimax-m3; needs <code>CODEMONKEY_UNBLOCK_KEY</code>).</li>
+  <li>Memory strategy is selectable but <strong>not wired</strong>: <code>~/.codemonkey/memory.md</code> is never injected into the system prompt and there is no <code>update_memory</code> tool yet (fix proposed as CYCLE 7F1).</li>
+  <li><code>max_edit_retries</code> and <code>observation_budget</code> are <code>run_turns</code> defaults only &mdash; not settable from config, env, or flags yet (fix proposed as CYCLE 17F1).</li>
+  <li>No repo map, no post-edit verification gate, and no provider retry/backoff &mdash; all proposed for loop 4.</li>
 </ul>
 
 <h2>Next planned features</h2>
+<p><strong>Loops 1&ndash;3 are complete and all cycles are checked.</strong> The list below is the
+<em>proposed</em> loop 4 (CYCLE R4 research, <code>build/research-loop4.md</code>) &mdash; nothing here is
+authorized to build until the user answers <strong>Gate 2</strong> (final acceptance of loop 3).</p>
 <ul>
-
-  <li class="todo">CYCLE 7 — Pluggable compaction / memory / session-state strategies</li>
-  <li class="todo">CYCLES 8–10 — review + approvals, REPL, loop-1 acceptance sweep (A1–A20)</li>
+  <li class="todo">CYCLE 7F1 &mdash; wire the memory strategy: inject <code>memory.load()</code> into the system prompt and register the <code>update_memory</code> tool (spec gap: built but never called)</li>
+  <li class="todo">CYCLE 17F1 &mdash; make <code>max_edit_retries</code> and <code>observation_budget</code> real config/env knobs</li>
+  <li class="todo">CYCLE 18 &mdash; project-instruction loader (AGENTS.md &rarr; CLAUDE.md &rarr; .codemonkey/instructions.md)</li>
+  <li class="todo">CYCLE 19 &mdash; verify gate: run the configured <code>verify_command</code> after mutating turns and feed failures back</li>
+  <li class="todo">CYCLES 20&ndash;21 &mdash; repo map: dependency-free symbol index + cache + <code>repo_map</code> tool, then ranked budgeted injection</li>
+  <li class="todo">CYCLE 22 &mdash; byte-stable prompt prefix + <code>cache_prompt</code> passthrough for llama.cpp KV-cache reuse</li>
+  <li class="todo">CYCLE 23 &mdash; provider retry/backoff honoring <code>Retry-After</code> (the tools-500 &rarr; prompt-fallback path stays un-retried)</li>
+  <li class="todo">CYCLE loop4-final &mdash; A1&ndash;A20 re-sweep + loop-4 report section</li>
+  <li class="todo">CYCLE R5 &mdash; loop 5 research only: subagents, hooks + rule-based permissions, local eval harness, MCP, cost accounting (core-design items end by asking the user)</li>
 </ul>
 </body>
 </html>

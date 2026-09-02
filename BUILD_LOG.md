@@ -877,3 +877,43 @@ commit chain, environment notes) and ends with the formal user-acceptance reques
 
 **Run state:** 20/20 original criteria + 8 loop-2/3 improvement probes, all live.
 **All cycles in plan.md are checked. The build is complete pending user acceptance.**
+
+## 2026-09-02 — CYCLE R4: Loop 4 research + entry review (PROPOSAL ONLY — Gate 2 still open)
+
+**Completed:** `build/research-loop4.md` — 9 researched capabilities (8 live web
+searches, 35 cited URLs, no fabricated sources), ranked by leverage ÷ cost for a
+local 27B model in headless runs, with a `SELECTED` list mapping 9 cycles into
+`build/plan.md`. Also an *entry review* of the built source (not of the log),
+which produced two real spec gaps:
+
+- **F-A** `strategies/memory.py` is instantiated by `strategies.build()` but
+  `load()` is never called and `update_memory` is not in the tool registry —
+  spec.md's Memory requirement is unmet (A19/A20 only cover compaction +
+  session-state, so it passed unnoticed). → CYCLE 7F1.
+- **F-B** `max_edit_retries` / `observation_budget` exist only as `run_turns`
+  parameter defaults; neither appears in `config.DEFAULTS`, `ENV_MAP`, or
+  `exec.py`'s call — the documented knobs are not settable. → CYCLE 17F1.
+
+**Selected for loop 4 (all UNCHECKED, unauthorized):** 7F1 memory wiring ·
+17F1 knob exposure · 18 project-instruction loader (AGENTS.md) · 19 verify gate
+(verification inside the loop) · 20–21 repo map (index+tool, then ranked
+injection) · 22 prompt-prefix stability for llama.cpp KV-cache reuse ·
+23 provider retry/backoff with Retry-After · loop4-final re-sweep.
+**Deferred to CYCLE R5 (research-gated):** subagents/delegated context, hooks +
+rule-based permissions, local eval harness, MCP client, cost accounting — the
+first two change core design, so R5 ends by asking the user.
+
+**Files changed:** build/research-loop4.md (new), build/plan.md (loop-4 +
+loop-5 sections appended, checked boxes preserved), SPRINT.md (checklist mirror
++ Gate-2 interlock), features.html (next-features + known-limitations refresh).
+
+**Tests:** `uv run pytest -q` → **197 passed** (unchanged; this cycle ships no
+code). R4 probe: 9 `###` candidates ≥ 5 · `## SELECTED` present · 9 selected
+entries ≥ 3 · 9 `loop4:` references in plan.md · 10 unchecked cycles appended.
+
+**Known issues:** Gate 2 (user acceptance of loop 3) is still unanswered, so the
+loop-4 section carries a DO-NOT-START header and SPRINT.md tells a tick that
+reaches it to report and stop instead of taking the first unchecked cycle.
+
+**Next step:** user decision — accept loop 3 and authorize loop 4 (optionally
+amending the cycle list), or reject with deficiencies.

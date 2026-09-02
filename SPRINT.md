@@ -76,6 +76,17 @@ Loop 2: CYCLE 11 research (web) → append `loop2:` cycles → build each →
 Loop 3: CYCLE R3 research (web) → append `loop3:` cycles → build each →
 `loop3-final` full re-sweep + FINAL BUILD_REPORT.md (all loops, criteria
 table, git log range, gaps). THE RUN ENDS AT loop3-final acceptance.
+Loop 4 (PROPOSED 2026-09-02 by CYCLE R4 — **NOT AUTHORIZED**): fix cycles
+7F1 (wire the memory strategy) + 17F1 (expose max_edit_retries /
+observation_budget as config knobs), then `loop4:` 18 project-instruction
+loader · 19 verify gate · 20 repo-map index+tool · 21 repo-map injection ·
+22 prompt-prefix stability / KV-cache reuse · 23 provider retry+backoff →
+loop4-final re-sweep. Loop 5: CYCLE R5 research only (subagents, hooks +
+rule-based permissions, local eval harness, MCP, cost accounting) — R5 ends
+by ASKING the user, because subagents and permission semantics are core
+design. **Gate 2 (user acceptance of loop 3) is still open: a tick that
+reaches the loop-4 section reports and stops; it does NOT take the first
+unchecked cycle.**
 
 Review gates (cycles 3, 6, 9 of loop 1): after committing that cycle,
 dispatch a fresh-context critic (delegate_task) with goal "check the

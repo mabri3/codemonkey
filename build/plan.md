@@ -329,3 +329,168 @@ against build/spec.md. Findings become the unchecked fix cycles below
   while :8080 answers chat completions (or if removed early), created-floor
   fresh + no-drift (1h backdate) cases. Full suite 118/118 (was 115).
   verify: `uv run pytest -q` → exit 0.
+
+## Cycle checklist — loop 4 (research + build) — ⚠️ AWAITING GATE 2
+
+> **DO NOT START THESE CYCLES.** loop3-final passed and `build/BUILD_REPORT.md`
+> requested **Gate 2** (final user acceptance) — the run's only remaining gate
+> (AGENTS.md "Stop conditions"). CYCLE R4 below is a *research/proposal* cycle
+> only: it selects candidates and writes probes. Every `loop4:` build cycle is
+> unauthorized until the user answers Gate 2 (accept + continue, or amend the
+> list). An autonomous tick that reaches this section with Gate 2 unanswered
+> must report and stop, not take the first unchecked cycle.
+
+- [x] CYCLE R4 — Loop 4 research: pick the next 10x improvements | est: 30m |
+  verify: `build/research-loop4.md` exists (committed) with ≥5 researched
+  capabilities (name, source URLs, why high-leverage for a local-model coding
+  CLI) and a `SELECTED` section listing ≥3, each mapped to a cycle appended
+  below; `grep -c '^### ' build/research-loop4.md` ≥ 5;
+  `grep -q '^## SELECTED' build/research-loop4.md`; `build/plan.md` contains
+  the `loop4:` cycles (unchecked).
+  spec sketch: live web search (verification-in-loop, repo maps/symbol index,
+  KV-cache prefix stability for llama.cpp, AGENTS.md instruction loading,
+  retry/backoff, subagents, hooks/permissions, eval harnesses, MCP), ranked by
+  leverage ÷ cost for a 27B local model in headless runs; plus an entry review
+  of the built source that turns spec gaps into `F`-numbered fix cycles.
+
+### Review findings — R4 entry review (2026-09-02) → fix cycles
+
+Both findings map to `build/spec.md`, not to new research (AGENTS.md: work must
+map to an A-criterion, a loop selection, or a cited research selection).
+
+- [ ] CYCLE 7F1 — memory strategy is built but never wired (spec.md "Modular
+  strategy architecture → Memory"): inject `memory.load()` into the system
+  prompt as part of a single project-context block, register `update_memory`
+  in `tools/__init__.py::_MODULES` + `SPECS`, and make `memory: none` disable
+  both. | est: 25m |
+  verify: `uv run pytest tests/test_memory_wiring.py -q` → exit 0 (≥4 tests:
+  a fact in `memory.md` appears verbatim in the `system` argument the mock
+  provider receives; `strategies.memory=none` → the fact is absent AND
+  `update_memory` is not advertised in the prompt block; `update_memory`
+  appends a fact and is idempotent on repeat; unknown memory name still exits
+  2 with valid names); `uv run pytest -q` → exit 0, 0 failed;
+  LIVE: seed a temp memory file with `codemonkey_memory_probe_token`, run
+  `uv run codemonkey exec --ephemeral "What probe token is in your memory?"`
+  → exit 0, stdout contains `codemonkey_memory_probe_token` (transcript to
+  `build/probes/`).
+- [ ] CYCLE 17F1 — loop-3 knobs are function defaults, not knobs: add
+  `max_edit_retries` (1) and `observation_budget` (24000) to `config.DEFAULTS`,
+  to `ENV_MAP` (`CODEMONKEY_MAX_EDIT_RETRIES`, `CODEMONKEY_OBSERVATION_BUDGET`)
+  and pass them from `exec.py`/`repl.py` into `run_turns`. | est: 20m |
+  verify: `uv run codemonkey config` → exit 0, stdout contains
+  `max_edit_retries` and `observation_budget`;
+  `CODEMONKEY_OBSERVATION_BUDGET=5000 uv run codemonkey config` → stdout
+  contains `5000`; `uv run pytest tests/test_knobs.py -q` → exit 0 (≥3 tests:
+  defaults present, env override applied, exec passes both values through to
+  `run_turns` — assert on a patched `run_turns` recording its kwargs);
+  `uv run pytest -q` → exit 0.
+
+### loop4: cycles (selected from build/research-loop4.md, cycle R4)
+
+- [ ] CYCLE 18 — `loop4:` project-instruction loader (AGENTS.md → CLAUDE.md →
+  `.codemonkey/instructions.md`, nearest-first from the workdir up to the repo
+  root; 32KB cap with a truncation marker; config `project_instructions: true`
+  + `--no-project-instructions`; merged with memory into ONE stable
+  project-context block) | est: 30m |
+  verify: `uv run pytest tests/test_instructions.py -q` → exit 0 (≥5 tests:
+  discovery precedence order; nearest-directory wins over repo root; 32KB cap
+  emits `[truncated at 32KB]`; gate off → text absent from the system prompt;
+  loaded text present verbatim in the mock provider's `system` argument);
+  `uv run pytest -q` → exit 0; LIVE: a temp git repo whose `AGENTS.md` says
+  "Always end your reply with the word pineapple", then
+  `uv run codemonkey exec --ephemeral "Say hello."` → exit 0, stdout contains
+  `pineapple` (transcript to `build/probes/`).
+- [ ] CYCLE 19 — `loop4:` verify gate (verification inside the loop): config
+  `verify_command` (default unset = disabled) + `max_verify_retries`
+  (default 1); after any turn whose mutating tool calls succeeded, run the
+  command once under the sandbox/timeout; on non-zero exit feed the trimmed
+  output back as a tool result for a corrective turn; emit
+  `verify.started` / `verify.completed{ok, exit_code}` events | est: 30m |
+  verify: `uv run pytest tests/test_verify_gate.py -q` → exit 0 (≥5 tests:
+  unset command → never runs; failing command → failure text appears in the
+  next turn's messages and a corrective turn is taken; passing command → no
+  extra turn; `max_verify_retries` respected (no infinite loop); verify output
+  is charged to the observation budget and truncated with the PARTIAL marker;
+  both events emitted in order); `uv run pytest -q` → exit 0; LIVE: temp repo
+  with a passing test file, `exec` told to change a function in a way that
+  breaks it, `verify_command="uv run pytest -q"` → run ends with the test
+  suite passing (verify.completed ok=true in the `--json` stream); transcript
+  to `build/probes/`.
+- [ ] CYCLE 20 — `loop4:` repo map, part 1: `repomap.py` dependency-free
+  def-scan (py/js/ts/go/rs/java/rb) producing file → [symbol, kind, line]
+  entries; cache at `.codemonkey/repomap.json` keyed by path+mtime+size;
+  skips `.git`, `.venv`, `node_modules`, `__pycache__`; new `repo_map` tool
+  (`repo_map(path='.', pattern=None, limit=200)`) + registry SPEC entry
+  | est: 30m |
+  verify: `uv run pytest tests/test_repomap.py -q` → exit 0 (≥6 tests: python
+  def/class + js function/const-arrow + go func fixtures extracted with
+  correct 1-based line numbers; second scan with unchanged mtime hits the
+  cache — assert the scanner is not re-entered; touching a file invalidates
+  just that entry; ignore-list honored; `limit` truncates deterministically;
+  unreadable/binary file is skipped, not fatal); `uv run pytest -q` → exit 0;
+  `uv run codemonkey exec --ephemeral --approval never "Use the repo_map tool
+  on src/codemonkey and tell me which file defines parse_tool_calls."` →
+  exit 0, stdout contains `protocol.py`.
+- [ ] CYCLE 21 — `loop4:` repo map, part 2: ranking (files touched in the last
+  N commits first, then symbol density) + budget (`repo_map_budget`, default
+  4000 chars) + injection into the project-context block behind config
+  `repo_map: false` (opt-in) | est: 30m |
+  verify: `uv run pytest tests/test_repomap_inject.py -q` → exit 0 (≥4 tests:
+  injected block never exceeds the budget; gate off by default → absent;
+  recently-committed files rank ahead of stale ones on a fixture repo;
+  the injected block is identical across two consecutive turns — feeds the
+  cycle-22 prefix-stability invariant); `uv run pytest -q` → exit 0; LIVE:
+  with `repo_map: true`, `uv run codemonkey exec --ephemeral "Which module
+  implements the prompt tool-call parser?"` → exit 0, stdout names
+  `protocol.py`; the `--json` transcript shows zero `read_file` calls
+  (transcript to `build/probes/`).
+- [ ] CYCLE 22 — `loop4:` prompt-prefix stability for KV-cache reuse:
+  deterministic tool-spec ordering, project-context block emitted once in a
+  fixed position, compaction constrained to rewrite only the tail (system
+  prefix bytes never change mid-run); `cache_prompt: true` passthrough in the
+  openai-protocol request body behind config `prompt_cache` (default true;
+  harmless/ignored on servers that do not know it) | est: 30m |
+  verify: `uv run pytest tests/test_prefix_stability.py -q` → exit 0 (≥4
+  tests: the `system` string the mock provider receives is byte-identical
+  across 3 consecutive turns including after tool results; byte-identical
+  after a forced compaction — only the message tail differs; `cache_prompt`
+  present in the openai JSON body when enabled and absent when disabled; the
+  anthropic request body is unchanged); `uv run pytest -q` → exit 0; LIVE
+  (best-effort, BLOCKED-tolerant): two identical-prefix runs against the
+  active provider, record both wall-clock times raw in `build/probes/` — no
+  claim is made if the numbers do not separate.
+- [ ] CYCLE 23 — `loop4:` provider resilience: retry with exponential backoff
+  + full jitter honoring `Retry-After` on 429/502/503/504/529 and on 500s that
+  are NOT the tools-parameter rejection; `max_retries` (default 3, config +
+  `CODEMONKEY_MAX_RETRIES`); `AuthError` never retried | est: 30m |
+  verify: `uv run pytest tests/test_retry.py -q` → exit 0 (≥6 tests: 429 with
+  `Retry-After: 2` sleeps ~2s — patched sleep records the delay; 503 retries
+  with increasing bounded jittered delays then succeeds; 400/404 not retried;
+  `AuthError` raises on the first attempt; a tools-parameter 500 raises
+  immediately WITHOUT retry so `looks_like_tools_rejection` still triggers the
+  prompt fallback; `max_retries` exhausted → `ProviderError` with the attempt
+  count); `uv run pytest -q` → exit 0; LIVE A9 re-probe:
+  `uv run codemonkey exec --sandbox workspace-write --approval never "Use the
+  shell tool to run: echo codemonkey_tool_test. Then reply with exactly the
+  command output."` → exit 0, stdout contains `codemonkey_tool_test`
+  (fallback path intact).
+- [ ] CYCLE loop4-final — Loop 4 acceptance: full A1–A20 re-sweep + the loop-4
+  probes above; `build/BUILD_REPORT.md` loop-4 section (criteria table, git
+  range, gaps); commit | est: 30m |
+  verify: `bash build/acceptance_sweep.sh` → all green; `uv run pytest -q` →
+  exit 0; report updated and committed.
+
+## Cycle checklist — loop 5 (research-gated forward look)
+
+- [ ] CYCLE R5 — Loop 5 research: re-research and re-rank the carried-forward
+  shortlist with FRESH citations (subagents / delegated context isolation;
+  hooks + rule-based command allow/deny permissions; a local eval harness for
+  the agent itself; MCP client extension points; token/cost accounting), then
+  append `loop5:` cycles | est: 30m |
+  verify: `build/research-loop5.md` committed, same shape as loops 2–4
+  (≥5 candidates with real cited URLs, ranked `SELECTED` section with ≥3
+  mapped to cycles); `build/plan.md` contains the `loop5:` cycles (unchecked).
+  NOTE: subagents and hooks/permissions change **core design** (loop
+  architecture; sandbox + approval semantics). AGENTS.md requires stop-and-ask
+  before building either — R5 therefore ENDS by asking the user, and does not
+  hand its selections to a build tick automatically.
