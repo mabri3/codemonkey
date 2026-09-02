@@ -168,7 +168,7 @@ def run_exec(
         sandbox=eff_sandbox,
         add_dirs=[str(Path(d).resolve()) for d in (add_dirs or [])],
         timeout=float(eff_timeout),
-        extra={"approval": eff_approval},
+        extra={"approval": eff_approval, "config": cfg},
     )
 
     # -- schema (cycle 6) -----------------------------------------------

@@ -497,3 +497,45 @@ cli.py; a future cycle could teach the exec group real subcommand parsing.
 
 **Next step:** CYCLE 6F3 (web_fetch config gate + fnmatch search fallback +
 probe transcripts), then 6F4 (unblock removal guard + session meta floor).
+
+---
+
+## 2026-09-02 — CYCLE 6F3: web_fetch config gate + fnmatch search fallback + missing live probe transcripts
+
+**Files changed:**
+- `src/codemonkey/tools/web_fetch.py` — config gate `_enabled(ctx)` reads
+  `ctx.extra['config']['web_fetch']` (default False; missing config = DEFAULTS
+  = False); gated-off returns `ok=False` "disabled by config" BEFORE any
+  network I/O (httpx.Client never constructed, pinned by test). Truncation
+  reworked: stream chunks accumulated with a running byte count, marker only
+  on true overflow (the old `resp.read()`-after-`iter_bytes()` check was
+  dead code).
+- `src/codemonkey/exec.py` — ToolContext `extra` now carries the merged
+  config (`extra={"approval": ..., "config": cfg}`) so tools can consult
+  config flags without a global.
+- `src/codemonkey/tools/search.py` — Python fallback filters with
+  `fnmatch.fnmatch(p.name, file_glob)` instead of `p.name.match(file_glob)`
+  (glob-as-regex — `*.py` was an invalid regex and silently mis-filtered).
+- `tests/test_tools.py` — `ctx_for` grows an `extra` kwarg; 4 new tests:
+  web_fetch blocked-by-default / blocked-by-explicit-false / allowed-by-true,
+  + 2 fnmatch-fork tests (glob filters + glob-not-regex no-crash).
+
+**Tests run + results:**
+- `uv run pytest -q` → **115 passed, 0 failed** (2.09s) — incl. the 4 new
+  tests.
+- LIVE (temporary `unblock` provider; home llama.cpp still wedged):
+  stdin-dash probe `echo 'Reply with exactly the word cactus and nothing
+  else.' | codemonkey exec -` → exit 0, stdout exactly `cactus`
+  (build/probes/cycle6f3-stdin.{out,stderr}) — closes the cycle-5 gap the
+  critic flagged (no committed stdin-dash transcript).
+- LIVE git-guard probe: temp dir outside any repo, `codemonkey exec "hello
+  there"` → exit 2, stderr `'...' is not inside a git repository; use
+  --skip-git-repo-check to run anyway`
+  (build/probes/cycle6f3-gitguard.out).
+
+**Known issues:** none new. Home llama.cpp inference still wedged — all
+live probes continue through the TEMPORARY `unblock` provider (removal
+guard = CYCLE 6F4).
+
+**Next step:** CYCLE 6F4 (unblock removal guard test + session meta
+created-floor fix), then CYCLE 7 (strategy layer).

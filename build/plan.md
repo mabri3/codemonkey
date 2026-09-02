@@ -252,10 +252,22 @@ against build/spec.md. Findings become the unchecked fix cycles below
   counting tests; LIVE (via unblock while home server wedged): a real
   `exec --json` transcript committed to build/probes/ plus an A9-style
   shell-tool transcript showing `command_execution` items and exit 0.
-- [ ] CYCLE 6F3 — web_fetch honors `web_fetch: true` config gate (default
+- [x] CYCLE 6F3 — web_fetch honors `web_fetch: true` config gate (default
   off; off → ToolResult error, no network); search Python fallback uses
   fnmatch not re.match; live stdin-`-` + git-guard probe transcripts
   committed to build/probes/. | est: 15m |
+  status: DONE 2026-09-02. web_fetch.py: _enabled() reads
+  ctx.extra['config']['web_fetch'] (default False — no network call made
+  when gated off, httpx.Client never constructed per test); truncation
+  coherent (stream accumulated with running byte count,
+  [truncated at 512KB] marker on true overflow only). exec.py ToolContext
+  extra now carries {"approval", "config"}. search.py: fnmatch.fnmatch
+  replaces p.name.match (glob-as-regex bug). LIVE via unblock: stdin-dash
+  probe build/probes/cycle6f3-stdin.out (exit 0, stdout `cactus`) +
+  git-guard probe build/probes/cycle6f3-gitguard.out (exit 2 in non-git
+  temp dir, stderr names --skip-git-repo-check). 4 new tests
+  (web_fetch default-blocked / explicitly-false-blocked / true-allowed /
+  fnmatch fork ×2). Full suite 115/115.
   verify: `uv run pytest -q` → exit 0 incl. new web_fetch-gated + fnmatch
   fork tests; probe files exist in the commit.
 - [ ] CYCLE 6F4 — hygiene sweep: temp `unblock` provider removal guard

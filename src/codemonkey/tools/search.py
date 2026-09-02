@@ -1,6 +1,7 @@
 """search — grep over files; prefers `rg` on PATH, falls back to a pure-Python walk."""
 
 from __future__ import annotations
+import fnmatch
 import re
 import shutil
 import subprocess
@@ -15,7 +16,7 @@ def _python_search(root: Path, pattern: str, file_glob: str, max_hits: int):
     for p in root.rglob("*"):
         if not p.is_file():
             continue
-        if file_glob and not p.name.match(file_glob):
+        if file_glob and not fnmatch.fnmatch(p.name, file_glob):
             continue
         try:
             text = p.read_text(errors="ignore")

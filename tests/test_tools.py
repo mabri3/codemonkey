@@ -25,8 +25,8 @@ def ws(tmp_path):
     return tmp_path
 
 
-def ctx_for(ws, sandbox="workspace-write", add_dirs=None, timeout=10) -> ToolContext:
-    return ToolContext(workdir=Path(ws), sandbox=sandbox, add_dirs=add_dirs or [], timeout=timeout)
+def ctx_for(ws, sandbox="workspace-write", add_dirs=None, timeout=10, extra=None) -> ToolContext:
+    return ToolContext(workdir=Path(ws), sandbox=sandbox, add_dirs=add_dirs or [], timeout=timeout, extra=extra or {})
 
 
 # ---------------------------------------------------------------- read_file
@@ -170,34 +170,110 @@ def test_shell_timeout(ws):
 
 # ---------------------------------------------------------------- web_fetch
 
+class _FakeResp:
+    def __init__(self, status_code=200, body=b"hello web"):
+        self.status_code = status_code
+        self._body = body
+
+    def iter_bytes(self):
+        yield self._body
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        return False
+
+
+class _FakeClient:
+    def __init__(self, *a, **k):
+        pass
+
+    def stream(self, method, url):
+        return _FakeResp(status_code=404)
+
+    def close(self):
+        pass
+
+
 def test_web_fetch_http_error_is_soft_failure(ws, monkeypatch):
     from codemonkey.tools import web_fetch
 
-    class _Resp:
-        status_code = 404
+    monkeypatch.setattr(web_fetch.httpx, "Client", _FakeClient)
+    ctx = ctx_for(ws, extra={"config": {"web_fetch": True}})
+    r = web_fetch.run({"url": "https://example.invalid/x"}, ctx)
+    assert not r.ok and "404" in r.output
 
-        def iter_bytes(self):
-            yield b"not here"
 
-        def __enter__(self):
-            return self
+def test_web_fetch_blocked_by_default_config(ws, monkeypatch):
+    """web_fetch: true config gate (spec:90) — default off, NO network call."""
+    from codemonkey.tools import web_fetch
 
-        def __exit__(self, *exc):
-            return False
+    def _boom(*a, **k):
+        raise AssertionError("httpx.Client must not be constructed when gated off")
 
-    class _Client:
+    monkeypatch.setattr(web_fetch.httpx, "Client", _boom)
+    # no config in ctx at all -> DEFAULTS apply -> web_fetch default is False
+    r = dispatch("web_fetch", {"url": "https://example.com/"}, ctx_for(ws))
+    assert not r.ok
+    assert "disabled by config" in r.output
+
+
+def test_web_fetch_blocked_when_config_explicitly_false(ws, monkeypatch):
+    from codemonkey.tools import web_fetch
+
+    def _boom(*a, **k):
+        raise AssertionError("no network when web_fetch: false")
+
+    monkeypatch.setattr(web_fetch.httpx, "Client", _boom)
+    ctx = ctx_for(ws, extra={"config": {"web_fetch": False}})
+    r = web_fetch.run({"url": "https://example.com/"}, ctx)
+    assert not r.ok and "disabled by config" in r.output
+
+
+def test_web_fetch_allowed_when_config_true(ws, monkeypatch):
+    from codemonkey.tools import web_fetch
+
+    class _OKClient:
         def __init__(self, *a, **k):
             pass
 
         def stream(self, method, url):
-            return _Resp()
+            return _FakeResp(status_code=200, body=b"page body")
 
         def close(self):
             pass
 
-    monkeypatch.setattr(web_fetch.httpx, "Client", _Client)
-    r = web_fetch.run({"url": "https://example.invalid/x"}, ctx_for(ws))
-    assert not r.ok and "404" in r.output
+    monkeypatch.setattr(web_fetch.httpx, "Client", _OKClient)
+    ctx = ctx_for(ws, extra={"config": {"web_fetch": True}})
+    r = web_fetch.run({"url": "https://example.com/"}, ctx)
+    assert r.ok and "page body" in r.output
+
+
+# ------------------------------------------------------------ search fallback
+
+def test_search_python_fallback_uses_fnmatch(ws, monkeypatch):
+    """Python fallback must treat file_glob as a GLOB (fnmatch), not regex."""
+    from codemonkey.tools import search as search_mod
+
+    monkeypatch.setattr(search_mod.shutil, "which", lambda name: None)
+    (ws / "target.py").write_text("needle in python\n")
+    (ws / "target.txt").write_text("needle in text\n")
+    r = search_mod.run({"pattern": "needle", "path": ".", "file_glob": "*.py"}, ctx_for(ws))
+    assert r.ok
+    assert "target.py" in r.output
+    assert "target.txt" not in r.output
+
+
+def test_search_python_fallback_glob_not_regex(ws, monkeypatch):
+    """A pattern valid as glob but invalid as regex must not crash the fallback."""
+    from codemonkey.tools import search as search_mod
+
+    monkeypatch.setattr(search_mod.shutil, "which", lambda name: None)
+    (ws / "README.md").write_text("needle\n")
+    (ws / "x.py").write_text("needle\n")
+    r = search_mod.run({"pattern": "needle", "path": ".", "file_glob": "*.md"}, ctx_for(ws))
+    assert r.ok and "README.md" in r.output and "x.py" not in r.output
 
 
 # ---------------------------------------------------------------- sandbox policy
