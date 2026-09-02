@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>codemonkey — build status</title>
+<style>
+  body{background:#0d1117;color:#c9d1d9;font-family:-apple-system,Segoe UI,
+    Helvetica,Arial,sans-serif;max-width:880px;margin:2rem auto;padding:0 1rem;line-height:1.5}
+  h1{color:#58a6ff} h2{color:#8b949e;border-bottom:1px solid #21262d;padding-bottom:.3rem}
+  .badge{display:inline-block;background:#1f6f3d;color:#7ee2a8;border-radius:12px;
+    padding:.1rem .6rem;font-size:.78rem;margin-left:.5rem;vertical-align:middle}
+  .next{color:#e3b341} code{background:#161b22;padding:.1rem .35rem;border-radius:4px}
+  li.done{list-style:none} li.done::before{content:"\2714  ";color:#7ee2a8}
+  li.todo::before{content:"\2610  ";color:#8b949e} li.todo{list-style:none}
+  pre{background:#161b22;padding:.8rem;border-radius:6px;overflow-x:auto}
+</style>
+</head>
+<body>
+<h1>codemonkey</h1>
+<p>A scriptable coding-agent CLI (Python 3.11, uv, Typer, httpx) for
+OpenAI-style <em>and</em> Anthropic-style endpoints, defaulting to the local
+llama.cpp server (<code>http://192.168.50.113:8080/v1</code>,
+<code>Qwen3.8-27B-NVFP4-MTP-VERY-HIGH.gguf</code>). Non-interactive
+<code>exec</code> mode for CI/other agents; interactive rich REPL when run bare.</p>
+
+<h2>Completed features</h2>
+<ul>
+  <li class="done">Repo scaffold + layered config (defaults → user YAML → project YAML → .env → env vars → CLI; secrets masked; strategy/enum validation)<span class="badge">CYCLE 1</span></li>
+  <li class="done">Provider layer: OpenAI-compatible + Anthropic Messages API, raw httpx, SSE streaming, auth-header handling, <code>models</code> command<span class="badge">CYCLE 2</span></li>
+  <li class="done">Tools (read/write/edit_file/list_dir/glob/search/shell/update_plan/web_fetch) + sandbox policy (read-only / workspace-write / danger-full-access, `--add-dir` roots)<span class="badge">CYCLE 3</span></li>
+  <li class="done">Tool protocol: prompt protocol (<code>TOOL_CALL:</code> parser, fence/garbage tolerant) + native extraction (OpenAI <code>tools</code>, Anthropic <code>tool_use</code>, streaming incl. <code>input_json_delta</code>)<span class="badge">CYCLE 4</span></li>
+  <li class="done">Agent loop: model → tool calls → sandbox-gated execution → result feedback, max_turns bail, per-turn events<span class="badge">CYCLE 4</span></li>
+  <li class="done"><code>tool_protocol: auto</code> catches the llama.cpp <code>tools</code>-parameter HTTP 500 and retries the same turn with the prompt protocol, remembering the fallback per provider (A9 mechanic)<span class="badge">CYCLE 4</span></li>
+</ul>
+
+<h2>How to run</h2>
+<pre>
+uv run codemonkey --version
+uv run codemonkey config          # effective merged config (secrets masked)
+uv run codemonkey models          # list models from the active provider
+uv run pytest -q                  # unit suite (73 tests, no network)
+</pre>
+
+<h2>Known limitations</h2>
+<ul>
+  <li><code>exec</code> / <code>review</code> / <code>sessions</code> / REPL commands are not wired yet (cycles 5–9).</li>
+  <li>Structured output (<code>--output-schema</code>), session persistence, and pluggable strategies land in cycles 6–7.</li>
+  <li>Live-LLM probes require the local llama.cpp server to be up.</li>
+</ul>
+
+<h2>Next planned features</h2>
+<ul>
+  <li class="todo">CYCLE 5 — <code>exec</code> core (text mode, stdin, JSONL event stream, git guard)</li>
+  <li class="todo">CYCLE 6 — Structured output + sessions/resume</li>
+  <li class="todo">CYCLE 7 — Pluggable compaction / memory / session-state strategies</li>
+  <li class="todo">CYCLES 8–10 — review + approvals, REPL, loop-1 acceptance sweep (A1–A20)</li>
+</ul>
+</body>
+</html>

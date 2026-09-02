@@ -31,7 +31,7 @@ end.
   `~/.codemonkey/config.yaml` → `.codemonkey.yaml` → `.env` (project then
   `~/.codemonkey/.env`) → env vars override → `config` command prints merged
   view (secrets masked). Repo-local git identity.
-- [ ] CYCLE 2 — Provider layer (OpenAI + Anthropic) + `models` | est: 30m |
+- [x] CYCLE 2 — Provider layer (OpenAI + Anthropic) + `models` | est: 30m |
   verify: `uv run pytest tests/test_providers.py -q` → exit 0 (≥8 passed,
   mocked HTTP: openai streaming SSE + non-streaming, anthropic SSE +
   non-streaming, auth headers, 401→exit 2);
@@ -42,7 +42,7 @@ end.
   `anthropic-version`/`x-api-key` headers), `base.py` common `ChatTurn`
   result (content, reasoning, usage, finish_reason), `models` command via
   `/v1/models` (openai) / config (anthropic).
-- [ ] CYCLE 3 — Tools + sandbox | est: 30m |
+- [x] CYCLE 3 — Tools + sandbox | est: 30m |
   verify: `uv run pytest tests/test_tools.py tests/test_sandbox.py -q` →
   exit 0 (≥12 passed; read/write/edit/list/glob/search/shell happy paths,
   edit_file non-unique-reject, sandbox `read-only` denies write_file + shell,
@@ -51,7 +51,7 @@ end.
   ToolResult` (output ≤ 20KB truncated with marker), `sandbox.py` policy
   `can(ToolCall, level, roots)`, `search` prefers `rg` if on PATH else
   Python walk, `shell` subprocess cwd=workdir, timeout default 120s.
-- [ ] CYCLE 4 — Tool protocol + agent loop | est: 30m |
+- [x] CYCLE 4 — Tool protocol + agent loop | est: 30m |
   verify: `uv run pytest tests/test_protocol.py -q` → exit 0 (≥8 passed:
   TOOL_CALL fenced + unfenced + multi-call + garbage-tolerance parsing,
   native-openai tool-call extraction, loop with mock server: 2 tool calls

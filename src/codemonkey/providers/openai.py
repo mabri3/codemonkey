@@ -20,6 +20,24 @@ from .base import (
 )
 
 
+
+
+
+
+def _native_openai_tool_calls(tool_calls) -> list:
+    """OpenAI `message.tool_calls` -> [{"name", "args"}, ...]."""
+    out = []
+    for tc in tool_calls or []:
+        fn = tc.get("function") or {}
+        raw = fn.get("arguments") or "{}"
+        try:
+            args = json.loads(raw)
+        except (json.JSONDecodeError, TypeError):
+            args = {"_raw": raw}
+        out.append({"name": fn.get("name", ""), "args": args})
+    return out
+
+
 def _auth_headers(api_key: Optional[str]) -> dict:
     headers = {"Content-Type": "application/json"}
     # llama.cpp servers usually ignore auth; OpenAI-compatible gates need it.
@@ -163,15 +181,18 @@ class OpenAIProvider(ProviderBase):
             data = self._request("/chat/completions", body)
             choice = (data.get("choices") or [{}])[0]
             msg = choice.get("message") or {}
-            return ChatTurn(
+            turn = ChatTurn(
                 content=msg.get("content") or "",
                 reasoning=(msg.get("reasoning") or msg.get("reasoning_content") or ""),
                 finish_reason=choice.get("finish_reason") or "stop",
                 usage=data.get("usage") or {},
             )
+            turn.tool_calls = _native_openai_tool_calls(msg.get("tool_calls"))
+            return turn
 
         # streaming
         turn = ChatTurn()
+        tc_acc: dict = {}
         for event in self._request_stream("/chat/completions", body):
             choice = (event.get("choices") or [{}])[0]
             delta = choice.get("delta") or {}
@@ -183,10 +204,25 @@ class OpenAIProvider(ProviderBase):
             r = delta.get("reasoning") or delta.get("reasoning_content")
             if r:
                 turn.reasoning += r
+            for tc in delta.get("tool_calls") or []:
+                idx = tc.get("index", 0)
+                slot = tc_acc.setdefault(idx, {"name": "", "arguments": ""})
+                fn = tc.get("function") or {}
+                if fn.get("name"):
+                    slot["name"] += fn["name"]
+                if fn.get("arguments"):
+                    slot["arguments"] += fn["arguments"]
             if choice.get("finish_reason"):
                 turn.finish_reason = choice["finish_reason"]
             if event.get("usage"):
                 turn.usage = event["usage"]
+        for idx in sorted(tc_acc):
+            slot = tc_acc[idx]
+            try:
+                args = json.loads(slot["arguments"] or "{}")
+            except json.JSONDecodeError:
+                args = {"_raw": slot["arguments"]}
+            turn.tool_calls.append({"name": slot["name"], "args": args})
         return turn
 
     def list_models(self) -> list[str]:

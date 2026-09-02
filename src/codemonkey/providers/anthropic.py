@@ -139,6 +139,10 @@ class AnthropicProvider(ProviderBase):
                 turn.content += block.get("text", "")
             elif block.get("type") == "thinking":
                 turn.reasoning += block.get("thinking", "")
+            elif block.get("type") == "tool_use":
+                turn.tool_calls.append(
+                    {"name": block.get("name", ""), "args": block.get("input") or {}}
+                )
         turn.finish_reason = data.get("stop_reason") or "end_turn"
         usage = data.get("usage") or {}
         turn.usage = {
@@ -165,6 +169,8 @@ class AnthropicProvider(ProviderBase):
 
         # streaming: parse SSE events
         turn = ChatTurn()
+        tool_raw: dict = {}   # block index -> accumulated input JSON
+        block_index: dict = {}  # block index -> position in turn.tool_calls
         for line in resp.iter_lines():
             line = line.strip()
             if not line.startswith("data:"):
@@ -177,9 +183,32 @@ class AnthropicProvider(ProviderBase):
             except json.JSONDecodeError:
                 continue
             etype = event.get("type")
-            if etype == "content_block_delta":
+            if etype == "content_block_start":
+                block = event.get("content_block") or {}
+                idx = event.get("index")
+                if block.get("type") == "tool_use":
+                    turn.tool_calls.append(
+                        {"name": block.get("name", ""), "args": {}}
+                    )
+                    if idx is not None:
+                        block_index[idx] = len(turn.tool_calls) - 1
+                        tool_raw[idx] = ""
+            elif etype == "content_block_stop":
+                idx = event.get("index")
+                if idx is not None and idx in tool_raw:
+                    raw = tool_raw[idx]
+                    pos = block_index[idx]
+                    try:
+                        turn.tool_calls[pos]["args"] = json.loads(raw or "{}")
+                    except json.JSONDecodeError:
+                        turn.tool_calls[pos]["args"] = {"_raw": raw}
+            elif etype == "content_block_delta":
                 delta = event.get("delta") or {}
-                if delta.get("type") == "text_delta":
+                if delta.get("type") == "input_json_delta":
+                    idx = event.get("index")
+                    if idx is not None and idx in tool_raw:
+                        tool_raw[idx] += delta.get("partial_json", "")
+                elif delta.get("type") == "text_delta":
                     piece = delta.get("text", "")
                     turn.content += piece
                     if on_token:

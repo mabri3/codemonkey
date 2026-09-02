@@ -23,12 +23,18 @@ class AuthError(ProviderError):
 
 @dataclass
 class ChatTurn:
-    """A single model response."""
+    """A single model response.
+
+    `tool_calls` carries native tool calls (provider `tool_calls` / `tool_use`
+    blocks) when the provider surfaces them; the prompt protocol fills it from
+    `parse_tool_calls(turn.content)`.
+    """
 
     content: str = ""
     reasoning: str = ""
     finish_reason: str = "stop"
     usage: dict = field(default_factory=dict)
+    tool_calls: list = field(default_factory=list)
 
 
 TokenSink = Optional[Callable[[str], None]]

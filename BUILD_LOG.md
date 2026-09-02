@@ -30,3 +30,39 @@
 - **Next step:** CYCLE 2 — provider layer (OpenAI + Anthropic, raw
   httpx, SSE) + `models` command. Verify via mocked HTTP pytest (≥8 tests)
   + live `uv run codemonkey models` containing the Qwen model name.
+
+## 2026-09-02 — CYCLE 4: tool protocol + agent loop
+
+Recovery note: this tick started with uncommitted provider edits (an
+interrupted CYCLE-4 worker) and CYCLE 2/3 commits (0b1ce0c, 9a16629) whose
+plan.md checkboxes/BUILD_LOG entries had never been written by their ticks.
+Fixed their state here: checkboxes 2–4 marked `[x]`; cycle-4 commit below.
+
+- **Resumed and finished partial work:** native tool-call extraction had been
+  added (`ChatTurn.tool_calls`; OpenAI `message.tool_calls` + streaming
+  accumulation; Anthropic non-streaming `tool_use` + streaming
+  `content_block_start`/`input_json_delta`/`content_block_stop`). Verified and
+  fixed its per-instance-state wart (`self._tool_raw` leakage → local dicts) +
+  PEP8 blank lines.
+- **Files changed:** `src/codemonkey/protocol.py` (`TOOL_CALL:` prompt
+  protocol — `prompt_block()` advertises `tools.SPECS`; `parse_tool_calls()`
+  returns `(calls, prose)`; tolerant of fences, a bare marker + fenced body,
+  multi-call, malformed JSON as error entries),
+  `src/codemonkey/native.py` (OpenAI `tools` wire schema + tool-result msg),
+  `src/codemonkey/loop.py` (`run_turns()` — messages, max_turns bail with
+  error event, soft per-turn `on_event` callbacks incl.
+  tool.started/tool.completed; `tool_protocol: auto` catches the
+  tools-parameter HTTP 4xx/5xx, retries the same turn with the prompt
+  protocol, remembers the fallback per provider — the A9 mechanic),
+  `src/codemonkey/providers/{base,openai,anthropic}.py` (native extraction,
+  resumed), `tests/test_protocol.py` (16 tests), `features.html` (created,
+  rule 11, backfills cycles 1–4).
+- **Tests run (literal):** `uv run pytest tests/test_protocol.py -q` →
+  **16 passed** (verify: ≥8). Full suite `uv run pytest -q` → **73 passed,
+  0 failed** (57 pre-existing + 16 new).
+- **Known issues:** none. Live A9 end-to-end lands with cycle 5/10 (the loop
+  is exercised here over a scripted provider replaying the verified llama.cpp
+  500-on-`tools` behaviour).
+- **Next step:** CYCLE 5 — `exec` core (text mode, stdin `-`, `--json` JSONL
+  event stream, git-repo guard, exit codes, `--output-last-message` tee);
+  LIVE probe: pong.
