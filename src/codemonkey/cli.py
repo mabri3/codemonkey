@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Annotated, Optional
 
+import json
 import typer
 
 from . import __version__
@@ -248,6 +249,55 @@ def undo(
     typer.echo(f"restored {len(result['restored'])} file(s) from checkpoint")
     for rel in result["restored"]:
         typer.echo(f"  {rel}")
+
+
+@app.command()
+def eval(
+    suite: Annotated[
+        Path,
+        typer.Argument(help="Path to the YAML golden suite."),
+    ],
+    check: Annotated[
+        bool,
+        typer.Option("--check", help="Compare against the baseline; exit 1 on regression."),
+    ] = False,
+    baseline: Annotated[
+        Path,
+        typer.Option("--baseline", help="Baseline JSON path (default build/eval/baseline.json)."),
+    ] = Path("build/eval/baseline.json"),
+    out_dir: Annotated[
+        Path,
+        typer.Option("--out", help="Results output dir (default build/eval)."),
+    ] = Path("build/eval"),
+    write_baseline: Annotated[
+        bool,
+        typer.Option("--write-baseline", help="Write the current run as the new baseline."),
+    ] = False,
+) -> None:
+    """Run a golden evaluation suite against the real exec path."""
+    from .eval import check_regression as _check_regression
+    from .eval import run_suite as _run_suite
+    from .eval import write_baseline as _write_baseline
+
+    results = _run_suite(suite, out_dir=out_dir)
+    typer.echo(f"suite: {results['suite']}  pass_rate: {results['pass_rate']}  "
+               f"tokens: {results['total_tokens']}  wall: {results['wall_seconds']}s")
+    for t in results["tasks"]:
+        mark = "PASS" if t["ok"] else "FAIL"
+        typer.echo(f"  [{mark}] {t['id']}")
+        if not t["ok"]:
+            typer.echo(f"         {json.dumps(t.get('detail', {}))}")
+    if write_baseline:
+        _write_baseline(results, baseline)
+        typer.echo(f"baseline written: {baseline}")
+        return
+    ok, regressions = _check_regression(results, baseline)
+    if not ok:
+        typer.secho("REGRESSIONS:", err=True, fg=typer.colors.RED)
+        for r in regressions:
+            typer.echo(f"  {r}")
+        raise typer.Exit(1)
+    typer.echo("no regressions")
 
 
 @app.command()

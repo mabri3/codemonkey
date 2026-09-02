@@ -1,0 +1,24 @@
+name: golden-core
+description: >
+  Core golden tasks for codemonkey (loop5 cycle 25). Covers the acceptance
+  probes as reusable eval tasks. Run: uv run codemonkey eval
+  build/eval/golden-core.yaml --check
+
+tasks:
+  - id: pong
+    prompt: "Reply with exactly the word pong and nothing else."
+    expect_stdout_contains: ["pong"]
+    expect_exit: 0
+    ephemeral: true
+
+  - id: banana
+    prompt: "Reply with exactly the word banana and nothing else."
+    expect_stdout_contains: ["banana"]
+    expect_exit: 0
+    ephemeral: true
+
+  - id: memory-recall
+    prompt: "Reply with exactly: memory-ok"
+    expect_stdout_contains: ["memory-ok"]
+    expect_exit: 0
+    ephemeral: true

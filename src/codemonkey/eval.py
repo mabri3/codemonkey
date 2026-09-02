@@ -161,3 +161,37 @@ def run_suite(suite_path: Path, *, exec_fn=None,
         out_dir.mkdir(parents=True, exist_ok=True)
         (out_dir / "results.json").write_text(json.dumps(results, indent=2))
     return results
+
+
+def write_baseline(results: dict, path: Path) -> None:
+    """Versioned baseline: per-task ok + pass_rate + token/wall totals."""
+    baseline = {
+        "suite": results["suite"],
+        "pass_rate": results["pass_rate"],
+        "total_tokens": results["total_tokens"],
+        "wall_seconds": results["wall_seconds"],
+        "tasks": {t["id"]: {"ok": t["ok"]} for t in results["tasks"]},
+    }
+    Path(path).parent.mkdir(parents=True, exist_ok=True)
+    Path(path).write_text(json.dumps(baseline, indent=2))
+
+
+def check_regression(results: dict, baseline_path: Path) -> tuple[bool, list[str]]:
+    """Compare a run against the baseline. Returns (ok, regressions).
+
+    A regression is: a task that passed before and fails now, or pass_rate
+    dropping. Improvements are noted but never fail the check.
+    """
+    if not baseline_path.is_file():
+        return True, []  # no baseline yet -> nothing to regress against
+    base = json.loads(baseline_path.read_text())
+    regressions = []
+    for t in results["tasks"]:
+        was = (base.get("tasks") or {}).get(t["id"], {}).get("ok")
+        if was is True and not t["ok"]:
+            regressions.append(f"{t['id']}: passed in baseline, fails now")
+    if results["pass_rate"] < float(base.get("pass_rate", 0)):
+        regressions.append(
+            f"pass_rate dropped: {base.get('pass_rate')} -> {results['pass_rate']}"
+        )
+    return (not regressions), regressions
