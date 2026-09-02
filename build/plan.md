@@ -479,6 +479,24 @@ map to an A-criterion, a loop selection, or a cited research selection).
   shell tool to run: echo codemonkey_tool_test. Then reply with exactly the
   command output."` → exit 0, stdout contains `codemonkey_tool_test`
   (fallback path intact).
+- [x] CYCLE 19F1 — `loop4:` critic fix (build/critic-loop4.md #6): the
+  `verify.completed` event must report the verify command's REAL exit code,
+  not a fabricated 0/1 — `--json` consumers and `events.py` render it | est: 10m |
+  verify: `uv run pytest tests/test_verify_gate.py -q` → exit 0 (added tests:
+  `verify_command="exit 7"` → the `verify.completed` event carries
+  `exit_code == 7`; a passing command carries `exit_code == 0`; a timeout
+  carries a non-zero code and does not claim 1); `uv run pytest -q` → exit 0.
+- [ ] CYCLE 22F1 — `loop4:` critic fix (build/critic-loop4.md #5, #7): thread
+  `cache_prompt=prompt_cache` through ALL `provider.chat` call sites in
+  `run_turns` — the A9 tools-rejection fallback turn and the three schema-retry
+  turns currently drop it, so `prompt_cache: false` is ignored on the primary
+  local path; also drop the dead second docstring in `run_turns` | est: 15m |
+  verify: `uv run pytest tests/test_prefix_stability.py -q` → exit 0 (added
+  tests: with `prompt_cache=False` a provider that rejects the `tools`
+  parameter records NO `cache_prompt` on either the native attempt or the
+  fallback turn; the schema-retry turn likewise; with `prompt_cache=True` the
+  fallback turn does carry it); `grep -c "cache_prompt=prompt_cache"
+  src/codemonkey/loop.py` → `7`; `uv run pytest -q` → exit 0.
 - [ ] CYCLE loop4-final — Loop 4 acceptance: full A1–A20 re-sweep + the loop-4
   probes above; `build/BUILD_REPORT.md` loop-4 section (criteria table, git
   range, gaps); commit | est: 30m |

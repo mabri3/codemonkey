@@ -1128,3 +1128,24 @@ llama.cpp still unreachable (curl /v1/models → 000); probe run through the
 
 **Next step:** CYCLE loop4-final — full A1–A20 re-sweep + BUILD_REPORT loop-4
 section. Then CYCLE R5 (loop-5 research), which ends by asking the user.
+
+## 2026-09-02 — CYCLE 19F1 (loop4 critic fix): real verify exit codes
+
+Source: `build/critic-loop4.md` finding #6. `verify.completed` reported
+`"exit_code": 0 if v_ok else 1` — a fabricated value. `codemonkey exec --json`
+is consumed by other agents and CI (intent.md: "clean stdout + stable exit
+codes") and `events.py:66` renders the number, so a verify command exiting 7
+was reported as 1.
+
+**Completed:** the gate captures `vr.returncode` and emits it verbatim; a
+timeout emits 124 (the conventional timeout status) rather than 1.
+
+**Files changed:** src/codemonkey/loop.py, tests/test_verify_gate.py (+3 tests),
+build/critic-loop4.md (new), build/plan.md (19F1 + 22F1 appended), features.html.
+
+**Tests (literal):** `uv run pytest tests/test_verify_gate.py -q` → **9 passed**
+(new: exit 7 → `exit_code == 7`; success → 0; `sleep 30` under a 1s ctx timeout
+→ non-zero and not 1). `uv run pytest -q` → **267 passed, 0 failed**.
+
+**Next step:** CYCLE 22F1 — thread `cache_prompt` through the remaining four
+`provider.chat` call sites.

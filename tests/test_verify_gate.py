@@ -137,3 +137,41 @@ def test_events_emitted_in_order(tmp_path):
     si = types.index("verify.started")
     ci = types.index("verify.completed")
     assert ti < si < ci
+
+
+# -- 19F1: the reported exit code must be the command's real status ------
+
+
+def test_verify_completed_reports_real_exit_code(tmp_path):
+    """`exit 7` must surface as exit_code 7 — --json consumers read this."""
+    events = []
+    run_turns(
+        WriteThenDone(), "write", _ctx(tmp_path), tool_protocol="prompt",
+        max_turns=6, verify_command="exit 7", on_event=events.append,
+    )
+    completed = [e for e in events if e.get("type") == "verify.completed"]
+    assert completed and completed[0]["exit_code"] == 7
+    assert completed[0]["ok"] is False
+
+
+def test_verify_completed_reports_zero_on_success(tmp_path):
+    events = []
+    run_turns(
+        WriteThenDone(), "write", _ctx(tmp_path), tool_protocol="prompt",
+        max_turns=6, verify_command="true", on_event=events.append,
+    )
+    completed = [e for e in events if e.get("type") == "verify.completed"]
+    assert completed and completed[0]["exit_code"] == 0 and completed[0]["ok"] is True
+
+
+def test_verify_timeout_reports_nonzero_code(tmp_path):
+    ctx = _ctx(tmp_path)
+    ctx.timeout = 1
+    events = []
+    run_turns(
+        WriteThenDone(), "write", ctx, tool_protocol="prompt",
+        max_turns=6, verify_command="sleep 30", on_event=events.append,
+    )
+    completed = [e for e in events if e.get("type") == "verify.completed"]
+    assert completed and completed[0]["ok"] is False
+    assert completed[0]["exit_code"] not in (0, 1)

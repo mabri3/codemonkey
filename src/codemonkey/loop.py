@@ -417,16 +417,20 @@ def run_turns(
                     capture_output=True, text=True,
                     timeout=max(5, int(ctx.timeout or 30)),
                 )
-                v_ok = vr.returncode == 0
+                v_code = vr.returncode
+                v_ok = v_code == 0
                 v_text = (vr.stdout or "") + (("\n" + vr.stderr) if vr.stderr else "")
             except _sp.TimeoutExpired as exc:
                 v_ok = False
+                # 124 is the conventional timeout status (GNU coreutils
+                # `timeout`); it is a real signal, not a fabricated 0/1.
+                v_code = 124
                 v_text = f"verify command timed out after {exc.timeout}s"
             if len(v_text) > 4000:
                 v_text = v_text[:4000] + "\n[verify output trimmed]"
             if on_event:
                 on_event({"type": "verify.completed",
-                          "ok": v_ok, "exit_code": 0 if v_ok else 1})
+                          "ok": v_ok, "exit_code": v_code})
             obs_spent += len(v_text)
             if not v_ok:
                 verify_retries_left -= 1
