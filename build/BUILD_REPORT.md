@@ -107,3 +107,57 @@ trailing-token-tolerant parser — model-special-tokens handled; A16 live review
   exactly one deduped `[prior context]` brief + the full system prompt.
 
 **Loop 2 COMPLETE — proceeding to CYCLE R3 (loop 3 research).**
+
+
+---
+
+# Loop 3 — FINAL ACCEPTANCE (CYCLE loop3-final) — USER GATE 2 REQUESTED
+
+**Date:** 2026-09-02 · **Suite:** 197/197 · **Re-sweep:** all A1–A20 exit 0
+(A4 via unblock2 fallback note; A16 live review 2,622 chars; A9 tool loop live).
+Probe wall: `build/acceptance_outputs/`.
+
+## Loop-3 criteria (from build/research-loop3.md — all pass)
+
+| Improvement | Probe | Result |
+|---|---|---|
+| Self-heal edit retries | tests/test_selfheal.py: feedback delivered, success-after-retry, no-retry on success, limit respected | ✅ 4/4 (+ live: forced bad SEARCH → self-heal → correct rename, DONE-RECOVERED) |
+| Observation budget | tests/test_obsbudget.py: marker format, elided count, shared ledger, under-budget untouched | ✅ 4/4 (+ live bridge + PARTIAL at 5k budget) |
+| Native→prompt bridge (bonus bug fix) | live: kimi/3459 wraps TOOL_CALL in content during native mode; previously returned as final answer, tool never ran | ✅ notice + tool executes + BUDGET-OK |
+
+## Complete run summary — all three loops
+
+- **Loop 1 (cycles 1–10):** scaffold/config → providers → tools/sandbox →
+  protocol/loop → exec → structured output/sessions (+review-gate fixes 6F1–6F4)
+  → strategies → approvals/review → REPL → acceptance sweep. **All A1–A20.**
+- **Loop 2 (11–15 + final):** research → parallel tool execution → SREP patch
+  editing → checkpoints/undo → auto-compaction → re-sweep green.
+- **Loop 3 (R3, 16–17 + final):** research → self-heal edit retries → observation
+  budget (+ native→prompt bridge bug fix) → re-sweep green.
+
+**Commit range:** `6528806` (cycle 1) … `e1788fb` (cycle 17).
+Full chain: 220f69d C4 · e8e3bae C5 · 29629ad C6 · e609ba8 review gate ·
+2a51f38/c572f82/6863814/833cffa 6F1–F4 · 37345aa C7 · 05debfb C8 · 5492dbe C9 ·
+2531b11 C10 · 8d40ebb C11 · bc15fdd C12 · 12db920 C13 · 6a2123d C14 · 9f4eb67 C15 ·
+1ee1457 loop2-final · 1e2b23a R3 · afb9f3c C16 · e1788fb C17 · this commit.
+
+## Environment notes (unchanged)
+
+- Live-LLM probes ran against the TEMP `unblock2` provider (3459/kimi) — home
+  llama.cpp inference still wedged; the 6F4 guard test removes TEMP providers
+  automatically the moment home serves inference.
+- Cron build-loop stayed gateway-stalled all run (`tool_call_id` stale-runtime
+  bug); every cycle was executed and committed from the interactive session.
+
+## ⚠️ USER ACCEPTANCE REQUESTED (Gate 2)
+
+This is the end of the autonomous run per the signed contract
+(`cap: none`, stop = loop3-final acceptance passing). **codemonkey is built:**
+a multi-provider (OpenAI/Anthropic wire), prompt-or-native tool-protocol,
+strategy-pluggable (compaction/memory/session-state), sandboxed, approvals-aware,
+checkpointing, self-healing, budget-managing, scriptable + interactive coding-agent
+CLI — 197 tests green, all 20 original acceptance criteria + 8 loop-2/3 improvement
+probes passing live.
+
+Please review: `git -C ~/Programs/CodeMonkey log --oneline`, `features.html`,
+`build/BUILD_REPORT.md`. Accept, or list deficiencies and the loop continues.

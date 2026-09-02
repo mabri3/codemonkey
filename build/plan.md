@@ -234,7 +234,7 @@ end.
   verify: `uv run pytest tests/test_obsbudget.py -q` → exit 0 (>=4 tests: budget
   enforcement, marker format, isolation across calls, under-budget untouched);
   suite green.
-- [ ] CYCLE loop3-final — Loop 3 acceptance: full A1–A20 re-sweep + loop3 probes;
+- [x] CYCLE loop3-final — Loop 3 acceptance: full A1–A20 re-sweep + loop3 probes;
   final BUILD_REPORT section (all three loops); REQUEST USER ACCEPTANCE (Gate 2)
   | est: 30m |
   verify: `bash build/acceptance_sweep.sh` all green; report updated; committed.

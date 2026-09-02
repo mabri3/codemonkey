@@ -1,5 +1,5 @@
-{"type": "thread.started", "thread_id": "26a533691653"}
-{"type": "turn.started", "thread_id": "26a533691653"}
-{"type": "turn.completed", "usage": {"prompt_tokens": 632, "total_tokens": 692, "completion_tokens": 60, "prompt_tokens_details": {"cached_tokens": 608, "created_cache_tokens": 16}}}
-{"type": "item.completed", "thread_id": "26a533691653", "item": {"id": "item_d78f3b6a", "type": "reasoning", "text": " The user asks me to reply with exactly the word \"pong\" and nothing else. This is a straightforward request. I should just output \"pong\" without any extra text, formatting, or explanation.\n\nI don't need any tools for this. I'll answer with exactly pong."}}
-{"type": "item.completed", "thread_id": "26a533691653", "item": {"id": "item_b3f599e5", "type": "agent_message", "text": " pong"}}
+{"type": "thread.started", "thread_id": "16a2ed945ab1"}
+{"type": "turn.started", "thread_id": "16a2ed945ab1"}
+{"type": "turn.completed", "usage": {"prompt_tokens": 632, "total_tokens": 659, "completion_tokens": 27, "prompt_tokens_details": {"cached_tokens": 608, "created_cache_tokens": 16}}}
+{"type": "item.completed", "thread_id": "16a2ed945ab1", "item": {"id": "item_41404a96", "type": "reasoning", "text": " The user wants me to reply with exactly \"pong\" and nothing else. This is a simple direct instruction."}}
+{"type": "item.completed", "thread_id": "16a2ed945ab1", "item": {"id": "item_0c050205", "type": "agent_message", "text": " pong"}}

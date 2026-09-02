@@ -1,55 +1,62 @@
-- **README.md contains scratch text**
+Review comments:
+
+- **Do not commit scratch text to `README.md`**
   ```diff
   +# acceptance sweep scratch
   ```
-  This line is clearly temporary/scratch content and should not be committed. It was also flagged as an issue in the previous cycle review (see deleted `a16.out`).
+  This line is clearly temporary/scratch content and should be removed before merging.
 
-- **A9 shows a tool-invocation regression**
+- **`a16.out` is emptied without resolving the issues it recorded**
   ```diff
-  - codemonkey_tool_test
-  + TOOL_CALL: {"name": "shell", "arguments": {"command": "echo codemonkey_tool_test"}}  <|tool_call_end|>   <|tool_calls_section_end|> 
-  ```
-  The model now emits a literal `TOOL_CALL:` JSON blob and special tokens instead of actually executing the shell command and returning `codemonkey_tool_test`. This is a behavioral regression in the prompt-based tool protocol.
-
-- **a16.out is emptied, but the underlying issues it recorded are still present**
-  ```diff
-  -1. **README scratch text**
-  -   ```diff
-  -   +# acceptance sweep scratch
-  -   ```
-  -   This looks like temporary scratch text and should not be committed to `README.md`.
-  ```
-  Deleting the previous review artifact does not resolve the issues it documented. Many of them are not visible as fixed in this diff, e.g.:
-  ```diff
-  -2. **Unreachable/duplicate `except` block in `_parse_one`**
-  -...
-  -   except json.JSONDecodeError as exc:
-  -       return {"name": "", "args": {}, "error": f"malformed tool-call JSON: {exc}"}
-  ```
-  ```diff
-  -3. **Type/docstring mismatch in `_extract_json_object`**
-  -   ```python
-  -   def _extract_json_object(text: str) -> Optional[str]:
-  -       """Return the first balanced top-level JSON object in `text`, or "".
-  ```
-
-- **Source fixes are not in the diff**
-  This PR only regenerates acceptance-output snapshots and adds a scratch README line. There are no code changes addressing the review items from `a16.out` (dead `except` branch, stale `sorted`, `KeyError` risk from `data["messages"]`, broader exception handling in `list()`, etc.). Either include those fixes or explain why they are not needed.
-
-- **A17–A20 coverage disappeared from the summary**
-  ```diff
-  ----- A17: sandbox unit tests (incl. read-only denies write_file+shell) ---
-  -A17 exit=0  13 passed in 0.12s  (denial coverage: 9 assertion sites)
+  --- a/build/acceptance_outputs/a16.out
+  +++ b/build/acceptance_outputs/a16.out
+  @@ -1,55 +0,0 @@
+  -- **README.md contains scratch text**
+  -  ```diff
+  -  +# acceptance sweep scratch
+  -  ```
+  -  This line is clearly temporary/scratch content and should not be committed.
   ...
+  -- **Source fixes are not in the diff**
+  -  This PR only regenerates acceptance-output snapshots and adds a scratch README line.
+  ```
+  Deleting the previous review artifact does not fix the bugs it described (e.g., unreachable/duplicate `except` branch, type/docstring mismatch in `_extract_json_object`, `KeyError` risk from `data["messages"]`, broader exception handling in `list()`, stale `sorted()` usage). Either implement those source fixes or explain why each is not needed.
+
+- **A17–A20 acceptance checks disappeared from the summary without explanation**
+  ```diff
+  ---- A17: sandbox unit tests (incl. read-only denies write_file+shell) ---
+  -A17 exit=0  13 passed in 0.10s  (denial coverage: 9 assertion sites)
+  ---- A18: help lists the five commands ---
+  -A18 exit=0
+  ---- A19: strategy selector + invalid exit 2 ---
+  -A19 valid_exit=0 invalid_exit2=2  stderr=
+  ---- A20: strategy unit tests ---
+  -A20 exit=0  18 passed in 0.02s
   -=== sweep complete ===
   ```
-  These acceptance checks are gone without explanation. If they were intentionally removed or consolidated, say why; otherwise restore them.
+  If these checks were consolidated or removed intentionally, document why; otherwise restore them.
 
-- **Test count increased, but not reviewable**
+- **No source-test files are included, so the new test coverage is unreviewable**
   ```diff
-  -164 passed in 10.59s
-  +189 passed in 13.13s
+  -A15 exit=0  189 passed in 13.13s
+  +A15 exit=0  197 passed in 13.02s
   ```
-  More tests is good, but no test files appear in this diff, so the new coverage cannot be reviewed.
+  Test count went up, but no test files appear in the diff, so the changes cannot be reviewed.
+
+- **`a12.out` now contains many session metadata rows**
+  ```diff
+  +eed2bec0bb4d  2026-09-02 10:56  unblock2/kimi-k2.7-code  3 msgs  Remember the token word: zebra. Reply with ok.
+  +c2896375ce30  2026-09-02 10:55  unblock2/kimi-k2.7-code  7 msgs  Fill the schema for a repository named codemonkey ...
+  ...
+  ```
+  Confirm this is expected and does not leak sensitive context, user prompts, or internal endpoint names.
+
+- **The README and snapshot changes alone are insufficient**
+  ```diff
+  diff --git a/README.md b/README.md
+  ...
+  +# acceptance sweep scratch
+  ```
+  The PR should contain actual code/test changes, not just regenerated acceptance snapshots and a scratch comment.
 
 CHANGES REQUESTED

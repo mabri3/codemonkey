@@ -1,3 +1,7 @@
- TOOL_CALL: {"name": "shell", "arguments": {"command": "echo codemonkey_tool_test"}} <|tool_call_end|> <|tool_calls_section_end|>[usage] prompt=644 completion=73
-[agent]  TOOL_CALL: {"name": "shell", "arguments": {"command": "echo codemonkey_tool_tes
+ TOOL_CALL: {"name": "shell", "arguments": {"command": "echo codemonkey_tool_test"}}[usage] prompt=644 completion=57
+[notice] native turn carried prompt-protocol tool call(s); parsing them
+$ 
+[exit None] 
+ codemonkey_tool_test[usage] prompt=688 completion=34
+[agent]  codemonkey_tool_test
 
