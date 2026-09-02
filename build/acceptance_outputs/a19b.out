@@ -1,0 +1,1 @@
+error: unknown strategy 'bogus' for 'compaction'. Valid compaction strategies: summarizing, sliding-window

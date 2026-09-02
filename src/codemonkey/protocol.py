@@ -118,10 +118,59 @@ def _parse_lines(lines: list) -> list:
     return out
 
 
+def _extract_json_object(text: str) -> Optional[str]:
+    """Return the first balanced top-level JSON object in `text`, or "".
+
+    models append special tokens / prose after the JSON (observed live:
+    `TOOL_CALL: {...} <|tool_call_end|> <|tool_calls_section_end|>` from
+    kimi-k2.7 via 3459), so a strict whole-blob json.loads is too brittle.
+    Scan for the first '{' and walk braces respecting strings/escapes.
+    """
+    depth = 0
+    in_str = False
+    esc = False
+    start = -1
+    for i, ch in enumerate(text):
+        if start < 0:
+            if ch == "{":
+                start = i
+                depth = 1
+            continue
+        if in_str:
+            if esc:
+                esc = False
+            elif ch == "\\":
+                esc = True
+            elif ch == '"':
+                in_str = False
+            continue
+        if ch == '"':
+            in_str = True
+        elif ch == "{":
+            depth += 1
+        elif ch == "}":
+            depth -= 1
+            if depth == 0:
+                return text[start:i + 1]
+    return ""
+
+
 def _parse_one(blob: str) -> dict:
     blob = blob.strip()
+    # Tolerate trailing junk after the JSON object (special tokens, prose):
+    # first try the strict whole-blob parse; on failure extract the first
+    # balanced {...} and retry with that.
     try:
         obj = json.loads(blob)
+    except json.JSONDecodeError:
+        candidate = _extract_json_object(blob)
+        if not candidate:
+            return {"name": "", "args": {}, "error": f"malformed tool-call JSON: no JSON object found in: {blob[:80]!r}"}
+        blob = candidate
+        try:
+            obj = json.loads(blob)
+        except json.JSONDecodeError as exc:
+            return {"name": "", "args": {}, "error": f"malformed tool-call JSON: {exc}"}
     except json.JSONDecodeError as exc:
         return {"name": "", "args": {}, "error": f"malformed tool-call JSON: {exc}"}
     if not isinstance(obj, dict):

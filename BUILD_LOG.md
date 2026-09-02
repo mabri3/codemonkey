@@ -677,3 +677,26 @@ confirmed separately). `codemonkey --help` lists exec/review/sessions/config/mod
 recovery (6F4 guard test enforces removal); A16 live review re-probe still earned.
 
 **Next step:** CYCLE 10 — Loop 1 final acceptance sweep (A1-A20).
+
+## 2026-09-02 — CYCLE 10: Loop 1 final acceptance sweep — ALL A1–A20 PASS
+
+**Completed:** full acceptance sweep run literally per spec (build/acceptance_sweep.sh,
+outputs in build/acceptance_outputs/); `build/BUILD_REPORT.md` written (criteria table,
+literal outputs, git range, gaps).
+
+**Fixes made during the sweep (all real bugs):**
+1. protocol.py `_parse_one`: tolerant extraction of the first balanced JSON object when
+   models append special tokens after the call (`<|tool_call_end|>`) — was killing A9.
+2. cli.py: `--approval` alias added (exec/resume/alias/REPL) — spec probes use
+   `--approval never`; previously silently swallowed by exec's ignore_unknown_options.
+3. strategies/session_state.py: rich `list()` contract (provider/model/n_messages/
+   first_prompt/cwd) for jsonl+sqlite — fixed `sessions` CLI KeyError from cycle 7;
+   `latest()` newest-first.
+
+**Tests:** suite 164/164. Sweep: A1–A20 all exit 0 (A4 with documented unblock2
+fallback; A16 live review 3087 chars + verdict; A9 full tool loop live).
+
+**Known issues:** home llama.cpp inference still wedged (TEMP unblock/unblock2
+providers guarded by 6F4 test); cron loop still stale-gateway-blocked.
+
+**Loop 1 complete. Next:** CYCLE 11 — loop 2 research (pick 10x improvements).

@@ -52,7 +52,7 @@ def _callback(
     ] = "",
     approval: Annotated[
         str,
-        typer.Option("--ask-for-approval", "-a", help="Approval policy (untrusted | on-request | never)."),
+        typer.Option("--ask-for-approval", "--approval", "-a", help="Approval policy (untrusted | on-request | never)."),
     ] = "",
     add_dir: Annotated[
         list[str],
@@ -354,7 +354,7 @@ def exec(
     ] = None,
     ask_for_approval: Annotated[
         Optional[str],
-        typer.Option("-a", "--ask-for-approval", help="untrusted | on-request | never"),
+        typer.Option("-a", "--ask-for-approval", "--approval", help="untrusted | on-request | never"),
     ] = None,
     provider: Annotated[
         Optional[str],
@@ -509,7 +509,7 @@ def exec_resume(
     ] = None,
     ask_for_approval: Annotated[
         Optional[str],
-        typer.Option("-a", "--ask-for-approval", help="untrusted | on-request | never"),
+        typer.Option("-a", "--ask-for-approval", "--approval", help="untrusted | on-request | never"),
     ] = None,
     provider: Annotated[
         Optional[str],
@@ -681,7 +681,7 @@ def exec_resume_alias(
     ] = None,
     ask_for_approval: Annotated[
         Optional[str],
-        typer.Option("-a", "--ask-for-approval", help="untrusted | on-request | never"),
+        typer.Option("-a", "--ask-for-approval", "--approval", help="untrusted | on-request | never"),
     ] = None,
     provider: Annotated[
         Optional[str],

@@ -1,0 +1,42 @@
+                                                                                
+ Usage: codemonkey [OPTIONS] COMMAND [ARGS]...                                  
+                                                                                
+ codemonkey — a scriptable coding-agent CLI for OpenAI-style and                
+ Anthropic-style endpoints (defaults to a local llama.cpp server).              
+                                                                                
+╭─ Options ────────────────────────────────────────────────────────────────────╮
+│ --version                                      Print the version and exit.   │
+│ --provider                      -p      <str>  Provider for the interactive  │
+│                                                session.                      │
+│ --model                         -m      <str>  Model override for the        │
+│                                                interactive session.          │
+│ --sandbox                               <str>  Sandbox level for the session │
+│                                                (read-only | workspace-write  │
+│                                                | danger-full-access).        │
+│ --ask-for-approval,--approval   -a      <str>  Approval policy (untrusted |  │
+│                                                on-request | never).          │
+│ --add-dir                       -C      <str>  Additional writable directory │
+│                                                (repeatable).                 │
+│ --max-turns                             <int>  Max agent turns per prompt.   │
+│                                                [default: 0]                  │
+│ --timeout                               <int>  Per-tool timeout seconds.     │
+│                                                [default: 0]                  │
+│ --ignore-user-config                           Skip                          │
+│                                                ~/.codemonkey/config.yaml.    │
+│ --dangerously-bypass-approval…                 Lift the sandbox and approval │
+│                                                gates entirely.               │
+│ --show-reasoning                               Print model reasoning blocks  │
+│                                                in the REPL.                  │
+│ --ephemeral                                    Do not persist this session.  │
+│ --help                                         Show this message and exit.   │
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ Commands ───────────────────────────────────────────────────────────────────╮
+│ config    Print the effective merged config (secrets masked).                │
+│ review    LLM review of the repo's uncommitted diff (read-only).             │
+│ models    List models exposed by a provider endpoint.                        │
+│ sessions  List persisted sessions (thread id, updated time, first prompt).   │
+│ exec      Non-interactive exec: run the agent once, print the final          │
+│           response. Use `exec resume [--last|THREAD_ID] [PROMPT]` to         │
+│           continue a session.                                                │
+╰──────────────────────────────────────────────────────────────────────────────╯
+

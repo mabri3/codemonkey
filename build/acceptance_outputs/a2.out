@@ -1,0 +1,38 @@
+---
+providers:
+  local:
+    protocol: openai
+    base_url: http://192.168.50.113:8080/v1
+    model: Qwen3.8-27B-NVFP4-MTP-VERY-HIGH.gguf
+    api_key_env: CODEMONKEY_API_KEY
+    tool_protocol: auto
+  unblock:
+    protocol: openai
+    base_url: http://127.0.0.1:3458/v1
+    model: minimax-m3
+    api_key_env: CODEMONKEY_UNBLOCK_KEY
+    tool_protocol: auto
+  unblock2:
+    protocol: openai
+    base_url: http://127.0.0.1:3459/v1
+    model: kimi-k2.7-code
+    api_key_env: CODEMONKEY_UNBLOCK2_KEY
+    tool_protocol: auto
+  anthropic:
+    protocol: anthropic
+    base_url: https://api.anthropic.com
+    model: claude-sonnet-4-5
+    api_key_env: ANTHROPIC_API_KEY
+    tool_protocol: native
+default_provider: unblock2
+sandbox: workspace-write
+approval: on-request
+max_turns: 30
+timeout_seconds: 300
+add_dirs: []
+web_fetch: false
+context_limit: 32000
+strategies:
+  compaction: summarizing
+  memory: file
+  session_state: jsonl

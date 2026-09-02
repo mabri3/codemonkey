@@ -155,7 +155,7 @@ end.
   `--max-turns`, `--ignore-user-config`,
   `--dangerously-bypass-approvals-and-sandbox` through config; streaming in
   exec text mode (deltas to stderr, final full message to stdout).
-- [ ] CYCLE 10 — Loop 1 final acceptance sweep | est: 30m |
+- [x] CYCLE 10 — Loop 1 final acceptance sweep | est: 30m |
   verify: ALL spec.md acceptance criteria A1–A20 pass (run each literally,
   capture output); `build/BUILD_REPORT.md` written (loop 1 section) with
   criteria table + literal probe output + `git log` range + known gaps.

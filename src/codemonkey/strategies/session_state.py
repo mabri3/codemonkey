@@ -107,9 +107,12 @@ class JsonlStore:
 
     def list(self) -> list[dict]:
         out = []
-        for p in sorted(self.base.glob("*.jsonl")):
-            tid = p.stem
-            created, updated = None, None
+        for p in sorted(self.base.glob("*.jsonl"), key=lambda q: q.stat().st_mtime, reverse=True):
+            try:
+                data = self.load(p.stem)
+            except FileNotFoundError:
+                continue
+            meta, messages = None, data["messages"]
             for line in p.read_text().splitlines():
                 line = line.strip()
                 if not line:
@@ -119,10 +122,21 @@ class JsonlStore:
                 except json.JSONDecodeError:
                     continue
                 if ev.get("type") == "meta":
-                    created = ev.get("created") or created
-                    updated = ev.get("updated") or updated
-            out.append({"thread_id": tid, "created": created, "updated": updated})
-        out.sort(key=lambda e: e.get("updated") or 0)
+                    meta = ev
+                    break   # earliest meta (file is append-ordered)
+            first_user = next(
+                (m.get("content", "") for m in messages if m.get("role") == "user"), ""
+            )
+            out.append({
+                "thread_id": p.stem,
+                "provider": (meta or {}).get("provider", "?"),
+                "model": (meta or {}).get("model", "?"),
+                "created": (meta or {}).get("created") or p.stat().st_mtime,
+                "updated": (meta or {}).get("updated") or p.stat().st_mtime,
+                "n_messages": len(messages),
+                "first_prompt": first_user[:80],
+                "cwd": (meta or {}).get("cwd", ""),
+            })
         return out
 
     def latest(self) -> Optional[str]:
@@ -217,9 +231,39 @@ class SqliteStore:
         with self._conn() as conn:
             rows = conn.execute(
                 "SELECT thread_id, MIN(ts) AS created, MAX(ts) AS updated "
-                "FROM events WHERE type='meta' GROUP BY thread_id"
+                "FROM events GROUP BY thread_id"
             ).fetchall()
-        out = [{"thread_id": r[0], "created": r[1], "updated": r[2]} for r in rows]
+        out = []
+        for tid, created, updated in rows:
+            try:
+                data = self.load(tid)
+            except FileNotFoundError:
+                continue
+            meta = {}
+            with self._conn() as conn:
+                row = conn.execute(
+                    "SELECT payload FROM events WHERE thread_id=? AND type='meta' "
+                    "ORDER BY ts ASC LIMIT 1", (tid,)
+                ).fetchone()
+            if row:
+                try:
+                    meta = json.loads(row[0])
+                except json.JSONDecodeError:
+                    meta = {}
+            messages = data["messages"]
+            first_user = next(
+                (m.get("content", "") for m in messages if m.get("role") == "user"), ""
+            )
+            out.append({
+                "thread_id": tid,
+                "provider": meta.get("provider", "?"),
+                "model": meta.get("model", "?"),
+                "created": created,
+                "updated": updated,
+                "n_messages": len(messages),
+                "first_prompt": first_user[:80],
+                "cwd": meta.get("cwd", ""),
+            })
         out.sort(key=lambda e: e.get("updated") or 0)
         return out
 

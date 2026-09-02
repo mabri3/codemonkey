@@ -1,0 +1,63 @@
+Review comments:
+
+1. **README scratch text**
+   ```diff
+   +# acceptance sweep scratch
+   ```
+   This looks like temporary scratch text and should not be committed to `README.md`.
+
+2. **Unreachable/duplicate `except` block in `_parse_one`**
+   ```python
+   try:
+       obj = json.loads(blob)
+   except json.JSONDecodeError:
+       candidate = _extract_json_object(blob)
+       ...
+       try:
+           obj = json.loads(blob)
+       except json.JSONDecodeError as exc:
+           return {"name": "", "args": {}, "error": f"malformed tool-call JSON: {exc}"}
+   except json.JSONDecodeError as exc:
+       return {"name": "", "args": {}, "error": f"malformed tool-call JSON: {exc}"}
+   ```
+   The outer `except json.JSONDecodeError` can never execute because the inner `except` already catches all `JSONDecodeError`s raised inside. Remove the dead branch and flatten the logic.
+
+3. **Type/docstring mismatch in `_extract_json_object`**
+   ```python
+   def _extract_json_object(text: str) -> Optional[str]:
+       """Return the first balanced top-level JSON object in `text`, or "".
+   ```
+   Annotated `Optional[str]` but docstring says `""` and code never returns `None`. Make the annotation and docstring consistent (e.g. `-> str`).
+
+4. **Wasted sort in `JsonlStore.list`**
+   ```python
+   for p in sorted(self.base.glob("*.jsonl"), key=lambda q: q.stat().st_mtime, reverse=True):
+       ...
+   out.sort(key=lambda e: e.get("updated") or 0)
+   ```
+   The mtime sort is immediately overwritten by the final `out.sort`. Remove the wasted `sorted(..., reverse=True)` and just iterate `self.base.glob("*.jsonl")`.
+
+5. **Unhandled `load()` exceptions in `list()` methods**
+   Both `JsonlStore.list` and `SqliteStore.list` call `self.load(...)` but only catch `FileNotFoundError`. If `load()` raises `json.JSONDecodeError`, `KeyError`, or a corrupted-file error, the whole `list` command crashes. Consider catching a broader exception or documenting the guarantee `load()` provides.
+
+6. **Possible `KeyError` on `data["messages"]`**
+   ```python
+   meta, messages = None, data["messages"]
+   ```
+   If `self.load()` returns a dict without a `"messages"` key, this raises. Add a guard or ensure `load()` always returns that key.
+
+7. **No tests for new behavior**
+   The new `_extract_json_object` parser and the enriched `list()` output format are non-trivial. Add unit tests covering:
+   - JSON followed by special-token junk
+   - JSON with nested objects/arrays/strings
+   - Escaped quotes and braces inside strings
+   - Malformed input with no JSON object
+   - The new `list()` schema fields (`provider`, `model`, `n_messages`, `first_prompt`, `cwd`)
+
+8. **Schema-change risk**
+   `JsonlStore.list()` and `SqliteStore.list()` now return a richer dict schema. Verify all callers (CLI table rendering, TUI, other modules) tolerate the extra fields and still work if `created`/`updated` fall back to file mtime.
+
+9. **Cli alias**
+   Adding `--approval` as an alias is fine; Typer supports multiple long names. Just confirm no other option already uses `--approval`.
+
+Verdict: CHANGES REQUESTED
