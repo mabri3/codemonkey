@@ -1019,3 +1019,16 @@ tests/test_tools.py, build/probes/cycle7f1-memory.md.
 
 **Tests:** test_memory_wiring 6/6; suite 228/228. LIVE: seeded temp memory with
 codemonkey_memory_probe_token -> exec recalled the token verbatim.
+
+## 2026-09-02 — CYCLE 17F1: loop-3 knobs become real config knobs
+
+**Completed:** `max_edit_retries` (default 1) and `observation_budget` (default
+24000) added to config.DEFAULTS + ENV_MAP (CODEMONKEY_MAX_EDIT_RETRIES /
+CODEMONKEY_OBSERVATION_BUDGET); exec and repl pass both into run_turns.
+`codemonkey config` shows them; env override verified.
+
+**Files changed:** src/codemonkey/config.py, src/codemonkey/exec.py,
+src/codemonkey/repl.py, tests/test_knobs.py (new, 4 tests).
+
+**Tests:** test_knobs 4/4 (defaults, env override, exec pass-through via patched
+run_turns recording kwargs, config surface). Suite 232/232.

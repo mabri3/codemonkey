@@ -373,7 +373,7 @@ map to an A-criterion, a loop selection, or a cited research selection).
   `uv run codemonkey exec --ephemeral "What probe token is in your memory?"`
   → exit 0, stdout contains `codemonkey_memory_probe_token` (transcript to
   `build/probes/`).
-- [ ] CYCLE 17F1 — loop-3 knobs are function defaults, not knobs: add
+- [x] CYCLE 17F1 — loop-3 knobs are function defaults, not knobs: add
   `max_edit_retries` (1) and `observation_budget` (24000) to `config.DEFAULTS`,
   to `ENV_MAP` (`CODEMONKEY_MAX_EDIT_RETRIES`, `CODEMONKEY_OBSERVATION_BUDGET`)
   and pass them from `exec.py`/`repl.py` into `run_turns`. | est: 20m |
