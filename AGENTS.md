@@ -62,6 +62,37 @@ job is to continue that machine, not invent a new process.
 - Python: always through `uv run`; Python 3.11.15; no global installs.
 - Secrets: `.env`/API keys never in git; providers reference `*_env` names.
 
+## graphify — knowledge graph (MANDATORY)
+
+This repo maintains a graphify knowledge graph in `graphify-out/`. Using it and
+keeping it current is REQUIRED, not optional:
+
+1. **Query first.** When `graphify-out/graph.json` exists, ANY question about
+   the codebase, architecture, or file relationships is a graphify query first:
+   `graphify query "<question>"` — before reading files ad hoc. Fall back to
+   direct reads only if the graph is missing or the query returns nothing.
+2. **Update after every cycle.** The graph must reflect the code at each
+   cycle's commit. At the END of every cycle (alongside the BUILD_LOG/
+   features.html obligations), refresh incrementally:
+   `graphify . --update` (or `/graphify . --update`).
+   A full rebuild (`graphify .`) is only needed after large-scale moves,
+   deletions, or a graphify version bump. Never leave `graphify-out/` stale
+   relative to HEAD: if new/renamed modules exist in the commit, the graph
+   update must cover them.
+3. **Research cycles use it too.** When writing `build/research-loop*.md`,
+   query the graph for architectural context (which modules exist, how they
+   connect) before proposing improvements — candidates should reference real
+   module names and relationships, not invented ones.
+4. **Critic/review cycles query it.** Reviewers trace impact paths
+   (`graphify path "<A>" "<B>"`) and explain nodes (`graphify explain "<X>"`)
+   before filing findings, so evidence includes relationship context.
+5. **Commit the graph.** `graphify-out/` is part of the repo: updated graph
+   outputs (graph.json, GRAPH_REPORT.md) ship in the same commit as the cycle
+   that changed the code. Do not gitignore it.
+6. **First build for fresh clones.** If `graphify-out/graph.json` is missing
+   (fresh clone), build it before answering any structural question:
+   `graphify .`
+
 ## Review-gate discipline (when asked to review or criticize)
 
 If your task is to REVIEW (not build), produce a critic report in the style of

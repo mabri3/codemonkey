@@ -13,3 +13,7 @@ Quick orientation:
 
 Tests: `uv run pytest -q` · Docs guard: `uv run codemonkey --help` lists
 exec/review/sessions/config/models (A18).
+
+Knowledge graph: `graphify-out/` — query it first for any codebase question
+(`graphify query "..."`), update after every cycle (`graphify . --update`).
+See the graphify section in AGENTS.md — mandatory, not optional.
