@@ -1,8 +1,9 @@
 """shell — run a command via bash in the workspace, bounded by ctx.timeout.
 
-Denied entirely under read-only / workspace-write (see sandbox.can).
-Only reachable at danger-full-access. Non-zero exit is ok=False with the
-output still returned so the model can read the failure.
+Denied under read-only; allowed (cwd-bound, approval-policy-gated) under
+workspace-write per spec:97, and free under danger-full-access
+(see sandbox.can). Non-zero exit is ok=False with the output still
+returned so the model can read the failure.
 """
 
 from __future__ import annotations

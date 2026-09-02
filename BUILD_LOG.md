@@ -391,3 +391,34 @@ sessions.get_store through the strategies registry.
 **Next step:** cycle-6 review gate — fresh-context critic on
 `git diff db4fa9a..HEAD` vs build/spec.md; findings become new unchecked
 cycles. Then CYCLE 7 (strategies).
+
+---
+
+## 2026-09-02 (late tick) — CYCLE 6F1 (review-gate fix): workspace-write allows shell per spec:97
+
+**Files changed:** `src/codemonkey/sandbox.py` (can(): shell now allowed at
+`workspace-write` and `danger-full-access`; docstring updated; read-only
+still denies), `src/codemonkey/tools/shell.py` (docstring spec compliance),
+`tests/test_sandbox.py` (matrix + check + dispatch tests updated/added),
+`tests/test_tools.py` (denying test flipped to allow + new
+workspace-write + approval `never` execution case + read-only-denies case),
+`features.html`, `build/plan.md`.
+
+**Tests / probes run (literal):**
+- Verify probe: `uv run pytest tests/test_sandbox.py tests/test_tools.py -q`
+  → exit 0, **38 passed** (1.29s) — incl. new
+  `test_shell_workspace_write_approval_never_executes`,
+  `test_read_only_still_denies_shell_through_dispatch`,
+  `test_check_allows_shell_workspace_write`, `test_check_denies_shell_read_only`.
+- Full suite: `uv run pytest -q` → exit 0, **107 passed** (2.00s, no network).
+
+**Known issues:** approval-GATING of shell itself is not yet enforced beyond
+the policy matrix — the approvals layer (soft-deny notice + interactive
+prompt) is CYCLE 8's `approvals.py`; this cycle only restores the spec:97
+sandbox policy contract. Home llama.cpp still wedged (no live probe needed
+for this cycle).
+
+**Next step:** CYCLE 6F2 (exec resume real Typer subcommand; JSONL item
+event names to spec contract item.started/item.completed; turn.started
+1:1 with turn.completed around schema retry; persisted sessions strip
+schema scaffolding).

@@ -137,8 +137,24 @@ def test_shell_happy_and_exit_code(ws):
     assert not r.ok and "exit 3" in r.output
 
 
-def test_shell_denied_workspace_write(ws):
+def test_shell_allowed_workspace_write(ws):
+    # spec:97 — workspace-write allows shell per policy (approval-gated,
+    # cwd-bound). Full approval semantics land with CYCLE 8's approvals.py.
     c = ctx_for(ws)  # workspace-write
+    r = dispatch("shell", {"command": "echo hi"}, c)
+    assert r.ok and "hi" in r.output
+
+
+def test_shell_workspace_write_approval_never_executes(ws):
+    # A9 shape: workspace-write + approval never → the shell command runs.
+    c = ctx_for(ws)
+    c.extra["approval"] = "never"
+    r = dispatch("shell", {"command": "echo auto_ok"}, c)
+    assert r.ok and "auto_ok" in r.output
+
+
+def test_shell_read_only_denied(ws):
+    c = ctx_for(ws, sandbox="read-only")
     r = dispatch("shell", {"command": "echo hi"}, c)
     assert not r.ok and "sandbox" in r.output
 
@@ -191,7 +207,8 @@ def test_sandbox_can_matrix():
     assert not can("write_file", "read-only")
     assert not can("shell", "read-only")
     assert can("write_file", "workspace-write")
-    assert not can("shell", "workspace-write")
+    # spec:97 — workspace-write allows shell per policy
+    assert can("shell", "workspace-write")
     assert can("write_file", "danger-full-access")
     assert can("shell", "danger-full-access")
     with pytest.raises(SandboxError):

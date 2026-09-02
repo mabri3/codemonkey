@@ -46,17 +46,22 @@ def test_can_matrix():
     assert can("write_file", "danger-full-access")
     assert not can("edit_file", "read-only")
     assert can("edit_file", "workspace-write")
-    # shell: full access only
+    # shell: read-only denied; allowed at workspace-write (spec:97) + full
     assert not can("shell", "read-only")
-    assert not can("shell", "workspace-write")
+    assert can("shell", "workspace-write")
     assert can("shell", "danger-full-access")
     # unknown level raises
     with pytest.raises(SandboxError):
         can("read_file", "bogus")
 
 
-def test_check_denies_shell_workspace_write(ws):
-    c = ctx_for(ws)  # workspace-write
+def test_check_allows_shell_workspace_write(ws):
+    c = ctx_for(ws)  # workspace-write — per spec:97, shell is allowed per policy
+    check("shell", c)  # must NOT raise (approval-gating is CYCLE 8's layer)
+
+
+def test_check_denies_shell_read_only(ws):
+    c = ctx_for(ws, sandbox="read-only")
     with pytest.raises(SandboxError) as ei:
         check("shell", c)
     assert "shell" in str(ei.value)
@@ -113,8 +118,15 @@ def test_read_only_denies_write_through_dispatch(ws):
     assert not r.ok and "sandbox-denied" in r.output
 
 
-def test_workspace_write_denies_shell_through_dispatch(ws):
-    c = ctx_for(ws)  # workspace-write
+def test_workspace_write_allows_shell_through_dispatch(ws):
+    c = ctx_for(ws)  # workspace-write; approval policy defaults to none here
+    # (exec sets extra["approval"]; "never" auto-approves — spec:97+A9)
+    r = dispatch("shell", {"command": "echo hi"}, c)
+    assert r.ok and "hi" in r.output
+
+
+def test_read_only_still_denies_shell_through_dispatch(ws):
+    c = ctx_for(ws, sandbox="read-only")
     r = dispatch("shell", {"command": "echo hi"}, c)
     assert not r.ok and "sandbox-denied" in r.output
 

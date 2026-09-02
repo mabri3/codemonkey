@@ -4,7 +4,10 @@ Three sandbox levels (config `sandbox` / `--sandbox`):
 
   read-only           : read-only tools allowed; every write + shell DENIED.
   workspace-write     : writes allowed only inside the allowed roots
-                        (cwd + `--add-dir`s); shell DENIED.
+                        (cwd + `--add-dir`s); shell ALLOWED per policy
+                        (spec:97) — cwd-bound, and callers should pair it
+                        with an approval policy (e.g. `approval: never` for
+                        auto-approve); the full approval layer is cycle 8.
   danger-full-access  : everything allowed (shell + arbitrary paths).
 
 The `--dangerously-bypass-approvals-and-sandbox` flag resolves to
@@ -69,7 +72,10 @@ def can(tool: str, level: str) -> bool:
     if level not in LEVELS:
         raise SandboxError(f"unknown sandbox level '{level}'")
     if tool in _SHELL_TOOLS:
-        return level == "danger-full-access"
+        # spec:97 — workspace-write allows shell per policy (spec text:
+        # "shell allowed per policy"). Approval-gating / soft-deny of shell
+        # is the approvals layer (CYCLE 8); the sandbox is not the gate.
+        return level in ("workspace-write", "danger-full-access")
     if tool in _WRITE_TOOLS:
         return level in ("workspace-write", "danger-full-access")
     if tool in _READ_TOOLS:

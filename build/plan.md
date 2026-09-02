@@ -215,7 +215,7 @@ Fresh-context critic (build/critic-cycle6.md) reviewed the cycles 1–6 diff
 against build/spec.md. Findings become the unchecked fix cycles below
 (inserted before CYCLE 7 per append rule; checked boxes preserved).
 
-- [ ] CYCLE 6F1 — Sandbox: `workspace-write` must ALLOW shell per policy
+- [x] CYCLE 6F1 — Sandbox: `workspace-write` must ALLOW shell per policy
   (spec:97) instead of denying it; approval-gated, cwd-bound. Fix
   `sandbox.py`/`tools/__init__.py`, update the two denying tests, add a
   test: workspace-write + approval never → shell executes, read-only still
