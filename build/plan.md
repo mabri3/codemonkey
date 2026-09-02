@@ -135,7 +135,7 @@ end.
   class; unknown name → exit 2 listing valid names. Config block
   `strategies: {compaction, memory, session_state}` + env
   `CODEMONKEY_STRATEGY_<DOMAIN>`.
-- [ ] CYCLE 8 — `review` + approvals + remaining tools | est: 30m |
+- [x] CYCLE 8 — `review` + approvals + remaining tools | est: 30m |
   verify: `uv run pytest tests/test_approvals.py -q` → exit 0 (soft-deny
   notice on stderr + run continues in exec; `approval: never` auto-approves;
   bypass flag lifts sandbox+approval); LIVE A16: `uv run codemonkey

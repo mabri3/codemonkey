@@ -57,7 +57,12 @@ def run_turns(
     on_token: Optional[Callable[[str], None]] = None,
     fallback: Optional[FallbackRecorded] = None,
     schema: Optional[dict] = None,
+    approval: Optional[str] = None,
+    approval_notice_stream=None,
 ) -> ChatTurn:
+    """Run agent turns. `approval` (None disables the gate) is a policy name;
+    `approval_notice_stream` overrides where soft-deny notices go (default:
+    sys.stderr resolved at call time)."""
     """Drive the model until a final text answer or max_turns.
 
     on_event receives dicts: {type: turn.started}, {type: tool.started, name},
@@ -233,6 +238,34 @@ def run_turns(
                 result_output = f"error: {call['error']}"
                 ok = False
             else:
+                # Approval gate (cycle 8): evaluate policy BEFORE dispatch.
+                decision = None
+                if approval:
+                    from . import approvals as approvals_mod
+
+                    decision = approvals_mod.decide(
+                        name, approval, sandbox=ctx.sandbox
+                    )
+                    if decision.action == approvals_mod.SOFT_DENY:
+                        approvals_mod.notice_to_stderr(
+                            decision, approval_notice_stream
+                        )
+                        result_output = approvals_mod.tool_result_notice(
+                            name, decision
+                        )
+                        ok = False
+                        if on_event:
+                            on_event({
+                                "type": "tool.completed",
+                                "name": name,
+                                "ok": False,
+                                "approval": "soft-deny",
+                            })
+                        messages.append(
+                            {"role": "user",
+                             "content": f"TOOL_RESULT {name}:\n{result_output}"}
+                        )
+                        continue
                 result = tool_registry.dispatch(name, call.get("args") or {}, ctx)
                 result_output = result.output
                 ok = result.ok

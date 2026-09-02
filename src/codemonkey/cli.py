@@ -73,6 +73,66 @@ def config(
 
 
 @app.command()
+def review(
+    uncommitted: Annotated[
+        bool,
+        typer.Option("--uncommitted", help="Review uncommitted changes vs HEAD (default)."),
+    ] = True,
+    base: Annotated[
+        str,
+        typer.Option("--base", help="Review the diff vs this base ref instead of HEAD."),
+    ] = "",
+    staged: Annotated[
+        bool,
+        typer.Option("--staged", help="Review only the staged changes."),
+    ] = False,
+    provider_name: Annotated[
+        str,
+        typer.Option("--provider", "-p", help="Provider to use (defaults to configured default)."),
+    ] = "",
+) -> None:
+    """LLM review of the repo's uncommitted diff (read-only)."""
+    from .config import ConfigError, load_config, resolve_api_key
+    from .providers import ProviderError, build_provider
+    from . import review as review_mod
+
+    cwd = Path.cwd()
+    try:
+        cfg = load_config(cwd=cwd)
+        name = provider_name or cfg.get("default_provider", "local")
+        pconf = cfg.get("providers", {}).get(name)
+        if pconf is None:
+            typer.secho(
+                f"error: unknown provider '{name}'. "
+                f"Valid providers: {', '.join(cfg['providers'])}",
+                err=True, fg=typer.colors.RED,
+            )
+            raise typer.Exit(2)
+        prov = build_provider(
+            protocol=pconf.get("protocol", "openai"),
+            base_url=pconf["base_url"],
+            model=pconf.get("model", ""),
+            api_key=resolve_api_key(cfg, name) or "",
+        )
+        text = review_mod.run_review(
+            prov, cwd,
+            base=(base or None),
+            staged=staged,
+            on_event=lambda ev: None,
+        )
+    except ConfigError as exc:
+        typer.secho(f"error: {exc}", err=True, fg=typer.colors.RED)
+        raise typer.Exit(2) from None
+    except RuntimeError as exc:
+        typer.secho(f"error: {exc}", err=True, fg=typer.colors.RED)
+        raise typer.Exit(2) from None
+    except ProviderError as exc:
+        typer.secho(f"error: provider failure: {exc}", err=True, fg=typer.colors.RED)
+        raise typer.Exit(1) from None
+    typer.echo(text)
+
+
+@app.command()
 def models(
     provider: Annotated[
         str,

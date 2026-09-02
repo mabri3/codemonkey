@@ -294,6 +294,7 @@ def run_exec(
             on_event=on_event,
             on_token=on_token,
             schema=schema,
+            approval=eff_approval,
         )
     finally:
         try:

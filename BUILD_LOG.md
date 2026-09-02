@@ -611,3 +611,38 @@ A5-A11/A16 not re-probed here — no live LLM path was touched in cycle 7;
 `unblock` provider remains TEMPORARY, removal still tracked).
 
 **Next step:** CYCLE 8 — `review` + approvals + remaining tools.
+
+## 2026-09-02 — CYCLE 8: approvals policy layer + `review` command
+
+**Completed:**
+- `src/codemonkey/approvals.py` — three policies (`untrusted` gates shell+writes,
+  `on-request` gates shell, `never` auto-approves), bypass flag lifts everything,
+  danger-full-access pre-approves, interactive ASK path reserved for the REPL.
+  Soft-deny emits a stderr notice (tool + how to allow: `--approval never` or
+  `--dangerously-bypass-approvals-and-sandbox`), feeds the model an explicit
+  TOOL_RESULT ("NOT executed — do not retry"), and the run CONTINUES so exec
+  still finishes with a best-effort answer.
+- `loop.run_turns` gains `approval` + `approval_notice_stream`: the gate runs
+  BEFORE dispatch (sandbox stays the hard backstop); decision trace verified:
+  soft-deny -> notice on stderr -> tool result -> second turn -> final answer.
+- `src/codemonkey/review.py` + `codemonkey review` — unified-diff context
+  (uncommitted vs HEAD, --base <ref>, --staged), read-only single review turn
+  with senior-reviewer system prompt + verdict line; error surfaces: not-a-repo /
+  no-changes -> exit 2, provider failure -> exit 1 (one line, no traceback).
+- exec passes `eff_approval` into run_turns (config / --approval / bypass all honored).
+
+**Files changed:** `src/codemonkey/approvals.py` (new), `src/codemonkey/review.py` (new),
+`src/codemonkey/loop.py` (gate), `src/codemonkey/exec.py` (pass-through),
+`src/codemonkey/cli.py` (review cmd), `tests/test_approvals.py` (new, 16 tests).
+
+**Tests:** `uv run pytest -q` -> 152 passed (was 136). Live A16 (`codemonkey review
+--uncommitted`, stdout >= 400 chars) is BLOCKED by environment: home llama.cpp
+inference wedged and the temporary 3458 unblock proxy rejects with 401
+"Missing API key" (no CODEMONKEY_UNBLOCK_KEY in env). Everything upstream of the
+LLM call verified live: git diff gathering, provider build, one-line error surface.
+(Mock suite covers the review turn + verdict; A16 to be re-probed when live
+inference returns.)
+
+**Known issues:** A16 pending live provider (see above); ASK path awaiting REPL (cycle 9).
+
+**Next step:** CYCLE 9 — interactive REPL + flag wiring + polish.
