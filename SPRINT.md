@@ -84,7 +84,16 @@ loader · 19 verify gate · 20 repo-map index+tool · 21 repo-map injection ·
 loop4-final re-sweep. Loop 5: CYCLE R5 research only (subagents, hooks +
 rule-based permissions, local eval harness, MCP, cost accounting) — R5 ends
 by ASKING the user, because subagents and permission semantics are core
-design. **Gate 2 (user acceptance of loop 3) is still open: a tick that
+design. Loop 4 additionally carries critic-fix cycles 19F1 (verify events
+report the real exit code) and 22F1 (`cache_prompt` threaded through every
+`provider.chat` call site) from `build/critic-loop4.md`.
+Loops 6-10 (PROPOSED 2026-09-02, **NOT AUTHORIZED** — charters in
+`build/loops-5-10-proposal.md`): CYCLE R6 context engineering chosen by
+measurement · R7 reliability + recovery · R8 throughput + cost control ·
+R9 governance for unattended runs (core design — ends by asking) · R10
+interop/distribution + `loop10-final` closing acceptance. Each loop opens with
+its research cycle; `loop<N>:` build cycles are appended by that cycle, never
+pre-selected. **Gate 2 (user acceptance of loop 3) is still open: a tick that
 reaches the loop-4 section reports and stops; it does NOT take the first
 unchecked cycle.**
 

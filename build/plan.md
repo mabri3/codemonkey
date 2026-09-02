@@ -517,3 +517,60 @@ map to an A-criterion, a loop selection, or a cited research selection).
   architecture; sandbox + approval semantics). AGENTS.md requires stop-and-ask
   before building either — R5 therefore ENDS by asking the user, and does not
   hand its selections to a build tick automatically.
+
+## Cycle checklists — loops 6-10 (PROPOSED 2026-09-02, NOT AUTHORIZED)
+
+Charters, entry conditions and core-design flags: `build/loops-5-10-proposal.md`.
+Each loop opens with its research cycle; `loop<N>:` build cycles are appended by
+that cycle, never pre-selected here. Gate 2 remains open.
+
+- [ ] CYCLE R6 — Loop 6 research: context engineering chosen by measurement —
+  retrieval beyond the symbol index, context-window telemetry, a compaction
+  strategy bake-off scored on loop 5's harness, small-model context-rot limits
+  | est: 30m |
+  verify: `build/research-loop6.md` committed in the loops 2-5 shape (>=5
+  candidates with real cited URLs, ranked `SELECTED` section with >=3 mapped to
+  cycles); `build/plan.md` contains the `loop6:` cycles (unchecked), each
+  stating its expected harness delta inside its verify probe.
+  ENTRY CONDITION: loop 5 shipped an eval harness that can score two
+  configurations of the same agent on the same tasks. If it did not, R6 records
+  BLOCKED with that reason and does not append cycles.
+- [ ] CYCLE R7 — Loop 7 research: reliability and recovery — a durable
+  write-ahead journal of tool intents/outcomes, idempotent mutating tools,
+  mid-turn crash resume, checkpoint/undo maturity, a failure taxonomy taken
+  from loop 5 harness runs, streaming partial-response handling (the cycle-23
+  limitation) | est: 30m |
+  verify: `build/research-loop7.md` committed in the standard shape;
+  `build/plan.md` contains the `loop7:` cycles (unchecked). Core-design flag:
+  ask the user before any cycle that changes session-state strategy semantics.
+- [ ] CYCLE R8 — Loop 8 research: throughput and cost control — batched
+  multi-file edits, transport reuse, measured prefix-cache payoff, bounded
+  concurrency across independent sub-tasks, per-run token/cost budgets with a
+  hard stop | est: 30m |
+  verify: `build/research-loop8.md` committed in the standard shape;
+  `build/plan.md` contains the `loop8:` cycles (unchecked), each with raw
+  before/after timing and token probes (cycle-22 convention: no claim is made
+  if the numbers do not separate). ENDS BY ASKING the user if any selection
+  proposes concurrent model turns (loop architecture = core design).
+- [ ] CYCLE R9 — Loop 9 research: governance for unattended runs — rule-based
+  command allow/deny matching, secret redaction across events/sessions/
+  checkpoints, an append-only audit trail, process-level sandbox hardening
+  beyond lexical containment, `web_fetch` egress policy, the documented `shell`
+  cwd-escape gap | est: 30m |
+  verify: `build/research-loop9.md` committed in the standard shape;
+  `build/plan.md` contains the `loop9:` cycles (unchecked). NOTE: this loop is
+  sandbox + approval semantics by definition — core design. R9 ENDS BY ASKING
+  the user and does not hand selections to a build tick.
+- [ ] CYCLE R10 — Loop 10 research: interop, distribution and closing
+  acceptance — MCP client (justify with a concrete need or close it
+  permanently after four deferrals), a documented config-declared tool
+  extension point, packaging/versioned release, a `--help`/docs surface audit
+  against the shipped flag set | est: 30m |
+  verify: `build/research-loop10.md` committed in the standard shape;
+  `build/plan.md` contains the `loop10:` cycles (unchecked) ending in
+  `loop10-final`. ENTRY CONDITION: no open critic finding above LOW severity.
+- [ ] CYCLE loop10-final — closing acceptance: full A1-A20 re-sweep plus every
+  loop-2..9 criterion, final `build/BUILD_REPORT.md` (all loops, criteria
+  table, git log range, gaps), commit | est: 40m |
+  verify: `bash build/acceptance_sweep.sh` → all green; `uv run pytest -q` →
+  exit 0; report updated and committed.

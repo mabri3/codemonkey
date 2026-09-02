@@ -1180,3 +1180,30 @@ tool to run: echo codemonkey_22f1. …"` → exit 0, stdout `codemonkey_22f1`.
 
 **Next step:** CYCLE loop4-final (A1–A20 re-sweep + report section) remains
 unchecked; Gate 2 is still open, so it waits on the user.
+
+## 2026-09-02 — Review + roadmap pass (no build cycle): loops 5–10 proposed
+
+Not a build cycle — a user-requested implementation review plus a forward
+proposal. The review's findings were committed as CYCLE 23 (in-flight work
+finished, four defects fixed pre-commit), CYCLE 19F1 and CYCLE 22F1; the report
+is `build/critic-loop4.md`.
+
+**Proposal:** `build/loops-5-10-proposal.md` — research charters for loops 5–10
+in the framework's shape (each loop opens with a `CYCLE R<N>` research cycle
+that must produce `build/research-loop<N>.md` with real citations, ≥5
+candidates and a ranked SELECTED section before any `loop<N>:` cycle exists).
+Arc: 5 measurement + extension points (already in plan) · 6 context engineering
+chosen by measurement · 7 reliability and recovery · 8 throughput and cost
+control · 9 governance for unattended runs · 10 interop, distribution and
+closing acceptance. Each charter carries an entry condition and a core-design
+flag; R9 (sandbox/approval semantics) and R8-if-concurrent-turns end by asking
+the user, per AGENTS.md.
+
+**Files changed:** build/critic-loop4.md, build/loops-5-10-proposal.md,
+build/plan.md (R6–R10 + loop10-final appended, all unchecked), SPRINT.md
+(checklist mirror), features.html, BUILD_LOG.md.
+
+**Tests:** `uv run pytest -q` → **271 passed, 0 failed**.
+
+**Authorization state:** NOTHING in loops 5–10 is authorized. Gate 2 (user
+acceptance of loop 3) is still open, and CYCLE loop4-final has not been run.
