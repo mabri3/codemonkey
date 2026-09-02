@@ -112,7 +112,7 @@ end.
   `sessions.py` — persistence via the configured session_state strategy
   (default `jsonl`), `--last` resolution, `resume` subcommand, `sessions`
   listing, `--ephemeral` skip.
-- [ ] CYCLE 7 — Strategy layer: pluggable compaction / memory / session state | est: 30m |
+- [x] CYCLE 7 — Strategy layer: pluggable compaction / memory / session state | est: 30m |
   verify: LIVE A19: `CODEMONKEY_STRATEGY_COMPACTION=sliding-window uv run
   codemonkey config` → exit 0, stdout shows effective compaction
   `sliding-window`; invalid name → exit 2, stderr lists valid names;

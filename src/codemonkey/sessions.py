@@ -132,10 +132,24 @@ class SessionStore:
         return items[0]["thread_id"] if items else None
 
 
-def get_store(cfg: dict) -> SessionStore:
-    """Cycle 6: always the jsonl store; cycle 7 routes via the strategies
-    registry (kept behind this seam)."""
-    return SessionStore()
+def get_store(cfg: dict):
+    """Cycle 7: route through the strategies registry so the config-selected
+    session_state backend (jsonl default | sqlite) is honored.
+
+    The env var CODEMONKEY_STRATEGY_SESSION_STATE overrides config. An
+    unknown backend name raises (CLI maps that to exit 2). Falls back to the
+    default jsonl store when no registry is available (defensive, should not
+    happen in practice).
+    """
+    from . import strategies
+
+    try:
+        name = strategies.select_strategy("session_state", cfg or {})
+    except Exception:
+        # A caller may pass a non-config dict; don't hard-fail the session
+        # path just because the strategy selector was given a bare dict.
+        return SessionStore()
+    return strategies.get_store(name)
 
 
 # Cycle-6 default singleton. `store(cfg)` is THE accessor run_exec uses;

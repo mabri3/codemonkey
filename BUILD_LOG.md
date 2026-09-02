@@ -576,3 +576,38 @@ change otherwise.
 
 **Next step:** CYCLE 7 (strategy layer: pluggable compaction / memory /
 session-state; A19/A20 probes).
+
+## 2026-09-02 — CYCLE 7: strategy layer (pluggable compaction / memory / session state)
+
+**Completed:** `src/codemonkey/strategies/` package with per-domain registries:
+- `compaction.py`: `SummarizingCompaction` (default; rolling summary via the
+  active provider, triggers when older messages exceed 60% of context budget,
+  graceful degrade when no provider or summarization fails) and
+  `SlidingWindowCompaction` (keep last N, no LLM call).
+- `memory.py`: `FileMemory` (default; `~/.codemonkey/memory.md`, idempotent
+  `add_fact`, injected into the system prompt) and `NoMemory`.
+- `session_state.py`: `JsonlStore` (default; reuses cycle-6 event shapes +
+  created-floor semantics) and `SqliteStore` (`~/.codemonkey/sessions.db`,
+  same protocol).
+- `__init__.py`: `select_strategy` (env `CODEMONKEY_STRATEGY_<DOMAIN>` >
+  config `strategies.<domain>` > default; unknown name → `StrategyError`,
+  CLI exit 2 with valid names) and `build()` bundle.
+- `sessions.get_store` now routes through the registry, so the
+  config-selected backend is honored by `exec`/resume.
+
+**Files changed:** `src/codemonkey/strategies/{__init__,compaction,memory,session_state}.py`
+(new), `src/codemonkey/sessions.py` (registry routing), `tests/test_strategies.py`
+(new, 18 tests).
+
+**Tests:** `uv run pytest -q` → 136 passed (was 118). Cycle-7 probes:
+`CODEMONKEY_STRATEGY_COMPACTION=sliding-window codemonkey config` → exit 0,
+effective `sliding-window` printed; `CODEMONKEY_STRATEGY_COMPACTION=banana` →
+exit 2, stderr lists valid names; `tests/test_strategies.py` → 18 passed
+(includes round-trips for BOTH jsonl and sqlite backends + sliding-window
+compaction without LLM call).
+
+**Known issues:** home llama.cpp inference still wedged this cycle (live
+A5-A11/A16 not re-probed here — no live LLM path was touched in cycle 7;
+`unblock` provider remains TEMPORARY, removal still tracked).
+
+**Next step:** CYCLE 8 — `review` + approvals + remaining tools.
