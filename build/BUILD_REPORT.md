@@ -292,3 +292,32 @@ edbe818 (R7) → 70e5117 C31 → 946437c C32 → 735c06f C33 → this commit
 - Mid-turn crash resume deliberately deferred: the journal (this loop) is its
   prerequisite; R8 opens next (throughput/cost), with measured cache/depth
   data from loops 5-6.
+
+
+---
+
+# Loop 8 — Final Acceptance (CYCLE loop8-final)
+
+**Date:** 2026-09-02 · **Suite:** 335/335 (4 live-probe skips: home llama.cpp
+still flapping down; honest skip per conftest). Transport reuse and cache
+payoff: carried/verified (cycle 29 measured 99% cache hit; providers hold one
+httpx.Client per instance — pooling present by construction).
+
+## Loop-8 criteria (from build/research-loop8.md — all pass)
+
+| Improvement | Probe | Result |
+|---|---|---|
+| Batched multi-file SREP edits (34) | tests/test_batch_edit.py: multi-file apply, atomic no-partial, classic back-compat, per-file outcomes, failing-edit naming, journal | ✅ 6/6 |
+| Tool-output slimming (35) | tests/test_slim.py: blank-line collapse, ANSI strip, trailing-WS strip, under-threshold untouched, clean-no-save | ✅ 5/5 |
+
+## Loop-8 commit range
+
+5c53995 (R8) → 480f7a0 C34 → 442e3a3 C35 → this commit (loop8-final).
+
+## Notes
+
+- Measured basis: loops 5-6 data (99% cache, depth 2843, strategy walls) drove
+  these selections — the "measurement" loop fed the "cost" loop.
+- Loop 9 (governance) opens next with BOTH R5 core-design items folded in:
+  rule-based command permissions (hooks) and subagents/delegated context
+  isolation — authorized by the user's blanket loop 6-10 approval.

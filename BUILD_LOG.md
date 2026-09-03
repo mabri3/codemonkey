@@ -1443,3 +1443,10 @@ Single-file classic form unchanged (old_string/new_string naming confirmed).
 escape strip, trailing-whitespace strip, 3+ blank lines collapse), min_chars
 200 threshold, chars_saved stats; wired into the loop before budget/spill,
 stats journaled when applied.
+
+## 2026-09-02 — CYCLE loop8-final: Loop 8 acceptance — batched edits + slimming verified
+
+**Completed:** loop-8 criteria all pass. Transport reuse documented as
+already-present; cache payoff carried from cycle 29.
+
+**LOOP 8 COMPLETE. Loop 9 (governance: hooks/permissions + subagents) opens.**

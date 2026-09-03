@@ -650,7 +650,7 @@ map to an A-criterion, a loop selection, or a cited research selection).
   stat in journal outcome | est: 30m |
   verify: `uv run pytest tests/test_slim.py -q` → exit 0 (≥5 tests); suite
   green.
-- [ ] CYCLE loop8-final — Loop 8 acceptance: sweep + report; transport reuse
+- [x] CYCLE loop8-final — Loop 8 acceptance: sweep + report; transport reuse
   and cache payoff documented as carried/verified (no new cycles) | est: 30m |
   verify: sweep green (A9-class exceptions recorded honestly); suite green;
   report committed.
