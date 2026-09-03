@@ -35,9 +35,9 @@
     "semantic_hash": "0562b87055009c2ca7f4ade7f9f342e3"
   },
   "src/codemonkey/exec.py": {
-    "mtime": 1788420000.327647,
-    "ast_hash": "e1a29fb4099ea24cfcefb96b7a8cd506",
-    "semantic_hash": "e1a29fb4099ea24cfcefb96b7a8cd506"
+    "mtime": 1788420154.524174,
+    "ast_hash": "8a13412e284755350f4e6eff3b4a0803",
+    "semantic_hash": "8a13412e284755350f4e6eff3b4a0803"
   },
   "src/codemonkey/instructions.py": {
     "mtime": 1788373203.899547,
@@ -45,9 +45,9 @@
     "semantic_hash": "dfbf3763c6db4d0823d5e630e8cfa48e"
   },
   "src/codemonkey/loop.py": {
-    "mtime": 1788417477.9961603,
-    "ast_hash": "f3c4c811b78eb0ef60a18770daa16003",
-    "semantic_hash": "f3c4c811b78eb0ef60a18770daa16003"
+    "mtime": 1788420256.9531162,
+    "ast_hash": "442b65dd9ac2780a3dd0e8e2cf4a83b5",
+    "semantic_hash": "442b65dd9ac2780a3dd0e8e2cf4a83b5"
   },
   "src/codemonkey/native.py": {
     "mtime": 1788339682.0384562,
@@ -80,9 +80,9 @@
     "semantic_hash": "4edcb6ff45b1d9e0d2bb160e8628a232"
   },
   "src/codemonkey/repl.py": {
-    "mtime": 1788375380.5547373,
-    "ast_hash": "13036703e0753794b0df3f07ac749dc0",
-    "semantic_hash": "13036703e0753794b0df3f07ac749dc0"
+    "mtime": 1788420159.1517646,
+    "ast_hash": "810f237ea1982613a34f63033e4ee00b",
+    "semantic_hash": "810f237ea1982613a34f63033e4ee00b"
   },
   "src/codemonkey/repomap.py": {
     "mtime": 1788393555.6524532,
@@ -360,14 +360,14 @@
     "semantic_hash": "0be571560509b6bd6e59799a47ae3c53"
   },
   "src/codemonkey/eval.py": {
-    "mtime": 1788416769.6877086,
-    "ast_hash": "0bfed54f55c640615df2569e52c53a22",
-    "semantic_hash": "0bfed54f55c640615df2569e52c53a22"
+    "mtime": 1788420154.5252264,
+    "ast_hash": "f3008ac1e614273ffc7e8864a2a5a6f7",
+    "semantic_hash": "f3008ac1e614273ffc7e8864a2a5a6f7"
   },
   "src/codemonkey/journal.py": {
-    "mtime": 1788414947.9935303,
-    "ast_hash": "242e1e8f375b8fd867b6f21e7020c55b",
-    "semantic_hash": "242e1e8f375b8fd867b6f21e7020c55b"
+    "mtime": 1788420138.9222817,
+    "ast_hash": "6eff104f5fe4df1ba1506996e2fd67b3",
+    "semantic_hash": "6eff104f5fe4df1ba1506996e2fd67b3"
   },
   "src/codemonkey/journal_cli.py": {
     "mtime": 1788416769.6809213,
@@ -458,5 +458,10 @@
     "mtime": 1788402489.6189675,
     "ast_hash": "60982d19937295f143797a5a454f559c",
     "semantic_hash": "60982d19937295f143797a5a454f559c"
+  },
+  "tests/test_journal_wiring.py": {
+    "mtime": 1788420227.5693274,
+    "ast_hash": "092f03874ad38934bdf715871d073bde",
+    "semantic_hash": "092f03874ad38934bdf715871d073bde"
   }
 }

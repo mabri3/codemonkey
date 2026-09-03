@@ -1501,3 +1501,22 @@ tests/test_journal_wiring.py (new), build/plan.md, features.html.
 `uv run pytest -q` → **348 passed, 4 skipped**.
 
 **Next:** CYCLE 35F1 — slim stats journaled from an unbound key.
+
+## 2026-09-03 — CYCLE 35F1 (critic-loop8 finding 6): slim stat actually journaled
+
+**Completed:** `jkey` is a local of the nested `_run_one()`; the slimming block
+in the outcome loop referenced it in `run_turns`' own scope, where it was
+unbound, and the block's `except Exception: pass` swallowed the `NameError` —
+so the cycle-35 "chars saved journaled with the outcome" claim never happened
+(slimming itself always worked). `_run_one` now returns the key in its meta
+(`_jkey`, popped before the event is emitted so it never leaks into the JSONL
+stream) and the loop journals the stat from it.
+
+**Files:** src/codemonkey/loop.py, tests/test_slim.py, build/plan.md,
+features.html.
+
+**Tests:** `uv run pytest tests/test_slim.py -q` → 6 passed (new test fails if
+the key is dropped again — mutation-verified); `uv run pytest -q` →
+**349 passed, 4 skipped**.
+
+**Next:** CYCLE 34F1 — batched edits on the same path.

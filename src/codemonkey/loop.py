@@ -366,7 +366,8 @@ def run_turns(
                             on_event({"type": "notice",
                                       "message": f"idempotent replay: {name} ({jkey})"})
                         return (idx, name, hit.get("status") == "ok",
-                                hit.get("output", ""), {"replayed": True})
+                                hit.get("output", ""),
+                                {"replayed": True, "_jkey": jkey})
                     _jr(journal_thread, "intent", tool=name, key=jkey)
                 except OSError:
                     jkey = ""
@@ -383,7 +384,8 @@ def run_turns(
                             duration_ms=int((time.monotonic() - t0) * 1000))
                     except OSError:
                         pass
-                return (idx, name, False, f"error: {exc}", {"raised": True})
+                return (idx, name, False, f"error: {exc}",
+                        {"raised": True, "_jkey": jkey})
             if journal_thread and jkey:
                 try:
                     from .journal import record as _jr
@@ -396,7 +398,7 @@ def run_turns(
                         )
                 except OSError:
                     pass
-            return (idx, name, result.ok, result.output, None)
+            return (idx, name, result.ok, result.output, {"_jkey": jkey})
 
         max_workers = min(len(calls), 8) if len(calls) > 1 else 1
         if max_workers > 1:
@@ -411,6 +413,12 @@ def run_turns(
         outcomes.sort(key=lambda o: o[0])  # deterministic call order
         edit_retry_hint = None
         for idx, name, ok, result_output, meta in outcomes:
+            # 35F1: `_jkey` is the journal key carried back from _run_one (it
+            # is a LOCAL there — the old code read an unbound `jkey` in this
+            # scope and the surrounding `except Exception` swallowed the
+            # NameError, so the cycle-35 slim stat was never recorded).
+            meta = dict(meta or {})
+            jkey = meta.pop("_jkey", "")
             if on_event:
                 ev = {"type": "tool.completed", "name": name, "ok": ok}
                 if meta:

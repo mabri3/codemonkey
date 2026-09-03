@@ -684,7 +684,7 @@ journal key semantics that cycle 36-38 will build on.
   args (no cross-run replay); same-run replay still hits; eval sets
   `_journal_thread` and results carry `journal_classes`; ephemeral still
   journals); `uv run pytest -q` → exit 0.
-- [ ] CYCLE 35F1 — critic finding 6 (LOW): the cycle-35 slim stat is journaled
+- [x] CYCLE 35F1 — critic finding 6 (LOW): the cycle-35 slim stat is journaled
   from an unbound `jkey` in `run_turns` scope; the `except Exception` swallows
   the NameError so no `:slim` record is ever written. Carry the key back with
   the outcome and record the stat | est: 15m |
