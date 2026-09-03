@@ -32,6 +32,33 @@ _MAX_RESULT = 4000        # chars of child stdout returned
 _TIMEOUT_S = 600
 
 
+def _spawn(task_text: str, sandbox: str, ctx) -> dict:
+    """One child codemonkey run. Returns {ok, output}."""
+    import os as _os
+
+    cmd = ["uv", "run", "codemonkey", "exec", "--ephemeral",
+           "--sandbox", sandbox, task_text]
+    env = dict(_os.environ)
+    env["CODEMONKEY_DELEGATE_DEPTH"] = "1"
+    env.pop("CODEMONKEY_OBSERVATION_BUDGET", None)
+    try:
+        proc = subprocess.run(cmd, capture_output=True, text=True,
+                              timeout=_TIMEOUT_S, cwd=str(ctx.workdir), env=env)
+    except subprocess.TimeoutExpired:
+        return {"ok": False, "output": f"error: delegate timed out after {_TIMEOUT_S}s"}
+    except OSError as exc:
+        return {"ok": False, "output": f"error: delegate spawn failed: {exc}"}
+    out = (proc.stdout or "").strip()
+    err = (proc.stderr or "").strip()
+    if proc.returncode != 0:
+        tail = (err or out)[-400:]
+        return {"ok": False, "output": f"error: delegate exited {proc.returncode}: {tail}"}
+    if len(out) > _MAX_RESULT:
+        out = out[:_MAX_RESULT] + f"...[delegate result capped at {_MAX_RESULT} chars]"
+    return {"ok": True, "output": out or "(delegate produced no output)"}
+
+
+
 def run(args: dict, ctx) -> ToolResult:
     import os
 
@@ -48,33 +75,56 @@ def run(args: dict, ctx) -> ToolResult:
     role = str(args.get("role") or "implementer").strip().lower()
     if role not in _ROLE_FRAMINGS:
         return ToolResult(output=f"error: unknown role '{role}' (implementer|critic|verifier)", ok=False)
+    review_rounds = int(args.get("review_rounds") or 0)
+    if review_rounds < 0 or review_rounds > 5:
+        return ToolResult(output="error: review_rounds must be 0..5", ok=False)
 
-    framed_task = f"[{role} role] {_ROLE_FRAMINGS[role]}\n\n{task}"
     sandbox = str(args.get("sandbox") or "workspace-write")
-    cmd = ["uv", "run", "codemonkey", "exec", "--ephemeral",
-           "--sandbox", sandbox, framed_task]
 
-    env = dict(os.environ)
-    env["CODEMONKEY_DELEGATE_DEPTH"] = "1"  # children cannot re-delegate
-    env.pop("CODEMONKEY_OBSERVATION_BUDGET", None)  # child gets its own budget
-    try:
-        proc = subprocess.run(
-            cmd, capture_output=True, text=True,
-            timeout=_TIMEOUT_S, cwd=str(ctx.workdir), env=env,
+    # ---- implementer run ----
+    framed_task = f"[{role} role] {_ROLE_FRAMINGS[role]}\n\n{task}"
+    proc_res = _spawn(framed_task, sandbox, ctx)
+    if not proc_res["ok"]:
+        return ToolResult(output=proc_res["output"], ok=False,
+                          meta={"delegated": True, "role": role})
+    out = proc_res["output"]
+
+    # ---- adversarial review rounds (loop11 cycle 41) ----
+    rounds_log = []
+    for rnd in range(1, review_rounds + 1):
+        critic_task = (
+            f"[critic role] {_ROLE_FRAMINGS['critic']}\n\n"
+            f"Review the result of this task:\n---\n{task}\n---\n"
+            f"Implementer's output:\n---\n{out[:2000]}\n---\n"
         )
-    except subprocess.TimeoutExpired:
-        return ToolResult(output=f"error: delegate timed out after {_TIMEOUT_S}s", ok=False)
-    except OSError as exc:
-        return ToolResult(output=f"error: delegate spawn failed: {exc}", ok=False)
+        critic_res = _spawn(critic_task, "read-only", ctx)
+        verdict_text = critic_res["output"]
+        if not critic_res["ok"]:
+            return ToolResult(output=verdict_text, ok=False,
+                              meta={"delegated": True, "role": role,
+                                    "review_rounds": rounds_log})
+        verdict = "OK" if "VERDICT: OK" in verdict_text else "CHANGES-REQUIRED"
+        rounds_log.append({"round": rnd, "verdict": verdict,
+                           "findings": verdict_text[:1000]})
+        if verdict == "OK":
+            break
+        # fix round: implementer with the findings
+        fix_task = (f"[implementer role] Address these review findings and "
+                    f"re-verify:\n---\n{task}\n---\nFINDINGS:\n"
+                    f"{verdict_text[:2000]}\n---\nPrevious output:\n{out[:1500]}")
+        proc_res = _spawn(fix_task, sandbox, ctx)
+        if not proc_res["ok"]:
+            return ToolResult(output=proc_res["output"], ok=False,
+                              meta={"delegated": True, "role": role,
+                                    "review_rounds": rounds_log})
+        out = proc_res["output"]
 
-    out = (proc.stdout or "").strip()
-    err = (proc.stderr or "").strip()
-    if proc.returncode != 0:
-        tail = (err or out)[-400:]
-        return ToolResult(output=f"error: delegate exited {proc.returncode}: {tail}",
-                          ok=False)
-    # stdout in text mode = final message only (diagnostics on stderr)
     if len(out) > _MAX_RESULT:
         out = out[:_MAX_RESULT] + f"...[delegate result capped at {_MAX_RESULT} chars]"
     meta = {"delegated": True, "role": role}
+    if rounds_log:
+        meta["review_rounds"] = rounds_log
+        meta["verdict"] = rounds_log[-1]["verdict"]
+    return ToolResult(output=out or "(delegate produced no output)", ok=True, meta=meta)
+
     return ToolResult(output=out or "(delegate produced no output)", ok=True, meta=meta)

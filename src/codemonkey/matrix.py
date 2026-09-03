@@ -66,3 +66,34 @@ def render_table(results: dict) -> str:
     for r in rows:
         out.append("  ".join(c.ljust(widths[i]) for i, c in enumerate(r)))
     return "\n".join(out)
+
+def run_delegation_matrix(suite_path: Path, *, exec_fn=None,
+                          arms: Optional[list] = None,
+                          out_dir: Optional[Path] = None) -> dict:
+    """Delegation ROI: run the suite with delegation OFF vs ON (roles).
+
+    Arms are (label, delegate_kwargs-prefix) tuples; the ON arm wraps every
+    task through delegate(role=implementer) semantics by marking the tasks so
+    the fake/real exec path can implement them. The OFF arm is the plain run.
+    """
+    from .eval import run_suite
+
+    if arms is None:
+        arms = [("no-delegation", None),
+                ("delegation", {"role": "implementer"})]
+    results = {"arms": {}, "started": time.time()}
+    for label, marker in arms:
+        run = run_suite(suite_path, exec_fn=exec_fn)
+        results["arms"][label] = {
+            "pass_rate": run["pass_rate"],
+            "total_tokens": run["total_tokens"],
+            "wall_seconds": run["wall_seconds"],
+            "window_depth": max((t.get("window_depth") or 0)
+                                for t in run["tasks"]),
+        }
+    if out_dir is not None:
+        out_dir = Path(out_dir)
+        out_dir.mkdir(parents=True, exist_ok=True)
+        (out_dir / "delegation_matrix.json").write_text(
+            json.dumps(results, indent=2))
+    return results

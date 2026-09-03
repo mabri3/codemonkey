@@ -277,8 +277,19 @@ def eval(
         str,
         typer.Option("--strategy-matrix", help="Comma-separated compaction strategies to bake off (runs the suite once per strategy)."),
     ] = "",
+    delegation_matrix: Annotated[
+        bool,
+        typer.Option("--delegation-matrix", help="Bake off delegation off vs on (implementer role)."),
+    ] = False,
 ) -> None:
     """Run a golden evaluation suite against the real exec path."""
+    if delegation_matrix:
+        from .matrix import run_delegation_matrix
+
+        results = run_delegation_matrix(suite, out_dir=out_dir)
+        typer.echo(json.dumps(results["arms"], indent=2))
+        typer.echo(f"matrix written: {Path(out_dir) / 'delegation_matrix.json'}")
+        return
     if strategy_matrix:
         from .matrix import render_table, run_matrix
 

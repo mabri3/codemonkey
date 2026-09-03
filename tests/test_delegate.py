@@ -55,11 +55,18 @@ def test_child_executes_and_returns_result(ctx, monkeypatch):
 
 
 def test_child_failure_propagates(ctx, monkeypatch):
+    """Child exit != 0 propagates as a failed delegate result."""
+    import codemonkey.tools.delegate as dmod
+
     monkeypatch.delenv("CODEMONKEY_DELEGATE_DEPTH", raising=False)
-    # force a child failure: invalid sandbox value -> CLI error
-    res = run({"task": "Reply ok", "sandbox": "bogus-sandbox"}, ctx)
+    monkeypatch.setenv("HOME", "/tmp")
+    monkeypatch.setattr(dmod, "_spawn",
+                        lambda task, sandbox, ctx2:
+                        {"ok": False,
+                         "output": "error: delegate exited 2: boom"})
+    res = run({"task": "Reply ok"}, ctx)
     assert not res.ok
-    assert "delegate exited" in res.output
+    assert "delegate exited 2" in res.output
 
 
 def test_result_capped(ctx, monkeypatch):
