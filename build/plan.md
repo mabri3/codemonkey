@@ -769,6 +769,20 @@ journal key semantics that cycle 36-38 will build on.
 
 
 
+
+### loop16: cycles (selected from build/research-loop16.md, cycle R16 — the final loop)
+
+- [ ] CYCLE 49 — `loop16:` hardening + release record: secret redaction pass
+  (eval stdout excerpts + journal output fields against configured API keys),
+  supply-chain audit (uv.lock committed, uv sync --locked green, dep-tree hash
+  recorded), THREAT_MODEL.md | est: 30m |
+  verify: `uv run pytest tests/test_hardening.py -q` → exit 0 (≥6 tests);
+  `uv run pytest -q` → exit 0.
+- [ ] CYCLE 50 — closing acceptance v1.0.0: full A1–A20 sweep + all-loop
+  criteria table, final report, v1.0.0 tag, Gate 2 handoff | est: 40m |
+  verify: sweep green (honest environment exceptions recorded); suite green;
+  v1.0.0 tagged; report committed.
+
 ### loop15: cycles (selected from build/research-loop15.md, cycle R15)
 
 - [x] CYCLE 48 — `loop15:` codemonkey status: aggregates jobs progress,
@@ -1009,7 +1023,7 @@ that cycle, never pre-selected here. `loop10-final` still precedes all of them.
   only; --json = JSONL only). ENTRY CONDITION: loop 12's long-horizon runs
   exist; if runs are still short, R15 narrows to the diff-gated approval mode
   alone. Core-design: PARTIAL — the diff-gated approval mode ends by asking.
-- [ ] CYCLE R16 — Loop 16 research: hardening, release readiness, v1.0
+- [x] CYCLE R16 — Loop 16 research: hardening, release readiness, v1.0
   acceptance — process-level containment (macOS `sandbox-exec`, Linux
   bubblewrap/seccomp) behind the existing sandbox levels closing the
   documented `shell` cwd-escape gap, secret redaction if loop 9 did not take

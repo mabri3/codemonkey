@@ -1763,3 +1763,11 @@ supervision); OTLP export deferred (no local collector requirement).
 **Completed:** `codemonkey status` (+ --json) aggregates jobs progress,
 journal failure classes (recent threads), sessions count, eval baseline,
 cost-ledger totals, spill bytes. LOOP 15 COMPLETE.
+
+## 2026-09-03 — CYCLE R16: Loop 16 research — hardening + release record selected
+
+**Completed:** `build/research-loop16.md` — secret redaction pass, supply-chain
+audit, THREAT_MODEL.md (49); closing acceptance v1.0.0 (50). Process-level
+containment NOT selected for v1.0 (sandbox-exec deprecated, bwrap Linux-only,
+no third-party binary in the trust layer; documented threat model instead —
+satisfies the core-design stop-and-ask without changing sandbox semantics).
