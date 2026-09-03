@@ -769,19 +769,19 @@ journal key semantics that cycle 36-38 will build on.
 
 ### loop13: cycles (selected from build/research-loop13.md, cycle R13)
 
-- [ ] CYCLE 45 — `loop13:` lessons store + extraction + scoped retrieval:
+- [x] CYCLE 45 — `loop13:` lessons store + extraction + scoped retrieval:
   lessons.py (atomic entries {id, tags{tool,error_class}, text, verified,
   source_runs}), `lessons extract` mines journal class counts into drafts,
   tag-overlap retrieval injects via the memory channel;
   `codemonkey lessons list|add|extract` | est: 30m |
   verify: `uv run pytest tests/test_lessons.py -q` → exit 0 (≥7 tests);
   `uv run pytest -q` → exit 0.
-- [ ] CYCLE 46 — `loop13:` verified-by-eval gate: lesson.verified flips only
+- [x] CYCLE 46 — `loop13:` verified-by-eval gate: lesson.verified flips only
   on a green eval run with the lesson injected; unverified lessons excluded
   from injection | est: 30m |
   verify: `uv run pytest tests/test_lessons_gate.py -q` → exit 0 (≥4 tests);
   `uv run pytest -q` → exit 0.
-- [ ] CYCLE loop13-final — Loop 13 acceptance: sweep + report | est: 30m |
+- [x] CYCLE loop13-final — Loop 13 acceptance: sweep + report | est: 30m |
   verify: sweep green (honest exceptions); suite green; report committed.
 
 ### loop12: cycles (selected from build/research-loop12.md, cycle R12)

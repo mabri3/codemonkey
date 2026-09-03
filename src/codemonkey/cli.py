@@ -336,6 +336,12 @@ try:
     app.add_typer(_jobs_app, name="jobs", help="Durable, resumable job files.")
 except ImportError:  # pragma: no cover
     pass
+try:
+    from .lessons_cli import app as _lessons_app
+
+    app.add_typer(_lessons_app, name="lessons", help="Lessons learned from run history.")
+except ImportError:  # pragma: no cover
+    pass
 
 
 @app.command()

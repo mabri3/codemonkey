@@ -503,3 +503,30 @@ job_id signature param (my own edit raced the anchor).
 - Workflow state ≠ session state: the job file is an external store; the
   session-state strategy contract untouched (R12 core-design flag avoided).
 - Multi-agent shared job store deferred (needs file locking) — R13+ follow-up.
+
+
+---
+
+# Loop 13 — Final Acceptance (CYCLE loop13-final)
+
+**Date:** 2026-09-03 · **Suite:** 417 passed / 5 skipped (home down; honest).
+
+## Loop-13 criteria (from build/research-loop13.md — all pass)
+
+| Improvement | Probe | Result |
+|---|---|---|
+| Lessons store + extraction + scoped retrieval (45) | tests/test_lessons.py: add/load, journal-class drafts, tag-overlap retrieval, unverified excluded, no-overlap no-inject, atomic writes, verify roundtrip | ✅ 7/7 |
+| Verified-by-eval gate (46) | tests/test_lessons_gate.py: flip on green eval, revert on regression, no-baseline adopts only perfect runs, injection excludes unverified, persists | ✅ 5/5 |
+
+## Design constraint honored
+
+Execute-distill-verify (arxiv 2606.24428): lessons are draft-only until an
+eval run with them injected passes baseline; regressions revert adoption.
+Experience-following guard: tag-overlap scoped retrieval (ACL 2026 study).
+
+## Loop-13 commit range
+
+e81c4b9 (R13) → lessons.py + lessons_cli.py + lessons_gate.py + tests → this
+commit (loop13-final).
+
+**LOOP 13 COMPLETE. Loop 14 (heterogeneous models/routing) opens.**

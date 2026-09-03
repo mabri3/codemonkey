@@ -1724,3 +1724,9 @@ classes, tag-overlap scoped retrieval (avoids experience-following per the ACL
 2026 memory-management study), verified-by-eval gate (execute-distill-verify
 per arxiv 2606.24428). Self-evolving harness + live self-improvement NOT
 selected (out of scope for a local CLI / violates governance).
+
+## 2026-09-03 — CYCLE loop13-final: Loop 13 acceptance — lessons + gate shipped
+
+**Completed:** lessons store (atomic), journal-class extraction into drafts,
+tag-overlap scoped retrieval via memory channel, verified-by-eval gate.
+LOOP 13 COMPLETE.
