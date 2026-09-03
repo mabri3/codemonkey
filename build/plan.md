@@ -741,7 +741,7 @@ journal key semantics that cycle 36-38 will build on.
   verify: `uv run pytest tests/test_permissions.py -q` → exit 0 (≥6 tests:
   precedence, first-match, glob, default-ask fallback, journal hit records,
   non-shell tools); `uv run pytest -q` → exit 0.
-- [ ] CYCLE 37 — `loop9:` delegate tool: `delegate(task, sandbox?)` spawns
+- [x] CYCLE 37 — `loop9:` delegate tool: `delegate(task, sandbox?)` spawns
   `codemonkey exec` subprocess with own context + journal thread; returns
   final result (capped); delegation depth 1 (delegate inside delegate
   refused) | est: 30m |

@@ -1642,3 +1642,12 @@ through to the approval gate); malformed rules raise ValueError (fail-closed);
 loop evaluates rules BEFORE the approval gate — deny short-circuits with a
 tool-error, ask forces the gate on, allow skips it; rule hits journaled.
 Config `permissions.rules: []` default; exec threads cfg → run_turns.
+
+## 2026-09-02 — CYCLE 37 (loop9): delegate tool
+
+**Completed:** `delegate(task, sandbox?)` — subprocess `codemonkey exec
+--ephemeral` with own context + journal thread; depth-1 limit via
+CODEMONKEY_DELEGATE_DEPTH env (children cannot re-delegate); result capped at
+4KB; child failure propagates with stderr tail; sandbox inherited (default
+workspace-write). Registered as the 12th tool. Live child run skipped when
+home is unreachable (same honest policy).
