@@ -369,17 +369,29 @@ def run_turns(
             # distinct marker + continuation hint. Ledger shared across the
             # whole run so 3 fat outputs can't silently evict the task.
             if observation_budget > 0 and len(result_output) > observation_budget - obs_spent:
-                allowance = max(0, observation_budget - obs_spent)
-                elided = len(result_output) - allowance
-                result_output = (
-                    result_output[:allowance]
-                    + f"\n\n[PARTIAL: {elided} chars elided by the observation budget "
-                    f"({observation_budget} per run) — rerun the tool with narrower args]"
-                )
+                # loop6 cycle 30: spill the full output verbatim and point the
+                # model at it, instead of only eliding (which caused re-runs).
+                try:
+                    from .spill import truncate_with_spill
+
+                    result_output = truncate_with_spill(
+                        result_output, max(200, observation_budget - obs_spent),
+                        tool=name,
+                    )
+                except OSError:
+                    # spill unavailable (disk/home unwritable): fall back to the
+                    # cycle-17 pure-truncation behavior
+                    allowance = max(0, observation_budget - obs_spent)
+                    elided = len(result_output) - allowance
+                    result_output = (
+                        result_output[:allowance]
+                        + f"\n\n[PARTIAL: {elided} chars elided by the observation budget "
+                        f"({observation_budget} per run) — rerun the tool with narrower args]"
+                    )
                 obs_spent = observation_budget
                 if on_event:
                     on_event({"type": "notice",
-                              "message": f"observation budget: {name} output truncated ({elided} chars elided)"})
+                              "message": f"observation budget: {name} output truncated (spilled where noted)"})
             else:
                 obs_spent += len(result_output)
             messages.append(

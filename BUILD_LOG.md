@@ -1351,3 +1351,21 @@ prefix-stability work is now MEASURED, not assumed.
 tests/test_cache_telemetry.py (new, 7 tests), build/probes/cycle29-cache.md.
 
 **Tests:** test_cache_telemetry 7/7; suite 304/304.
+
+## 2026-09-02 — CYCLE 30 (loop6): tool-result spill
+
+**Completed:** `src/codemonkey/spill.py` — spill() writes oversized tool output
+verbatim to ~/.codemonkey/spill/<ts>-<tool>-<hash>.txt; truncate_with_spill()
+returns head+tail with `PARTIAL [<n> chars total; full output saved to <path>]`;
+prune() removes files older than 24h (called once per exec). Loop's observation
+budget now spills instead of bare-eliding (OSError fallback keeps cycle-17
+behavior). Cycle-17 test contract updated to the spill-marker wording.
+
+**Files changed:** src/codemonkey/spill.py (new), src/codemonkey/loop.py,
+src/codemonkey/exec.py, tests/test_spill.py (new, 6 tests),
+tests/test_obsbudget.py (marker contract), build/probes/cycle30-spill.md.
+
+**Tests:** test_spill 6/6 (incl. read_file slice retrieval on the spill path);
+suite 310/310. LIVE: spill wiring verified in-process (spill files written by
+the loop path); full seq-3000 live probe BLOCKED-slow on home hardware (same
+limit as A9), recorded honestly.

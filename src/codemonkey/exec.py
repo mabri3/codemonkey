@@ -421,6 +421,14 @@ def run_exec(
         }
     )
 
+    # -- spill hygiene (loop6, cycle 30): prune stale spill files ----------
+    try:
+        from .spill import prune as _spill_prune
+
+        _spill_prune()
+    except OSError:
+        pass
+
     # -- cost telemetry (loop5, cycle 26) --------------------------------
     if cost_summary and event_sink is not None:
         import time as _t

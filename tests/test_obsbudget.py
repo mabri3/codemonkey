@@ -53,7 +53,7 @@ def test_over_budget_truncated_with_partial_marker(tmp_path):
     results = _results_of(turn.all_messages)
     assert len(results) == 2
     # first call consumed the whole budget -> PARTIAL marker
-    assert "[PARTIAL:" in results[0] and "elided by the observation budget" in results[0]
+    assert "[PARTIAL:" in results[0] and "full output saved to" in results[0]
     # second got nothing -> 0-allowance PARTIAL but still a marker, not raw dump
     assert "[PARTIAL:" in results[1]
 
@@ -88,9 +88,11 @@ def test_marker_reports_elided_count(tmp_path):
     results = _results_of(turn.all_messages)
     first = results[0]
     import re
-    m = re.search(r"\[PARTIAL: (\d+) chars elided", first)
+    m = re.search(r"\[PARTIAL: (\d+) chars total; full output saved to (\S+)", first)
     assert m, first[-200:]
     assert int(m.group(1)) > 0
+    import os as _os
+    assert _os.path.isfile(m.group(2))  # spill file exists
 
 
 def test_ledger_shared_across_calls(tmp_path):

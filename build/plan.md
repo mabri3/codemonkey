@@ -584,7 +584,7 @@ map to an A-criterion, a loop selection, or a cited research selection).
   timings parse, ratio math, absent-timings tolerance, summary line, eval
   field); `uv run pytest -q` → exit 0; LIVE: repeated identical task shows
   cache_n > 0 (probe transcript committed).
-- [ ] CYCLE 30 — `loop6:` tool-result spill: outputs over the observation
+- [x] CYCLE 30 — `loop6:` tool-result spill: outputs over the observation
   budget spill verbatim to ~/.codemonkey/spill/<hash>.txt; tool result becomes
   head+tail + `PARTIAL [full output: <path>]`; read_file/search can fetch
   slices; spill files pruned after 24h | est: 30m |
