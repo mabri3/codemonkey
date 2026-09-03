@@ -330,6 +330,12 @@ try:
     app.add_typer(_journal_app, name="journal", help="Execution-journal forensics.")
 except ImportError:  # pragma: no cover
     pass
+try:
+    from .jobs_cli import app as _jobs_app
+
+    app.add_typer(_jobs_app, name="jobs", help="Durable, resumable job files.")
+except ImportError:  # pragma: no cover
+    pass
 
 
 @app.command()
