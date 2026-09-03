@@ -771,12 +771,12 @@ journal key semantics that cycle 36-38 will build on.
 
 ### loop15: cycles (selected from build/research-loop15.md, cycle R15)
 
-- [ ] CYCLE 48 — `loop15:` codemonkey status: aggregates jobs progress,
+- [x] CYCLE 48 — `loop15:` codemonkey status: aggregates jobs progress,
   journal failure-class totals, sessions count, latest eval baseline,
   cost-ledger totals, spill bytes; --json | est: 30m |
   verify: `uv run pytest tests/test_status.py -q` → exit 0 (≥6 tests);
   `uv run pytest -q` → exit 0.
-- [ ] CYCLE loop15-final — Loop 15 acceptance: sweep + report | est: 30m |
+- [x] CYCLE loop15-final — Loop 15 acceptance: sweep + report | est: 30m |
   verify: sweep green (honest exceptions); suite green; report committed.
 
 ### loop14: cycles (selected from build/research-loop14.md, cycle R14)

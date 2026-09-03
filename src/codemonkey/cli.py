@@ -345,6 +345,23 @@ except ImportError:  # pragma: no cover
 
 
 @app.command()
+def status(
+    json_out: Annotated[
+        bool,
+        typer.Option("--json", help="Emit machine-readable JSON."),
+    ] = False,
+) -> None:
+    """Operator surface: aggregate jobs/journal/sessions/eval/cost/spill."""
+    from .status_mod import collect, render
+
+    data = collect(Path("build/eval").resolve())
+    if json_out:
+        typer.echo(json.dumps(data, indent=2))
+    else:
+        typer.echo(render(data))
+
+
+@app.command()
 def models(
     provider: Annotated[
         str,

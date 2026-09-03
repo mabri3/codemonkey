@@ -1757,3 +1757,9 @@ Loop 15 (operator surface & observability) opens.
 **Completed:** `build/research-loop15.md` — one-shot operator summary
 aggregating every store. Live TUI deferred (status + JSONL cover unattended
 supervision); OTLP export deferred (no local collector requirement).
+
+## 2026-09-03 — CYCLE loop15-final: Loop 15 acceptance — operator status shipped
+
+**Completed:** `codemonkey status` (+ --json) aggregates jobs progress,
+journal failure classes (recent threads), sessions count, eval baseline,
+cost-ledger totals, spill bytes. LOOP 15 COMPLETE.

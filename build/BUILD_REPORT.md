@@ -551,3 +551,24 @@ honest skips).
 commit (loop14-final).
 
 **LOOP 14 COMPLETE. Loop 15 (operator surface & observability) opens.**
+
+
+---
+
+# Loop 15 — Final Acceptance (CYCLE loop15-final)
+
+**Date:** 2026-09-03 · **Suite:** 428 passed / 5 skipped (honest).
+
+## Loop-15 criteria (from build/research-loop15.md — all pass)
+
+| Improvement | Probe | Result |
+|---|---|---|
+| codemonkey status (48) | tests/test_status.py: empty-store tolerance, jobs progress, journal classes, baseline + cost aggregates, spill bytes, render sections | ✅ 6/6 |
+
+## Loop-15 commit range
+
+66702a8 (R15) → status_mod.py + cli status + tests → this commit
+(loop15-final). Deferred: live TUI, OTLP export (reasons in research file).
+
+**LOOP 15 COMPLETE. Loop 16 (hardening, release readiness, v1.0) opens —
+the final loop.**
