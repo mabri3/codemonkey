@@ -1697,3 +1697,9 @@ loop coordinates).
 implementer); role framing prepended to the child task (critic requires
 FINDINGS + VERDICT:, verifier requires VERIFIED:); unknown role rejected;
 role recorded in result meta.
+
+## 2026-09-03 — CYCLE loop11-final: Loop 11 acceptance
+
+**Completed:** roles + adversarial review rounds + ROI matrix verified (14 new
+tests). Real bug fixed: delegate ok-propagation (child non-zero exit returned
+ok=True). LOOP 11 COMPLETE. Loop 12 (long-horizon work across runs) opens.

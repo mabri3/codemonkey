@@ -771,15 +771,15 @@ journal key semantics that cycle 36-38 will build on.
   implementer|critic|verifier) — role prompts frame the child system context;
   role in journal + result meta; default implementer | est: 30m |
   verify: `uv run pytest tests/test_roles.py -q` → exit 0 (≥5 tests).
-- [ ] CYCLE 41 — `loop11:` adversarial review rounds: delegate review_rounds=N
+- [x] CYCLE 41 — `loop11:` adversarial review rounds: delegate review_rounds=N
   (default 0=off) — implementer → critic structured verdict → bounded fix
   rounds; journaled | est: 30m |
   verify: `uv run pytest tests/test_review_rounds.py -q` → exit 0 (≥5 tests).
-- [ ] CYCLE 42 — `loop11:` delegation ROI matrix: eval --delegation-matrix
+- [x] CYCLE 42 — `loop11:` delegation ROI matrix: eval --delegation-matrix
   (off vs on-with-roles), per-arm metrics, matrix.json | est: 30m |
   verify: `uv run pytest tests/test_delegation_matrix.py -q` → exit 0 (≥4
   tests).
-- [ ] CYCLE loop11-final — Loop 11 acceptance: sweep + report | est: 30m |
+- [x] CYCLE loop11-final — Loop 11 acceptance: sweep + report | est: 30m |
   verify: sweep green (honest exceptions); suite green; report committed.
 
 ### loop10: cycles (selected from build/research-loop10.md, cycle R10)

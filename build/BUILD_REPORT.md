@@ -448,3 +448,30 @@ graphify knowledge-graph update.
 The framework is complete through loop 10 and version-tagged **1.0.0-rc1**.
 Gate 2 (user acceptance) is the remaining decision. Suggested review path:
 `features.html` → `build/BUILD_REPORT.md` → `build/plan.md` → `git log`.
+
+
+---
+
+# Loop 11 — Final Acceptance (CYCLE loop11-final)
+
+**Date:** 2026-09-03 · **Suite:** 393 passed / 5 skipped (home server still
+flapping down; honest skips). Delegation is now role-aware, adversarially
+reviewed, and measurable.
+
+## Loop-11 criteria (from build/research-loop11.md — all pass)
+
+| Improvement | Probe | Result |
+|---|---|---|
+| Delegation roles (40) | tests/test_roles.py: unknown role rejected, all three roles accepted, framing prefix in child task, default implementer, framing content | ✅ 5/5 |
+| Adversarial review rounds (41) | tests/test_review_rounds.py: rounds validation, 0-rounds = old behavior, critic-OK stops early, CHANGES-REQUIRED triggers fix round with findings fed in, rounds recorded in meta | ✅ 5/5 |
+| Delegation ROI matrix (42) | tests/test_delegation_matrix.py: two arms, matrix.json shape, table renders, custom arms | ✅ 4/4 |
+
+## Real bug fixed: delegate ok-propagation
+
+_spawn's ok flag was dropped — a child that exited non-zero still returned
+ok=True with the error text as "result". Now the implementer/critic/fix
+failure paths return ok=False with meta.
+
+## Loop-11 commit range
+
+eff1162 (R11) → a05afb6 C40 → 30d385b C41+42 → this commit (loop11-final).
