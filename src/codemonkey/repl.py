@@ -13,6 +13,7 @@ cycle-9 verify probe path (`printf 'Reply with exactly: fig\n/quit\n' | codemonk
 from __future__ import annotations
 
 import sys
+import uuid
 from pathlib import Path
 
 from .providers.base import ProviderError
@@ -111,6 +112,21 @@ def run_repl(
     pconf = cfg.get("providers", {}).get(name, {})
     state = ReplState(name, pconf.get("model", ""))
 
+    # 31F1: the REPL is a production caller of the loop — give it a journal
+    # thread (forensics + idempotent replay) and the same auto-compaction
+    # wiring exec has, so a long session cannot outgrow the context window.
+    from . import events as _events
+
+    journal_thread = _events.new_thread_id()
+    journal_run = uuid.uuid4().hex[:8]
+    try:
+        from .strategies import select_strategy as _sel_strat
+        from .strategies.compaction import get_compactor as _get_compactor
+
+        compaction = _get_compactor(_sel_strat("compaction", cfg), cfg)
+    except Exception:
+        compaction = None  # fail-soft: never block the REPL on strategy wiring
+
     interactive = sys.stdin.isatty()
     if interactive:
         print(f"codemonkey REPL — provider: {name}  model: {state.model}", file=err)
@@ -148,6 +164,10 @@ def run_repl(
                 approval=eff_approval,
                 max_edit_retries=int(cfg.get("max_edit_retries", 1) or 0),
                 observation_budget=int(cfg.get("observation_budget", 24000) or 0),
+                context_limit=int(cfg.get("context_limit", 32000) or 0) or None,
+                compaction=compaction,
+                journal_thread=journal_thread,
+                journal_run=journal_run,
             )
         except ProviderError as exc:
             print(f"[provider error: {exc}]", file=err)

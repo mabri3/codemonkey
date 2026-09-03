@@ -31,10 +31,20 @@ def journal_path(thread_id: str) -> Path:
     return journal_dir() / f"{thread_id}.jsonl"
 
 
-def args_key(thread_id: str, turn: int, call_index: int, args: dict) -> str:
-    """Stable idempotency key: thread+turn+call-index+canonical args hash."""
+def args_key(thread_id: str, turn: int, call_index: int, args: dict,
+             run: str = "") -> str:
+    """Stable idempotency key: thread+run+turn+call-index+canonical args hash.
+
+    `run` scopes the key to ONE invocation (31F1). Cycle 32's replay exists to
+    de-duplicate a retry inside a run; without a run scope a resumed thread
+    restarts turn numbering at 1 and would replay the previous invocation's
+    "wrote N bytes" outcome without writing anything. Callers that want the
+    pre-31F1 cross-call behavior (the in-process recovery tests) omit `run`.
+    """
     payload = json.dumps(args, sort_keys=True, separators=(",", ":"))
-    h = hashlib.sha256(f"{thread_id}|{turn}|{call_index}|{payload}".encode()).hexdigest()
+    h = hashlib.sha256(
+        f"{thread_id}|{run}|{turn}|{call_index}|{payload}".encode()
+    ).hexdigest()
     return h[:24]
 
 

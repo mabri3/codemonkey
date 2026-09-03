@@ -208,6 +208,7 @@ def run_exec(
         full_prompt = full_prompt + "\n\n" + schema_mod.schema_instructions(schema)
 
     thread_id = events.new_thread_id()
+    run_id = uuid.uuid4().hex[:8]  # 31F1: journal idempotency scope
     _emit_base = emit_fn or (lambda ev: events.emit(ev, json_mode=json_mode))
 
     def emit(ev: dict) -> None:
@@ -390,6 +391,13 @@ def run_exec(
             max_edit_retries=int(cfg.get("max_edit_retries", 1) or 0),
             observation_budget=int(cfg.get("observation_budget", 24000) or 0),
             prompt_cache=bool(cfg.get("prompt_cache", True)),
+            # 31F1: the loop-7 journal was never given a thread by any
+            # production caller, so intents/outcomes/idempotent replay were
+            # inert outside the unit tests. The session thread id names the
+            # journal file; a per-invocation run id scopes the idempotency key
+            # so a resumed thread cannot replay an earlier run's write.
+            journal_thread=thread_id,
+            journal_run=run_id,
         )
     finally:
         try:

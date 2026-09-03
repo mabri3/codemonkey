@@ -162,8 +162,16 @@ def run_suite(suite_path: Path, *, exec_fn=None,
         try:
             from .journal import class_summary as _cs, read_thread as _rt
 
-            if task.get("_journal_thread"):
-                scored["journal_classes"] = _cs(_rt(task["_journal_thread"]))
+            # 31F1: the thread id comes from the run itself (thread.started);
+            # `_journal_thread` stays as an explicit per-task override.
+            jt = task.get("_journal_thread") or next(
+                (ev.get("thread_id") for ev in events
+                 if ev.get("type") == "thread.started" and ev.get("thread_id")),
+                "",
+            )
+            if jt:
+                scored["journal_thread"] = jt
+                scored["journal_classes"] = _cs(_rt(jt))
         except OSError:
             pass
         results["tasks"].append(scored)

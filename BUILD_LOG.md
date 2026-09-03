@@ -1478,3 +1478,26 @@ build/critic-loop8.md (new), build/plan.md, features.html.
 `uv run pytest -q` → **341 passed, 4 skipped** (home server down).
 
 **Next:** CYCLE 31F1 — wire `journal_thread` into exec/REPL/eval.
+
+## 2026-09-03 — CYCLE 31F1 (critic-loop8 finding 2): journal wiring + run scope
+
+**Completed:** `run_turns(journal_thread=...)` had no production caller —
+`grep -rn journal_thread src/` outside loop.py found only eval.py's read of a
+key nothing ever set — so cycles 31/32/33 (journal, idempotent replay,
+forensics CLI, eval journal stats) were inert in every real run. Now: exec
+passes the session thread id, the REPL creates its own journal thread (and
+gained exec-parity `context_limit`/`compaction` wiring), and eval derives the
+thread from the run's own `thread.started` event (`_journal_thread` kept as an
+override). `journal.args_key()` gained a `run` scope, passed by exec/REPL:
+without it a resumed thread restarts turn numbering at 1 and would replay the
+previous invocation's "wrote N bytes" outcome without writing — verified by
+mutation (dropping the scope fails `test_resumed_run_rewrites_instead_of_
+replaying`).
+
+**Files:** src/codemonkey/{journal,loop,exec,repl,eval}.py,
+tests/test_journal_wiring.py (new), build/plan.md, features.html.
+
+**Tests:** `uv run pytest tests/test_journal_wiring.py -q` → 7 passed;
+`uv run pytest -q` → **348 passed, 4 skipped**.
+
+**Next:** CYCLE 35F1 — slim stats journaled from an unbound key.

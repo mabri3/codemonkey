@@ -672,7 +672,7 @@ journal key semantics that cycle 36-38 will build on.
   user message; assistant answers present in order; schema-retry path stores
   exactly [pristine prompt, final answer]; ephemeral stores nothing);
   `uv run pytest -q` → exit 0.
-- [ ] CYCLE 31F1 — critic finding 2 (HIGH): `journal_thread` is never passed by
+- [x] CYCLE 31F1 — critic finding 2 (HIGH): `journal_thread` is never passed by
   any production caller, so the loop-7 journal/idempotency/forensics stack is
   inert. Wire it from exec (session thread id), REPL and eval; scope the
   idempotency key to a per-run id so a resumed thread cannot replay a previous

@@ -73,6 +73,7 @@ def run_turns(
     memory_enabled: bool = True,
     prompt_cache: bool = True,
     journal_thread: str = "",
+    journal_run: str = "",
 ) -> ChatTurn:
     """Drive the model until a final text answer or max_turns.
 
@@ -354,7 +355,8 @@ def run_turns(
                 try:
                     from .journal import args_key as _ak, find_outcome as _fo, record as _jr
 
-                    jkey = _ak(journal_thread, _turn_no, idx, call.get("args") or {})
+                    jkey = _ak(journal_thread, _turn_no, idx, call.get("args") or {},
+                               run=journal_run)
                     hit = _fo(journal_thread, jkey) if name in _MUTATING_TOOLS else None
                     if hit is not None:
                         _jr(journal_thread, "outcome", tool=name, key=jkey,
