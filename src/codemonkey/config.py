@@ -53,6 +53,7 @@ DEFAULTS: dict = {
     "repo_map_budget": 4000,
     "max_retries": 3,
     "permissions": {"rules": []},
+    "fallback_provider": "",
     "prompt_cache": True,
     "strategies": {
         "compaction": "summarizing",

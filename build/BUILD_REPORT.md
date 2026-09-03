@@ -530,3 +530,24 @@ e81c4b9 (R13) → lessons.py + lessons_cli.py + lessons_gate.py + tests → this
 commit (loop13-final).
 
 **LOOP 13 COMPLETE. Loop 14 (heterogeneous models/routing) opens.**
+
+
+---
+
+# Loop 14 — Final Acceptance (CYCLE loop14-final)
+
+**Date:** 2026-09-03 · **Suite:** 422 passed / 5 skipped (home server down;
+honest skips).
+
+## Loop-14 criteria (from build/research-loop14.md — all pass)
+
+| Improvement | Probe | Result |
+|---|---|---|
+| Availability failover (47) | tests/test_failover.py: transport-error failover, timeout failover, no-failover on auth, no-failover on tools-500 (protocol fallback owns it), unknown fallback provider fail-closed, journal route record | ✅ 5/5 |
+
+## Loop-14 commit range
+
+1f97c38 (R14) → failover wrapper in exec.py + config default + tests → this
+commit (loop14-final).
+
+**LOOP 14 COMPLETE. Loop 15 (operator surface & observability) opens.**

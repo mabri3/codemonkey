@@ -770,7 +770,7 @@ journal key semantics that cycle 36-38 will build on.
 
 ### loop14: cycles (selected from build/research-loop14.md, cycle R14)
 
-- [ ] CYCLE 47 — `loop14:` availability failover: config
+- [x] CYCLE 47 — `loop14:` availability failover: config
   `fallback_provider: <name>`; after transport/timeout errors exhaust retries,
   exec re-runs the turn against the fallback provider; journal records the
   route switch; no fallback on auth/tools-500 | est: 30m |
@@ -778,7 +778,7 @@ journal key semantics that cycle 36-38 will build on.
   fallback on transport+timeout, none on auth/tools-500, journal record,
   retry-exhaustion precondition, config default off, unknown fallback
   provider rejected); `uv run pytest -q` → exit 0.
-- [ ] CYCLE loop14-final — Loop 14 acceptance: sweep + report | est: 30m |
+- [x] CYCLE loop14-final — Loop 14 acceptance: sweep + report | est: 30m |
   verify: sweep green (honest exceptions); suite green; report committed.
 
 ### loop13: cycles (selected from build/research-loop13.md, cycle R13)

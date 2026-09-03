@@ -1737,3 +1737,17 @@ LOOP 13 COMPLETE.
 (directly motivated by 3 home-server outages blocking acceptance);
 complexity/semantic routing and cascades deferred (no second local model;
 quality-judge cascade = offline eval's job).
+
+## 2026-09-03 — CYCLE 47 (loop14): availability failover
+
+**Completed:** config `fallback_provider: <name>`; exec wraps the run_turns
+call in _attempt(); on transport/timeout errors (post provider-retries) it
+rebuilds the provider from fallback_provider and re-runs; auth + tools-500
+never fail over; route switch journaled (error_class recorded); unknown
+fallback provider raises ExecUsageError (fail-closed). Config default "".
+
+## 2026-09-03 — CYCLE loop14-final: Loop 14 acceptance — availability failover shipped
+
+**Completed:** fallback_provider wired in exec (transport/timeout only),
+journaled route switches, fail-closed validation. LOOP 14 COMPLETE.
+Loop 15 (operator surface & observability) opens.

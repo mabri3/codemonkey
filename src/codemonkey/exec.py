@@ -383,9 +383,9 @@ def run_exec(
             cwd=str(workdir),
         )
 
-    try:
-        turn = run_turns(
-            provider,
+    def _attempt(prov):
+        return run_turns(
+            prov,
             full_prompt,
             ctx,
             history=history,
@@ -414,6 +414,53 @@ def run_exec(
             journal_run=run_id,
             perm_rules=list(((cfg.get("permissions") or {}).get("rules")) or []),
         )
+
+    # loop14 cycle 47: availability failover — after transport/timeout errors
+    # exhaust retries, re-run against fallback_provider (if configured and
+    # existing). Auth and tools-500 never fail over (wrong-credentials and
+    # protocol-rejection are not availability problems).
+    _fall_name = (cfg.get("fallback_provider") or "").strip()
+    _attempt_provs = [provider]
+    if _fall_name:
+        _fp = (cfg.get("providers") or {}).get(_fall_name)
+        if _fp is None:
+            raise ExecUsageError(
+                f"fallback_provider '{_fall_name}' is not defined. "
+                f"Valid providers: {', '.join(cfg.get('providers', {}))}")
+        if _fall_name != p_name:
+            pass  # fallback provider built lazily only if the primary fails
+    try:
+        turn = _attempt(provider)
+    except Exception as _exc:
+        _err_text = str(_exc).lower()
+        _transport = ("transport" in _err_text or "timeout" in _err_text
+                      or "timed out" in _err_text or "deadline" in _err_text)
+        _auth = ("auth" in _err_text or "401" in _err_text or "403" in _err_text)
+        _tools_rej = "tools parameter" in _err_text
+        if (_fall_name and _transport and not _auth and not _tools_rej
+                and _fall_name != p_name
+                and (cfg.get("providers") or {}).get(_fall_name)):
+            if on_event:
+                on_event({"type": "notice",
+                          "message": f"failover: primary failed ({type(_exc).__name__}); "
+                                     f"retrying against fallback_provider '{_fall_name}'"})
+            try:
+                from .journal import classify_error as _ce, record as _jr
+
+                _jr(thread_id, "outcome", tool="failover", key=run_id + ":failover",
+                    status="switch", error_class=_ce(_exc))
+            except OSError:
+                pass
+            _fb_name, _fb = _provider_from_config(cfg, _fall_name, model)
+            try:
+                turn = _attempt(_fb)
+            finally:
+                try:
+                    _fb.close()
+                except Exception:
+                    pass
+        else:
+            raise
     finally:
         try:
             provider.close()
