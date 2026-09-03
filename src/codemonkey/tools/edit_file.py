@@ -209,12 +209,22 @@ def _run_batch(args: dict, ctx) -> ToolResult:
     if not isinstance(edits, list) or not edits:
         return ToolResult(output="error: edits must be a non-empty list", ok=False)
 
-    planned = []  # (path, new_text)
+    # 34F1 (critic-loop8 finding 3): edits used to be planned against a FRESH
+    # read of each path, so two edits on the SAME file both started from the
+    # on-disk text and the second write silently discarded the first. Text is
+    # now carried per path, so successive edits on one file compose.
+    # keyed by RESOLVED path so "a.txt" and "./a.txt" are one file
+    planned: dict = {}  # resolved -> [display_path, new_text] (insertion-ordered)
     for i, edit in enumerate(edits, 1):
         try:
+            from ..sandbox import validate_root
+
             path = edit["path"]
-            raw = _load(path, ctx)
-            text = raw.decode("utf-8", errors="replace")
+            key = str(validate_root(ctx, path))
+            if key in planned:
+                text = planned[key][1]
+            else:
+                text = _load(path, ctx).decode("utf-8", errors="replace")
         except Exception as exc:
             return ToolResult(output=f"error: edit {i}: {exc}", ok=False)
 
@@ -229,7 +239,7 @@ def _run_batch(args: dict, ctx) -> ToolResult:
                     return ToolResult(
                         output=f"error: edit {i} ({path}) block {bi}/{len(blocks)} failed — {err}",
                         ok=False)
-            planned.append((path, current))
+            planned[key] = [path, current]
         elif "search" in edit:
             search = edit["search"]
             replace = edit.get("replace", "")
@@ -246,13 +256,13 @@ def _run_batch(args: dict, ctx) -> ToolResult:
                         output=(f"error: edit {i} ({path}): {occurrences} occurrences "
                                 f"(need exactly 1, or pass count)"), ok=False)
                 new_text = text.replace(search, replace, 1)
-            planned.append((path, new_text))
+            planned[key] = [path, new_text]
         else:
             return ToolResult(output=f"error: edit {i}: needs 'patch' or 'search'", ok=False)
 
     from .write_file import run as _write_run
     outcomes = []
-    for path, new_text in planned:
+    for path, new_text in planned.values():
         res = _write_run({"path": path, "content": new_text}, ctx)
         outcomes.append((path, res.ok, res.output[:120]))
     failed = [o for o in outcomes if not o[1]]

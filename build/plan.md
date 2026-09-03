@@ -691,7 +691,7 @@ journal key semantics that cycle 36-38 will build on.
   verify: `uv run pytest tests/test_slim.py -q` → exit 0 with a new test
   asserting a `status="slimmed"` journal record with the chars-saved payload
   after a journaled run; `uv run pytest -q` → exit 0.
-- [ ] CYCLE 34F1 — critic finding 3 (MED): batched edits re-read each path from
+- [x] CYCLE 34F1 — critic finding 3 (MED): batched edits re-read each path from
   disk, so two edits on the SAME file silently discard the earlier one while
   reporting success. Accumulate per path so successive edits compose; one
   outcome line per file | est: 25m |

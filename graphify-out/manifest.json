@@ -145,9 +145,9 @@
     "semantic_hash": "0dfdc207ee4fb66cdd39048f2faa55a2"
   },
   "src/codemonkey/tools/edit_file.py": {
-    "mtime": 1788417091.795144,
-    "ast_hash": "ad208734ec015dee043e7ff6fbe96890",
-    "semantic_hash": "ad208734ec015dee043e7ff6fbe96890"
+    "mtime": 1788420490.326191,
+    "ast_hash": "7574a7b834c8937037e1af15d9690b83",
+    "semantic_hash": "7574a7b834c8937037e1af15d9690b83"
   },
   "src/codemonkey/tools/glob.py": {
     "mtime": 1788338522.781879,
@@ -395,9 +395,9 @@
     "semantic_hash": "67ee93cea0da18225fa0fe35b8ba18ff"
   },
   "tests/test_batch_edit.py": {
-    "mtime": 1788417369.680262,
-    "ast_hash": "62f821f689c6f95e9728097ca296ec71",
-    "semantic_hash": "62f821f689c6f95e9728097ca296ec71"
+    "mtime": 1788420490.3307574,
+    "ast_hash": "94fbd2d06b4fdc14752e75897130af95",
+    "semantic_hash": "94fbd2d06b4fdc14752e75897130af95"
   },
   "tests/test_cache_telemetry.py": {
     "mtime": 1788416303.978223,

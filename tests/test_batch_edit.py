@@ -120,3 +120,66 @@ def test_journal_records_per_file(tmp_path, ctx, monkeypatch):
 
     recs = [r for r in read_thread("t-batch") if r["tool"] == "edit_file"]
     assert recs, "edit_file journaled"
+
+
+# -- CYCLE 34F1 (critic-loop8 finding 3) ---------------------------------
+# Two edits on the SAME file used to be planned from separate disk reads, so
+# the second write clobbered the first while the result still said "applied".
+
+def _ctx(tmp_path):
+    from codemonkey.sandbox import ToolContext
+
+    return ToolContext(workdir=tmp_path, sandbox="workspace-write", timeout=10)
+
+
+def test_two_edits_on_one_file_both_land(tmp_path):
+    from codemonkey.tools import dispatch
+
+    f = tmp_path / "a.txt"
+    f.write_text("alpha\nbeta\n")
+    r = dispatch("edit_file", {"edits": [
+        {"path": "a.txt", "search": "alpha", "replace": "ALPHA"},
+        {"path": "a.txt", "search": "beta", "replace": "BETA"},
+    ]}, _ctx(tmp_path))
+    assert r.ok, r.output
+    assert f.read_text() == "ALPHA\nBETA\n"
+
+
+def test_same_file_listed_once_in_the_outcome(tmp_path):
+    from codemonkey.tools import dispatch
+
+    (tmp_path / "a.txt").write_text("alpha\nbeta\n")
+    r = dispatch("edit_file", {"edits": [
+        {"path": "a.txt", "search": "alpha", "replace": "ALPHA"},
+        {"path": "./a.txt", "search": "beta", "replace": "BETA"},
+    ]}, _ctx(tmp_path))
+    assert r.ok, r.output
+    assert r.output.count("applied") == 2  # header + one per-file line
+    assert "1 file(s)" in r.output
+
+
+def test_second_edit_on_same_file_failing_writes_nothing(tmp_path):
+    from codemonkey.tools import dispatch
+
+    f = tmp_path / "a.txt"
+    f.write_text("alpha\nbeta\n")
+    r = dispatch("edit_file", {"edits": [
+        {"path": "a.txt", "search": "alpha", "replace": "ALPHA"},
+        {"path": "a.txt", "search": "nowhere", "replace": "X"},
+    ]}, _ctx(tmp_path))
+    assert not r.ok
+    assert f.read_text() == "alpha\nbeta\n"  # atomic: nothing written
+
+
+def test_later_edit_sees_the_earlier_edit_text(tmp_path):
+    """An edit may target text produced by a previous edit in the same batch."""
+    from codemonkey.tools import dispatch
+
+    f = tmp_path / "a.txt"
+    f.write_text("one\n")
+    r = dispatch("edit_file", {"edits": [
+        {"path": "a.txt", "search": "one", "replace": "two"},
+        {"path": "a.txt", "search": "two", "replace": "three"},
+    ]}, _ctx(tmp_path))
+    assert r.ok, r.output
+    assert f.read_text() == "three\n"

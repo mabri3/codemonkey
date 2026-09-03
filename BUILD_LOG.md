@@ -1520,3 +1520,21 @@ the key is dropped again — mutation-verified); `uv run pytest -q` →
 **349 passed, 4 skipped**.
 
 **Next:** CYCLE 34F1 — batched edits on the same path.
+
+## 2026-09-03 — CYCLE 34F1 (critic-loop8 finding 3): batched edits compose per file
+
+**Completed:** `_run_batch` planned every edit against a fresh `_load()` of its
+path, so two edits on ONE file both started from the on-disk text and the
+write-back loop's last write won — the earlier edit was silently lost while the
+result still reported `applied 2 file(s) atomically`. Planning now carries text
+per file, keyed by the RESOLVED path (so `a.txt` and `./a.txt` are one file),
+and each file is written and reported exactly once. A later edit may target
+text produced by an earlier edit in the same batch.
+
+**Files:** src/codemonkey/tools/edit_file.py, tests/test_batch_edit.py,
+build/plan.md, features.html.
+
+**Tests:** `uv run pytest tests/test_batch_edit.py -q` → 10 passed (4 new);
+`uv run pytest -q` → **353 passed, 4 skipped**.
+
+**Next:** CYCLE 14F1 — one checkpoint group per tool call.

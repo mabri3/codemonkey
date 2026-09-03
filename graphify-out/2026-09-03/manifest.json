@@ -45,9 +45,9 @@
     "semantic_hash": "dfbf3763c6db4d0823d5e630e8cfa48e"
   },
   "src/codemonkey/loop.py": {
-    "mtime": 1788420256.9531162,
-    "ast_hash": "442b65dd9ac2780a3dd0e8e2cf4a83b5",
-    "semantic_hash": "442b65dd9ac2780a3dd0e8e2cf4a83b5"
+    "mtime": 1788420406.5175505,
+    "ast_hash": "a372b29d4addbbf1bb1f68c27c7e0635",
+    "semantic_hash": "a372b29d4addbbf1bb1f68c27c7e0635"
   },
   "src/codemonkey/native.py": {
     "mtime": 1788339682.0384562,
@@ -450,9 +450,9 @@
     "semantic_hash": "1582f86fa28eb824fb60645f51afdaa0"
   },
   "tests/test_slim.py": {
-    "mtime": 1788417497.456362,
-    "ast_hash": "67efe6893ca5f824ab74dc6d1880d44d",
-    "semantic_hash": "67efe6893ca5f824ab74dc6d1880d44d"
+    "mtime": 1788420378.5203588,
+    "ast_hash": "25b8ac13ae763c5f4deafb610d91ec60",
+    "semantic_hash": "25b8ac13ae763c5f4deafb610d91ec60"
   },
   "tests/test_spill.py": {
     "mtime": 1788402489.6189675,
