@@ -1684,3 +1684,9 @@ BLOCKED (home server down, 3rd flap — recorded honestly). Final BUILD_REPORT
 
 **ALL 10 LOOPS COMPLETE. Gate 2 = user acceptance. Loops 11-16 authorized
 (next: R11 delegation ROI) — to be built under the extended authorization.**
+
+## 2026-09-03 — CYCLE R11: Loop 11 research — roles + adversarial review + ROI matrix selected
+
+**Completed:** `build/research-loop11.md` — CIV roles (40), adversarial review
+rounds (41), delegation ROI matrix (42). Coordinator role not selected (outer
+loop coordinates).

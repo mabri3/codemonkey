@@ -764,6 +764,24 @@ journal key semantics that cycle 36-38 will build on.
   jkey) | verify: unit — slim record appears in journal when slimming applies.
 
 
+
+### loop11: cycles (selected from build/research-loop11.md, cycle R11)
+
+- [ ] CYCLE 40 — `loop11:` delegation roles: delegate(task, role=
+  implementer|critic|verifier) — role prompts frame the child system context;
+  role in journal + result meta; default implementer | est: 30m |
+  verify: `uv run pytest tests/test_roles.py -q` → exit 0 (≥5 tests).
+- [ ] CYCLE 41 — `loop11:` adversarial review rounds: delegate review_rounds=N
+  (default 0=off) — implementer → critic structured verdict → bounded fix
+  rounds; journaled | est: 30m |
+  verify: `uv run pytest tests/test_review_rounds.py -q` → exit 0 (≥5 tests).
+- [ ] CYCLE 42 — `loop11:` delegation ROI matrix: eval --delegation-matrix
+  (off vs on-with-roles), per-arm metrics, matrix.json | est: 30m |
+  verify: `uv run pytest tests/test_delegation_matrix.py -q` → exit 0 (≥4
+  tests).
+- [ ] CYCLE loop11-final — Loop 11 acceptance: sweep + report | est: 30m |
+  verify: sweep green (honest exceptions); suite green; report committed.
+
 ### loop10: cycles (selected from build/research-loop10.md, cycle R10)
 
 - [x] CYCLE 39 — `loop10:` docs & packaging release prep: README rewrite
@@ -867,7 +885,7 @@ authorization: they stay unchecked until the user authorizes the arc. Each
 loop opens with its research cycle; `loop<N>:` build cycles are appended by
 that cycle, never pre-selected here. `loop10-final` still precedes all of them.
 
-- [ ] CYCLE R11 — Loop 11 research: delegation that measurably pays — which
+- [x] CYCLE R11 — Loop 11 research: delegation that measurably pays — which
   delegated ROLES (independent implementer, adversarial critic, verifier that
   owns the verify gate, retrieval scout) raise golden-suite pass rate at a
   fixed token budget on a 27B-class local model, and which are pure overhead;
