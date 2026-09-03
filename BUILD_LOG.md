@@ -1310,3 +1310,12 @@ trickling stream; added wall-clock deadline per stream in _request_stream.
 
 **Loop 5 COMPLETE. R6 entry condition SATISFIED (eval harness live).**
 Core-design asks (subagents, hooks/permissions) remain open for the user.
+
+## 2026-09-02 — CYCLE R6: Loop 6 research — 5 candidates, 3 selected
+
+**Completed:** `build/research-loop6.md` — compaction bake-off, KV-cache
+telemetry, tool-result spill selected (cycles 28-30); context-depth tracking
+folds into 28; PACMS submodular selection deferred until bake-off data exists.
+Entry condition verified: eval harness shipped (cycles 24/25).
+
+**Next step:** CYCLE 28 — compaction bake-off.

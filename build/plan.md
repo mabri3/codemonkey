@@ -565,13 +565,47 @@ map to an A-criterion, a loop selection, or a cited research selection).
 - Hooks + rule-based command permissions (candidate 5) — 2 cycles, changes
   approval/sandbox semantics. Build or defer?
 
+
+### loop6: cycles (selected from build/research-loop6.md, cycle R6)
+
+- [ ] CYCLE 28 — `loop6:` compaction bake-off: `codemonkey eval
+  --strategy-matrix summarizing,sliding-window` runs the golden suite once per
+  strategy (env override per run), records pass_rate/tokens/wall/window-depth
+  per strategy into build/eval/matrix.json, prints a comparison table |
+  est: 30m |
+  verify: `uv run pytest tests/test_matrix.py -q` → exit 0 (≥5 tests: matrix
+  runs both configs via patched exec, depth recorded per turn, matrix.json
+  shape, comparison table prints, tie handling); `uv run pytest -q` → exit 0;
+  LIVE: matrix over the golden-core suite on home server (results committed).
+- [ ] CYCLE 29 — `loop6:` KV-cache telemetry: openai provider parses
+  `timings.cache_n`/`prompt_n` when the server returns them; cost summary and
+  eval results record cache_hit ratio; `--cost-summary` prints it | est: 30m |
+  verify: `uv run pytest tests/test_cache_telemetry.py -q` → exit 0 (≥5 tests:
+  timings parse, ratio math, absent-timings tolerance, summary line, eval
+  field); `uv run pytest -q` → exit 0; LIVE: repeated identical task shows
+  cache_n > 0 (probe transcript committed).
+- [ ] CYCLE 30 — `loop6:` tool-result spill: outputs over the observation
+  budget spill verbatim to ~/.codemonkey/spill/<hash>.txt; tool result becomes
+  head+tail + `PARTIAL [full output: <path>]`; read_file/search can fetch
+  slices; spill files pruned after 24h | est: 30m |
+  verify: `uv run pytest tests/test_spill.py -q` → exit 0 (≥6 tests: spill
+  verbatim, marker contains path, under-budget untouched, prune, read_file
+  slice retrieval, head+tail shape); `uv run pytest -q` → exit 0; LIVE: big
+  seq output spills and the model reads the slice (transcript committed).
+- [ ] CYCLE loop6-final — Loop 6 acceptance: full A1–A20 re-sweep + loop-6
+  probes; BUILD_REPORT loop-6 section | est: 30m |
+  verify: `bash build/acceptance_sweep.sh` → all green (A9 slow-hardware
+  exception per loop5-final precedent, recorded honestly); `uv run pytest -q`
+  → exit 0; report updated and committed. (R7 opens; its session-semantics
+  core-design flag still requires the user.)
+
 ## Cycle checklists — loops 6-10 (PROPOSED 2026-09-02, NOT AUTHORIZED)
 
 Charters, entry conditions and core-design flags: `build/loops-5-10-proposal.md`.
 Each loop opens with its research cycle; `loop<N>:` build cycles are appended by
 that cycle, never pre-selected here. Gate 2 remains open.
 
-- [ ] CYCLE R6 — Loop 6 research: context engineering chosen by measurement —
+- [x] CYCLE R6 — Loop 6 research: context engineering chosen by measurement —
   retrieval beyond the symbol index, context-window telemetry, a compaction
   strategy bake-off scored on loop 5's harness, small-model context-rot limits
   | est: 30m |
