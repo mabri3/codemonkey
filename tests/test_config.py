@@ -44,7 +44,7 @@ def clean_env(monkeypatch, tmp_path):
 def test_version_flag():
     r = run_cli("--version")
     assert r.returncode == 0, r.stderr
-    assert re.search(r"^codemonkey \d+\.\d+\.\d+$", r.stdout.strip())
+    assert re.search(r"^codemonkey \d+\.\d+\.\d+(-rc\d+)?$", r.stdout.strip())
 
 
 def test_config_shows_local_defaults():
