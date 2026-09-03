@@ -16,7 +16,7 @@ default_provider: anthropic
 sandbox: workspace-write
 approval: on-request
 max_turns: 30
-timeout_seconds: 240
+timeout_seconds: 300
 add_dirs: []
 web_fetch: false
 context_limit: 32000

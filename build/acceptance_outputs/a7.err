@@ -1,2 +1,1 @@
-banana[agent] banana
-
+error: default_provider 'unblock2' is not defined. Valid providers: local, anthropic

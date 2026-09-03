@@ -1369,3 +1369,11 @@ tests/test_obsbudget.py (marker contract), build/probes/cycle30-spill.md.
 suite 310/310. LIVE: spill wiring verified in-process (spill files written by
 the loop path); full seq-3000 live probe BLOCKED-slow on home hardware (same
 limit as A9), recorded honestly.
+
+## 2026-09-02 — CYCLE R7: Loop 7 research — journal + idempotency selected
+
+**Completed:** `build/research-loop7.md` — execution journal + failure taxonomy
+(31), idempotent mutating tools (32), journal forensics CLI (33). Mid-turn
+crash resume deferred (journal is its prerequisite); transport reuse verified
+as already-present (one client per provider) and documented. Session-state
+strategy contract deliberately untouched (journal is a sidecar).

@@ -1,2 +1,1 @@
-pong[agent] pong
-
+error: default_provider 'unblock2' is not defined. Valid providers: local, anthropic

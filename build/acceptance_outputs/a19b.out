@@ -1,1 +1,1 @@
-error: unknown strategy 'bogus' for 'compaction'. Valid compaction strategies: summarizing, sliding-window
+error: default_provider 'unblock2' is not defined. Valid providers: local, anthropic

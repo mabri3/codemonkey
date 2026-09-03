@@ -1,10 +1,1 @@
-$ 
-$ 
-$ 
-$ 
-[exit None] 
-[exit None] 
-[exit None] 
-[exit None] 
-error: stream wall-clock deadline exceeded from http://192.168.50.113:8080/v1/chat/completions (>240s)
-error: stream wall-clock deadline exceeded from http://192.168.50.113:8080/v1/chat/completions (>240s)
+error: default_provider 'unblock2' is not defined. Valid providers: local, anthropic

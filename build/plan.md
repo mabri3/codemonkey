@@ -599,7 +599,45 @@ map to an A-criterion, a loop selection, or a cited research selection).
   → exit 0; report updated and committed. (R7 opens; its session-semantics
   core-design flag still requires the user.)
 
-## Cycle checklists — loops 6-10 (PROPOSED 2026-09-02, NOT AUTHORIZED)
+
+> **USER LOOP AUTHORIZATION (2026-09-02):** "finish through loop 10 ... approved
+> to not stop and work until loop 10 is done." Loops 6-10 proceed continuously
+> without per-loop gates. The two R5 core-design asks (subagents/delegated
+> context isolation; hooks/rule-based command permissions) are folded into
+> LOOP 9 (governance) per user instruction. Core-design stop-and-ask is
+> therefore SATISFIED for loops 7-10 by this blanket authorization.
+
+
+### loop7: cycles (selected from build/research-loop7.md, cycle R7)
+
+- [ ] CYCLE 31 — `loop7:` execution journal + failure taxonomy: append-only
+  ~/.codemonkey/journal/<thread>.jsonl records intent BEFORE dispatch and
+  outcome AFTER for every tool call; error_class enum (transport, auth,
+  timeout, parse, tool-error, budget, unknown); args hashed, never stored raw |
+  est: 30m |
+  verify: `uv run pytest tests/test_journal.py -q` → exit 0 (≥6 tests: intent-
+  before-outcome ordering, error classes, args-hash stability (no raw args on
+  disk), kill -9 mid-run leaves a readable journal, per-thread isolation,
+  journal-tail command); `uv run pytest -q` → exit 0.
+- [ ] CYCLE 32 — `loop7:` idempotent mutating tools: write_file/edit_file
+  compute idempotency key (thread+turn+call-index+args hash); journal hit →
+  recorded outcome replayed instead of re-executing | est: 30m |
+  verify: `uv run pytest tests/test_idempotency.py -q` → exit 0 (≥5 tests: key
+  stability, replay-on-hit returns recorded result, miss executes, read-only
+  tools unaffected, replay recorded in journal); `uv run pytest -q` → exit 0.
+- [ ] CYCLE 33 — `loop7:` journal forensics: `codemonkey journal list|tail|
+  show` CLI; per-run failure-class summary; eval results.json gains journal
+  stats | est: 30m |
+  verify: `uv run pytest tests/test_journal_cli.py -q` → exit 0 (≥4 tests: list
+  threads, tail shape, show by thread, class summary counts); LIVE: golden run
+  produces journal with class breakdown (transcript committed).
+- [ ] CYCLE loop7-final — Loop 7 acceptance: full A1–A20 re-sweep + loop-7
+  probes; BUILD_REPORT loop-7 section | est: 30m |
+  verify: sweep → all green except A9-class slow-hardware exceptions (recorded
+  honestly per loop5-final precedent); `uv run pytest -q` → exit 0; report
+  committed.
+
+## Cycle checklists — loops 6-10 (AUTHORIZED 2026-09-02 (blanket, see note above))
 
 Charters, entry conditions and core-design flags: `build/loops-5-10-proposal.md`.
 Each loop opens with its research cycle; `loop<N>:` build cycles are appended by
@@ -616,7 +654,7 @@ that cycle, never pre-selected here. Gate 2 remains open.
   ENTRY CONDITION: loop 5 shipped an eval harness that can score two
   configurations of the same agent on the same tasks. If it did not, R6 records
   BLOCKED with that reason and does not append cycles.
-- [ ] CYCLE R7 — Loop 7 research: reliability and recovery — a durable
+- [x] CYCLE R7 — Loop 7 research: reliability and recovery — a durable
   write-ahead journal of tool intents/outcomes, idempotent mutating tools,
   mid-turn crash resume, checkpoint/undo maturity, a failure taxonomy taken
   from loop 5 harness runs, streaming partial-response handling (the cycle-23
