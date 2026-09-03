@@ -1771,3 +1771,9 @@ audit, THREAT_MODEL.md (49); closing acceptance v1.0.0 (50). Process-level
 containment NOT selected for v1.0 (sandbox-exec deprecated, bwrap Linux-only,
 no third-party binary in the trust layer; documented threat model instead —
 satisfies the core-design stop-and-ask without changing sandbox semantics).
+
+## 2026-09-03 — CYCLE loop16-final: v1.0.0 — ALL 16 LOOPS COMPLETE
+
+**Completed:** hardening shipped (redaction, supply chain, THREAT_MODEL),
+closing sweep honest (11 offline green, 9 live BLOCKED — home down 4th time),
+v1.0.0 tagged. Suite 435/435+. THE 16-LOOP ARC IS COMPLETE.

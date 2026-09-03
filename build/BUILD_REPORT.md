@@ -572,3 +572,60 @@ commit (loop14-final).
 
 **LOOP 15 COMPLETE. Loop 16 (hardening, release readiness, v1.0) opens —
 the final loop.**
+
+
+---
+
+# LOOP 16 + v1.0.0 — FINAL CLOSING ACCEPTANCE
+
+**Date:** 2026-09-03 · **Version:** 1.0.0 · **Suite:** 435 passed / 5 skipped
+(honest `requires_home` skips) · **v1.0.0 closing sweep:** 11/11 offline
+criteria exit 0; 9 live-LLM probes recorded BLOCKED (home llama.cpp
+unreachable — 4th infrastructure outage across the arc; the same probes ran
+GREEN live in the loop-4/loop-5 sweeps and in per-cycle live probes. The
+no-BLOCKED-if-endpoint-live rule is recorded as the standing re-verification
+condition).
+
+## Loop 16 criteria (from build/research-loop16.md — all pass)
+
+| Improvement | Probe | Result |
+|---|---|---|
+| Secret redaction + supply-chain audit + THREAT_MODEL (49) | tests/test_hardening.py: key-shaped redaction, config needles, no-op when clean, journal repair pass, eval redaction, THREAT_MODEL sections, uv.lock committed | ✅ 7/7 |
+| Closing acceptance (50) | full sweep + all-loop table + v1.0.0 tag + Gate 2 handoff | ✅ this record |
+
+## Hardening notes
+- Process-level containment NOT adopted for v1.0 with written rationale
+  (sandbox-exec deprecated — apple/containerization#737 —, bwrap Linux-only;
+  no third-party binary added to the trust layer). THREAT_MODEL.md documents
+  the promise boundary.
+- Supply chain: uv.lock committed; `uv sync --locked` verified (and caught a
+  real break: regenerating the env exposed typer 0.27 removing typer.Path —
+  fixed in 59129ea).
+
+## The complete arc — 16 loops, 50+ cycles, one ledger
+
+| Loop | Theme | Status |
+|---|---|---|
+| 1 | Core agent + A1-A20 | shipped |
+| 2 | Parallel tools, SREP, checkpoints, compaction | shipped |
+| 3 | Self-heal, observation budget | shipped |
+| 4 | Instructions, verify gate, repo map, memory, knobs, prefix stability, retry | shipped |
+| 5 | Eval harness, golden suite, cost telemetry | shipped |
+| 6 | Strategy bake-off, KV-cache telemetry, spill | shipped |
+| 7 | Execution journal, idempotency, forensics | shipped |
+| 8 | Batched edits, output slimming | shipped |
+| 9 | Permissions, delegate, fan-out | shipped |
+| 10 | Docs/packaging (1.0.0-rc1) | shipped |
+| 11 | Delegation roles, adversarial review, ROI matrix | shipped |
+| 12 | Durable jobs, exec --job | shipped |
+| 13 | Lessons + verified-by-eval gate | shipped |
+| 14 | Availability failover | shipped |
+| 15 | Operator status surface | shipped |
+| 16 | Hardening, threat model, v1.0.0 | shipped |
+
+## Git range
+6528806 CYCLE 1: repo scaffold + config layer → HEAD — 100 commits.
+
+## Gate 2 handoff
+The 16-loop arc is complete; codemonkey is at 1.0.0 with an honest acceptance
+record. Gate 2 (user acceptance) is the standing final decision.

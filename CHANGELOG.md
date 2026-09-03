@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.0 (2026-09-03)
+
+Final v1.0 closing the 16-loop arc: delegation ROI (roles + adversarial review
+rounds), durable jobs across runs, lessons with verified-by-eval adoption,
+availability failover, operator status surface, hardening (secret redaction,
+supply chain, THREAT_MODEL).
+
 ## 1.0.0-rc1 (2026-09-03)
 
 Release candidate closing the loop 1-10 arc. Gate 2 (user acceptance) pending.

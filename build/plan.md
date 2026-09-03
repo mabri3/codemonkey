@@ -772,13 +772,13 @@ journal key semantics that cycle 36-38 will build on.
 
 ### loop16: cycles (selected from build/research-loop16.md, cycle R16 — the final loop)
 
-- [ ] CYCLE 49 — `loop16:` hardening + release record: secret redaction pass
+- [x] CYCLE 49 — `loop16:` hardening + release record: secret redaction pass
   (eval stdout excerpts + journal output fields against configured API keys),
   supply-chain audit (uv.lock committed, uv sync --locked green, dep-tree hash
   recorded), THREAT_MODEL.md | est: 30m |
   verify: `uv run pytest tests/test_hardening.py -q` → exit 0 (≥6 tests);
   `uv run pytest -q` → exit 0.
-- [ ] CYCLE 50 — closing acceptance v1.0.0: full A1–A20 sweep + all-loop
+- [x] CYCLE 50 — closing acceptance v1.0.0: full A1–A20 sweep + all-loop
   criteria table, final report, v1.0.0 tag, Gate 2 handoff | est: 40m |
   verify: sweep green (honest environment exceptions recorded); suite green;
   v1.0.0 tagged; report committed.

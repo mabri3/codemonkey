@@ -36,9 +36,13 @@
 │ undo      Undo: restore the most recent checkpoint (files snapshotted        │
 │           pre-mutation).                                                     │
 │ eval      Run a golden evaluation suite against the real exec path.          │
+│ status    Operator surface: aggregate jobs/journal/sessions/eval/cost/spill. │
 │ models    List models exposed by a provider endpoint.                        │
 │ sessions  List persisted sessions (thread id, updated time, first prompt).   │
 │ journal   Execution-journal forensics.                                       │
+│ jobs      Durable, resumable job files.                                      │
+│ lessons   Lessons learned from run history.                                  │
+│ redact    Secret-redaction repair pass.                                      │
 │ exec      Non-interactive exec: run the agent once, print the final          │
 │           response. Use `exec resume [--last|THREAD_ID] [PROMPT]` to         │
 │           continue a session.                                                │
