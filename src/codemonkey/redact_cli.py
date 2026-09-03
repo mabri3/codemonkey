@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import typer
 
 from .config import load_config
@@ -13,7 +15,7 @@ app = typer.Typer(help="Redact configured secrets from durable stores.")
 
 @app.command("run")
 def redact_run(
-    eval_dir: typer.Path = typer.Option("build/eval", help="Eval results dir."),
+    eval_dir: Path = typer.Option(Path("build/eval"), help="Eval results dir."),
 ) -> None:
     """Scan journal + eval results for configured API key values and
     key-shaped strings; replace with [REDACTED]."""
