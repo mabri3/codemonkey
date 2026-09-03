@@ -812,3 +812,92 @@ that cycle, never pre-selected here. Gate 2 remains open.
   table, git log range, gaps), commit | est: 40m |
   verify: `bash build/acceptance_sweep.sh` → all green; `uv run pytest -q` →
   exit 0; report updated and committed.
+
+## Cycle checklists — loops 11-16 (PROPOSED 2026-09-03, ⚠️ NOT AUTHORIZED)
+
+Charters, entry conditions and core-design flags:
+`build/loops-11-16-proposal.md`. Unlike loops 6-10, these carry NO blanket
+authorization: they stay unchecked until the user authorizes the arc. Each
+loop opens with its research cycle; `loop<N>:` build cycles are appended by
+that cycle, never pre-selected here. `loop10-final` still precedes all of them.
+
+- [ ] CYCLE R11 — Loop 11 research: delegation that measurably pays — which
+  delegated ROLES (independent implementer, adversarial critic, verifier that
+  owns the verify gate, retrieval scout) raise golden-suite pass rate at a
+  fixed token budget on a 27B-class local model, and which are pure overhead;
+  depth/fan-out limits taken from measurement; delegate result contracts;
+  delegate failure isolation from the parent journal thread | est: 30m |
+  verify: `build/research-loop11.md` committed in the loops 2-9 shape (>=5
+  candidates with real cited URLs, ranked `SELECTED` section with >=3 mapped
+  to cycles); `build/plan.md` contains the `loop11:` cycles (unchecked), each
+  stating its expected harness delta (pass rate, tokens, wall) inside its
+  verify probe. ENTRY CONDITION: loop 9 shipped `delegate`/`delegate_batch`
+  AND loop 5's harness can score two configurations on the same tasks — if
+  not, R11 records BLOCKED with that reason and appends no cycles.
+  Core-design: PARTIAL — concurrent model turns inside one thread ends by
+  asking (the R8 flag, unchanged).
+- [ ] CYCLE R12 — Loop 12 research: long-horizon work across runs — durable
+  task/plan state that survives a run, honest mid-turn crash resume off the
+  loop-7 journal (deferred in loop 7 with the journal named as prerequisite),
+  resumable long-horizon eval tasks, compaction policy for week-long threads,
+  GC for journals/spills/checkpoints under a long job | est: 30m |
+  verify: `build/research-loop12.md` committed in the standard shape;
+  `build/plan.md` contains the `loop12:` cycles (unchecked), including one
+  whose probe kills a run mid-turn and shows the resumed run applying the
+  interrupted mutation EXACTLY once. ENTRY CONDITION: loop 11 closed (shipped
+  or explicitly rejected). Core-design: YES (durable task state borders
+  session-state strategy semantics) — R12 ENDS BY ASKING.
+- [ ] CYCLE R13 — Loop 13 research: learning from the run history — failure-mode
+  memory keyed by the loop-7 error taxonomy, retrieval over past
+  sessions/journals scoped to the repo, tool-choice priors from journal
+  success rates, memory curation/decay, privacy posture for a cross-repo
+  store | est: 30m |
+  verify: `build/research-loop13.md` committed in the standard shape AND one
+  of: `build/plan.md` contains the `loop13:` cycles (unchecked, each with a
+  harness-delta probe), OR the research file closes the theme with the
+  measurements that killed it (an honest "no" is a valid exit). ENTRY
+  CONDITION: >=2 loops of journal + eval history exist in volume. Core-design:
+  PARTIAL — a cross-repo history store ends by asking.
+- [ ] CYCLE R14 — Loop 14 research: heterogeneous models and routing (the R8
+  deferral) — per-task-class routing scored on the golden suite, cheap model
+  for compaction vs main model for edits, health checks that distinguish
+  "unreachable" from "reachable but wedged" (the failure this repo keeps
+  hitting), declarative failover chains where a fallback is RECORDED never
+  silent, cost-aware routing against the cycle-26 ledger, the cycle-23
+  streaming partial-response gap | est: 30m |
+  verify: `build/research-loop14.md` committed in the standard shape;
+  `build/plan.md` contains the `loop14:` cycles (unchecked) with raw
+  before/after tables per task class. ENTRY CONDITION: >=2 usable providers
+  reachable at once — otherwise R14 records BLOCKED (routing cannot be
+  measured on one endpoint). Core-design: YES (provider selection) — R14 ENDS
+  BY ASKING.
+- [ ] CYCLE R15 — Loop 15 research: operator surface and observability — diff
+  preview before a mutation is applied (and a diff-gated approval mode), a run
+  timeline over the JSONL stream, one inspector unifying journal/spill/
+  checkpoints/cost, a REPL status line, structured run reports for CI | est:
+  30m |
+  verify: `build/research-loop15.md` committed in the standard shape;
+  `build/plan.md` contains the `loop15:` cycles (unchecked), EACH carrying a
+  probe asserting exec stdout purity is unchanged (text mode = final answer
+  only; --json = JSONL only). ENTRY CONDITION: loop 12's long-horizon runs
+  exist; if runs are still short, R15 narrows to the diff-gated approval mode
+  alone. Core-design: PARTIAL — the diff-gated approval mode ends by asking.
+- [ ] CYCLE R16 — Loop 16 research: hardening, release readiness, v1.0
+  acceptance — process-level containment (macOS `sandbox-exec`, Linux
+  bubblewrap/seccomp) behind the existing sandbox levels closing the
+  documented `shell` cwd-escape gap, secret redaction if loop 9 did not take
+  it, supply-chain/lockfile hygiene, a tagged release with upgrade/rollback, a
+  documented threat model | est: 30m |
+  verify: `build/research-loop16.md` committed in the standard shape;
+  `build/plan.md` contains the `loop16:` cycles (unchecked) ending in
+  `loop16-final`. ENTRY CONDITION: loops 11-15 closed AND no open critic
+  finding above LOW severity AND a live endpoint is available (the closing
+  sweep may not contain BLOCKED rows). Core-design: YES (containment redefines
+  what the sandbox levels promise) — R16 ENDS BY ASKING.
+- [ ] CYCLE loop16-final — v1.0 closing acceptance: A1-A20 plus every
+  loop-2..15 criterion re-run LIVE with no BLOCKED rows, final
+  `build/BUILD_REPORT.md` (all loops, criteria table, git log range, gaps),
+  version tag | est: 40m |
+  verify: `bash build/acceptance_sweep.sh` → all green, zero BLOCKED;
+  `uv run pytest -q` → exit 0; `uv run codemonkey --version` matches the tag;
+  report updated and committed.

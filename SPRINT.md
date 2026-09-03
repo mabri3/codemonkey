@@ -96,6 +96,20 @@ its research cycle; `loop<N>:` build cycles are appended by that cycle, never
 pre-selected. **Gate 2 (user acceptance of loop 3) is still open: a tick that
 reaches the loop-4 section reports and stops; it does NOT take the first
 unchecked cycle.**
+Critic gate 2026-09-03 (`build/critic-loop8.md`, all shipped and green): fix
+cycles 7F2 (append-only session persistence) · 31F1 (journal wiring + per-run
+idempotency scope) · 35F1 (slim stat journaled) · 34F1 (batched edits compose
+per file) · 14F1 (one checkpoint per tool call) · 14F2 (checkpoints scoped to
+their workspace) · SWEEP-F1 (acceptance sweep records live probes BLOCKED
+instead of failing offline criteria) → `loop8-critic-final`.
+Loops 11-16 (PROPOSED 2026-09-03, **NOT AUTHORIZED — no blanket approval,
+unlike 6-10** — charters in `build/loops-11-16-proposal.md`): CYCLE R11
+delegation that measurably pays · R12 long-horizon work across runs (core
+design — ends by asking) · R13 learning from the run history (may exit with a
+documented "no") · R14 heterogeneous models + routing (core design — ends by
+asking; BLOCKED unless two providers are reachable) · R15 operator surface +
+observability · R16 hardening/release/v1.0 (core design — ends by asking) +
+`loop16-final` closing acceptance with zero BLOCKED rows.
 
 Review gates (cycles 3, 6, 9 of loop 1): after committing that cycle,
 dispatch a fresh-context critic (delegate_task) with goal "check the

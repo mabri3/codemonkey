@@ -90,15 +90,15 @@ llama.cpp server (<code>http://192.168.50.113:8080/v1</code>,
 uv run codemonkey --version
 uv run codemonkey config          # effective merged config (secrets masked)
 uv run codemonkey models          # list models from the active provider
-uv run pytest -q                  # unit suite (118 tests, no network)
+uv run pytest -q                  # unit suite (360 tests, no network)
 uv run codemonkey exec "your prompt"          # non-interactive exec (text mode)
 uv run codemonkey exec --json "your prompt"   # JSONL event stream on stdout
 uv run codemonkey exec --output-schema s.json -o out.json "..."  # validated structured output
 uv run codemonkey exec resume --last "follow-up"   # resume the latest session
 uv run codemonkey sessions        # list persisted sessions
 echo "your prompt" | uv run codemonkey exec - # prompt from stdin
-# While the home llama.cpp inference is wedged (2026-09-02), live run:
-CODEMONKEY_PROVIDER=unblock CODEMONKEY_UNBLOCK_KEY=... uv run codemonkey exec "..."
+uv run codemonkey undo --list     # checkpoints for THIS workspace
+uv run codemonkey journal list    # execution-journal threads (now written by real runs)
 
 </pre>
 
@@ -111,19 +111,24 @@ CODEMONKEY_PROVIDER=unblock CODEMONKEY_UNBLOCK_KEY=... uv run codemonkey exec ".
 </ul>
 
 <h2>Next planned features</h2>
-<p><strong>Loops 1&ndash;3 are complete and all cycles are checked.</strong> The list below is the
-<em>proposed</em> loop 4 (CYCLE R4 research, <code>build/research-loop4.md</code>) &mdash; nothing here is
-authorized to build until the user answers <strong>Gate 2</strong> (final acceptance of loop 3).</p>
+<p><strong>Loops 1&ndash;8 are complete</strong>, plus the 2026-09-03 critic gate
+(<code>build/critic-loop8.md</code> &mdash; 9 findings, 7 fix cycles, all shipped).
+Suite: 360 passed. Live-LLM acceptance criteria are currently <strong>BLOCKED</strong>
+(home llama.cpp wedged) and must be re-run before Gate 2.</p>
 <ul>
-  <li class="todo">CYCLE 7F1 &mdash; wire the memory strategy: inject <code>memory.load()</code> into the system prompt and register the <code>update_memory</code> tool (spec gap: built but never called)</li>
-  <li class="todo">CYCLE 17F1 &mdash; make <code>max_edit_retries</code> and <code>observation_budget</code> real config/env knobs</li>
-  <li class="todo">CYCLE 18 &mdash; project-instruction loader (AGENTS.md &rarr; CLAUDE.md &rarr; .codemonkey/instructions.md)</li>
-  <li class="todo">CYCLE 19 &mdash; verify gate: run the configured <code>verify_command</code> after mutating turns and feed failures back</li>
-  <li class="todo">CYCLES 20&ndash;21 &mdash; repo map: dependency-free symbol index + cache + <code>repo_map</code> tool, then ranked budgeted injection</li>
-  <li class="todo">CYCLE 22 &mdash; byte-stable prompt prefix + <code>cache_prompt</code> passthrough for llama.cpp KV-cache reuse</li>
-  <li class="todo">CYCLE loop4-final &mdash; A1&ndash;A20 re-sweep + loop-4 report section</li>
-  <li class="todo">CYCLE R5 &mdash; loop 5 research only: subagents, hooks + rule-based permissions, local eval harness, MCP, cost accounting (core-design items end by asking the user)</li>
-  <li class="todo">CYCLES R6&ndash;R10 &mdash; <em>proposed</em> forward loops (charters in <code>build/loops-5-10-proposal.md</code>, none authorized): 6 context engineering chosen by measurement &middot; 7 reliability + recovery (durable journal, idempotent mutations, mid-turn resume) &middot; 8 throughput + cost control &middot; 9 governance for unattended runs (rule-based permissions, redaction, audit trail &mdash; core design, ends by asking) &middot; 10 interop/distribution + <code>loop10-final</code> closing acceptance</li>
+  <li class="todo">CYCLES 36&ndash;38 &mdash; <em>authorized, not yet built</em> (loop 9, governance):
+  rule-based permissions (deny&rarr;ask&rarr;allow, first match) &middot; <code>delegate</code> tool
+  (own context + journal thread, depth 1) &middot; <code>delegate_batch</code> parallel fan-out</li>
+  <li class="todo">CYCLE R10 + <code>loop10-final</code> &mdash; <em>authorized</em>: interop/distribution
+  (MCP justified or closed, config-declared tool extension point, packaging) then the closing sweep</li>
+  <li class="todo">CYCLES R11&ndash;R16 &mdash; <em>proposed 2026-09-03, NOT authorized</em>
+  (charters in <code>build/loops-11-16-proposal.md</code>):
+  11 delegation that measurably pays &middot;
+  12 long-horizon work across runs (durable task state + true mid-turn resume) &middot;
+  13 learning from the run history (may exit with a documented &ldquo;no&rdquo;) &middot;
+  14 heterogeneous models + routing (the R8 deferral; needs two live providers) &middot;
+  15 operator surface + observability (diff-gated approval, run timeline, one inspector) &middot;
+  16 hardening/release/v1.0 + <code>loop16-final</code> closing acceptance with zero BLOCKED rows</li>
 </ul>
 </body>
 </html>

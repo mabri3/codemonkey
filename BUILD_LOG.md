@@ -1611,3 +1611,24 @@ loop4-final) must be re-run before Gate 2 once the home server recovers.
 
 **Next:** loops 11-16 research charters (proposal), then the unbuilt loop-9
 cycles 36-38.
+
+## 2026-09-03 — Loops 11-16 research charters (PROPOSAL, not authorized)
+
+**Completed:** `build/loops-11-16-proposal.md` — six charters in the
+loops-5-10 shape (question · seeds · entry condition · core-design flag ·
+exit artifact), grounded in the shipped state (loops 1-8 + the critic gate) and
+in the standing gaps this arc inherits (mid-turn resume deferred in loop 7,
+model routing deferred in R8, `update_plan` state not durable, cycle-23
+streaming gap, live criteria BLOCKED). Arc: 11 delegation that measurably pays
+· 12 long-horizon work across runs · 13 learning from the run history · 14
+heterogeneous models + routing · 15 operator surface + observability · 16
+hardening/release/v1.0. `CYCLE R11`-`R16` + `loop16-final` appended UNCHECKED to
+`build/plan.md`; SPRINT.md checklist mirror synced; `features.html` roadmap
+section rewritten (it still listed the loop-4 era plan).
+
+**Authorization:** loops 6-10 hold a blanket authorization; **11-16 do not** —
+they stay proposals until the user authorizes the arc. Four of the six carry a
+YES/PARTIAL core-design flag and end by asking.
+
+**Next:** user decision on (a) the loops 11-16 arc and (b) whether to build the
+already-authorized loop-9 cycles 36-38.
