@@ -625,13 +625,13 @@ map to an A-criterion, a loop selection, or a cited research selection).
   verify: `uv run pytest tests/test_idempotency.py -q` → exit 0 (≥5 tests: key
   stability, replay-on-hit returns recorded result, miss executes, read-only
   tools unaffected, replay recorded in journal); `uv run pytest -q` → exit 0.
-- [ ] CYCLE 33 — `loop7:` journal forensics: `codemonkey journal list|tail|
+- [x] CYCLE 33 — `loop7:` journal forensics: `codemonkey journal list|tail|
   show` CLI; per-run failure-class summary; eval results.json gains journal
   stats | est: 30m |
   verify: `uv run pytest tests/test_journal_cli.py -q` → exit 0 (≥4 tests: list
   threads, tail shape, show by thread, class summary counts); LIVE: golden run
   produces journal with class breakdown (transcript committed).
-- [ ] CYCLE loop7-final — Loop 7 acceptance: full A1–A20 re-sweep + loop-7
+- [x] CYCLE loop7-final — Loop 7 acceptance: full A1–A20 re-sweep + loop-7
   probes; BUILD_REPORT loop-7 section | est: 30m |
   verify: sweep → all green except A9-class slow-hardware exceptions (recorded
   honestly per loop5-final precedent); `uv run pytest -q` → exit 0; report

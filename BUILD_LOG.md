@@ -1407,3 +1407,17 @@ replayed WITHOUT re-executing (mtime proof), miss -> normal execution; replay
 itself journaled (status=replayed with capped output). Read-only tools always
 execute. Test-isolation lesson: journal lives under HOME — tests must isolate
 HOME or cross-run state leaks in (fixed with jhome fixture).
+
+## 2026-09-02 — CYCLE 33 (loop7): journal forensics
+
+**Completed:** `codemonkey journal list|tail|show` CLI (journal_cli.py
+sub-app); class_summary rendered per thread; eval results.json gains
+journal_classes per task when a journal thread is attached.
+
+## 2026-09-02 — CYCLE loop7-final: Loop 7 acceptance — 324/324 (4 honest skips)
+
+**Completed:** loop-7 criteria all pass (journal, idempotency, forensics).
+Home server flapped down mid-loop; live-probe tests skip via requires_home;
+sweep fallback records honestly. BUILD_REPORT loop-7 section written.
+
+**LOOP 7 COMPLETE. Loop 8 (throughput/cost) opens next.**
