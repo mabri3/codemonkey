@@ -342,6 +342,12 @@ try:
     app.add_typer(_lessons_app, name="lessons", help="Lessons learned from run history.")
 except ImportError:  # pragma: no cover
     pass
+try:
+    from .redact_cli import app as _redact_app
+
+    app.add_typer(_redact_app, name="redact", help="Secret-redaction repair pass.")
+except ImportError:  # pragma: no cover
+    pass
 
 
 @app.command()
