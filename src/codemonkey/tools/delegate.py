@@ -14,6 +14,19 @@ from pathlib import Path
 
 from .base import ToolResult
 
+# loop11 cycle 40: CIV role framings (augmentcode.com/guides/coordinator-
+# implementor-verifier; arxiv.org/html/2606.20629 — role specialization).
+_ROLE_FRAMINGS = {
+    "implementer": "You are the implementer: make the requested change work "
+                   "end-to-end; run/verify it before finishing.",
+    "critic": "You are the critic: review the artifact/diff for correctness, "
+              "edge cases, and spec drift. Structure your reply as FINDINGS "
+              "(numbered, with file:line evidence) then a final line VERDICT: "
+              "OK or VERDICT: CHANGES-REQUIRED.",
+    "verifier": "You are the verifier: run the tests/commands that prove the "
+                "change works. Report only observed command output and a "
+                "final line VERIFIED: yes|no.",
+}
 _MAX_TASK = 8000          # chars of task text accepted
 _MAX_RESULT = 4000        # chars of child stdout returned
 _TIMEOUT_S = 600
@@ -32,9 +45,14 @@ def run(args: dict, ctx) -> ToolResult:
     if len(task) > _MAX_TASK:
         return ToolResult(output=f"error: task too long ({len(task)} > {_MAX_TASK})", ok=False)
 
+    role = str(args.get("role") or "implementer").strip().lower()
+    if role not in _ROLE_FRAMINGS:
+        return ToolResult(output=f"error: unknown role '{role}' (implementer|critic|verifier)", ok=False)
+
+    framed_task = f"[{role} role] {_ROLE_FRAMINGS[role]}\n\n{task}"
     sandbox = str(args.get("sandbox") or "workspace-write")
     cmd = ["uv", "run", "codemonkey", "exec", "--ephemeral",
-           "--sandbox", sandbox, task]
+           "--sandbox", sandbox, framed_task]
 
     env = dict(os.environ)
     env["CODEMONKEY_DELEGATE_DEPTH"] = "1"  # children cannot re-delegate
@@ -58,5 +76,5 @@ def run(args: dict, ctx) -> ToolResult:
     # stdout in text mode = final message only (diagnostics on stderr)
     if len(out) > _MAX_RESULT:
         out = out[:_MAX_RESULT] + f"...[delegate result capped at {_MAX_RESULT} chars]"
-    meta = {"delegated": True}
+    meta = {"delegated": True, "role": role}
     return ToolResult(output=out or "(delegate produced no output)", ok=True, meta=meta)

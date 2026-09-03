@@ -767,7 +767,7 @@ journal key semantics that cycle 36-38 will build on.
 
 ### loop11: cycles (selected from build/research-loop11.md, cycle R11)
 
-- [ ] CYCLE 40 — `loop11:` delegation roles: delegate(task, role=
+- [x] CYCLE 40 — `loop11:` delegation roles: delegate(task, role=
   implementer|critic|verifier) — role prompts frame the child system context;
   role in journal + result meta; default implementer | est: 30m |
   verify: `uv run pytest tests/test_roles.py -q` → exit 0 (≥5 tests).

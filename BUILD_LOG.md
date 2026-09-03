@@ -1690,3 +1690,10 @@ BLOCKED (home server down, 3rd flap — recorded honestly). Final BUILD_REPORT
 **Completed:** `build/research-loop11.md` — CIV roles (40), adversarial review
 rounds (41), delegation ROI matrix (42). Coordinator role not selected (outer
 loop coordinates).
+
+## 2026-09-03 — CYCLE 40 (loop11): delegation roles (CIV)
+
+**Completed:** delegate gains `role` (implementer|critic|verifier, default
+implementer); role framing prepended to the child task (critic requires
+FINDINGS + VERDICT:, verifier requires VERIFIED:); unknown role rejected;
+role recorded in result meta.
