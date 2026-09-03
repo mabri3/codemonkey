@@ -1716,3 +1716,11 @@ injection + step write-back (44). Multi-agent shared job store deferred
 **Completed:** jobs module (atomic writes, step transitions, entropy ids,
 render), jobs CLI, exec --job injection + JOB_STEP write-back (cross-run
 progress visible). LOOP 12 COMPLETE. Loop 13 (learning from run history) opens.
+
+## 2026-09-03 — CYCLE R13: Loop 13 research — lessons store + verified-by-eval gate selected
+
+**Completed:** `build/research-loop13.md` — lessons mined from journal failure
+classes, tag-overlap scoped retrieval (avoids experience-following per the ACL
+2026 memory-management study), verified-by-eval gate (execute-distill-verify
+per arxiv 2606.24428). Self-evolving harness + live self-improvement NOT
+selected (out of scope for a local CLI / violates governance).

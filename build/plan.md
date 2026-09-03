@@ -766,6 +766,24 @@ journal key semantics that cycle 36-38 will build on.
 
 
 
+
+### loop13: cycles (selected from build/research-loop13.md, cycle R13)
+
+- [ ] CYCLE 45 — `loop13:` lessons store + extraction + scoped retrieval:
+  lessons.py (atomic entries {id, tags{tool,error_class}, text, verified,
+  source_runs}), `lessons extract` mines journal class counts into drafts,
+  tag-overlap retrieval injects via the memory channel;
+  `codemonkey lessons list|add|extract` | est: 30m |
+  verify: `uv run pytest tests/test_lessons.py -q` → exit 0 (≥7 tests);
+  `uv run pytest -q` → exit 0.
+- [ ] CYCLE 46 — `loop13:` verified-by-eval gate: lesson.verified flips only
+  on a green eval run with the lesson injected; unverified lessons excluded
+  from injection | est: 30m |
+  verify: `uv run pytest tests/test_lessons_gate.py -q` → exit 0 (≥4 tests);
+  `uv run pytest -q` → exit 0.
+- [ ] CYCLE loop13-final — Loop 13 acceptance: sweep + report | est: 30m |
+  verify: sweep green (honest exceptions); suite green; report committed.
+
 ### loop12: cycles (selected from build/research-loop12.md, cycle R12)
 
 - [x] CYCLE 43 — `loop12:` durable jobs module + CLI: jobs.py (atomic
@@ -931,7 +949,7 @@ that cycle, never pre-selected here. `loop10-final` still precedes all of them.
   interrupted mutation EXACTLY once. ENTRY CONDITION: loop 11 closed (shipped
   or explicitly rejected). Core-design: YES (durable task state borders
   session-state strategy semantics) — R12 ENDS BY ASKING.
-- [ ] CYCLE R13 — Loop 13 research: learning from the run history — failure-mode
+- [x] CYCLE R13 — Loop 13 research: learning from the run history — failure-mode
   memory keyed by the loop-7 error taxonomy, retrieval over past
   sessions/journals scoped to the repo, tool-choice priors from journal
   success rates, memory curation/decay, privacy posture for a cross-repo
