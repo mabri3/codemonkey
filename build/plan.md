@@ -655,6 +655,31 @@ map to an A-criterion, a loop selection, or a cited research selection).
   verify: sweep green (A9-class exceptions recorded honestly); suite green;
   report committed.
 
+
+### loop9: cycles (selected from build/research-loop9.md, cycle R9 — R5 core-design items folded in per user authorization)
+
+- [ ] CYCLE 36 — `loop9:` rule-based permissions: config `permissions.rules` —
+  ordered {tool, pattern, action: allow|deny|ask}; evaluated deny→ask→allow,
+  first match wins, BEFORE the approval gate; glob pattern over shell command
+  (or path for file tools); journal records rule hits | est: 30m |
+  verify: `uv run pytest tests/test_permissions.py -q` → exit 0 (≥6 tests:
+  precedence, first-match, glob, default-ask fallback, journal hit records,
+  non-shell tools); `uv run pytest -q` → exit 0.
+- [ ] CYCLE 37 — `loop9:` delegate tool: `delegate(task, sandbox?)` spawns
+  `codemonkey exec` subprocess with own context + journal thread; returns
+  final result (capped); delegation depth 1 (delegate inside delegate
+  refused) | est: 30m |
+  verify: `uv run pytest tests/test_delegate.py -q` → exit 0 (≥6 tests);
+  `uv run pytest -q` → exit 0.
+- [ ] CYCLE 38 — `loop9:` parallel fan-out: `delegate_batch(tasks[])` runs
+  max_delegates workers (default 2), results aggregated in call order,
+  per-task isolation | est: 30m |
+  verify: `uv run pytest tests/test_delegate_batch.py -q` → exit 0 (≥5 tests);
+  `uv run pytest -q` → exit 0.
+- [ ] CYCLE loop9-final — Loop 9 acceptance: sweep + report | est: 30m |
+  verify: sweep green (honest exceptions recorded); suite green; report
+  committed.
+
 ## Cycle checklists — loops 6-10 (AUTHORIZED 2026-09-02 (blanket, see note above))
 
 Charters, entry conditions and core-design flags: `build/loops-5-10-proposal.md`.
@@ -689,7 +714,7 @@ that cycle, never pre-selected here. Gate 2 remains open.
   before/after timing and token probes (cycle-22 convention: no claim is made
   if the numbers do not separate). ENDS BY ASKING the user if any selection
   proposes concurrent model turns (loop architecture = core design).
-- [ ] CYCLE R9 — Loop 9 research: governance for unattended runs — rule-based
+- [x] CYCLE R9 — Loop 9 research: governance for unattended runs — rule-based
   command allow/deny matching, secret redaction across events/sessions/
   checkpoints, an append-only audit trail, process-level sandbox hardening
   beyond lexical containment, `web_fetch` egress policy, the documented `shell`

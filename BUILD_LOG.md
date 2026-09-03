@@ -1450,3 +1450,11 @@ stats journaled when applied.
 already-present; cache payoff carried from cycle 29.
 
 **LOOP 8 COMPLETE. Loop 9 (governance: hooks/permissions + subagents) opens.**
+
+## 2026-09-02 — CYCLE R9: Loop 9 research — rules + delegate + fan-out selected
+
+**Completed:** `build/research-loop9.md` — rule-based permissions (deny→ask→
+allow, first-match), delegate tool (context isolation via subprocess exec with
+own journal thread), parallel fan-out with max_delegates. Pre-tool-use hook
+scripts deferred as a config extension of the rules engine. R5 core-design
+asks satisfied here per user authorization.
