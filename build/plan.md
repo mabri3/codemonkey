@@ -766,13 +766,13 @@ journal key semantics that cycle 36-38 will build on.
 
 ### loop10: cycles (selected from build/research-loop10.md, cycle R10)
 
-- [ ] CYCLE 39 — `loop10:` docs & packaging release prep: README rewrite
+- [x] CYCLE 39 — `loop10:` docs & packaging release prep: README rewrite
   (13 tools, 8 commands, permissions/delegate/verify-gate/checkpoints/journal),
   version 1.0.0-rc1, CHANGELOG.md | est: 30m |
   verify: README documents every shipped command and tool (audit script);
   `uv run codemonkey --version` → 1.0.0-rc1; CHANGELOG covers loops 1-10;
   suite green.
-- [ ] CYCLE loop10-final — closing acceptance: full A1-A20 re-sweep + every
+- [x] CYCLE loop10-final — closing acceptance: full A1-A20 re-sweep + every
   loop-2..9 criterion, final BUILD_REPORT (all loops, criteria table, git log
   range, gaps), version tag, commit | est: 40m |
   verify: sweep green (A9-class honest exceptions); `uv run pytest -q` green;

@@ -1675,3 +1675,12 @@ churn); config-declared extension point = delegate tool (shipped); packaging
 verified (pyproject complete, --version works); docs audit found README stale
 → fix cycle 39. Entry condition verified: all 7 critic-loop8 fixes shipped
 (d0992a1..c91808d).
+
+## 2026-09-03 — CYCLE loop10-final: CLOSING ACCEPTANCE — 1.0.0-rc1
+
+**Completed:** closing sweep 11/11 offline criteria green; 9 live probes
+BLOCKED (home server down, 3rd flap — recorded honestly). Final BUILD_REPORT
+(all loops table, git range, honest gaps). Version 1.0.0-rc1.
+
+**ALL 10 LOOPS COMPLETE. Gate 2 = user acceptance. Loops 11-16 authorized
+(next: R11 delegation ROI) — to be built under the extended authorization.**

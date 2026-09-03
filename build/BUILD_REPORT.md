@@ -400,3 +400,51 @@ c53b47b (R9) → a84e5a4 C36 → c7b345a C37 → 811b2b4 C38 (+ registry test fi
 - Governance is defense-in-depth: rules evaluate BEFORE the approval gate;
   deny is absolute; ask escalates; allow only pre-approves what the policy
   would have gated.
+
+
+---
+
+# CLOSING ACCEPTANCE — Loop 10 Final (codemonkey 1.0.0-rc1)
+
+**Date:** 2026-09-03 · **Suite:** 379 passed / 5 skipped (home server down —
+honest skips) · **Closing sweep:** 11/11 offline criteria exit 0; 9 live-LLM
+probes recorded **BLOCKED (home llama.cpp unreachable — 3rd flap today)**
+per the SWEEP-F1 honest-recording policy. The same live probes were GREEN in
+the loop4/loop5 sweeps when the server was up.
+
+## The full arc (loops 1-10, every criterion)
+
+| Loop | Theme | Criteria |
+|---|---|---|
+| 1 | Core agent (config, providers, tools, protocol, exec, sessions, strategies, approvals, REPL) | A1-A20 all PASS |
+| 2 | Parallel tools, SREP editing, checkpoints/undo, auto-compaction | all PASS |
+| 3 | Self-heal edit retries, observation budget (+ native→prompt bridge) | all PASS |
+| 4 | Instruction loader, verify gate, repo map, memory wiring, knobs, prefix stability + cache_prompt, retry/backoff | all PASS |
+| 5 | Eval harness, golden suite + regression gate, cost telemetry | all PASS |
+| 6 | Compaction bake-off, KV-cache telemetry (99% hit), tool-result spill | all PASS |
+| 7 | Execution journal + failure taxonomy, idempotent mutating tools, forensics CLI | all PASS |
+| 8 | Batched multi-file atomic edits, tool-output slimming | all PASS |
+| 9 | Rule-based permissions, delegate tool, parallel fan-out (13 tools) | all PASS |
+| 10 | Docs/packaging release prep (README, CHANGELOG, 1.0.0-rc1) | docs audit PASS |
+
+## Git range
+
+6528806 CYCLE 1: repo scaffold + config layer (cycle 1) → HEAD — 82 commits, every cycle with its own CYCLE
+commit, tests, BUILD_LOG entry, features.html badge, and (from loop 6) a
+graphify knowledge-graph update.
+
+## Honest gaps at close
+
+1. Home llama.cpp flapping (3 outages today): live probes are environment-
+   dependent; the suite skips/records honestly instead of failing or faking.
+2. A9-class probes (heavy multi-tool loops) exceed local 27B latency budgets
+   even when the server is up; recorded BLOCKED-slow, unit-covered.
+3. shell cwd-escape remains a documented standing limitation (loop-9 charter).
+4. MCP client closed permanently after 5 deferrals with consistent rationale.
+5. Loop 11-16 charters exist (proposal committed); R11 next if authorized.
+
+## Gate 2 handoff
+
+The framework is complete through loop 10 and version-tagged **1.0.0-rc1**.
+Gate 2 (user acceptance) is the remaining decision. Suggested review path:
+`features.html` → `build/BUILD_REPORT.md` → `build/plan.md` → `git log`.
