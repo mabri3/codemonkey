@@ -220,6 +220,7 @@ def run_exec(
     # -- event translation: loop events -> codex-style items ------------
     open_items: dict = {}
     history_len = 0  # set after session load; used by the persist.drop hook
+    persist_pruned = {"done": False}  # 7F2: set when persist.drop pruned in place
 
     if cost_summary and event_sink is None:
         event_sink = []  # telemetry needs a collector even without --json
@@ -271,6 +272,7 @@ def run_exec(
             msgs = ev.get("messages")
             if isinstance(msgs, list):
                 del msgs[: history_len]
+                persist_pruned["done"] = True
                 if msgs and msgs[0].get("content") == full_prompt:
                     msgs[0] = {**msgs[0], "content": persist_prompt}
                 meta = ev.get("meta") or {}
@@ -460,11 +462,30 @@ def run_exec(
             sys.stderr.write(f"[warn] could not write {output_last_message}: {exc}\n")
 
     # -- persist session (unless --ephemeral) ------------------------------
+    # 7F2 (critic-loop8 finding 1): the loop returns history + THIS run, and
+    # the store is append-only — persisting the whole stack re-wrote a resumed
+    # thread's history on every resume (2^n growth). Append only what this run
+    # produced, and append the closing assistant answer exactly once (the loop
+    # never puts the final answer into `messages`).
     if not ephemeral:
-        all_msgs = getattr(turn, "all_messages", None) or history + [
-            {"role": "user", "content": full_prompt},
-            {"role": "assistant", "content": final_text},
-        ]
+        all_msgs = getattr(turn, "all_messages", None)
+        if all_msgs is None:
+            new_msgs = [{"role": "user", "content": persist_prompt}]
+        elif persist_pruned["done"]:
+            # the persist.drop hook already stripped the prior history in place
+            new_msgs = list(all_msgs)
+        elif list(all_msgs[:history_len]) == list(history):
+            new_msgs = list(all_msgs[history_len:])
+        else:
+            # the prefix no longer matches (auto-compaction rewrote the stack):
+            # index slicing is not trustworthy, so persist the minimal honest
+            # pair instead of guessing which messages are new.
+            new_msgs = [{"role": "user", "content": persist_prompt}]
+        if new_msgs and new_msgs[0].get("content") == full_prompt:
+            new_msgs[0] = {**new_msgs[0], "content": persist_prompt}
+        while new_msgs and new_msgs[-1].get("role") == "assistant":
+            new_msgs.pop()
+        new_msgs.append({"role": "assistant", "content": final_text})
         try:
             store.append_meta(
                 thread_id,
@@ -472,7 +493,7 @@ def run_exec(
                 model=getattr(provider, "model", "") or "",
                 cwd=str(workdir),
             )
-            for m in all_msgs:
+            for m in new_msgs:
                 if m.get("role") in ("user", "assistant") and isinstance(m.get("content"), str):
                     store.append_message(thread_id, m["role"], m["content"])
         except OSError as exc:

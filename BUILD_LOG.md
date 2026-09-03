@@ -1458,3 +1458,23 @@ allow, first-match), delegate tool (context isolation via subprocess exec with
 own journal thread), parallel fan-out with max_delegates. Pre-tool-use hook
 scripts deferred as a config extension of the rules engine. R5 core-design
 asks satisfied here per user authorization.
+
+## 2026-09-03 — CYCLE 7F2 (critic-loop8 finding 1): append-only session persistence
+
+**Completed:** `src/codemonkey/exec.py` persisted `turn.all_messages` (history
++ this run) on every invocation, so each resume re-wrote the thread's entire
+history (measured 2^n growth: 1 → 3 → 7 messages over three runs) and the final
+assistant answer was never stored at all (the `or` fallback that added it only
+fired when `all_messages` was absent). Now: only this run's new messages are
+appended (prefix-verified against the loaded history; if auto-compaction
+rewrote the stack the run falls back to persisting the pristine prompt), the
+6F2 schema-retry pruning path is tracked with an explicit flag, and the closing
+assistant answer is appended exactly once.
+
+**Files:** src/codemonkey/exec.py, tests/test_sessions_persist.py (new),
+build/critic-loop8.md (new), build/plan.md, features.html.
+
+**Tests:** `uv run pytest tests/test_sessions_persist.py -q` → 6 passed;
+`uv run pytest -q` → **341 passed, 4 skipped** (home server down).
+
+**Next:** CYCLE 31F1 — wire `journal_thread` into exec/REPL/eval.

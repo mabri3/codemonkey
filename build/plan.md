@@ -656,6 +656,71 @@ map to an A-criterion, a loop selection, or a cited research selection).
   report committed.
 
 
+## Review-gate findings — loops 5-8 critic (2026-09-03) → fix cycles
+
+Report: `build/critic-loop8.md` (6 findings, each with a runnable repro).
+These fix cycles run BEFORE the loop-9 build cycles: finding 2 changes the
+journal key semantics that cycle 36-38 will build on.
+
+- [x] CYCLE 7F2 — critic finding 1 (HIGH): exec persists the FULL message
+  stack on every resume (exponential duplication) and never persists the final
+  assistant answer. Persist only this run's new messages, plus the final
+  assistant text exactly once; keep the 6F2 schema-retry pruning correct
+  | est: 25m |
+  verify: `uv run pytest tests/test_sessions_persist.py -q` → exit 0 (>=5
+  tests: single run stores [user, assistant]; two resumes store no duplicate
+  user message; assistant answers present in order; schema-retry path stores
+  exactly [pristine prompt, final answer]; ephemeral stores nothing);
+  `uv run pytest -q` → exit 0.
+- [ ] CYCLE 31F1 — critic finding 2 (HIGH): `journal_thread` is never passed by
+  any production caller, so the loop-7 journal/idempotency/forensics stack is
+  inert. Wire it from exec (session thread id), REPL and eval; scope the
+  idempotency key to a per-run id so a resumed thread cannot replay a previous
+  invocation's write outcome; bring the REPL to exec parity on
+  context_limit/compaction while wiring | est: 35m |
+  verify: `uv run pytest tests/test_journal_wiring.py -q` → exit 0 (>=6 tests:
+  exec run writes intent+outcome records under its thread id; `journal list`
+  shows that thread; two runs on one thread produce DIFFERENT keys for the same
+  args (no cross-run replay); same-run replay still hits; eval sets
+  `_journal_thread` and results carry `journal_classes`; ephemeral still
+  journals); `uv run pytest -q` → exit 0.
+- [ ] CYCLE 35F1 — critic finding 6 (LOW): the cycle-35 slim stat is journaled
+  from an unbound `jkey` in `run_turns` scope; the `except Exception` swallows
+  the NameError so no `:slim` record is ever written. Carry the key back with
+  the outcome and record the stat | est: 15m |
+  verify: `uv run pytest tests/test_slim.py -q` → exit 0 with a new test
+  asserting a `status="slimmed"` journal record with the chars-saved payload
+  after a journaled run; `uv run pytest -q` → exit 0.
+- [ ] CYCLE 34F1 — critic finding 3 (MED): batched edits re-read each path from
+  disk, so two edits on the SAME file silently discard the earlier one while
+  reporting success. Accumulate per path so successive edits compose; one
+  outcome line per file | est: 25m |
+  verify: `uv run pytest tests/test_batch_edit.py -q` → exit 0 with >=3 new
+  tests (two edits on one file both land; a failing second edit on the same
+  file writes nothing; outcome lists each file once); `uv run pytest -q` →
+  exit 0.
+- [ ] CYCLE 14F1 — critic finding 4 (MED): `_save` opens a NEW checkpoint per
+  file, so `undo` after a multi-file (atomic) edit restores one file and leaves
+  the rest modified. Group every snapshot taken during one tool call into one
+  checkpoint | est: 25m |
+  verify: `uv run pytest tests/test_checkpoints.py -q` → exit 0 with >=2 new
+  tests (a 2-file batch edit produces ONE checkpoint listing both files; undo
+  restores both; per-call grouping still yields separate groups for separate
+  calls); `uv run pytest -q` → exit 0.
+- [ ] CYCLE 14F2 — critic finding 5 (MED): checkpoints carry no workspace
+  identity, so `codemonkey undo` in repo B can restore repo A's files into B.
+  Record the workdir with each group; list/restore only groups taken in the
+  current workspace | est: 25m |
+  verify: `uv run pytest tests/test_checkpoints.py -q` → exit 0 with >=3 new
+  tests (a checkpoint from another workdir is not listed/restored for this cwd;
+  same-workdir restore unchanged; legacy groups with no workdir record are
+  still restorable); `uv run pytest -q` → exit 0.
+- [ ] CYCLE loop8-critic-final — fix-cycle acceptance: re-run the loops-5-8
+  criteria touched by the six fixes plus the full suite; append the outcome to
+  `build/BUILD_REPORT.md` | est: 20m |
+  verify: `uv run pytest -q` → exit 0; `bash build/acceptance_sweep.sh`
+  re-run with home-down exceptions recorded honestly; report committed.
+
 ### loop9: cycles (selected from build/research-loop9.md, cycle R9 — R5 core-design items folded in per user authorization)
 
 - [ ] CYCLE 36 — `loop9:` rule-based permissions: config `permissions.rules` —
