@@ -74,6 +74,7 @@ def run_turns(
     prompt_cache: bool = True,
     journal_thread: str = "",
     journal_run: str = "",
+    perm_rules: list | None = None,
 ) -> ChatTurn:
     """Drive the model until a final text answer or max_turns.
 
@@ -332,8 +333,35 @@ def run_turns(
                 on_event({"type": "tool.started", "name": name})
             if call.get("error"):
                 return (idx, name, False, f"error: {call['error']}", None)
+            # loop9 cycle 36: rule-based permissions BEFORE the approval gate.
+            rule_decision = None
+            try:
+                from .permissions import evaluate as _pe
+
+                rule_decision = _pe(perm_rules or [], name, call.get("args") or {})
+                if rule_decision and journal_thread:
+                    try:
+                        from .journal import record as _jr
+
+                        _jr(journal_thread, "outcome", tool=name, key=jkey + ":rule",
+                            status=f"rule-{rule_decision}")
+                    except OSError:
+                        pass
+            except ValueError as _ve:
+                if on_event:
+                    on_event({"type": "error", "message": f"permissions config: {_ve}"})
+                return (idx, name, False, f"error: permissions config invalid: {_ve}",
+                        {"raised": True})
+            if rule_decision == "deny":
+                if on_event:
+                    on_event({"type": "notice",
+                              "message": f"permission rule: {name} denied by rule"})
+                return (idx, name, False,
+                        "error: denied by permission rule", {"rule": "deny"})
+
             # Approval gate (cycle 8): evaluate policy BEFORE dispatch.
-            if approval:
+            # (rule_decision == 'ask' forces the gate on; 'allow' skips it)
+            if approval and rule_decision != "allow":
                 from . import approvals as approvals_mod
 
                 decision = approvals_mod.decide(name, approval, sandbox=ctx.sandbox)

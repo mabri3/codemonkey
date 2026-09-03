@@ -1632,3 +1632,13 @@ YES/PARTIAL core-design flag and end by asking.
 
 **Next:** user decision on (a) the loops 11-16 arc and (b) whether to build the
 already-authorized loop-9 cycles 36-38.
+
+## 2026-09-02 — CYCLE 36 (loop9): rule-based permissions
+
+**Completed:** `src/codemonkey/permissions.py` — ordered rules evaluated
+deny→ask→allow (first match per tier wins, Claude-Code-canonical precedence);
+patterns glob over shell command / file-tool path; no match → None (falls
+through to the approval gate); malformed rules raise ValueError (fail-closed);
+loop evaluates rules BEFORE the approval gate — deny short-circuits with a
+tool-error, ask forces the gate on, allow skips it; rule hits journaled.
+Config `permissions.rules: []` default; exec threads cfg → run_turns.

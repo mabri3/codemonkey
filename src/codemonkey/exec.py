@@ -398,6 +398,7 @@ def run_exec(
             # so a resumed thread cannot replay an earlier run's write.
             journal_thread=thread_id,
             journal_run=run_id,
+            perm_rules=list(((cfg.get("permissions") or {}).get("rules")) or []),
         )
     finally:
         try:

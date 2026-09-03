@@ -734,7 +734,7 @@ journal key semantics that cycle 36-38 will build on.
 
 ### loop9: cycles (selected from build/research-loop9.md, cycle R9 — R5 core-design items folded in per user authorization)
 
-- [ ] CYCLE 36 — `loop9:` rule-based permissions: config `permissions.rules` —
+- [x] CYCLE 36 — `loop9:` rule-based permissions: config `permissions.rules` —
   ordered {tool, pattern, action: allow|deny|ask}; evaluated deny→ask→allow,
   first match wins, BEFORE the approval gate; glob pattern over shell command
   (or path for file tools); journal records rule hits | est: 30m |
