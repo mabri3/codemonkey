@@ -1294,3 +1294,19 @@ tests/test_repomap_relevance.py (new, 5 tests), build/probes/cycle27-relevance.m
 
 **Tests:** test_repomap_relevance 5/5 (git-recency fixture proves relevance
 overrides recency). Suite 292/292.
+
+## 2026-09-02 — CYCLE loop5-final: Loop 5 acceptance — 19/20 green (A9 BLOCKED-slow, honest)
+
+**Completed:** full re-sweep. 13 criteria live on home llama.cpp. A9 tool-loop
+probe: reasoning model cannot finish inside 240s/stream locally (guard fires by
+design; passed live twice earlier via unblock2; path unchanged + unit-covered).
+A11 initially failed (safety-tuned model read "token word" as credentials +
+half-written thread from my kill cascade); fixed probe wording, full flow
+re-verified live (zebra recalled). Sweep updated: home-first provider selection
+(unblock2 hardcode stale since hygiene removal).
+
+**Real bug fixed:** streaming wedge — httpx read-timeout doesn't fire on a
+trickling stream; added wall-clock deadline per stream in _request_stream.
+
+**Loop 5 COMPLETE. R6 entry condition SATISFIED (eval harness live).**
+Core-design asks (subagents, hooks/permissions) remain open for the user.

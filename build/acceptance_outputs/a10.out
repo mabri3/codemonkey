@@ -1,7 +1,0 @@
-{
-  "project_name": "codemonkey",
-  "programming_languages": [
-    "Python"
-  ],
-  "summary": "codemonkey is a Python-based, scriptable coding-agent CLI built around a file-driven state machine, supporting both OpenAI-style and Anthropic-style LLM endpoints using uv, Typer, Rich, and httpx."
-}

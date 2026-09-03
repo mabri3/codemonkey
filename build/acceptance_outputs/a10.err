@@ -1,11 +1,12 @@
- ```json
-{
-  "project_name": "codemonkey",
-  "programming_languages": [
-    "Python"
-  ],
-  "summary": "codemonkey is a Python-based, scriptable coding-agent CLI built around a file-driven state machine, supporting both OpenAI-style and Anthropic-style LLM endpoints using uv, Typer, Rich, and httpx."
-}
-```[usage] prompt=3357 completion=451
-[agent] {   "project_name": "codemonkey",   "programming_languages": [     "Python"   ],
-
+$ 
+[exit None] 
+$ 
+$ 
+$ 
+$ 
+[exit None] 
+[exit None] 
+[exit None] 
+[exit None] 
+error: stream wall-clock deadline exceeded from http://192.168.50.113:8080/v1/chat/completions (>240s)
+error: stream wall-clock deadline exceeded from http://192.168.50.113:8080/v1/chat/completions (>240s)

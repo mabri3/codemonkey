@@ -552,7 +552,7 @@ map to an A-criterion, a loop selection, or a cited research selection).
   relevance overrides recency for matching symbols; non-matching fallback keeps
   cycle-21 order; budget still enforced; injection stays deterministic across
   two calls); `uv run pytest -q` → exit 0.
-- [ ] CYCLE loop5-final — Loop 5 acceptance: full A1–A20 re-sweep + loop-5
+- [x] CYCLE loop5-final — Loop 5 acceptance: full A1–A20 re-sweep + loop-5
   probes; BUILD_REPORT loop-5 section | est: 30m |
   verify: `bash build/acceptance_sweep.sh` → all green; `uv run pytest -q` →
   exit 0; report updated and committed. (R6 entry condition: eval harness

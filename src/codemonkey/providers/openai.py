@@ -7,6 +7,7 @@ terminator). Non-streaming is a single JSON body.
 
 from __future__ import annotations
 
+import time
 import json
 from typing import Optional
 
@@ -134,6 +135,10 @@ class OpenAIProvider(ProviderBase):
         body["stream"] = True
         attempts = retry.attempts_for(self.max_retries)
         last: ProviderError | None = None
+        # loop5-final: wall-clock cap on the WHOLE streamed response. The httpx
+        # read timeout only fires on gaps BETWEEN bytes; a reasoning model that
+        # trickles tokens never trips it (A9 hung 31+ min this way).
+        stream_deadline = time.monotonic() + max(60.0, float(getattr(self, "timeout", 300.0)))
         for attempt in range(1, attempts + 1):
             started = False
             try:
@@ -162,6 +167,11 @@ class OpenAIProvider(ProviderBase):
                     started = True
                     events: list[dict] = []
                     for line in resp.iter_lines():
+                        if time.monotonic() > stream_deadline:
+                            raise ProviderError(
+                                f"stream wall-clock deadline exceeded from {url} "
+                                f"(>{max(60.0, float(getattr(self, 'timeout', 300.0))):.0f}s)"
+                            )
                         line = line.strip()
                         if not line.startswith("data:"):
                             continue

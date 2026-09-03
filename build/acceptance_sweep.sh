@@ -9,18 +9,38 @@ mkdir -p "$OUT"
 
 note() { printf '%s\n' "$1" | tee -a "$OUT/summary.txt"; }
 
-KEY="${CODEMONKEY_UNBLOCK2_KEY:-}"
-LIVE_PROV="unblock2"
-if [ -z "$KEY" ]; then
-  KEY=$(python3 -c "import yaml; c=yaml.safe_load(open('/Users/bharris/.hermes/config.yaml')); print([p['api_key'] for p in c.get('custom_providers',[]) if p.get('name')=='neuralwatt'][0])" 2>/dev/null || true)
+# Home llama.cpp recovered (loop4-final): live probes run against the DEFAULT
+# local provider. Fallback to the (removed-from-defaults) unblock2 provider only
+# if home inference is wedged again — the key is env-injected per process and
+# never written to disk.
+HOME_ALIVE=$(uv run python -c "
+import httpx
+try:
+    r = httpx.post('http://192.168.50.113:8080/v1/chat/completions',
+        json={'model':'Qwen3.8-27B-NVFP4-MTP-VERY-HIGH.gguf','messages':[{'role':'user','content':'Reply with exactly: pong'}],'max_tokens':200}, timeout=30)
+    print('pong' if 'pong' in (r.json()['choices'][0]['message'].get('content') or '') else 'dead')
+except Exception:
+    print('dead')
+" 2>/dev/null || echo dead)
+
+if [ "$HOME_ALIVE" = "pong" ]; then
+  unset CODEMONKEY_PROVIDER CODEMONKEY_UNBLOCK2_KEY
+  # loop5-final: cap per-probe HTTP time so a wedged stream fails fast instead of
+# hanging the whole sweep (A9 hung 31+ min on a streaming tool-loop call).
+export CODEMONKEY_TIMEOUT_SECONDS=240
+
+note "=== acceptance sweep $(date '+%Y-%m-%d %H:%M:%S') ==="
+  note "live-LLM probes via provider: local (home llama.cpp, live)"
+else
+  KEY="${CODEMONKEY_UNBLOCK2_KEY:-}"
+  if [ -z "$KEY" ]; then
+    KEY=$(python3 -c "import yaml; c=yaml.safe_load(open('/Users/bharris/.hermes/config.yaml')); print([p['api_key'] for p in c.get('custom_providers',[]) if p.get('name')=='neuralwatt'][0])" 2>/dev/null || true)
+  fi
+  export CODEMONKEY_PROVIDER=unblock2
+  export CODEMONKEY_UNBLOCK2_KEY="$KEY"
+  note "=== acceptance sweep $(date '+%Y-%m-%d %H:%M:%S') ==="
+  note "home wedged — live-LLM probes via TEMP unblock2 fallback (recorded honestly)"
 fi
-
-# live probes run with the provider/key env injected (never written to disk)
-export CODEMONKEY_PROVIDER=unblock2
-export CODEMONKEY_UNBLOCK2_KEY="$KEY"
-
-note "=== CYCLE 10 acceptance sweep $(date '+%Y-%m-%d %H:%M:%S') ==="
-note "live-LLM probes via provider: unblock2 (3459 kimi-k2.7-code) — home llama.cpp wedged"
 
 # A1
 note "--- A1: --version ---"
@@ -44,19 +64,18 @@ if grep -q "Qwen3.8" "$OUT/a4.out"; then
   note "A4 exit=0 (live local)"
 else
   note "A4-LOCAL note: home llama.cpp /v1/models timed out (wedged). Falling back to unblock2 for the live probe; models listing verified (kimi-k2.7-code)."
-  CODEMONKEY_PROVIDER=unblock2 uv run codemonkey models >"$OUT/a4.out" 2>"$OUT/a4.err"
+  uv run codemonkey models >"$OUT/a4.out" 2>"$OUT/a4.err"
   grep -q "kimi" "$OUT/a4.out"; note "A4 exit=$? (unblock2 fallback)"
 fi
 
 # A5-A11, A16 need the live provider: inject --provider unblock2 or env
-export CODEMONKEY_PROVIDER=unblock2
 
 note "--- A5: exec pong ---"
-CODEMONKEY_UNBLOCK2_KEY="$KEY" uv run codemonkey exec "Reply with exactly the word pong and nothing else." >"$OUT/a5.out" 2>"$OUT/a5.err"
+uv run codemonkey exec "Reply with exactly the word pong and nothing else." >"$OUT/a5.out" 2>"$OUT/a5.err"
 grep -qi "pong" "$OUT/a5.out"; note "A5 exit=$?  out=$(head -c 120 "$OUT/a5.out" | tr '\n' ' ')"
 
 note "--- A6: exec --json events ---"
-CODEMONKEY_UNBLOCK2_KEY="$KEY" uv run codemonkey exec --json "Reply with exactly the word pong and nothing else." >"$OUT/a6.out" 2>"$OUT/a6.err"
+uv run codemonkey exec --json "Reply with exactly the word pong and nothing else." >"$OUT/a6.out" 2>"$OUT/a6.err"
 python3 - "$OUT/a6.out" << 'PY'
 import json, sys
 lines = [l for l in open(sys.argv[1]) if l.strip().startswith("{")]
@@ -74,7 +93,7 @@ PY
 note "A6 exit=$?"
 
 note "--- A7: stdin-as-prompt banana ---"
-echo "Reply with exactly the word banana and nothing else." | CODEMONKEY_UNBLOCK2_KEY="$KEY" uv run codemonkey exec - >"$OUT/a7.out" 2>"$OUT/a7.err"
+echo "Reply with exactly the word banana and nothing else." | uv run codemonkey exec - >"$OUT/a7.out" 2>"$OUT/a7.err"
 grep -qi "banana" "$OUT/a7.out"; note "A7 exit=$?  out=$(head -c 120 "$OUT/a7.out" | tr '\n' ' ')"
 
 note "--- A8: non-git dir guard ---"
@@ -83,11 +102,11 @@ TMPSWEEP=$(mktemp -d)
 grep -q "git repository" "$OUT/a8.err" && grep -q "skip-git-repo-check" "$OUT/a8.err"; note "A8 exit=$?  err=$(head -c 120 "$OUT/a8.err" | tr '\n' ' ')"
 
 note "--- A9: tool loop shell echo (prompt protocol) ---"
-CODEMONKEY_UNBLOCK2_KEY="$KEY" uv run codemonkey exec --sandbox workspace-write --approval never "Use the shell tool to run: echo codemonkey_tool_test. Then reply with exactly the command output." >"$OUT/a9.out" 2>"$OUT/a9.err"
+uv run codemonkey exec --sandbox workspace-write --approval never "Use the shell tool to run: echo codemonkey_tool_test. Then reply with exactly the command output." >"$OUT/a9.out" 2>"$OUT/a9.err"
 grep -q "codemonkey_tool_test" "$OUT/a9.out"; note "A9 exit=$?  out=$(head -c 200 "$OUT/a9.out" | tr '\n' ' ')"
 
 note "--- A10: structured output schema ---"
-CODEMONKEY_UNBLOCK2_KEY="$KEY" uv run codemonkey exec --output-schema build/schema-repo.json --output-last-message /tmp/cm-repo.json "Fill the schema for a repository named codemonkey whose languages are Python." >"$OUT/a10.out" 2>"$OUT/a10.err"
+uv run codemonkey exec --output-schema build/schema-repo.json --output-last-message /tmp/cm-repo.json "Fill the schema for a repository named codemonkey whose languages are Python." >"$OUT/a10.out" 2>"$OUT/a10.err"
 python3 - << 'PY'
 import json
 d = json.load(open("/tmp/cm-repo.json"))
@@ -98,9 +117,9 @@ PY
 note "A10 exit=$?  out=$(head -c 150 "$OUT/a10.out" | tr '\n' ' ')"
 
 note "--- A11: resume with token word ---"
-T=$(CODEMONKEY_UNBLOCK2_KEY="$KEY" uv run codemonkey exec --json "Remember the token word: zebra. Reply with ok." 2>/dev/null | python3 -c 'import sys,json; [print(json.loads(l)["thread_id"]) for l in sys.stdin if l.startswith("{") and "thread.started" in l]' | head -1)
+T=$(uv run codemonkey exec --json "Remember this codeword: zebra. Reply with ok." 2>/dev/null | python3 -c 'import sys,json; [print(json.loads(l)["thread_id"]) for l in sys.stdin if l.startswith("{") and "thread.started" in l]' | head -1)
 note "A11 thread=$T"
-CODEMONKEY_UNBLOCK2_KEY="$KEY" uv run codemonkey exec resume "$T" "What token word did I give you?" >"$OUT/a11.out" 2>"$OUT/a11.err"
+uv run codemonkey exec resume "$T" "What codeword did I ask you to remember?" >"$OUT/a11.out" 2>"$OUT/a11.err"
 grep -q "zebra" "$OUT/a11.out"; note "A11 exit=$?  out=$(head -c 150 "$OUT/a11.out" | tr '\n' ' ')"
 
 note "--- A12: sessions lists the thread ---"
@@ -122,7 +141,7 @@ note "A15 exit=$?  $(tail -1 "$OUT/a15.out")"
 note "--- A16: live review of uncommitted diff ---"
 # ensure there ARE uncommitted changes: touch a scratch file and restore after
 echo "# acceptance sweep scratch" >> README.md 2>/dev/null || printf 'scratch\n' > README.md.scratch
-CODEMONKEY_UNBLOCK2_KEY="$KEY" uv run codemonkey review --uncommitted >"$OUT/a16.out" 2>"$OUT/a16.err"
+uv run codemonkey review --uncommitted >"$OUT/a16.out" 2>"$OUT/a16.err"
 grep -q "verdict" "$(echo $OUT/a16.out | tr 'A-Z' 'a-z')" 2>/dev/null
 CHARS=$(wc -c < "$OUT/a16.out" | xargs)
 [ "$CHARS" -ge 400 ]; note "A16 exit=$? chars=$CHARS (verdict check: $(grep -ci "verdict" "$OUT/a16.out" || true))"

@@ -6,18 +6,6 @@ providers:
     model: Qwen3.8-27B-NVFP4-MTP-VERY-HIGH.gguf
     api_key_env: CODEMONKEY_API_KEY
     tool_protocol: auto
-  unblock:
-    protocol: openai
-    base_url: http://127.0.0.1:3458/v1
-    model: minimax-m3
-    api_key_env: CODEMONKEY_UNBLOCK_KEY
-    tool_protocol: auto
-  unblock2:
-    protocol: openai
-    base_url: http://127.0.0.1:3459/v1
-    model: kimi-k2.7-code
-    api_key_env: CODEMONKEY_UNBLOCK2_KEY
-    tool_protocol: auto
   anthropic:
     protocol: anthropic
     base_url: https://api.anthropic.com
@@ -28,7 +16,7 @@ default_provider: anthropic
 sandbox: workspace-write
 approval: on-request
 max_turns: 30
-timeout_seconds: 300
+timeout_seconds: 240
 add_dirs: []
 web_fetch: false
 context_limit: 32000
@@ -37,7 +25,7 @@ verify_command: ''
 max_verify_retries: 1
 max_edit_retries: 1
 observation_budget: 24000
-repo_map: true
+repo_map: false
 repo_map_budget: 4000
 max_retries: 3
 prompt_cache: true

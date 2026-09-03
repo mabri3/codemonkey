@@ -1,7 +1,10 @@
- TOOL_CALL: {"name": "shell", "arguments": {"command": "echo codemonkey_tool_test"}} <|tool_call_end|> <|tool_calls_section_end|>[usage] prompt=3190 completion=54
-[notice] native turn carried prompt-protocol tool call(s); parsing them
+$ 
+$ 
+$ 
 $ 
 [exit None] 
- codemonkey_tool_test[usage] prompt=3238 completion=49
-[agent]  codemonkey_tool_test
-
+[exit None] 
+[exit None] 
+[exit None] 
+error: stream wall-clock deadline exceeded from http://192.168.50.113:8080/v1/chat/completions (>240s)
+error: stream wall-clock deadline exceeded from http://192.168.50.113:8080/v1/chat/completions (>240s)

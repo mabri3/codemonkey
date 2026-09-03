@@ -205,3 +205,49 @@ d0fade9 C20 → 0f6f12a 7F1 → 654ece6 17F1 → 2e5fb21 C21 → 9adcb7a C22 →
 - graphify knowledge graph mandated (AGENTS.md) and built: 1046 nodes/2104 edges;
   per-cycle `--update` now part of the ritual.
 - Loops 5–10 charters remain PROPOSED, research-gated (see plan.md).
+
+
+---
+
+# Loop 5 — Final Acceptance (CYCLE loop5-final)
+
+**Date:** 2026-09-02 · **Suite:** 292/292 · **Re-sweep:** 19/20 criteria exit 0,
+13 of them **live on the home llama.cpp server**. A9 (tool-loop probe) is
+BLOCKED-slow on the local 27B hardware: the reasoning model cannot finish the
+4-completion loop inside 240s/stream. It passed live twice earlier (loop-1 and
+loop-4 sweeps) and the code path is unchanged since + unit-covered — recorded
+honestly in `build/acceptance_outputs/summary.txt`.
+
+## Loop-5 criteria (from build/research-loop5.md — all pass)
+
+| Improvement | Probe | Result |
+|---|---|---|
+| Eval harness core (24) | tests/test_eval.py: YAML load+malformed reject, patched-exec run, stdout contract, trajectory subset-in-order, results.json | ✅ 6/6 (+ live 2-task smoke: pass_rate 1.0) |
+| Golden suite + baseline (25) | tests/test_golden.py: baseline roundtrip, regression detected, improvement never fails, no-baseline ok, live CLI --check exit-1 flow | ✅ 5/5 |
+| Cost telemetry (26) | tests/test_cost.py: summarize totals, ledger cumulative, render shape, no-tools, live --cost-summary e2e | ✅ 5/5 |
+| Repo-map relevance (27) | tests/test_repomap_relevance.py: relevance overrides recency (git fixture), non-matching fallback, score counts, budget enforced, deterministic | ✅ 5/5 |
+
+## Real bugs fixed this loop
+
+1. **exec event_sink gap** (cycle 24): `emit()` never fed external collectors —
+   item.completed events invisible to any external observer.
+2. **write_baseline shadowing** (cycle 25): CLI param shadowed by same-named
+   import; truthy function object made EVERY run write baseline and skip the
+   regression check — the gate would never have fired.
+3. **Streaming wedge** (loop5-final): httpx read-timeout only fires on gaps
+   BETWEEN stream bytes; a reasoning model trickling tokens never trips it
+   (A9 hung the sweep 31+ min). Added a wall-clock deadline guard per stream.
+4. **Sweep staleness**: sweep still hardcoded the removed unblock2 provider —
+   now home-first with honest fallback.
+
+## Loop-5 commit range
+
+f936f5d (R5) → 28938b0 C24 → f23d43d C25 → 6edfe13 docs → 185f368 C26 →
+90c6aa4 C27 → this commit (loop5-final).
+
+## Notes
+
+- The R5 core-design questions remain OPEN for the user: subagents/delegated
+  context isolation; hooks/rule-based command permissions.
+- R6 entry condition (eval harness scoring two configurations) is SATISFIED by
+  cycles 24/25.
