@@ -170,7 +170,7 @@ def run_turns(
                     messages,
                     system=system,
                     stream=stream,
-                    tools=_native_specs(specs),
+                    tools=_native_specs(specs, provider),
                     on_token=on_token,
                     cache_prompt=prompt_cache,
                 )
@@ -195,10 +195,12 @@ def run_turns(
                 except ProviderError as exc2:
                     if on_event:
                         on_event({"type": "error", "message": str(exc2)})
+                        exc2.reported = True
                     raise
             else:
                 if on_event:
                     on_event({"type": "error", "message": str(exc)})
+                    exc.reported = True
                 raise
 
         if not use_prompt:
@@ -262,7 +264,7 @@ def run_turns(
                         elif native_first:
                             retry = provider.chat(
                                 messages, system=system, stream=stream,
-                                tools=_native_specs(specs), on_token=on_token,
+                                tools=_native_specs(specs, provider), on_token=on_token,
                                 cache_prompt=prompt_cache,
                             )
                         else:
@@ -330,7 +332,14 @@ def run_turns(
             """Execute one parsed call. Returns (idx, name, ok, output, meta)."""
             name = call.get("name", "")
             if on_event:
-                on_event({"type": "tool.started", "name": name})
+                # 51F5: the text renderer prints `$ {item.command}` and
+                # `[exit {item.exit_code}]`, but nothing ever populated those
+                # keys, so every tool trace read `$ ` / `[exit None]` no matter
+                # what ran. Carry the args here and the output below so the
+                # trace shows the real command — the blank trace is what made
+                # the empty-schema tool failure so hard to diagnose.
+                on_event({"type": "tool.started", "name": name,
+                          "args": call.get("args") or {}})
             if call.get("error"):
                 return (idx, name, False, f"error: {call['error']}", None)
             # loop9 cycle 36: rule-based permissions BEFORE the approval gate.
@@ -448,7 +457,8 @@ def run_turns(
             meta = dict(meta or {})
             jkey = meta.pop("_jkey", "")
             if on_event:
-                ev = {"type": "tool.completed", "name": name, "ok": ok}
+                ev = {"type": "tool.completed", "name": name, "ok": ok,
+                      "output": (result_output or "")[:2000]}
                 if meta:
                     ev.update(meta)
                 on_event(ev)
@@ -579,7 +589,8 @@ def run_turns(
     return last_turn
 
 
-def _native_specs(specs: dict) -> list[dict]:
-    from .native import openai_tool_specs
+def _native_specs(specs: dict, provider=None) -> list[dict]:
+    """Native tool array in the wire shape this provider's protocol expects."""
+    from .native import tool_specs_for
 
-    return openai_tool_specs(specs)
+    return tool_specs_for(getattr(provider, "protocol", "openai"), specs)

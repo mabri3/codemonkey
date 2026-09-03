@@ -20,11 +20,19 @@ def run_cli(*args: str, env: dict | None = None, cwd: Path | None = None):
             del e[key]
     if env:
         e.update(env)
+    # 51F4: running from a cwd other than the repo needs --project so uv still
+    # resolves this package. Tests that assert DEFAULTS use a scratch cwd, so a
+    # developer's own ./.env (the documented place to put a key) cannot feed
+    # CODEMONKEY_* values back in behind the env scrub above.
+    run_cwd = cwd or REPO
+    uv_args = ["uv", "run"]
+    if Path(run_cwd).resolve() != REPO:
+        uv_args += ["--project", str(REPO)]
     return subprocess.run(
-        ["uv", "run", "codemonkey", *args],
+        [*uv_args, "codemonkey", *args],
         capture_output=True,
         text=True,
-        cwd=cwd or REPO,
+        cwd=run_cwd,
         env=e,
         timeout=120,
     )
@@ -47,8 +55,10 @@ def test_version_flag():
     assert re.search(r"^codemonkey \d+\.\d+\.\d+(-rc\d+)?$", r.stdout.strip())
 
 
-def test_config_shows_local_defaults():
-    r = run_cli("config")
+def test_config_shows_local_defaults(tmp_path):
+    # Scratch cwd: assert the built-in defaults, not whatever the developer
+    # happens to have in the repo's own .env / .codemonkey.yaml.
+    r = run_cli("config", cwd=tmp_path)
     assert r.returncode == 0, r.stderr
     assert "http://192.168.50.113:8080/v1" in r.stdout
     assert "Qwen3.8-27B-NVFP4-MTP-VERY-HIGH.gguf" in r.stdout

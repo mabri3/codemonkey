@@ -1,1 +1,7 @@
-error: default_provider 'unblock2' is not defined. Valid providers: local, anthropic
+[usage] prompt=4082 completion=62
+$ echo codemonkey_tool_test
+[exit 0] codemonkey_tool_test
+
+codemonkey_tool_test[usage] prompt=4098 completion=76
+[agent] codemonkey_tool_test
+

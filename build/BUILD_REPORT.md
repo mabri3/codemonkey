@@ -629,3 +629,59 @@ condition).
 ## Gate 2 handoff
 The 16-loop arc is complete; codemonkey is at 1.0.0 with an honest acceptance
 record. Gate 2 (user acceptance) is the standing final decision.
+
+---
+
+# CYCLE 51 — FIRST ALL-GREEN LIVE SWEEP (supersedes the BLOCKED record above)
+
+**Date:** 2026-09-03 · **Version:** 1.0.0 · **Suite:** 455 passed / 5 skipped
+· **Sweep:** **A1–A20 all exit 0, ZERO BLOCKED**
+
+The endpoint moved to `192.168.50.176:8080` (unsloth-studio,
+`unsloth/Qwen3.8-27B-GGUF`, 45.6k ctx). This is the first sweep in the project
+run against a reachable model, and it retires the standing re-verification
+condition recorded in the loop-16 closing record above.
+
+## What the live probes found
+
+The nine probes that had been BLOCKED for four loops were not merely
+unverified — three of them were **failing**, and the failure was in the core
+agent loop:
+
+| Probe | Before | After |
+|---|---|---|
+| A4 models | BLOCKED | ✅ |
+| A5 exec pong | BLOCKED | ✅ 6.2s |
+| A6 --json events | BLOCKED | ✅ 5 events |
+| A7 stdin prompt | BLOCKED | ✅ |
+| A9 tool loop | BLOCKED → **RED** (tool never executed) | ✅ verified by trace |
+| A10 structured output | BLOCKED → **RED** (turn-exhausted) | ✅ |
+| A11 resume | BLOCKED → **RED** (context overflow) | ✅ |
+| A12 sessions | BLOCKED | ✅ |
+| A16 review | BLOCKED | ✅ 5170 chars |
+
+Root cause of A9/A10/A11: **51F1** — the native tool protocol advertised all 13
+tools with empty `properties`, so a schema-following model correctly sent `{}`
+and every tool call died. A10 and A11 were downstream of that same loop.
+
+## Honesty note on the prior record
+
+A9 had been graded GREEN in earlier sweeps by a check that grepped stdout for a
+sentinel string the **model** emits while *explaining that the tool failed*
+(51F7). Any earlier "A9 green" row obtained through that check should be read
+as unverified. The probe now requires trace evidence of real execution; the
+saved broken output was replayed against both checks to confirm the old one
+passed it and the new one fails it.
+
+## Gate 2
+
+`loop16-final`'s verify probe ("all green, zero BLOCKED") is satisfied on
+evidence for the first time. Gate 2 (final user acceptance) remains the
+standing decision, now against a complete record.
+
+## Known gap
+
+The Anthropic native tool shape (`input_schema`, fixed in 51F1b) is unit-tested
+only — no Anthropic key was available. Two older closing cycles
+(`loop6-final`, `loop10-final`) remain unchecked in `build/plan.md`; their own
+probes were not re-run in this cycle.

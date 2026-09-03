@@ -417,7 +417,10 @@ def models(
         typer.secho(f"error: {exc}", err=True, fg=typer.colors.RED)
         raise typer.Exit(2) from None
     except ProviderError as exc:
-        typer.secho(f"error: {exc}", err=True, fg=typer.colors.RED)
+        # 51F2: the run's event stream already printed this line; printing it
+        # again here is what made every transport failure report twice.
+        if not getattr(exc, "reported", False):
+            typer.secho(f"error: {exc}", err=True, fg=typer.colors.RED)
         raise typer.Exit(1) from None
 
     if json_out:
@@ -620,7 +623,10 @@ def exec(
         typer.secho(f"error: {exc}", err=True, fg=typer.colors.RED)
         raise typer.Exit(2) from None
     except ProviderError as exc:
-        typer.secho(f"error: {exc}", err=True, fg=typer.colors.RED)
+        # 51F2: the run's event stream already printed this line; printing it
+        # again here is what made every transport failure report twice.
+        if not getattr(exc, "reported", False):
+            typer.secho(f"error: {exc}", err=True, fg=typer.colors.RED)
         raise typer.Exit(1) from None
     except KeyboardInterrupt:
         typer.secho("interrupted", err=True)
@@ -643,7 +649,10 @@ def _run_exec_or_exit(prompt, **kwargs) -> None:
         typer.secho(f"error: {exc}", err=True, fg=typer.colors.RED)
         raise typer.Exit(2) from None
     except ProviderError as exc:
-        typer.secho(f"error: {exc}", err=True, fg=typer.colors.RED)
+        # 51F2: the run's event stream already printed this line; printing it
+        # again here is what made every transport failure report twice.
+        if not getattr(exc, "reported", False):
+            typer.secho(f"error: {exc}", err=True, fg=typer.colors.RED)
         raise typer.Exit(1) from None
     except KeyboardInterrupt:
         typer.secho("interrupted", err=True)

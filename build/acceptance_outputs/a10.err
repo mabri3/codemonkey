@@ -1,1 +1,44 @@
-error: default_provider 'unblock2' is not defined. Valid providers: local, anthropic
+[usage] prompt=4272 completion=136
+$ 
+[exit 0] dir .venv
+dir .pytest_cache
+dir src
+dir .codemonkey
+dir graphify-out
+dir .git
+dir tests
+dir build
+file .python-version 5B
+file .gitignore 239B
+file AGENTS.md 6299B
+file CLAUDE.md 966B
+file SPRINT.md 9949B
+file THREAT_MODEL.md 2684B
+file pyproject.toml 619B
+file CHANGELOG.md 2004B
+file uv.lock 71993B
+file BUILD_LOG.md 98484B
+file features.html 22515B
+file .env 155B
+file README.md 3617B
+[usage] prompt=4455 completion=132
+$ ls src && head -30 build/intent.md 2>/dev/null
+$ 
+[codemonkey] approval required: 'shell' needs approval (policy: on-request). Continued without running it. To allow: run with `--approval never` (or set approval: never in config) to auto-approve, or `--dangerously-bypass-approvals-and-sandbox` to lift both gates
+[exit 1] 
+[exit 0]      1| # codemonkey
+     2| 
+     3| A scriptable, headless coding-agent CLI for **OpenAI-style and Anthropic-style
+     4| endpoints** — built to run unattended against a **local llama.cpp server**
+     5| (~27B-class model, ~32k context), but happy in front of any OpenAI-compatible
+     6| API.
+     7| 
+     8| Python 3.11 · uv · Typer · Rich · httpx · zero LLM SDKs (raw wire protocol).
+     9|
+{
+  "project_name": "codemonkey",
+  "programming_languages": ["Python"],
+  "summary": "CodeMonkey is a scriptable, headless coding-agent CLI written in Python 3.11 (uv, Typer, Rich, httpx) that runs autonomous coding sessions against OpenAI-style and Anthropic-style endpoints — including a local llama.cpp server — using raw wire protocol with zero LLM SDKs. It provides one-shot and resumable exec runs, diff review, session management, execution-journal forensics, checkpoint/undo, an eval harness, and an interactive REPL, backed by 13 tools (shell, file read/write/edit, glob/search, repo_map, web_fetch, plan/memory updates, delegation) governed by rule-based permissions and approval policies. Reliability features include pre-write checkpoints, a verify gate with bounded corrective turns, idempotent mutating tools, auto-compaction strategies, prompt-prefix KV-cache stability, streaming wall-clock guards, observation budgeting with spill-to-disk, retry/backoff, and token/cost telemetry."
+}[usage] prompt=5889 completion=504
+[agent] {   "project_name": "codemonkey",   "programming_languages": [     "Python"   ],
+

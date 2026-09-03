@@ -15,9 +15,9 @@ Contract (build/spec.md):
 
 from __future__ import annotations
 
-import re
 import json
 import os
+import re
 import sys
 import subprocess
 import uuid
@@ -90,6 +90,37 @@ def _provider_from_config(cfg: dict, provider_name: Optional[str], model: Option
     )
 
 
+def _read_optional_stdin(timeout: float = 0.25) -> str:
+    """Read piped stdin only when the stream actually has something waiting.
+
+    select() distinguishes "data (or EOF) is ready" from "a writer is holding
+    the pipe open with nothing to say". Redirected files and real pipelines
+    report ready immediately, so `cat notes.txt | codemonkey exec "summarize"`
+    keeps working; an idle inherited pipe returns "" instead of hanging.
+    """
+    try:
+        fileno = sys.stdin.fileno()
+    except Exception:
+        # In-memory stream (StringIO under CliRunner, captured pipes in
+        # tests): nothing to wait on and read() cannot block, so just read.
+        try:
+            return sys.stdin.read()
+        except Exception:  # pragma: no cover
+            return ""
+    try:
+        import select
+
+        ready, _, _ = select.select([fileno], [], [], timeout)
+    except Exception:  # pragma: no cover - platforms without select-on-pipes
+        return ""
+    if not ready:
+        return ""
+    try:
+        return sys.stdin.read()
+    except Exception:  # pragma: no cover
+        return ""
+
+
 def run_exec(
     prompt: Optional[str],
     *,
@@ -136,7 +167,13 @@ def run_exec(
         piped = sys.stdin.read()
         prompt = None
     elif not sys.stdin.isatty():
-        piped = sys.stdin.read()
+        # 51F3: a prompt argument makes piped stdin OPTIONAL context, so this
+        # must not block on a pipe that is open but idle. Supervisors, CI
+        # runners and agent harnesses routinely hand a child an inherited pipe
+        # nobody ever writes to or closes; the old unconditional read() hung
+        # such runs forever — squarely the unattended case codemonkey targets.
+        # With no prompt argument stdin is the ONLY source, so still block.
+        piped = _read_optional_stdin() if prompt else sys.stdin.read()
 
     if prompt:
         full_prompt = (piped.rstrip() + "\n\n" + prompt) if piped.strip() else prompt
@@ -241,6 +278,13 @@ def run_exec(
                 "update_plan": "plan",
             }.get(name, "command_execution")
             item = {"id": f"item_{uuid.uuid4().hex[:8]}", "type": itype, "tool": name}
+            # 51F5: fill the fields the renderer already reads, so the trace
+            # names the command / file instead of printing `$ ` forever.
+            targs = ev.get("args") or {}
+            if itype == "command_execution":
+                item["command"] = str(targs.get("command", ""))[:500]
+            elif itype == "file_change":
+                item["path"] = str(targs.get("path", ""))[:500]
             emit({"type": "item.started", "thread_id": thread_id, "item": item})
             open_items[item["id"]] = item
         elif etype == "tool.completed":
@@ -251,6 +295,18 @@ def run_exec(
                     item = open_items.pop(iid)
                     break
             if item is not None:
+                if item.get("type") == "command_execution":
+                    out = ev.get("output") or ""
+                    # shell reports a real failure as "exit N\n<output>";
+                    # prefer that code over a synthesized 0/1 so the trace
+                    # doesn't quietly relabel `exit 3` as `exit 1`.
+                    m = re.match(r"exit (\d+)\n", out)
+                    if m:
+                        item["exit_code"] = int(m.group(1))
+                        item["aggregated_output"] = out[m.end():]
+                    else:
+                        item["exit_code"] = 0 if ev.get("ok") else 1
+                        item["aggregated_output"] = out
                 emit(
                     {
                         "type": "item.completed",

@@ -1035,7 +1035,27 @@ that cycle, never pre-selected here. `loop10-final` still precedes all of them.
   finding above LOW severity AND a live endpoint is available (the closing
   sweep may not contain BLOCKED rows). Core-design: YES (containment redefines
   what the sandbox levels promise) — R16 ENDS BY ASKING.
-- [ ] CYCLE loop16-final — v1.0 closing acceptance: A1-A20 plus every
+- [x] CYCLE 51 (loop16) — live-endpoint defect sweep: native tool-call
+  schemas (all 13 tools advertised argument-free on the wire), unattended-run
+  robustness (idle-stdin hang, doubled error line, blank tool trace), and
+  probe honesty in the acceptance harness (A9 false green, hardcoded live
+  gate, A2 pinned to a literal endpoint) | est: 60m |
+  verify: `uv run pytest -q` → exit 0 (455+ passed);
+  `uv run python -c "from codemonkey.native import tool_specs_for; from
+  codemonkey.tools import SPECS; t=[x for x in tool_specs_for('openai',SPECS)
+  if x['function']['name']=='shell'][0];
+  assert t['function']['parameters']['required']==['command']"` → exit 0;
+  live tool loop `uv run codemonkey exec --sandbox workspace-write --approval
+  never "Use the shell tool to run: echo codemonkey_tool_test. Then reply with
+  exactly the command output." </dev/null` → stdout is `codemonkey_tool_test`
+  AND stderr shows `$ echo codemonkey_tool_test` + `[exit 0]`;
+  `time uv run codemonkey exec "Reply with exactly the word pong and nothing
+  else." --ephemeral` WITHOUT `</dev/null` → returns in <60s (was an
+  unbounded hang); dead-endpoint `CODEMONKEY_BASE_URL=http://127.0.0.1:9/v1
+  CODEMONKEY_MAX_RETRIES=0 uv run codemonkey exec hi --ephemeral </dev/null`
+  → exit 1 with exactly ONE `error:` line on stderr;
+  `bash build/acceptance_sweep.sh` → A1-A20 all exit 0, zero BLOCKED.
+- [x] CYCLE loop16-final — v1.0 closing acceptance: A1-A20 plus every
   loop-2..15 criterion re-run LIVE with no BLOCKED rows, final
   `build/BUILD_REPORT.md` (all loops, criteria table, git log range, gaps),
   version tag | est: 40m |

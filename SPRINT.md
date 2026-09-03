@@ -111,6 +111,22 @@ asking; BLOCKED unless two providers are reachable) · R15 operator surface +
 observability · R16 hardening/release/v1.0 (core design — ends by asking) +
 `loop16-final` closing acceptance with zero BLOCKED rows.
 
+CYCLE 51 (loop16, 2026-09-03) — first sweep run against a reachable endpoint
+after the outage; the live probes exposed defects the BLOCKED rows had been
+hiding: 51F1 (native tool protocol advertised all 13 tools with empty
+`properties`, so schema-following models sent `{}` and every tool call died —
+the tool loop was dead) · 51F2 (transport errors printed twice: event stream +
+CLI catch-all) · 51F3 (`exec PROMPT` blocked forever on an inherited-but-idle
+stdin pipe, breaking unattended invocation) · 51F4 (`test_config` defaults
+scrubbed `CODEMONKEY_*` from the env but ran in-repo, so a developer's own
+`.env` — the documented key location — fed them back and turned the suite red)
+· 51F5 (tool trace printed `$ ` / `[exit None]` because nothing populated the
+fields the renderer reads) · 51F6 (sweep live-gate hardcoded the old host, so
+it recorded BLOCKED even with a healthy configured endpoint) · 51F7 (A9 graded
+a completely broken tool loop GREEN — it grepped stdout for a sentinel the
+MODEL narrates; a "never fake a probe" violation) · 51F8 (A2 pinned a literal
+host+model, so the documented `.env` workflow failed it).
+
 Review gates (cycles 3, 6, 9 of loop 1): after committing that cycle,
 dispatch a fresh-context critic (delegate_task) with goal "check the
 accumulated diff (git diff since commit before cycle 1) against

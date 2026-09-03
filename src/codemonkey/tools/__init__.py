@@ -52,6 +52,158 @@ SPECS = {
 }
 
 
+# JSON Schema for each tool's arguments, fed to the provider-native tool
+# protocols (OpenAI `parameters` / Anthropic `input_schema`).
+#
+# 51F1: these used to be omitted entirely — native.openai_tool_specs sent
+# `{"type": "object", "properties": {}}` for every tool, so the wire schema
+# told the model the tools took NO arguments. Models that follow the declared
+# schema (rather than guessing from the SPECS prose) correctly answered with
+# `{}`, and every call died on a KeyError — e.g. shell's args["command"]
+# surfacing as `error: 'command'`. The one-line SPECS strings stay as the
+# human-readable descriptions; the machine-readable contract lives here.
+def _s(desc: str) -> dict:
+    return {"type": "string", "description": desc}
+
+
+def _i(desc: str, default: int) -> dict:
+    return {"type": "integer", "description": f"{desc} (default {default})"}
+
+
+PARAMS: dict[str, dict] = {
+    "read_file": {
+        "type": "object",
+        "properties": {
+            "path": _s("File to read, relative to the workspace root."),
+            "offset": _i("1-based first line to read.", 1),
+            "limit": _i("Maximum number of lines to return.", 2000),
+        },
+        "required": ["path"],
+    },
+    "write_file": {
+        "type": "object",
+        "properties": {
+            "path": _s("File to write, relative to the workspace root."),
+            "content": _s("Full new contents; overwrites the whole file."),
+        },
+        "required": ["path", "content"],
+    },
+    "edit_file": {
+        "type": "object",
+        "properties": {
+            "path": _s("File to edit (single-edit form)."),
+            "old_string": _s("Exact text to replace; must match uniquely."),
+            "new_string": _s("Replacement text."),
+            "replace_all": {
+                "type": "boolean",
+                "description": "Replace every occurrence instead of requiring a unique match.",
+            },
+            "patch": _s("SREP search/replace block, as an alternative to old_string/new_string."),
+            "edits": {
+                "type": "array",
+                "description": "Batched multi-file edits, applied atomically (all-or-nothing).",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "path": _s("File to edit."),
+                        "patch": _s("SREP block for this file."),
+                        "search": _s("Exact text to find."),
+                        "replace": _s("Replacement text."),
+                    },
+                    "required": ["path"],
+                },
+            },
+        },
+    },
+    "list_dir": {
+        "type": "object",
+        "properties": {"path": _s("Directory to list (default '.').")},
+    },
+    "glob": {
+        "type": "object",
+        "properties": {
+            "pattern": _s("Glob pattern, e.g. '**/*.py'."),
+            "path": _s("Directory to search from (default '.')."),
+            "limit": _i("Maximum paths to return.", 100),
+        },
+        "required": ["pattern"],
+    },
+    "search": {
+        "type": "object",
+        "properties": {
+            "pattern": _s("Regular expression to search for."),
+            "path": _s("Directory to search from (default '.')."),
+            "file_glob": _s("Restrict matches to files matching this glob."),
+            "limit": _i("Maximum matches to return.", 50),
+        },
+        "required": ["pattern"],
+    },
+    "shell": {
+        "type": "object",
+        "properties": {
+            "command": _s("Shell command to run via `bash -lc` in the workspace."),
+        },
+        "required": ["command"],
+    },
+    "delegate": {
+        "type": "object",
+        "properties": {
+            "task": _s("Task for the isolated child run."),
+            "role": _s("Child role, e.g. 'implementer' or 'reviewer'."),
+            "review_rounds": _i("Adversarial review rounds to run.", 0),
+            "sandbox": _s("Sandbox policy for the child run."),
+        },
+        "required": ["task"],
+    },
+    "delegate_batch": {
+        "type": "object",
+        "properties": {
+            "tasks": {
+                "type": "array",
+                "description": "Tasks to run as isolated child runs; results come back in call order.",
+                "items": {"type": "string"},
+            },
+        },
+        "required": ["tasks"],
+    },
+    "repo_map": {
+        "type": "object",
+        "properties": {
+            "path": _s("Directory to scan (default '.')."),
+            "pattern": _s("Only report symbols matching this pattern."),
+            "limit": _i("Maximum symbols to return.", 200),
+        },
+    },
+    "update_memory": {
+        "type": "object",
+        "properties": {"fact": _s("Durable fact to append to memory.")},
+        "required": ["fact"],
+    },
+    "update_plan": {
+        "type": "object",
+        "properties": {
+            "mode": {
+                "type": "string",
+                "enum": ["append", "replace", "clear"],
+                "description": "How to apply this update (default 'append').",
+            },
+            "content": _s("Plan item text."),
+            "id": _s("Plan item id; defaults to the next free id."),
+            "status": {
+                "type": "string",
+                "enum": ["pending", "in_progress", "completed"],
+                "description": "Item status (default 'pending').",
+            },
+        },
+    },
+    "web_fetch": {
+        "type": "object",
+        "properties": {"url": _s("URL to GET (bounded: 60s, 512KB).")},
+        "required": ["url"],
+    },
+}
+
+
 def names() -> list[str]:
     return list(_MODULES)
 
@@ -84,4 +236,4 @@ def dispatch(name: str, args: dict, ctx):
         cp_mod.end_call()
 
 
-__all__ = ["names", "dispatch", "SPECS", "_MODULES"]
+__all__ = ["names", "dispatch", "SPECS", "PARAMS", "_MODULES"]

@@ -13,12 +13,27 @@ note() { printf '%s\n' "$1" | tee -a "$OUT/summary.txt"; }
 # local provider. Fallback to the (removed-from-defaults) unblock2 provider only
 # if home inference is wedged again — the key is env-injected per process and
 # never written to disk.
+# 51F6: this probe used to hardcode http://192.168.50.113:8080 and the old
+# model name, so it reported the live probes BLOCKED even when a perfectly
+# healthy endpoint was configured (the endpoint moved to another host and the
+# sweep could not see it). Probe whatever the EFFECTIVE config resolves to,
+# through codemonkey's own provider layer, so the gate follows configuration
+# instead of a literal that silently rots.
 HOME_ALIVE=$(uv run python -c "
-import httpx
+from codemonkey.config import load_config, resolve_api_key
+from codemonkey.providers import build_provider
 try:
-    r = httpx.post('http://192.168.50.113:8080/v1/chat/completions',
-        json={'model':'Qwen3.8-27B-NVFP4-MTP-VERY-HIGH.gguf','messages':[{'role':'user','content':'Reply with exactly: pong'}],'max_tokens':200}, timeout=30)
-    print('pong' if 'pong' in (r.json()['choices'][0]['message'].get('content') or '') else 'dead')
+    cfg = load_config()
+    name = cfg.get('default_provider') or 'local'
+    pconf = (cfg.get('providers') or {}).get(name) or {}
+    prov = build_provider(
+        pconf.get('protocol', 'openai'), pconf.get('base_url', ''),
+        pconf.get('model', ''), api_key=resolve_api_key(cfg, name),
+        timeout=30, max_retries=0,
+    )
+    turn = prov.chat([{'role': 'user', 'content': 'Reply with exactly: pong'}],
+                     max_tokens=200)
+    print('pong' if 'pong' in (turn.content or '').lower() else 'dead')
 except Exception:
     print('dead')
 " 2>/dev/null || echo dead)
@@ -79,7 +94,17 @@ uv run codemonkey --version >"$OUT/a1.out" 2>"$OUT/a1.err"; note "A1 exit=$? out
 # A2
 note "--- A2: config contains local/llama endpoints, no sk- secrets ---"
 uv run codemonkey config >"$OUT/a2.out" 2>"$OUT/a2.err"
-grep -q "local" "$OUT/a2.out" && grep -q "192.168.50.113:8080/v1" "$OUT/a2.out" && grep -q "Qwen3.8-27B-NVFP4-MTP-VERY-HIGH.gguf" "$OUT/a2.out" && ! grep -qE "sk-[A-Za-z0-9]" "$OUT/a2.out"; note "A2 exit=$?"
+# 51F8: this pinned the literal default host+model, so the DOCUMENTED way to
+# supply a key (./.env, which config.py loads as a first-class source) turned
+# A2 red purely for pointing at a different endpoint. The durable contract is
+# what A2 is really for: a local provider is configured, it has a real
+# endpoint and model, and NO secret value is ever rendered. The resolved
+# endpoint is echoed into the summary so a change stays visible.
+grep -q "local" "$OUT/a2.out" \
+  && grep -qE "base_url: https?://" "$OUT/a2.out" \
+  && grep -qE "^\s+model: \S" "$OUT/a2.out" \
+  && ! grep -qE "sk-[A-Za-z0-9]" "$OUT/a2.out"
+note "A2 exit=$?  endpoint=$(grep -m1 'base_url:' "$OUT/a2.out" | tr -d ' ')  model=$(grep -m1 'model:' "$OUT/a2.out" | tr -d ' ')"
 
 # A3
 note "--- A3: env override ---"
@@ -142,7 +167,16 @@ grep -q "git repository" "$OUT/a8.err" && grep -q "skip-git-repo-check" "$OUT/a8
 note "--- A9: tool loop shell echo (prompt protocol) ---"
 if ! live_blocked A9; then
 uv run codemonkey exec --sandbox workspace-write --approval never "Use the shell tool to run: echo codemonkey_tool_test. Then reply with exactly the command output." >"$OUT/a9.out" 2>"$OUT/a9.err"
-grep -q "codemonkey_tool_test" "$OUT/a9.out"; note "A9 exit=$?  out=$(head -c 200 "$OUT/a9.out" | tr '\n' ' ')"
+# 51F7: this used to be a bare grep of stdout for the sentinel — but the
+# MODEL echoes that string while EXPLAINING that the tool failed, so a run
+# where the shell tool was completely broken still graded green. Require
+# evidence the tool actually executed: the trace must show the real command
+# and a zero exit, not just the word appearing somewhere in the prose.
+grep -q "codemonkey_tool_test" "$OUT/a9.out" \
+  && grep -q "echo codemonkey_tool_test" "$OUT/a9.err" \
+  && grep -q "\[exit 0\]" "$OUT/a9.err" \
+  && ! grep -q "error: 'command'" "$OUT/a9.err"
+note "A9 exit=$?  out=$(head -c 200 "$OUT/a9.out" | tr '\n' ' ')"
 fi
 
 note "--- A10: structured output schema ---"

@@ -1777,3 +1777,66 @@ satisfies the core-design stop-and-ask without changing sandbox semantics).
 **Completed:** hardening shipped (redaction, supply chain, THREAT_MODEL),
 closing sweep honest (11 offline green, 9 live BLOCKED — home down 4th time),
 v1.0.0 tagged. Suite 435/435+. THE 16-LOOP ARC IS COMPLETE.
+
+## 2026-09-03 — CYCLE 51 (loop16): live-endpoint defect sweep — the tool loop was dead
+
+**Context:** the endpoint moved to `192.168.50.176:8080` (unsloth-studio,
+`unsloth/Qwen3.8-27B-GGUF`). This is the FIRST sweep run against a reachable
+model since the outage began, and it immediately exposed defects the BLOCKED
+rows had been masking for four loops.
+
+**Completed — 8 findings, all fixed and probe-verified:**
+
+- **51F1 (severity: the agent did not work)** — `native.openai_tool_specs`
+  emitted `{"type":"object","properties":{}}` for all 13 tools, so the wire
+  schema claimed every tool takes NO arguments; argument names existed only as
+  prose in `SPECS`. A schema-following model correctly answered `{}` and every
+  call died (`shell` → `args["command"]` → `error: 'command'`), looping until
+  timeout. A/B proved it live: empty schema → `args: {}` ×14; real schema →
+  `{"command":"echo codemonkey_tool_test"}` first try. Added `tools.PARAMS`
+  (JSON Schema for all 13) + `native.tool_specs_for(protocol, ...)`.
+  Previously masked because older models guessed the args from the prose.
+- **51F1b** — `_native_specs` always built the OpenAI nesting, even for
+  `protocol: anthropic`, which needs flat `{name, description, input_schema}`.
+  Added `anthropic_tool_specs`; the loop now dispatches on `provider.protocol`.
+  NOT verified live (no Anthropic key available) — shape-checked by unit test.
+- **51F2** — transport failures printed the same `error:` line twice (loop
+  event stream + CLI catch-all). `ProviderError.reported` now marks what the
+  stream already showed.
+- **51F3** — `exec PROMPT` ran `sys.stdin.read()` whenever stdin was not a
+  TTY, so an inherited-but-idle pipe hung the run forever — exactly the
+  unattended case codemonkey exists for. Optional stdin is now `select`-polled
+  (`_read_optional_stdin`); `exec -` and `cat x | exec "prompt"` unchanged.
+- **51F4** — `test_config_shows_local_defaults` scrubbed `CODEMONKEY_*` from
+  the env but ran in-repo, so `./.env` (the documented key location) fed them
+  straight back and turned the suite red. Now runs from a scratch cwd via
+  `uv run --project`.
+- **51F5** — the text renderer reads `item.command` / `item.exit_code` /
+  `item.aggregated_output`, but nothing ever populated them: every trace read
+  `$ ` / `[exit None]`. This is what made 51F1 so hard to read. Tool events now
+  carry args + output; the real exit code is parsed from the shell tool's
+  `exit N` prefix rather than synthesized 0/1 (verified: `[exit 3]`).
+- **51F6** — the sweep's live gate hardcoded `192.168.50.113` + the old model,
+  so it reported BLOCKED even with a healthy configured endpoint. It now probes
+  the effective config through codemonkey's own provider layer.
+- **51F7 (contract violation)** — A9 graded a COMPLETELY BROKEN tool loop
+  GREEN: it grepped stdout for a sentinel the MODEL echoes while explaining the
+  tool failed. Directly violates "Never fake a probe". Now requires trace
+  evidence (`$ echo ...` + `[exit 0]`, no `error: 'command'`). Proved against
+  the saved broken output: old check exit 0, new check exit 1.
+- **51F8** — A2 pinned the literal default host+model, so the documented `.env`
+  workflow failed it. Now asserts the durable contract (local provider, real
+  endpoint, model present, NO secret rendered — that assertion kept strict) and
+  echoes the resolved endpoint into the summary.
+
+**Tests:** 455 passed, 5 skipped (was 435; +20 across `tests/test_tool_schema.py`
+and `tests/test_exec_robustness.py`).
+
+**Acceptance:** `bash build/acceptance_sweep.sh` → **A1–A20 all exit 0, ZERO
+BLOCKED** — the first all-green live sweep of the project. A9/A10/A11 pass live
+for the first time (A11's context overflow was downstream of the 51F1 tool
+loop). Secret hygiene re-checked: the key value appears in NO tracked file.
+
+**This satisfies `loop16-final`'s verify probe** ("all green, zero BLOCKED"),
+which was unsatisfiable while the endpoint was unreachable; both it and CYCLE
+51 are now marked `[x]` on evidence rather than on a note.

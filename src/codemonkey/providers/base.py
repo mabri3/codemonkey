@@ -12,6 +12,9 @@ class ProviderError(Exception):
     def __init__(self, message: str, status: Optional[int] = None):
         super().__init__(message)
         self.status = status
+        # 51F2: set once the message has been surfaced through the event
+        # stream, so the CLI's catch-all doesn't print the same line twice.
+        self.reported = False
 
 
 class AuthError(ProviderError):

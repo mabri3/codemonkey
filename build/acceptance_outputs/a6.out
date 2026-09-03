@@ -1,0 +1,5 @@
+{"type": "thread.started", "thread_id": "1dbf254b1f25"}
+{"type": "turn.started", "thread_id": "1dbf254b1f25"}
+{"type": "turn.completed", "usage": {"completion_tokens": 36, "prompt_tokens": 4070, "total_tokens": 4106, "prompt_tokens_details": {"cached_tokens": 0}, "cached_tokens": 0}}
+{"type": "item.completed", "thread_id": "1dbf254b1f25", "item": {"id": "item_65fd2191", "type": "reasoning", "text": "The user is asking me to reply with exactly the word \"pong\" and nothing else. This is a simple test. I should just reply \"pong\".\n"}}
+{"type": "item.completed", "thread_id": "1dbf254b1f25", "item": {"id": "item_1d298afa", "type": "agent_message", "text": "pong"}}

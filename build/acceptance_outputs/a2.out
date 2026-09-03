@@ -2,10 +2,11 @@
 providers:
   local:
     protocol: openai
-    base_url: http://192.168.50.113:8080/v1
-    model: Qwen3.8-27B-NVFP4-MTP-VERY-HIGH.gguf
+    base_url: http://192.168.50.176:8080/v1
+    model: unsloth/Qwen3.8-27B-GGUF
     api_key_env: CODEMONKEY_API_KEY
     tool_protocol: auto
+    api_key: '***'
   anthropic:
     protocol: anthropic
     base_url: https://api.anthropic.com
@@ -16,7 +17,7 @@ default_provider: local
 sandbox: workspace-write
 approval: on-request
 max_turns: 30
-timeout_seconds: 300
+timeout_seconds: 240
 add_dirs: []
 web_fetch: false
 context_limit: 32000

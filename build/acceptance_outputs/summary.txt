@@ -1,39 +1,40 @@
-=== acceptance sweep 2026-09-03 10:26:31 ===
-home wedged and no fallback provider configured (6F4 removed unblock2) — live-LLM probes recorded BLOCKED; offline probes run normally
+=== acceptance sweep 2026-09-03 16:01:22 ===
+live-LLM probes via provider: local (home llama.cpp, live)
 --- A1: --version ---
 A1 exit=0 out=codemonkey 1.0.0
 --- A2: config contains local/llama endpoints, no sk- secrets ---
-A2 exit=0
+A2 exit=0  endpoint=base_url:http://192.168.50.176:8080/v1  model=model:unsloth/Qwen3.8-27B-GGUF
 --- A3: env override ---
 A3 exit=0
 --- A4: models (live, default provider local; unblock2 fallback) ---
-A4 BLOCKED (home llama.cpp wedged; no fallback provider configured)
+A4 exit=0 (live local)
 --- A5: exec pong ---
-A5 BLOCKED (home llama.cpp wedged; no fallback provider configured)
+A5 exit=0  out=pong 
 --- A6: exec --json events ---
-A6 BLOCKED (home llama.cpp wedged; no fallback provider configured)
+A6 exit=0
 --- A7: stdin-as-prompt banana ---
-A7 BLOCKED (home llama.cpp wedged; no fallback provider configured)
+A7 exit=0  out=banana 
 --- A8: non-git dir guard ---
-A8 exit=0  err=error: '/private/var/folders/xb/kzc31shn1pz2s_5l2fy6d7rh0000gn/T/tmp.Wfs17QSkev' is not inside a git repository; use --s
+A8 exit=0  err=error: '/private/var/folders/xb/kzc31shn1pz2s_5l2fy6d7rh0000gn/T/tmp.Pnbl1pcfvv' is not inside a git repository; use --s
 --- A9: tool loop shell echo (prompt protocol) ---
-A9 BLOCKED (home llama.cpp wedged; no fallback provider configured)
+A9 exit=0  out=codemonkey_tool_test 
 --- A10: structured output schema ---
-A10 BLOCKED (home llama.cpp wedged; no fallback provider configured)
+A10 exit=0  out={   "project_name": "codemonkey",   "programming_languages": [     "Python"   ],   "summary": "CodeMonkey is a scriptable, headless coding-agent CLI w
 --- A11: resume with token word ---
-A11 BLOCKED (home llama.cpp wedged; no fallback provider configured)
+A11 thread=a66abf1f0009
+A11 exit=0  out=The codeword you asked me to remember is **zebra**. 
 --- A12: sessions lists the thread ---
-A12 BLOCKED (home llama.cpp wedged; no fallback provider configured)
+A12 exit=0
 --- A13: anthropic provider selection ---
 A13 exit=0
 --- A14: anthropic unit tests ---
 A14 exit=0  13 passed in 0.02s
 --- A15: full suite ---
-A15 exit=0  435 passed, 5 skipped in 44.04s
+A15 exit=0  455 passed, 5 skipped in 13.94s
 --- A16: live review of uncommitted diff ---
-A16 BLOCKED (home llama.cpp wedged; no fallback provider configured)
+A16 exit=0 chars=5170 (verdict check: 0)
 --- A17: sandbox unit tests (incl. read-only denies write_file+shell) ---
-A17 exit=0  13 passed in 0.15s  (denial coverage: 9 assertion sites)
+A17 exit=0  13 passed in 0.19s  (denial coverage: 9 assertion sites)
 --- A18: help lists the five commands ---
 A18 exit=0
 --- A19: strategy selector + invalid exit 2 ---
