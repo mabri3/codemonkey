@@ -67,7 +67,15 @@ def dispatch(name: str, args: dict, ctx):
         check(name, ctx)
     except SandboxError as e:
         return ToolResult(output=f"sandbox-denied: {e}", ok=False)
-    return mod.run(args, ctx)
+    # 14F1: every file snapshotted by this call joins ONE checkpoint group, so
+    # `codemonkey undo` reverses a multi-file edit whole instead of in part.
+    from .. import checkpoints as cp_mod
+
+    cp_mod.begin_call()
+    try:
+        return mod.run(args, ctx)
+    finally:
+        cp_mod.end_call()
 
 
 __all__ = ["names", "dispatch", "SPECS", "_MODULES"]

@@ -1538,3 +1538,22 @@ build/plan.md, features.html.
 `uv run pytest -q` → **353 passed, 4 skipped**.
 
 **Next:** CYCLE 14F1 — one checkpoint group per tool call.
+
+## 2026-09-03 — CYCLE 14F1 (critic-loop8 finding 4): one checkpoint per tool call
+
+**Completed:** `_save()` opened a NEW checkpoint per file, so a batch edit over
+2 files produced 2 groups and `undo` restored only the newest — a torn undo of
+an atomic change (reproduced: `[['b.txt'], ['a.txt']]`, undo left `a.txt`
+modified). `checkpoints` gained a thread-local call scope
+(`begin_call`/`end_call`/`current_checkpoint`) that `tools.dispatch` opens
+around every tool call; concurrent calls in one turn (cycle 12) still get their
+own groups.
+
+**Files:** src/codemonkey/checkpoints.py, src/codemonkey/tools/base.py,
+src/codemonkey/tools/__init__.py, tests/test_checkpoints.py, build/plan.md,
+features.html.
+
+**Tests:** `uv run pytest tests/test_checkpoints.py -q` → 9 passed (3 new);
+`uv run pytest -q` → **356 passed, 4 skipped**.
+
+**Next:** CYCLE 14F2 — scope checkpoints to their workspace.

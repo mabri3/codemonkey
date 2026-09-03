@@ -699,7 +699,7 @@ journal key semantics that cycle 36-38 will build on.
   tests (two edits on one file both land; a failing second edit on the same
   file writes nothing; outcome lists each file once); `uv run pytest -q` →
   exit 0.
-- [ ] CYCLE 14F1 — critic finding 4 (MED): `_save` opens a NEW checkpoint per
+- [x] CYCLE 14F1 — critic finding 4 (MED): `_save` opens a NEW checkpoint per
   file, so `undo` after a multi-file (atomic) edit restores one file and leaves
   the rest modified. Group every snapshot taken during one tool call into one
   checkpoint | est: 25m |

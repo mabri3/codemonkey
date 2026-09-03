@@ -90,3 +90,47 @@ def test_new_file_write_makes_no_snapshot(env):
 def test_no_checkpoints_restore_raises(env):
     with pytest.raises(LookupError):
         cp_mod.restore_latest(env["tmp"])
+
+
+# -- CYCLE 14F1 (critic-loop8 finding 4) ---------------------------------
+# One checkpoint group per TOOL CALL: a multi-file atomic edit used to create
+# one group per file, so `undo` restored a single file and left the rest
+# modified — a torn undo of an "atomic" change.
+
+def test_batch_edit_makes_one_checkpoint_group(env):
+    tmp = env["tmp"]
+    (tmp / "m1.txt").write_text("one\n")
+    (tmp / "m2.txt").write_text("two\n")
+    r = dispatch("edit_file", {"edits": [
+        {"path": "m1.txt", "search": "one", "replace": "ONE"},
+        {"path": "m2.txt", "search": "two", "replace": "TWO"},
+    ]}, _ctx_of(tmp))
+    assert r.ok, r.output
+    cps = cp_mod.list_checkpoints()
+    assert len(cps) == 1
+    assert sorted(cps[0]["files"]) == ["m1.txt", "m2.txt"]
+
+
+def test_undo_restores_every_file_of_a_batch(env):
+    tmp = env["tmp"]
+    (tmp / "m1.txt").write_text("one\n")
+    (tmp / "m2.txt").write_text("two\n")
+    dispatch("edit_file", {"edits": [
+        {"path": "m1.txt", "search": "one", "replace": "ONE"},
+        {"path": "m2.txt", "search": "two", "replace": "TWO"},
+    ]}, _ctx_of(tmp))
+    restored = cp_mod.restore_latest(tmp)["restored"]
+    assert sorted(restored) == ["m1.txt", "m2.txt"]
+    assert (tmp / "m1.txt").read_text() == "one\n"
+    assert (tmp / "m2.txt").read_text() == "two\n"
+
+
+def test_separate_calls_stay_separate_groups(env):
+    tmp = env["tmp"]
+    (tmp / "s1.txt").write_text("a\n")
+    (tmp / "s2.txt").write_text("b\n")
+    dispatch("write_file", {"path": "s1.txt", "content": "A\n"}, _ctx_of(tmp))
+    time.sleep(0.02)
+    dispatch("write_file", {"path": "s2.txt", "content": "B\n"}, _ctx_of(tmp))
+    cps = cp_mod.list_checkpoints()
+    assert [c["files"] for c in cps] == [["s2.txt"], ["s1.txt"]]

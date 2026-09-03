@@ -19,6 +19,7 @@ declared targets (write/edit), which are the autonomous-run workhorses.
 from __future__ import annotations
 
 import shutil
+import threading
 import time
 import uuid
 from pathlib import Path
@@ -60,6 +61,36 @@ class Checkpoint:
 def new_checkpoint() -> Checkpoint:
     stamp = time.strftime("%Y%m%d-%H%M%S")
     return Checkpoint(checkpoints_dir() / f"{stamp}-{uuid.uuid4().hex[:6]}")
+
+
+# 14F1 (critic-loop8 finding 4): a checkpoint used to be opened PER FILE, so
+# one logical change spread over N files became N groups and `undo` restored
+# only the newest — a torn undo of an "atomic" multi-file edit. Snapshots taken
+# during one tool call now share one group. Thread-local because independent
+# tool calls in a turn run concurrently (cycle 12) and must not share a group.
+_call = threading.local()
+
+
+def begin_call() -> None:
+    """Open a call scope: every snapshot until end_call() shares one group."""
+    _call.active = True
+    _call.cp = None
+
+
+def end_call() -> None:
+    _call.active = False
+    _call.cp = None
+
+
+def current_checkpoint() -> Checkpoint:
+    """The group for the tool call in flight (a fresh one outside any call)."""
+    if getattr(_call, "active", False):
+        cp = getattr(_call, "cp", None)
+        if cp is None:
+            cp = new_checkpoint()
+            _call.cp = cp
+        return cp
+    return new_checkpoint()
 
 
 def list_checkpoints(base: Path | None = None) -> list[dict]:

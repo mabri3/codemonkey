@@ -44,7 +44,7 @@ def _save(path, data, ctx) -> str:
         from .. import checkpoints as cp_mod
 
         if rp.is_file():
-            cp = cp_mod.new_checkpoint()
+            cp = cp_mod.current_checkpoint()  # 14F1: one group per tool call
             cp.snapshot_file(Path(ctx.workdir).resolve(),
                              str(rp.relative_to(Path(ctx.workdir).resolve())),
                              rp.read_bytes())
