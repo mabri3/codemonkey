@@ -1597,3 +1597,17 @@ features.html.
 standalone run), A17-A20 → green; A4-A7, A9-A12, A16 → BLOCKED with reason.
 
 **Next:** CYCLE loop8-critic-final.
+
+## 2026-09-03 — CYCLE loop8-critic-final: fix-cycle acceptance
+
+**Completed:** all seven fix cycles verified together. `uv run pytest -q` →
+**360 passed, 4 skipped**. `bash build/acceptance_sweep.sh` (home wedged):
+A1-A3, A8, A13-A15, A17-A20 green; A4-A7, A9-A12, A16 recorded BLOCKED with the
+reason (never faked). `build/BUILD_REPORT.md` gained the critic-gate section
+with the findings→cycles table and the commit range.
+
+**Known gap carried forward:** the live-LLM criteria (last green live in
+loop4-final) must be re-run before Gate 2 once the home server recovers.
+
+**Next:** loops 11-16 research charters (proposal), then the unbuilt loop-9
+cycles 36-38.

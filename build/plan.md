@@ -726,7 +726,7 @@ journal key semantics that cycle 36-38 will build on.
   A14, A15, A17-A20 all green (A15 matching the standalone `uv run pytest -q`
   count) and every live probe recorded `BLOCKED (home llama.cpp wedged; no
   fallback provider configured)` — no probe reported green off a stale file.
-- [ ] CYCLE loop8-critic-final — fix-cycle acceptance: re-run the loops-5-8
+- [x] CYCLE loop8-critic-final — fix-cycle acceptance: re-run the loops-5-8
   criteria touched by the six fixes plus the full suite; append the outcome to
   `build/BUILD_REPORT.md` | est: 20m |
   verify: `uv run pytest -q` → exit 0; `bash build/acceptance_sweep.sh`

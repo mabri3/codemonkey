@@ -321,3 +321,43 @@ httpx.Client per instance — pooling present by construction).
 - Loop 9 (governance) opens next with BOTH R5 core-design items folded in:
   rule-based command permissions (hooks) and subagents/delegated context
   isolation — authorized by the user's blanket loop 6-10 approval.
+
+
+---
+
+# Critic gate — loops 5-8 review + fix cycles (2026-09-03)
+
+**Report:** `build/critic-loop8.md` (9 findings, each reproduced with a
+runnable probe before filing). **Suite:** 360 passed, 4 skipped (the 4 are the
+honest `requires_home` skips; the home llama.cpp server is wedged again).
+
+## Findings → fix cycles
+
+| # | Sev | What was wrong | Fix cycle | Probe |
+|---|---|---|---|---|
+| 1 | HIGH | exec re-persisted the whole message stack on resume (2^n growth) and never persisted the final assistant answer | 7F2 | tests/test_sessions_persist.py → 6/6 |
+| 2 | HIGH | `journal_thread` had no production caller — the entire loop-7 journal/idempotency/forensics stack was inert; wiring it naively would have let a resumed thread replay a previous run's write | 31F1 | tests/test_journal_wiring.py → 7/7 (mutation-verified) |
+| 3 | MED | batched edits on the SAME file were planned from separate disk reads; the earlier edit was silently discarded | 34F1 | tests/test_batch_edit.py → 10/10 |
+| 4 | MED | one checkpoint per file, so `undo` of a multi-file atomic edit restored one file | 14F1 | tests/test_checkpoints.py → 9/9 |
+| 5 | MED | checkpoints carried no workspace identity — `undo` in repo B could restore repo A's files | 14F2 | tests/test_checkpoints.py → 13/13 |
+| 6 | LOW | the cycle-35 slim stat was journaled from an unbound name; the `NameError` was swallowed | 35F1 | tests/test_slim.py → 6/6 |
+| 7 | HIGH | the sweep's home-down branch selected the provider 6F4 deleted, reporting RED for offline criteria (A15 `29 failed` vs a clean 360 passed) | SWEEP-F1 | sweep re-run |
+| 8 | HIGH | A10 graded a stale `/tmp/cm-repo.json` — a false green | SWEEP-F1 | sweep re-run |
+| 9 | LOW | A19's invalid-name check read `$?` after a grep and grepped a file never written | SWEEP-F1 | sweep re-run |
+
+## Acceptance state after the fix cycles (sweep, home down)
+
+| Criterion | Result |
+|---|---|
+| A1, A2, A3, A8, A13, A14, A17, A18, A19, A20 | ✅ green |
+| A15 (full suite) | ✅ 360 passed, 4 skipped |
+| A4-A7, A9-A12, A16 (live-LLM) | ⛔ BLOCKED — home llama.cpp wedged and no fallback provider configured (6F4 removed `unblock2`). Recorded, never faked. |
+
+The live-LLM criteria were last verified green in loop4-final (all A1-A20 live
+on the home server) and loop5-final (19/20, A9 BLOCKED-slow). They must be
+re-run before Gate 2 acceptance once the home server is back.
+
+## Commit range
+
+d0992a1 (7F2) → e358858 (31F1) → de1951d (35F1) → e37bc25 (34F1) →
+e935627 (14F1) → 624d81d (14F2) → b3b8c08 (SWEEP-F1) → this commit.
