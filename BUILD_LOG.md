@@ -1428,3 +1428,11 @@ sweep fallback records honestly. BUILD_REPORT loop-7 section written.
 and deterministic tool-output slimming (35). Transport reuse verified as
 already-present (documented); cache payoff already shipped (cycle 29); model
 routing deferred (single home server).
+
+## 2026-09-02 — CYCLE 34 (loop8): batched multi-file SREP edits
+
+**Completed:** edit_file gains batch mode — args["edits"] list of {path, patch}
+(SREP) or {path, search, replace[, count]}; all files patched IN MEMORY first,
+any failure aborts with nothing written (atomic); per-file outcomes listed in
+the result; journal records the edit_file call (per-file detail in output).
+Single-file classic form unchanged (old_string/new_string naming confirmed).

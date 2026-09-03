@@ -144,6 +144,9 @@ def _apply_block(text: str, block: dict):
 
 
 def run(args: dict, ctx) -> ToolResult:
+    # loop8 cycle 34: batched multi-file mode
+    if "edits" in args:
+        return _run_batch(args, ctx)
     try:
         path = args["path"]
         patch_text = args.get("patch")
@@ -194,3 +197,67 @@ def run(args: dict, ctx) -> ToolResult:
         return ToolResult(output=f"replaced {count} occurrence(s) in {path}")
     except Exception as e:
         return _err(e)
+
+def _run_batch(args: dict, ctx) -> ToolResult:
+    """Atomic multi-file SREP apply (loop8, cycle 34).
+
+    args["edits"] = [{"path": p, "patch": SREP} | {"path": p, "search": s,
+    "replace": r, "count": optional}] — all files read and patched in memory
+    first; any failure aborts with NO file written (all-or-nothing).
+    """
+    edits = args.get("edits") or []
+    if not isinstance(edits, list) or not edits:
+        return ToolResult(output="error: edits must be a non-empty list", ok=False)
+
+    planned = []  # (path, new_text)
+    for i, edit in enumerate(edits, 1):
+        try:
+            path = edit["path"]
+            raw = _load(path, ctx)
+            text = raw.decode("utf-8", errors="replace")
+        except Exception as exc:
+            return ToolResult(output=f"error: edit {i}: {exc}", ok=False)
+
+        if "patch" in edit:
+            blocks = parse_blocks(edit["patch"])
+            if not blocks:
+                return ToolResult(output=f"error: edit {i}: no SREP blocks", ok=False)
+            current = text
+            for bi, block in enumerate(blocks, 1):
+                current, _, err = _apply_block(current, block)
+                if err:
+                    return ToolResult(
+                        output=f"error: edit {i} ({path}) block {bi}/{len(blocks)} failed — {err}",
+                        ok=False)
+            planned.append((path, current))
+        elif "search" in edit:
+            search = edit["search"]
+            replace = edit.get("replace", "")
+            count = int(edit.get("count", 0) or 0)
+            if search not in text:
+                return ToolResult(
+                    output=f"error: edit {i} ({path}): SEARCH not found", ok=False)
+            if count:
+                new_text = text.replace(search, replace, count)
+            else:
+                occurrences = text.count(search)
+                if occurrences != 1:
+                    return ToolResult(
+                        output=(f"error: edit {i} ({path}): {occurrences} occurrences "
+                                f"(need exactly 1, or pass count)"), ok=False)
+                new_text = text.replace(search, replace, 1)
+            planned.append((path, new_text))
+        else:
+            return ToolResult(output=f"error: edit {i}: needs 'patch' or 'search'", ok=False)
+
+    from .write_file import run as _write_run
+    outcomes = []
+    for path, new_text in planned:
+        res = _write_run({"path": path, "content": new_text}, ctx)
+        outcomes.append((path, res.ok, res.output[:120]))
+    failed = [o for o in outcomes if not o[1]]
+    if failed:
+        return ToolResult(output="error: write-back failed: " + "; ".join(
+            f"{p}: {msg}" for p, ok, msg in failed), ok=False)
+    lines = [f"{p}: applied" for p, ok, msg in outcomes]
+    return ToolResult(output=f"applied {len(outcomes)} file(s) atomically:\n" + "\n".join(lines))

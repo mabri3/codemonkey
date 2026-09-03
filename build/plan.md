@@ -640,7 +640,7 @@ map to an A-criterion, a loop selection, or a cited research selection).
 
 ### loop8: cycles (selected from build/research-loop8.md, cycle R8)
 
-- [ ] CYCLE 34 — `loop8:` batched multi-file SREP edits: edit_file args accept
+- [x] CYCLE 34 — `loop8:` batched multi-file SREP edits: edit_file args accept
   `edits: [{path, blocks|search+replace}, ...]`; atomic all-or-nothing across
   files; per-file outcomes in the result; journal records per file | est: 30m |
   verify: `uv run pytest tests/test_batch_edit.py -q` → exit 0 (≥6 tests);
