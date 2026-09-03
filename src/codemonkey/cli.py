@@ -529,6 +529,10 @@ def exec(
         bool,
         typer.Option("--cost-summary", help="Print a token/cost summary to stderr after the run."),
     ] = False,
+    job: Annotated[
+        str,
+        typer.Option("--job", help="Durable job id: inject goal/steps, persist JOB_STEP transitions."),
+    ] = "",
     ignore_user_config: Annotated[
         bool,
         typer.Option("--ignore-user-config", help="Skip ~/.codemonkey/config.yaml."),
@@ -578,6 +582,7 @@ def exec(
             bypass=dangerously_bypass,
             project_instructions=(False if no_project_instructions else None),
             cost_summary=cost_summary,
+            job_id=job,
         )
     except ExecUsageError as exc:
         typer.secho(f"error: {exc}", err=True, fg=typer.colors.RED)

@@ -115,6 +115,7 @@ def run_exec(
     event_sink=None,  # test/dev: collect JSONL events into a list,
     cost_summary: bool = False,
     emit_fn=None,  # override for tests: (event_dict) -> None
+    job_id: str = "",
 ) -> int:
     """Run one non-interactive exec turn-group. Returns the exit code."""
     from .config import ConfigError, load_config
@@ -306,6 +307,17 @@ def run_exec(
     pi_enabled = cfg.get("project_instructions", True)
     if project_instructions is not None:
         pi_enabled = project_instructions
+    # loop12 cycle 44: job-aware injection
+    job_text = ""
+    job_id_arg = job_id
+    if job_id_arg:
+        from .jobs import load as _job_load, render as _job_render
+
+        _job = _job_load(job_id_arg)
+        if _job is None:
+            raise ExecUsageError(f"--job: no such job: {job_id_arg}")
+        job_text = _job_render(_job)
+
     repo_map_text = ""
     if cfg.get("repo_map", False):
         try:
@@ -333,6 +345,8 @@ def run_exec(
         block = build_project_context_block(
             Path(workdir), instructions=instr_text, memory_text=memory_text
         )
+        if job_text:
+            block = f"{block}\n\n{job_text}" if block else job_text
         if repo_map_text:
             block = (block + "\n\n" if block else "") + repo_map_text
         if block:
@@ -439,6 +453,22 @@ def run_exec(
         _spill_prune()
     except OSError:
         pass
+
+    # -- job step write-back (loop12, cycle 44) ---------------------------
+    if job_id_arg and not ephemeral:
+        try:
+            from .jobs import set_step as _job_set
+
+            _all = getattr(turn, "all_messages", []) or []
+            _texts = [str(m.get("content", "")) for m in _all
+                      if m.get("role") == "assistant"]
+            _combined = "\n".join(_texts)
+            for m in re.finditer(
+                    r"JOB_STEP\s+(\S+)\s+(done|failed)(?:\s+--\s*([^\n]*))?", _combined):
+                _job_set(job_id_arg, m.group(1), m.group(2),
+                         (m.group(3) or "").strip())
+        except OSError:
+            pass
 
     # -- cost telemetry (loop5, cycle 26) --------------------------------
     if cost_summary and event_sink is not None:
