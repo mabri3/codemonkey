@@ -15,6 +15,7 @@ Contract (build/spec.md):
 
 from __future__ import annotations
 
+import re
 import json
 import os
 import sys
@@ -308,9 +309,16 @@ def run_exec(
             from . import repomap as _rm
 
             rmap = _rm.scan_repo(Path(workdir))
+            # cycle 27: task-conditioned relevance — derive query terms from
+            # the user prompt (words >=4 chars, lowercased, deduped).
+            _prompt_words = re.findall(r"[A-Za-z_][A-Za-z0-9_]{3,}", full_prompt or "")
+            _seen_terms: set[str] = set()
+            _query_terms = [w.lower() for w in _prompt_words
+                            if not (w.lower() in _seen_terms or _seen_terms.add(w.lower()))]
             repo_map_text = _rm.render_injection(
                 rmap, Path(workdir),
                 budget=int(cfg.get("repo_map_budget", 4000) or 4000),
+                query_terms=_query_terms[:40],
             )
         except Exception:
             repo_map_text = ""

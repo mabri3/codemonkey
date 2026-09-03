@@ -1279,3 +1279,18 @@ set (previously silent without --json because event_sink was None).
 src/codemonkey/cli.py, tests/test_cost.py (new, 5 tests), build/probes/cycle26-cost.md.
 
 **Tests:** test_cost 5/5 incl. live exec --cost-summary end-to-end vs home server.
+
+## 2026-09-02 — CYCLE 27 (loop5): repo-map relevance ranking
+
+**Completed:** repomap.relevance_score (case-insensitive term hits against file
+path + symbol names), rank_files_relevant (relevance>0 files lead, cycle-21
+order preserved within and after the group), render_injection query_terms param;
+exec derives query terms from the user prompt (words >=4 chars, deduped, capped
+at 40) and threads them into the injection. Fixed an import-order break my own
+edit introduced (import re prepended before __future__).
+
+**Files changed:** src/codemonkey/repomap.py, src/codemonkey/exec.py,
+tests/test_repomap_relevance.py (new, 5 tests), build/probes/cycle27-relevance.md.
+
+**Tests:** test_repomap_relevance 5/5 (git-recency fixture proves relevance
+overrides recency). Suite 292/292.

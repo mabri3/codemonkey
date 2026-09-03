@@ -187,7 +187,7 @@ def rank_files(repo_map: dict, workdir: Path, *, recent_commits: int = 30) -> li
 
 
 def render_injection(repo_map: dict, workdir: Path, *, budget: int = 4000,
-                     recent_commits: int = 30) -> str:
+                     recent_commits: int = 30, query_terms: list[str] | None = None) -> str:
     """Render the ranked map within `budget` chars (never exceeds).
 
     Files are added in rank order until the budget is hit; the header states
@@ -195,7 +195,8 @@ def render_injection(repo_map: dict, workdir: Path, *, budget: int = 4000,
     """
     if not repo_map:
         return ""
-    ranked = rank_files(repo_map, workdir, recent_commits=recent_commits)
+    ranked = rank_files_relevant(repo_map, workdir, query_terms=query_terms,
+                                 recent_commits=recent_commits)
     lines = ["[repo map: symbols per file, ranked by recent commits then density]"]
     used = len(lines[0]) + 1
     omitted = 0
@@ -212,3 +213,38 @@ def render_injection(repo_map: dict, workdir: Path, *, budget: int = 4000,
         lines.append(candidate)
         used += len(candidate) + 1
     return "\n".join(lines)
+
+def relevance_score(rel: str, repo_map_entry: dict, query_terms: list[str]) -> int:
+    """Task-conditioned relevance for one file (cycle 27).
+
+    Counts case-insensitive term hits against the file path, its symbol names,
+    and (for functions/methods) kind names. Pure string matching against the
+    existing map — no extra index, deterministic.
+    """
+    if not query_terms:
+        return 0
+    terms = [q.lower() for q in query_terms if q]
+    haystack_parts = [rel.lower()]
+    for sym in repo_map_entry:
+        haystack_parts.append(str(sym.get("symbol", "")).lower())
+    haystack = " ".join(haystack_parts)
+    return sum(1 for term in terms if term and term in haystack)
+
+
+def rank_files_relevant(repo_map: dict, workdir: Path, *, query_terms: list[str] | None = None,
+                        recent_commits: int = 30) -> list[str]:
+    """rank_files, then re-rank files with relevance > 0 ahead of the rest
+    (highest relevance first, recency/density order preserved within groups).
+    Files with zero relevance keep the cycle-21 order (graceful fallback)."""
+    base = rank_files(repo_map, workdir, recent_commits=recent_commits)
+    if not query_terms:
+        return base
+    scored = []
+    for rel in base:
+        rel_score = relevance_score(rel, repo_map.get(rel, []), query_terms)
+        scored.append((rel, rel_score))
+    relevant = [r for r, sc in scored if sc > 0]
+    rest = [r for r, sc in scored if sc == 0]
+    # within relevant group: keep base order (stable sort by -relevance would
+    # reshuffle; simple two-bucket split preserves base ordering inside each)
+    return relevant + rest

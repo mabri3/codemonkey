@@ -544,7 +544,7 @@ map to an A-criterion, a loop selection, or a cited research selection).
   verify: `uv run pytest tests/test_cost.py -q` → exit 0 (≥4 tests: run totals
   in JSONL, ledger append, ledger cumulative across runs, --cost-summary
   output shape); `uv run pytest -q` → exit 0.
-- [ ] CYCLE 27 — `loop5:` repo-map relevance ranking: task-conditioned selection
+- [x] CYCLE 27 — `loop5:` repo-map relevance ranking: task-conditioned selection
   folded into the cycle-21 injection — query terms (from the user prompt) match
   symbol/file names via the existing search index; still budget-capped, still
   opt-in (`repo_map: true`) | est: 30m |
