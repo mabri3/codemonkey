@@ -134,3 +134,56 @@ def test_separate_calls_stay_separate_groups(env):
     dispatch("write_file", {"path": "s2.txt", "content": "B\n"}, _ctx_of(tmp))
     cps = cp_mod.list_checkpoints()
     assert [c["files"] for c in cps] == [["s2.txt"], ["s1.txt"]]
+
+
+# -- CYCLE 14F2 (critic-loop8 finding 5) ---------------------------------
+# Checkpoints live in one global dir and carried no workspace identity, so
+# `codemonkey undo` in repo B restored repo A's files into B.
+
+def test_other_workspace_checkpoint_is_not_listed(env):
+    tmp = env["tmp"]
+    other = tmp / "other_repo"
+    other.mkdir()
+    (other / "x.txt").write_text("theirs\n")
+    dispatch("write_file", {"path": "x.txt", "content": "changed\n"}, _ctx_of(other))
+    mine = tmp / "my_repo"
+    mine.mkdir()
+    assert cp_mod.list_checkpoints(workdir=other)  # visible where it was taken
+    assert cp_mod.list_checkpoints(workdir=mine) == []
+
+
+def test_undo_in_another_workspace_refuses(env):
+    tmp = env["tmp"]
+    other = tmp / "other_repo"
+    other.mkdir()
+    (other / "x.txt").write_text("theirs\n")
+    dispatch("write_file", {"path": "x.txt", "content": "changed\n"}, _ctx_of(other))
+    mine = tmp / "my_repo"
+    mine.mkdir()
+    (mine / "x.txt").write_text("mine\n")
+    with pytest.raises(LookupError):
+        cp_mod.restore_latest(mine)
+    assert (mine / "x.txt").read_text() == "mine\n"  # untouched
+
+
+def test_same_workspace_restore_unchanged(env):
+    tmp = env["tmp"]
+    repo = tmp / "repo"
+    repo.mkdir()
+    (repo / "y.txt").write_text("v1\n")
+    dispatch("write_file", {"path": "y.txt", "content": "v2\n"}, _ctx_of(repo))
+    assert cp_mod.restore_latest(repo)["restored"] == ["y.txt"]
+    assert (repo / "y.txt").read_text() == "v1\n"
+
+
+def test_legacy_group_without_workdir_record_still_restores(env):
+    """Groups written before 14F2 carry no marker and stay eligible."""
+    tmp = env["tmp"]
+    repo = tmp / "legacy"
+    repo.mkdir()
+    (repo / "z.txt").write_text("new\n")
+    cp = cp_mod.new_checkpoint()
+    cp.snapshot_file(repo, "z.txt", b"old\n")
+    (cp.base / "workdir.txt").unlink()  # simulate a pre-14F2 group
+    assert cp_mod.restore_latest(repo)["restored"] == ["z.txt"]
+    assert (repo / "z.txt").read_text() == "old\n"

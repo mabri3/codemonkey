@@ -1557,3 +1557,22 @@ features.html.
 `uv run pytest -q` → **356 passed, 4 skipped**.
 
 **Next:** CYCLE 14F2 — scope checkpoints to their workspace.
+
+## 2026-09-03 — CYCLE 14F2 (critic-loop8 finding 5): checkpoints are workspace-scoped
+
+**Completed:** checkpoints live in one global `~/.codemonkey/checkpoints` and
+carried no record of the workspace they came from, so `codemonkey undo` in
+repo B restored repo A's prior file contents into B at the same relative paths.
+Each group now writes a `workdir.txt` marker on its first snapshot;
+`list_checkpoints(workdir=…)` and `restore_latest(workdir)` keep only groups
+taken in that workspace, and `undo --list` filters by cwd. Groups written
+before this cycle carry no marker and stay eligible, so undo still works for
+changes made earlier.
+
+**Files:** src/codemonkey/checkpoints.py, src/codemonkey/cli.py,
+tests/test_checkpoints.py, build/plan.md, features.html.
+
+**Tests:** `uv run pytest tests/test_checkpoints.py -q` → 13 passed (4 new);
+`uv run pytest -q` → **360 passed, 4 skipped**.
+
+**Next:** CYCLE loop8-critic-final — fix-cycle acceptance.

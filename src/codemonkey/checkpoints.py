@@ -41,11 +41,24 @@ class Checkpoint:
 
     def snapshot_file(self, workdir: Path, rel_path: str, content: bytes) -> None:
         """Store the PRIOR contents of one file (before mutation)."""
+        # 14F2: record which workspace this group belongs to, so `undo` in
+        # another repo cannot restore these files there.
+        marker = self.base / "workdir.txt"
+        if not marker.exists():
+            marker.write_text(str(Path(workdir).resolve()))
         dest = self.base / rel_path
         dest.parent.mkdir(parents=True, exist_ok=True)
         dest.write_bytes(content)
         with self.manifest.open("a") as f:
             f.write(f"{time.time()}\t{rel_path}\t{len(content)}\n")
+
+    def workdir(self) -> str:
+        """The workspace this group was taken in ("" for pre-14F2 groups)."""
+        marker = self.base / "workdir.txt"
+        try:
+            return marker.read_text().strip()
+        except OSError:
+            return ""
 
     def entries(self) -> list[dict]:
         if not self.manifest.is_file():
@@ -93,21 +106,32 @@ def current_checkpoint() -> Checkpoint:
     return new_checkpoint()
 
 
-def list_checkpoints(base: Path | None = None) -> list[dict]:
-    """All checkpoints, newest first: {dir, ts, files: [rel paths]}."""
+def list_checkpoints(base: Path | None = None,
+                     workdir: Path | str | None = None) -> list[dict]:
+    """Checkpoints, newest first: {dir, ts, workdir, files: [rel paths]}.
+
+    `workdir` (14F2) keeps only groups taken in that workspace. Groups written
+    before 14F2 carry no workspace record and stay eligible — dropping them
+    would silently disable undo for changes made before this cycle.
+    """
     root = base or checkpoints_dir()
     if not root.exists():
         return []
+    want = str(Path(workdir).resolve()) if workdir is not None else None
     out = []
     for d in root.iterdir():
         if not d.is_dir():
             continue
         cp = Checkpoint(d)
         entries = cp.entries()
+        cp_workdir = cp.workdir()
+        if want is not None and cp_workdir and cp_workdir != want:
+            continue
         if entries:
             out.append({
                 "dir": d,
                 "ts": max(e["ts"] for e in entries),
+                "workdir": cp_workdir,
                 "files": [e["path"] for e in entries],
             })
     out.sort(key=lambda c: c["ts"], reverse=True)  # chronological, not name sort
@@ -117,11 +141,15 @@ def list_checkpoints(base: Path | None = None) -> list[dict]:
 def restore_latest(workdir: Path, base: Path | None = None) -> dict:
     """Restore the newest checkpoint's files into workdir (byte-identical).
 
+    Only groups taken in `workdir` are eligible (14F2): checkpoints live in one
+    global `~/.codemonkey/checkpoints`, and restoring another repo's snapshot
+    into this one silently clobbered files at the same relative paths.
+
     Returns {"restored": [rel, ...], "checkpoint": dir} or raises LookupError.
     """
-    cps = list_checkpoints(base)
+    cps = list_checkpoints(base, workdir=workdir)
     if not cps:
-        raise LookupError("no checkpoints to restore")
+        raise LookupError("no checkpoints to restore for this workspace")
     cp = cps[0]
     cwd = Path(workdir).resolve()
     for rel in cp["files"]:

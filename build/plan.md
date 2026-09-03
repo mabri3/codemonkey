@@ -707,7 +707,7 @@ journal key semantics that cycle 36-38 will build on.
   tests (a 2-file batch edit produces ONE checkpoint listing both files; undo
   restores both; per-call grouping still yields separate groups for separate
   calls); `uv run pytest -q` → exit 0.
-- [ ] CYCLE 14F2 — critic finding 5 (MED): checkpoints carry no workspace
+- [x] CYCLE 14F2 — critic finding 5 (MED): checkpoints carry no workspace
   identity, so `codemonkey undo` in repo B can restore repo A's files into B.
   Record the workdir with each group; list/restore only groups taken in the
   current workspace | est: 25m |

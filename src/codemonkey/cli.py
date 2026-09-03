@@ -228,7 +228,7 @@ def undo(
 
     cwd = Path.cwd()
     if list_only:
-        cps = cp_mod.list_checkpoints()
+        cps = cp_mod.list_checkpoints(workdir=cwd)  # 14F2: this workspace only
         if not cps:
             typer.echo("(no checkpoints)")
             return
