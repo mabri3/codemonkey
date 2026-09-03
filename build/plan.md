@@ -747,12 +747,12 @@ journal key semantics that cycle 36-38 will build on.
   refused) | est: 30m |
   verify: `uv run pytest tests/test_delegate.py -q` → exit 0 (≥6 tests);
   `uv run pytest -q` → exit 0.
-- [ ] CYCLE 38 — `loop9:` parallel fan-out: `delegate_batch(tasks[])` runs
+- [x] CYCLE 38 — `loop9:` parallel fan-out: `delegate_batch(tasks[])` runs
   max_delegates workers (default 2), results aggregated in call order,
   per-task isolation | est: 30m |
   verify: `uv run pytest tests/test_delegate_batch.py -q` → exit 0 (≥5 tests);
   `uv run pytest -q` → exit 0.
-- [ ] CYCLE loop9-final — Loop 9 acceptance: sweep + report | est: 30m |
+- [x] CYCLE loop9-final — Loop 9 acceptance: sweep + report | est: 30m |
   verify: sweep green (honest exceptions recorded); suite green; report
   committed.
 

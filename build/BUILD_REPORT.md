@@ -361,3 +361,42 @@ re-run before Gate 2 acceptance once the home server is back.
 
 d0992a1 (7F2) → e358858 (31F1) → de1951d (35F1) → e37bc25 (34F1) →
 e935627 (14F1) → 624d81d (14F2) → b3b8c08 (SWEEP-F1) → this commit.
+
+
+---
+
+# Loop 9 — Final Acceptance (CYCLE loop9-final)
+
+**Date:** 2026-09-02 · **Suite:** 379/379 passing (5 live-probe skips: home
+llama.cpp down; honest conftest skip). Sweep fallback records honestly per
+precedent.
+
+## Loop-9 criteria (from build/research-loop9.md — all pass)
+
+| Improvement | Probe | Result |
+|---|---|---|
+| Rule-based permissions (36) | tests/test_permissions.py: deny>ask>allow precedence, first-match, globs, wildcard tool, default-None fallback, malformed fail-closed, pattern-subject semantics | ✅ 8/8 |
+| Delegate tool (37) | tests/test_delegate.py: task validation, length cap, depth-1 limit, child success path, child failure propagation, result cap constant | ✅ 5/5 (+1 live skip) |
+| Parallel fan-out (38) | tests/test_delegate_batch.py: validation, empty/too-many, depth limit, order aggregation (out-of-order completion), per-task isolation | ✅ 6/6 |
+
+## R5 core-design asks — SATISFIED
+
+Both items the R5 research flagged as core design are now shipped, folded into
+this loop per the user's instruction:
+1. **Hooks/rule-based command permissions** → cycle 36 (rules engine; hook
+   scripts remain a config-list extension if ever needed).
+2. **Subagents/delegated context isolation** → cycles 37-38 (delegate +
+   delegate_batch; subprocess isolation with own journal thread — the
+   session-state strategy contract remains untouched).
+
+## Loop-9 commit range
+
+c53b47b (R9) → a84e5a4 C36 → c7b345a C37 → 811b2b4 C38 (+ registry test fix)
+→ this commit (loop9-final).
+
+## Notes
+
+- 13 tools now registered (delegate + delegate_batch joined).
+- Governance is defense-in-depth: rules evaluate BEFORE the approval gate;
+  deny is absolute; ask escalates; allow only pre-approves what the policy
+  would have gated.

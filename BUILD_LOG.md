@@ -1651,3 +1651,18 @@ CODEMONKEY_DELEGATE_DEPTH env (children cannot re-delegate); result capped at
 4KB; child failure propagates with stderr tail; sandbox inherited (default
 workspace-write). Registered as the 12th tool. Live child run skipped when
 home is unreachable (same honest policy).
+
+## 2026-09-02 — CYCLE 38 (loop9): parallel fan-out + registry test fix
+
+**Completed:** `delegate_batch(tasks[])` — ThreadPool with max_delegates
+(config delegate.max_delegates, default 2), results aggregated in call order
+regardless of completion order, per-task isolation (FAIL marks, batch fails
+only if any task failed). Registry now 13 tools; registry test updated
+(twelve -> thirteen).
+
+## 2026-09-02 — CYCLE loop9-final: Loop 9 acceptance — governance shipped
+
+**Completed:** rule permissions + delegate + fan-out all verified. Both R5
+core-design asks SATISFIED. Registry: 13 tools.
+
+**LOOP 9 COMPLETE. Loop 10 (interop/distribution/closing) opens — the last loop.**
