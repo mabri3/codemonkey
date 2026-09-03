@@ -11,6 +11,7 @@ import json
 import pytest
 
 from codemonkey.cost import append_to_ledger, render_summary, summarize
+from conftest import requires_home
 
 
 def _events():
@@ -66,6 +67,7 @@ def test_render_summary_no_tools():
     assert "tool calls: none" in text
 
 
+@requires_home
 def test_exec_cost_summary_flag(tmp_path, monkeypatch):
     """--cost-summary end-to-end: exec prints summary + ledger written."""
     import codemonkey.loop as loop_mod

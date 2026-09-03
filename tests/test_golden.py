@@ -13,6 +13,7 @@ from pathlib import Path
 import yaml
 
 from codemonkey.eval import check_regression, run_suite, write_baseline
+from conftest import requires_home
 
 
 def test_baseline_roundtrip(tmp_path):
@@ -66,6 +67,7 @@ def _run_eval_cli(args, cwd):
     )
 
 
+@requires_home
 def test_cli_check_regression_flow(tmp_path, monkeypatch):
     """Live CLI: green run -> write baseline -> broken suite -> --check exit 1."""
     repo = Path("/Users/bharris/Programs/CodeMonkey")

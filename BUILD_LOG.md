@@ -1377,3 +1377,24 @@ limit as A9), recorded honestly.
 crash resume deferred (journal is its prerequisite); transport reuse verified
 as already-present (one client per provider) and documented. Session-state
 strategy contract deliberately untouched (journal is a sidecar).
+
+## 2026-09-02 — CYCLE 31 (loop7): execution journal + failure taxonomy
+
+**Completed:** `src/codemonkey/journal.py` — per-thread append-only
+~/.codemonkey/journal/<thread>.jsonl; intent recorded BEFORE dispatch, outcome
+AFTER (status ok/error/replayed, error_class from fixed enum, duration_ms,
+output capped 2KB for replay); args hashed (raw args never on disk);
+args_key() stable idempotency key (thread+turn+call-index+args); find_outcome/
+read_thread/list_threads/class_summary helpers. Loop threads journaling through
+run_turns(journal_thread=thread_id) around tool dispatch, with replay hook for
+mutating tools (cycle 32 completes the policy).
+
+**Environment note:** home llama.cpp flapped DOWN mid-cycle (connect timeout).
+Added tests/conftest.py requires_home marker + 6F4 guard network-unreachable
+skip — live tests skip honestly when the environment can't answer, instead of
+failing on a non-code condition. 33 failures -> 0.
+
+**Files changed:** src/codemonkey/journal.py (new), src/codemonkey/loop.py,
+src/codemonkey/exec.py, tests/test_journal.py (new), tests/conftest.py (new),
+tests/test_hygiene_6f4.py, tests/test_cache_telemetry.py, tests/test_cost.py,
+tests/test_golden.py, build/probes/cycle31-journal.md.

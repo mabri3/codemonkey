@@ -13,6 +13,8 @@
 
 from __future__ import annotations
 
+import time
+
 from typing import Callable, Optional
 
 from . import protocol as prompt_protocol
@@ -33,6 +35,11 @@ class FallbackRecorded:
 
     def must_prompt(self, provider: ProviderBase) -> bool:
         return id(provider) in self.force_prompt_providers
+
+
+# loop7 cycle 32: tools whose retry could double side effects; replay from the
+# journal instead of re-executing when an outcome is already recorded.
+_MUTATING_TOOLS = {"write_file", "edit_file"}
 
 
 def looks_like_tools_rejection(exc: ProviderError) -> bool:
@@ -65,6 +72,7 @@ def run_turns(
     max_verify_retries: int = 1,
     memory_enabled: bool = True,
     prompt_cache: bool = True,
+    journal_thread: str = "",
 ) -> ChatTurn:
     """Drive the model until a final text answer or max_turns.
 
@@ -340,10 +348,52 @@ def run_turns(
                     return (idx, name, False,
                             approvals_mod.tool_result_notice(name, decision),
                             {"approval": "soft-deny"})
+            # loop7 cycle 31/32: journal intent + idempotent replay
+            jkey = ""
+            if journal_thread:
+                try:
+                    from .journal import args_key as _ak, find_outcome as _fo, record as _jr
+
+                    jkey = _ak(journal_thread, _turn_no, idx, call.get("args") or {})
+                    hit = _fo(journal_thread, jkey) if name in _MUTATING_TOOLS else None
+                    if hit is not None:
+                        _jr(journal_thread, "outcome", tool=name, key=jkey,
+                            status="replayed",
+                            output=hit.get("output", ""))
+                        if on_event:
+                            on_event({"type": "notice",
+                                      "message": f"idempotent replay: {name} ({jkey})"})
+                        return (idx, name, hit.get("status") == "ok",
+                                hit.get("output", ""), {"replayed": True})
+                    _jr(journal_thread, "intent", tool=name, key=jkey)
+                except OSError:
+                    jkey = ""
+            t0 = time.monotonic()
             try:
                 result = tool_registry.dispatch(name, call.get("args") or {}, ctx)
             except Exception as exc:  # isolation: sibling calls must survive
+                if journal_thread and jkey:
+                    try:
+                        from .journal import classify_error as _ce, record as _jr
+
+                        _jr(journal_thread, "outcome", tool=name, key=jkey,
+                            status="error", error_class=_ce(exc),
+                            duration_ms=int((time.monotonic() - t0) * 1000))
+                    except OSError:
+                        pass
                 return (idx, name, False, f"error: {exc}", {"raised": True})
+            if journal_thread and jkey:
+                try:
+                    from .journal import record as _jr
+
+                    _jr(journal_thread, "outcome", tool=name, key=jkey,
+                        status=("ok" if result.ok else "error"),
+                        error_class=("tool-error" if not result.ok else ""),
+                        duration_ms=int((time.monotonic() - t0) * 1000),
+                        output=result.output,
+                        )
+                except OSError:
+                    pass
             return (idx, name, result.ok, result.output, None)
 
         max_workers = min(len(calls), 8) if len(calls) > 1 else 1

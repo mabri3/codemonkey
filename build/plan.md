@@ -610,7 +610,7 @@ map to an A-criterion, a loop selection, or a cited research selection).
 
 ### loop7: cycles (selected from build/research-loop7.md, cycle R7)
 
-- [ ] CYCLE 31 — `loop7:` execution journal + failure taxonomy: append-only
+- [x] CYCLE 31 — `loop7:` execution journal + failure taxonomy: append-only
   ~/.codemonkey/journal/<thread>.jsonl records intent BEFORE dispatch and
   outcome AFTER for every tool call; error_class enum (transport, auth,
   timeout, parse, tool-error, budget, unknown); args hashed, never stored raw |

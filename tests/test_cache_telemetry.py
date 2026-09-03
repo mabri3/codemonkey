@@ -11,6 +11,7 @@ import json
 import pytest
 
 from codemonkey.cost import cache_ratio, render_summary, summarize
+from conftest import requires_home
 
 
 # ---------------- timings -> usage surface (provider) ----------------
@@ -94,6 +95,7 @@ def test_render_summary_no_cache_signal():
     assert "cache:" not in render_summary(s)
 
 
+@requires_home
 def test_exec_cost_summary_shows_cache(monkeypatch):
     """--cost-summary surfaces a cache line when the server reports timings."""
     import subprocess
