@@ -645,7 +645,7 @@ map to an A-criterion, a loop selection, or a cited research selection).
   files; per-file outcomes in the result; journal records per file | est: 30m |
   verify: `uv run pytest tests/test_batch_edit.py -q` → exit 0 (≥6 tests);
   `uv run pytest -q` → exit 0.
-- [ ] CYCLE 35 — `loop8:` tool-output slimming: deterministic pre-budget pass
+- [x] CYCLE 35 — `loop8:` tool-output slimming: deterministic pre-budget pass
   (collapse 3+ blank lines, strip trailing WS, drop ANSI escapes); chars-saved
   stat in journal outcome | est: 30m |
   verify: `uv run pytest tests/test_slim.py -q` → exit 0 (≥5 tests); suite

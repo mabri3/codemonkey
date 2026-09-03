@@ -418,6 +418,22 @@ def run_turns(
             # Keep the PARTIAL signal pattern: useful prefix + structurally
             # distinct marker + continuation hint. Ledger shared across the
             # whole run so 3 fat outputs can't silently evict the task.
+            # loop8 cycle 35: deterministic slimming before budget/spill
+            try:
+                from .slim import slim as _slim
+
+                result_output, _slim_stats = _slim(result_output)
+                if journal_thread and jkey and _slim_stats.get("applied"):
+                    try:
+                        from .journal import record as _jr
+
+                        _jr(journal_thread, "outcome", tool=name, key=jkey + ":slim",
+                            status="slimmed",
+                            output=str(_slim_stats.get("chars_saved", 0)))
+                    except OSError:
+                        pass
+            except Exception:
+                pass
             if observation_budget > 0 and len(result_output) > observation_budget - obs_spent:
                 # loop6 cycle 30: spill the full output verbatim and point the
                 # model at it, instead of only eliding (which caused re-runs).

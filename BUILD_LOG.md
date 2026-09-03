@@ -1436,3 +1436,10 @@ routing deferred (single home server).
 any failure aborts with nothing written (atomic); per-file outcomes listed in
 the result; journal records the edit_file call (per-file detail in output).
 Single-file classic form unchanged (old_string/new_string naming confirmed).
+
+## 2026-09-02 — CYCLE 35 (loop8): tool-output slimming
+
+**Completed:** `src/codemonkey/slim.py` — deterministic pre-budget pass (ANSI
+escape strip, trailing-whitespace strip, 3+ blank lines collapse), min_chars
+200 threshold, chars_saved stats; wired into the loop before budget/spill,
+stats journaled when applied.
