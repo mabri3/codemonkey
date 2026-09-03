@@ -619,7 +619,7 @@ map to an A-criterion, a loop selection, or a cited research selection).
   before-outcome ordering, error classes, args-hash stability (no raw args on
   disk), kill -9 mid-run leaves a readable journal, per-thread isolation,
   journal-tail command); `uv run pytest -q` → exit 0.
-- [ ] CYCLE 32 — `loop7:` idempotent mutating tools: write_file/edit_file
+- [x] CYCLE 32 — `loop7:` idempotent mutating tools: write_file/edit_file
   compute idempotency key (thread+turn+call-index+args hash); journal hit →
   recorded outcome replayed instead of re-executing | est: 30m |
   verify: `uv run pytest tests/test_idempotency.py -q` → exit 0 (≥5 tests: key

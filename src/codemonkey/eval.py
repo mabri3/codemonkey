@@ -158,6 +158,14 @@ def run_suite(suite_path: Path, *, exec_fn=None,
                              events=events, wall=wall)
         scored["stdout"] = stdout_text[:2000]
         scored["window_depth"] = _window_depth_from_events(events)
+        # loop7 cycle 33: journal-derived failure-class stats for the run
+        try:
+            from .journal import class_summary as _cs, read_thread as _rt
+
+            if task.get("_journal_thread"):
+                scored["journal_classes"] = _cs(_rt(task["_journal_thread"]))
+        except OSError:
+            pass
         results["tasks"].append(scored)
 
     results["pass_rate"] = round(

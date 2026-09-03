@@ -1398,3 +1398,12 @@ failing on a non-code condition. 33 failures -> 0.
 src/codemonkey/exec.py, tests/test_journal.py (new), tests/conftest.py (new),
 tests/test_hygiene_6f4.py, tests/test_cache_telemetry.py, tests/test_cost.py,
 tests/test_golden.py, build/probes/cycle31-journal.md.
+
+## 2026-09-02 — CYCLE 32 (loop7): idempotent mutating tools
+
+**Completed:** write_file/edit_file dispatch checks the thread journal for a
+recorded outcome at key(thread, turn, call-index, args); hit -> recorded result
+replayed WITHOUT re-executing (mtime proof), miss -> normal execution; replay
+itself journaled (status=replayed with capped output). Read-only tools always
+execute. Test-isolation lesson: journal lives under HOME — tests must isolate
+HOME or cross-run state leaks in (fixed with jhome fixture).

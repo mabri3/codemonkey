@@ -312,6 +312,15 @@ def eval(
     typer.echo("no regressions")
 
 
+journal_app = typer.Typer()
+try:
+    from .journal_cli import app as _journal_app
+
+    app.add_typer(_journal_app, name="journal", help="Execution-journal forensics.")
+except ImportError:  # pragma: no cover
+    pass
+
+
 @app.command()
 def models(
     provider: Annotated[
