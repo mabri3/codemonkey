@@ -1421,3 +1421,10 @@ Home server flapped down mid-loop; live-probe tests skip via requires_home;
 sweep fallback records honestly. BUILD_REPORT loop-7 section written.
 
 **LOOP 7 COMPLETE. Loop 8 (throughput/cost) opens next.**
+
+## 2026-09-02 — CYCLE R8: Loop 8 research — batched edits + output slimming selected
+
+**Completed:** `build/research-loop8.md` — multi-file batched SREP edits (34)
+and deterministic tool-output slimming (35). Transport reuse verified as
+already-present (documented); cache payoff already shipped (cycle 29); model
+routing deferred (single home server).

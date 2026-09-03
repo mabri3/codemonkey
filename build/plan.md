@@ -637,6 +637,24 @@ map to an A-criterion, a loop selection, or a cited research selection).
   honestly per loop5-final precedent); `uv run pytest -q` → exit 0; report
   committed.
 
+
+### loop8: cycles (selected from build/research-loop8.md, cycle R8)
+
+- [ ] CYCLE 34 — `loop8:` batched multi-file SREP edits: edit_file args accept
+  `edits: [{path, blocks|search+replace}, ...]`; atomic all-or-nothing across
+  files; per-file outcomes in the result; journal records per file | est: 30m |
+  verify: `uv run pytest tests/test_batch_edit.py -q` → exit 0 (≥6 tests);
+  `uv run pytest -q` → exit 0.
+- [ ] CYCLE 35 — `loop8:` tool-output slimming: deterministic pre-budget pass
+  (collapse 3+ blank lines, strip trailing WS, drop ANSI escapes); chars-saved
+  stat in journal outcome | est: 30m |
+  verify: `uv run pytest tests/test_slim.py -q` → exit 0 (≥5 tests); suite
+  green.
+- [ ] CYCLE loop8-final — Loop 8 acceptance: sweep + report; transport reuse
+  and cache payoff documented as carried/verified (no new cycles) | est: 30m |
+  verify: sweep green (A9-class exceptions recorded honestly); suite green;
+  report committed.
+
 ## Cycle checklists — loops 6-10 (AUTHORIZED 2026-09-02 (blanket, see note above))
 
 Charters, entry conditions and core-design flags: `build/loops-5-10-proposal.md`.
@@ -662,7 +680,7 @@ that cycle, never pre-selected here. Gate 2 remains open.
   verify: `build/research-loop7.md` committed in the standard shape;
   `build/plan.md` contains the `loop7:` cycles (unchecked). Core-design flag:
   ask the user before any cycle that changes session-state strategy semantics.
-- [ ] CYCLE R8 — Loop 8 research: throughput and cost control — batched
+- [x] CYCLE R8 — Loop 8 research: throughput and cost control — batched
   multi-file edits, transport reuse, measured prefix-cache payoff, bounded
   concurrency across independent sub-tasks, per-run token/cost budgets with a
   hard stop | est: 30m |
