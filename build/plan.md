@@ -715,6 +715,17 @@ journal key semantics that cycle 36-38 will build on.
   tests (a checkpoint from another workdir is not listed/restored for this cwd;
   same-workdir restore unchanged; legacy groups with no workdir record are
   still restorable); `uv run pytest -q` → exit 0.
+- [x] CYCLE SWEEP-F1 — critic findings 7-9 (harness): the acceptance sweep's
+  home-down branch selects a provider that 6F4 deleted, so offline criteria
+  (A2/A15/A19) report RED while they are green; A10 asserts against a stale
+  `/tmp/cm-repo.json`; A19's invalid-name check reads `$?` after a grep and
+  greps a file that is never written. Select a fallback only if it exists,
+  otherwise record live probes BLOCKED with the reason; clear A10's artifact
+  first; fix the A19 check | est: 25m |
+  verify: `bash build/acceptance_sweep.sh` with home down → A1-A3, A8, A13,
+  A14, A15, A17-A20 all green (A15 matching the standalone `uv run pytest -q`
+  count) and every live probe recorded `BLOCKED (home llama.cpp wedged; no
+  fallback provider configured)` — no probe reported green off a stale file.
 - [ ] CYCLE loop8-critic-final — fix-cycle acceptance: re-run the loops-5-8
   criteria touched by the six fixes plus the full suite; append the outcome to
   `build/BUILD_REPORT.md` | est: 20m |

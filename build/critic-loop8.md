@@ -98,6 +98,36 @@ covers it · **LOW** = silent no-op, no data loss.
    Fix cycle: **35F1**. Return the key with the outcome and journal the
    slim stat from it.
 
+## Harness findings (found while running the sweep for the fix cycles)
+
+7. **HIGH — build/acceptance_sweep.sh:33-42 (home-down fallback branch)**
+   What: when the home llama.cpp server is wedged the sweep exports
+   `CODEMONKEY_PROVIDER=unblock2` — but the `unblock2` provider was REMOVED
+   from config by the 6F4 hygiene guard in loop4-final. Every probe in that
+   branch then dies on `error: default_provider 'unblock2' is not defined`,
+   including the probes that need no network at all: A2 (config), A15 (full
+   suite, `29 failed` inside the sweep while a clean `uv run pytest -q` is
+   360 passed), A19.
+   Impact: the sweep reports RED for offline criteria that are green, which is
+   the mirror image of a faked probe and just as bad for the ledger.
+   Fix cycle: **SWEEP-F1**. Only select a fallback provider that actually
+   exists; otherwise run the offline probes normally and record the live ones
+   as BLOCKED with the reason.
+
+8. **HIGH — build/acceptance_sweep.sh:110-120 (A10)**
+   What: A10 asserts against `/tmp/cm-repo.json` without removing it first. In
+   this run `codemonkey exec` exited 2 (finding 7) and wrote nothing, yet A10
+   was recorded green off a file left behind by an earlier sweep — a false
+   green in the acceptance record.
+   Fix cycle: **SWEEP-F1**. Delete the artifact before the probe.
+
+9. **LOW — build/acceptance_sweep.sh:163-168 (A19)**
+   What: `[ $? -eq 2 ] && grep -q ... "$OUT/a19b.err"` — `$?` is consumed by
+   the preceding `grep`, and `a19b.err` is never written (the probe redirects
+   `2>&1` into `a19b.out`), so `R2` reports the grep's status against a
+   missing file. The criterion is real; the check is not measuring it.
+   Fix cycle: **SWEEP-F1**.
+
 ## Not findings (checked, behaving as designed)
 
 - `tool_protocol: auto` HTTP-500 → prompt-protocol fallback (SPRINT rule 8) —

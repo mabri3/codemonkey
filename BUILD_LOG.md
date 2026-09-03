@@ -1576,3 +1576,24 @@ tests/test_checkpoints.py, build/plan.md, features.html.
 `uv run pytest -q` → **360 passed, 4 skipped**.
 
 **Next:** CYCLE loop8-critic-final — fix-cycle acceptance.
+
+## 2026-09-03 — CYCLE SWEEP-F1 (critic-loop8 findings 7-9): honest acceptance sweep
+
+**Completed:** with home down the sweep exported `CODEMONKEY_PROVIDER=unblock2`
+— a provider the 6F4 hygiene guard deleted — so every probe, including the
+offline ones, died on `default_provider 'unblock2' is not defined`: A15 read
+`29 failed` inside the sweep while a clean `uv run pytest -q` was 360 passed,
+and A10 was recorded GREEN off a stale `/tmp/cm-repo.json` left by an earlier
+run. Now the fallback is used only if that provider actually exists in the
+merged config; otherwise live probes print `BLOCKED (home llama.cpp wedged; no
+fallback provider configured)` and the offline probes run normally. A10 deletes
+its artifact first; A19 captures the exit code before a grep consumes `$?` and
+greps the file that is actually written.
+
+**Files:** build/acceptance_sweep.sh, build/critic-loop8.md, build/plan.md,
+features.html.
+
+**Sweep (home down):** A1-A3, A8, A13, A14, A15 (360 passed, matching the
+standalone run), A17-A20 → green; A4-A7, A9-A12, A16 → BLOCKED with reason.
+
+**Next:** CYCLE loop8-critic-final.

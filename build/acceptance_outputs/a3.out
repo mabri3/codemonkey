@@ -3,7 +3,7 @@ providers:
   local:
     protocol: openai
     base_url: http://192.168.50.113:8080/v1
-    model: Qwen3.8-27B-NVFP4-MTP-VERY-HIGH.gguf
+    model: override-test
     api_key_env: CODEMONKEY_API_KEY
     tool_protocol: auto
   anthropic:
@@ -12,9 +12,7 @@ providers:
     model: claude-sonnet-4-5
     api_key_env: ANTHROPIC_API_KEY
     tool_protocol: native
-  unblock2:
-    model: override-test
-default_provider: unblock2
+default_provider: local
 sandbox: workspace-write
 approval: on-request
 max_turns: 30

@@ -38,6 +38,7 @@
 │ eval      Run a golden evaluation suite against the real exec path.          │
 │ models    List models exposed by a provider endpoint.                        │
 │ sessions  List persisted sessions (thread id, updated time, first prompt).   │
+│ journal   Execution-journal forensics.                                       │
 │ exec      Non-interactive exec: run the agent once, print the final          │
 │           response. Use `exec resume [--last|THREAD_ID] [PROMPT]` to         │
 │           continue a session.                                                │
