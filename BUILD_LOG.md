@@ -1666,3 +1666,12 @@ only if any task failed). Registry now 13 tools; registry test updated
 core-design asks SATISFIED. Registry: 13 tools.
 
 **LOOP 9 COMPLETE. Loop 10 (interop/distribution/closing) opens — the last loop.**
+
+## 2026-09-03 — CYCLE R10: Loop 10 research — MCP closed permanently, release prep selected
+
+**Completed:** `build/research-loop10.md` — MCP client closed permanently
+(fifth deferral; delegate covers the extension use case without protocol
+churn); config-declared extension point = delegate tool (shipped); packaging
+verified (pyproject complete, --version works); docs audit found README stale
+→ fix cycle 39. Entry condition verified: all 7 critic-loop8 fixes shipped
+(d0992a1..c91808d).

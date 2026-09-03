@@ -607,6 +607,12 @@ map to an A-criterion, a loop selection, or a cited research selection).
 > LOOP 9 (governance) per user instruction. Core-design stop-and-ask is
 > therefore SATISFIED for loops 7-10 by this blanket authorization.
 
+> **USER LOOP AUTHORIZATION EXTENDED (2026-09-03):** "make sure that this
+> finishes through loop 16." Loops 11-16 (per build/loops-11-16-proposal.md:
+> delegation ROI, long-horizon work, learning from run history, model routing,
+> operator surface, hardening/v1.0) proceed continuously under the same
+> blanket authorization. Gate 2 remains the final user decision at the end.
+
 
 ### loop7: cycles (selected from build/research-loop7.md, cycle R7)
 
@@ -735,27 +741,42 @@ journal key semantics that cycle 36-38 will build on.
 
 ### loop8 critic fix cycles (from build/critic-loop8.md — entry condition for R10)
 
-- [ ] CYCLE 7F2 — session persistence: persist only THIS run's messages (not
+- [x] CYCLE 7F2 — session persistence: persist only THIS run's messages (not
   full all_messages), and persist the final assistant answer exactly once |
   verify: unit — 2 resumes on one thread → no duplicated user turns; assistant
   answer present exactly once; store grows linearly.
-- [ ] CYCLE 31F1 — journal wiring: exec/REPL/eval pass journal_thread; args_key
+- [x] CYCLE 31F1 — journal wiring: exec/REPL/eval pass journal_thread; args_key
   gains a per-run scope (run id) so resumed runs can't replay stale outcomes |
   verify: unit — real exec run writes journal records; resumed run does NOT
   replay previous run's outcome.
-- [ ] CYCLE 34F1 — batched edit composition: edits to the SAME file compose
+- [x] CYCLE 34F1 — batched edit composition: edits to the SAME file compose
   (accumulate per path); one outcome per file | verify: unit — two edits on
   one file both apply.
-- [ ] CYCLE 14F1 — one checkpoint group per tool call (batch writes share a
+- [x] CYCLE 14F1 — one checkpoint group per tool call (batch writes share a
   group) | verify: unit — batch write of 2 files → undo restores BOTH.
-- [ ] CYCLE 14F2 — checkpoints record their workspace; undo only restores
+- [x] CYCLE 14F2 — checkpoints record their workspace; undo only restores
   groups taken in the current workspace | verify: unit — cross-workspace undo
   is refused.
-- [ ] CYCLE SWEEP-F1 — sweep: fallback only selects an EXISTING provider;
+- [x] CYCLE SWEEP-F1 — sweep: fallback only selects an EXISTING provider;
   A10 deletes stale artifacts first; A19 measures the real criterion |
   verify: sweep green offline (live probes recorded BLOCKED with reason).
-- [ ] CYCLE 35F1 — slim stats journaled from the outcome's key (fix unbound
+- [x] CYCLE 35F1 — slim stats journaled from the outcome's key (fix unbound
   jkey) | verify: unit — slim record appears in journal when slimming applies.
+
+
+### loop10: cycles (selected from build/research-loop10.md, cycle R10)
+
+- [ ] CYCLE 39 — `loop10:` docs & packaging release prep: README rewrite
+  (13 tools, 8 commands, permissions/delegate/verify-gate/checkpoints/journal),
+  version 1.0.0-rc1, CHANGELOG.md | est: 30m |
+  verify: README documents every shipped command and tool (audit script);
+  `uv run codemonkey --version` → 1.0.0-rc1; CHANGELOG covers loops 1-10;
+  suite green.
+- [ ] CYCLE loop10-final — closing acceptance: full A1-A20 re-sweep + every
+  loop-2..9 criterion, final BUILD_REPORT (all loops, criteria table, git log
+  range, gaps), version tag, commit | est: 40m |
+  verify: sweep green (A9-class honest exceptions); `uv run pytest -q` green;
+  report committed; Gate 2 handoff recorded.
 
 ### loop9: cycles (selected from build/research-loop9.md, cycle R9 — R5 core-design items folded in per user authorization)
 
@@ -824,7 +845,7 @@ that cycle, never pre-selected here. Gate 2 remains open.
   `build/plan.md` contains the `loop9:` cycles (unchecked). NOTE: this loop is
   sandbox + approval semantics by definition — core design. R9 ENDS BY ASKING
   the user and does not hand selections to a build tick.
-- [ ] CYCLE R10 — Loop 10 research: interop, distribution and closing
+- [x] CYCLE R10 — Loop 10 research: interop, distribution and closing
   acceptance — MCP client (justify with a concrete need or close it
   permanently after four deferrals), a documented config-declared tool
   extension point, packaging/versioned release, a `--help`/docs surface audit
