@@ -475,3 +475,31 @@ failure paths return ok=False with meta.
 ## Loop-11 commit range
 
 eff1162 (R11) → a05afb6 C40 → 30d385b C41+42 → this commit (loop11-final).
+
+
+---
+
+# Loop 12 — Final Acceptance (CYCLE loop12-final)
+
+**Date:** 2026-09-03 · **Suite:** 405 passed / 5 skipped (home server still
+down; honest skips). Long-horizon work now has a durable home.
+
+## Loop-12 criteria (from build/research-loop12.md — all pass)
+
+| Improvement | Probe | Result |
+|---|---|---|
+| Durable jobs + CLI (43) | tests/test_jobs.py: create/show, transitions, atomic tmp+rename crash safety, list ordering, done/fail, unknown errors, CLI flow | ✅ 7/7 |
+| exec --job injection + write-back (44) | tests/test_job_exec.py: injection contains goal+steps, JOB_STEP marker parse+persist, cross-run progress visible, invalid marker ignored, unknown job errors, ephemeral no-write | ✅ 5/5 |
+
+## Real bugs fixed: job-id collision (same-second ids overwritten); missing
+job_id signature param (my own edit raced the anchor).
+
+## Loop-12 commit range
+
+5956661 (R12) → 8ab4c6a C43 → 2d2faef C44 → this commit (loop12-final).
+
+## Notes
+
+- Workflow state ≠ session state: the job file is an external store; the
+  session-state strategy contract untouched (R12 core-design flag avoided).
+- Multi-agent shared job store deferred (needs file locking) — R13+ follow-up.

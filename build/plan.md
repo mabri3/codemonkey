@@ -768,21 +768,21 @@ journal key semantics that cycle 36-38 will build on.
 
 ### loop12: cycles (selected from build/research-loop12.md, cycle R12)
 
-- [ ] CYCLE 43 — `loop12:` durable jobs module + CLI: jobs.py (atomic
+- [x] CYCLE 43 — `loop12:` durable jobs module + CLI: jobs.py (atomic
   tmp+rename JSON read/write), ~/.codemonkey/jobs/<id>.json {id, goal,
   steps[{id, status: pending|done|failed, note}], created, updated};
   `codemonkey jobs list|create|show|done|fail` | est: 30m |
   verify: `uv run pytest tests/test_jobs.py -q` → exit 0 (≥6 tests: create/
   show, step transitions, atomicity under simulated crash, list, done/fail,
   unknown job error); `uv run pytest -q` → exit 0.
-- [ ] CYCLE 44 — `loop12:` exec --job injection + step write-back: job
+- [x] CYCLE 44 — `loop12:` exec --job injection + step write-back: job
   goal/steps inject into project-context; model writes `JOB_STEP <id> done`
   markers parsed post-turn; statuses persist across runs | est: 30m |
   verify: `uv run pytest tests/test_job_exec.py -q` → exit 0 (≥6 tests:
   injection contains goal+steps, marker parse, transition persists, cross-run
   resume shows progress, invalid marker ignored, ephemeral doesn't write);
   `uv run pytest -q` → exit 0.
-- [ ] CYCLE loop12-final — Loop 12 acceptance: sweep + report | est: 30m |
+- [x] CYCLE loop12-final — Loop 12 acceptance: sweep + report | est: 30m |
   verify: sweep green (honest exceptions); suite green; report committed.
 
 ### loop11: cycles (selected from build/research-loop11.md, cycle R11)

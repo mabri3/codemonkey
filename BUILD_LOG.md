@@ -1710,3 +1710,9 @@ ok=True). LOOP 11 COMPLETE. Loop 12 (long-horizon work across runs) opens.
 durable job files (43) with crash-safe atomic transitions; exec --job
 injection + step write-back (44). Multi-agent shared job store deferred
 (needs file locking).
+
+## 2026-09-03 — CYCLE loop12-final: Loop 12 acceptance — durable jobs shipped
+
+**Completed:** jobs module (atomic writes, step transitions, entropy ids,
+render), jobs CLI, exec --job injection + JOB_STEP write-back (cross-run
+progress visible). LOOP 12 COMPLETE. Loop 13 (learning from run history) opens.
