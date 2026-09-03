@@ -1703,3 +1703,10 @@ role recorded in result meta.
 **Completed:** roles + adversarial review rounds + ROI matrix verified (14 new
 tests). Real bug fixed: delegate ok-propagation (child non-zero exit returned
 ok=True). LOOP 11 COMPLETE. Loop 12 (long-horizon work across runs) opens.
+
+## 2026-09-03 — CYCLE R12: Loop 12 research — durable job files + job-aware exec selected
+
+**Completed:** `build/research-loop12.md` — workflow state ≠ session state;
+durable job files (43) with crash-safe atomic transitions; exec --job
+injection + step write-back (44). Multi-agent shared job store deferred
+(needs file locking).
