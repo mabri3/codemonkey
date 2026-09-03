@@ -732,6 +732,31 @@ journal key semantics that cycle 36-38 will build on.
   verify: `uv run pytest -q` → exit 0; `bash build/acceptance_sweep.sh`
   re-run with home-down exceptions recorded honestly; report committed.
 
+
+### loop8 critic fix cycles (from build/critic-loop8.md — entry condition for R10)
+
+- [ ] CYCLE 7F2 — session persistence: persist only THIS run's messages (not
+  full all_messages), and persist the final assistant answer exactly once |
+  verify: unit — 2 resumes on one thread → no duplicated user turns; assistant
+  answer present exactly once; store grows linearly.
+- [ ] CYCLE 31F1 — journal wiring: exec/REPL/eval pass journal_thread; args_key
+  gains a per-run scope (run id) so resumed runs can't replay stale outcomes |
+  verify: unit — real exec run writes journal records; resumed run does NOT
+  replay previous run's outcome.
+- [ ] CYCLE 34F1 — batched edit composition: edits to the SAME file compose
+  (accumulate per path); one outcome per file | verify: unit — two edits on
+  one file both apply.
+- [ ] CYCLE 14F1 — one checkpoint group per tool call (batch writes share a
+  group) | verify: unit — batch write of 2 files → undo restores BOTH.
+- [ ] CYCLE 14F2 — checkpoints record their workspace; undo only restores
+  groups taken in the current workspace | verify: unit — cross-workspace undo
+  is refused.
+- [ ] CYCLE SWEEP-F1 — sweep: fallback only selects an EXISTING provider;
+  A10 deletes stale artifacts first; A19 measures the real criterion |
+  verify: sweep green offline (live probes recorded BLOCKED with reason).
+- [ ] CYCLE 35F1 — slim stats journaled from the outcome's key (fix unbound
+  jkey) | verify: unit — slim record appears in journal when slimming applies.
+
 ### loop9: cycles (selected from build/research-loop9.md, cycle R9 — R5 core-design items folded in per user authorization)
 
 - [x] CYCLE 36 — `loop9:` rule-based permissions: config `permissions.rules` —
