@@ -1,0 +1,39 @@
+{
+  "strategies": {
+    "summarizing": {
+      "pass_rate": 1.0,
+      "total_tokens": 17198,
+      "wall_seconds": 3.66,
+      "window_depth": 2843,
+      "tasks": {
+        "pong": {
+          "ok": true
+        },
+        "banana": {
+          "ok": true
+        },
+        "memory-recall": {
+          "ok": true
+        }
+      }
+    },
+    "sliding-window": {
+      "pass_rate": 1.0,
+      "total_tokens": 17256,
+      "wall_seconds": 4.01,
+      "window_depth": 2843,
+      "tasks": {
+        "pong": {
+          "ok": true
+        },
+        "banana": {
+          "ok": true
+        },
+        "memory-recall": {
+          "ok": true
+        }
+      }
+    }
+  },
+  "started": 1788402074.376232
+}

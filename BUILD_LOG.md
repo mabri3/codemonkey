@@ -1319,3 +1319,35 @@ folds into 28; PACMS submodular selection deferred until bake-off data exists.
 Entry condition verified: eval harness shipped (cycles 24/25).
 
 **Next step:** CYCLE 28 — compaction bake-off.
+
+## 2026-09-02 — CYCLE 28 (loop6): compaction strategy bake-off
+
+**Completed:** eval tracks window_depth per task (max prompt_tokens across
+turns — the deepest context the model saw); `src/codemonkey/matrix.py`
+run_matrix() runs the suite once per compaction strategy via the
+CODEMONKEY_STRATEGY_COMPACTION env override (restored after), aggregates
+pass_rate/tokens/wall/window_depth into build/eval/matrix.json; render_table()
+prints an aligned comparison; CLI `codemonkey eval SUITE --strategy-matrix
+s1,s2`.
+
+**Files changed:** src/codemonkey/eval.py, src/codemonkey/matrix.py (new),
+src/codemonkey/cli.py, tests/test_matrix.py (new, 5 tests).
+
+**Tests:** test_matrix 5/5. LIVE matrix over golden-core on home server:
+build/eval/matrix.json (committed when probe completes).
+
+## 2026-09-02 — CYCLE 29 (loop6): KV-cache telemetry
+
+**Completed:** openai provider surfaces llama-server `timings.cache_n` (and the
+OpenAI-canonical `usage.prompt_tokens_details.cached_tokens`) as
+`usage.cached_tokens`; streaming now requests `stream_options.include_usage`
+(previously the streaming path never received usage at all — token counts were
+0 in cost summaries!). cost.summarize() aggregates cached_tokens;
+cache_ratio() with clamp; --cost-summary prints `cache: N/M tokens (P%)`.
+LIVE on home server: 99% cache hit (5646/5680) on repeated prefix — cycle 22's
+prefix-stability work is now MEASURED, not assumed.
+
+**Files changed:** src/codemonkey/providers/openai.py, src/codemonkey/cost.py,
+tests/test_cache_telemetry.py (new, 7 tests), build/probes/cycle29-cache.md.
+
+**Tests:** test_cache_telemetry 7/7; suite 304/304.

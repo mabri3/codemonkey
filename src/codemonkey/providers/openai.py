@@ -222,6 +222,10 @@ class OpenAIProvider(ProviderBase):
         # servers that do not know the field.
         if cache_prompt:
             body["cache_prompt"] = True
+        if stream:
+            # OpenAI-canonical: ask the server to include a final usage chunk
+            # (llama.cpp honors this and also merges its timings block there).
+            body["stream_options"] = {"include_usage": True}
         if max_tokens is not None:
             body["max_tokens"] = max_tokens
         if temperature is not None:
@@ -235,11 +239,17 @@ class OpenAIProvider(ProviderBase):
             data = self._request("/chat/completions", body)
             choice = (data.get("choices") or [{}])[0]
             msg = choice.get("message") or {}
+            usage = dict(data.get("usage") or {})
+            # loop6 cycle 29: llama-server timings (cache_n = prompt tokens
+            # served from KV cache). Surface as usage.cached_tokens when present.
+            timings = data.get("timings") or {}
+            if timings.get("cache_n") is not None:
+                usage.setdefault("cached_tokens", int(timings["cache_n"]))
             turn = ChatTurn(
                 content=msg.get("content") or "",
                 reasoning=(msg.get("reasoning") or msg.get("reasoning_content") or ""),
                 finish_reason=choice.get("finish_reason") or "stop",
-                usage=data.get("usage") or {},
+                usage=usage,
             )
             turn.tool_calls = _native_openai_tool_calls(msg.get("tool_calls"))
             return turn
@@ -269,7 +279,11 @@ class OpenAIProvider(ProviderBase):
             if choice.get("finish_reason"):
                 turn.finish_reason = choice["finish_reason"]
             if event.get("usage"):
-                turn.usage = event["usage"]
+                turn.usage = dict(event["usage"])
+            if event.get("timings", {}).get("cache_n") is not None:
+                u = dict(turn.usage or {})
+                u.setdefault("cached_tokens", int(event["timings"]["cache_n"]))
+                turn.usage = u
         for idx in sorted(tc_acc):
             slot = tc_acc[idx]
             try:

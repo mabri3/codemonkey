@@ -568,7 +568,7 @@ map to an A-criterion, a loop selection, or a cited research selection).
 
 ### loop6: cycles (selected from build/research-loop6.md, cycle R6)
 
-- [ ] CYCLE 28 — `loop6:` compaction bake-off: `codemonkey eval
+- [x] CYCLE 28 — `loop6:` compaction bake-off: `codemonkey eval
   --strategy-matrix summarizing,sliding-window` runs the golden suite once per
   strategy (env override per run), records pass_rate/tokens/wall/window-depth
   per strategy into build/eval/matrix.json, prints a comparison table |
@@ -577,7 +577,7 @@ map to an A-criterion, a loop selection, or a cited research selection).
   runs both configs via patched exec, depth recorded per turn, matrix.json
   shape, comparison table prints, tie handling); `uv run pytest -q` → exit 0;
   LIVE: matrix over the golden-core suite on home server (results committed).
-- [ ] CYCLE 29 — `loop6:` KV-cache telemetry: openai provider parses
+- [x] CYCLE 29 — `loop6:` KV-cache telemetry: openai provider parses
   `timings.cache_n`/`prompt_n` when the server returns them; cost summary and
   eval results record cache_hit ratio; `--cost-summary` prints it | est: 30m |
   verify: `uv run pytest tests/test_cache_telemetry.py -q` → exit 0 (≥5 tests:

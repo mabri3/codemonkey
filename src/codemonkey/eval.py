@@ -105,6 +105,16 @@ def _tokens_from_events(events: list) -> int:
     return total
 
 
+def _window_depth_from_events(events: list) -> int:
+    """Max prompt_tokens across turns — the deepest context the model saw."""
+    depth = 0
+    for ev in events:
+        if ev.get("type") == "turn.completed":
+            usage = ev.get("usage") or {}
+            depth = max(depth, int(usage.get("prompt_tokens") or 0))
+    return depth
+
+
 def run_suite(suite_path: Path, *, exec_fn=None,
               out_dir: Optional[Path] = None) -> dict:
     """Run every task through the real exec path and score it.
@@ -147,6 +157,7 @@ def run_suite(suite_path: Path, *, exec_fn=None,
         scored = _score_task(task, exit_code=code, stdout=stdout_text,
                              events=events, wall=wall)
         scored["stdout"] = stdout_text[:2000]
+        scored["window_depth"] = _window_depth_from_events(events)
         results["tasks"].append(scored)
 
     results["pass_rate"] = round(

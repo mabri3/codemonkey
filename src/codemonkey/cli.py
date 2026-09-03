@@ -273,8 +273,20 @@ def eval(
         bool,
         typer.Option("--write-baseline", help="Write the current run as the new baseline."),
     ] = False,
+    strategy_matrix: Annotated[
+        str,
+        typer.Option("--strategy-matrix", help="Comma-separated compaction strategies to bake off (runs the suite once per strategy)."),
+    ] = "",
 ) -> None:
     """Run a golden evaluation suite against the real exec path."""
+    if strategy_matrix:
+        from .matrix import render_table, run_matrix
+
+        strats = [s.strip() for s in strategy_matrix.split(",") if s.strip()]
+        results = run_matrix(suite, strats, out_dir=out_dir)
+        typer.echo(render_table(results))
+        typer.echo(f"matrix written: {Path(out_dir) / 'matrix.json'}")
+        return
     from .eval import check_regression as _check_regression
     from .eval import run_suite as _run_suite
     from .eval import write_baseline as _write_baseline

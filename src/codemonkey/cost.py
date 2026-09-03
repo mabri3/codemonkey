@@ -30,6 +30,7 @@ def summarize(events: list, *, wall_seconds: float = 0.0) -> dict:
         "total_tokens": 0,
         "prompt_tokens": 0,
         "completion_tokens": 0,
+        "cached_tokens": 0,   # loop6 cycle 29: llama-server timings-derived
         "tool_calls": {},
         "wall_seconds": round(wall_seconds, 2),
     }
@@ -42,10 +43,20 @@ def summarize(events: list, *, wall_seconds: float = 0.0) -> dict:
             s["total_tokens"] += int(u.get("total_tokens") or 0)
             s["prompt_tokens"] += int(u.get("prompt_tokens") or 0)
             s["completion_tokens"] += int(u.get("completion_tokens") or 0)
+            s["cached_tokens"] += int(u.get("cached_tokens") or 0)
         elif et == "tool.started":
             name = ev.get("name") or "?"
             s["tool_calls"][name] = s["tool_calls"].get(name, 0) + 1
     return s
+
+
+def cache_ratio(summary: dict) -> float | None:
+    """cached/prompt ratio; None when no prompt tokens or no cache signal."""
+    p = summary.get("prompt_tokens") or 0
+    c = summary.get("cached_tokens") or 0
+    if p <= 0:
+        return None
+    return round(min(1.0, c / p), 3)
 
 
 def append_to_ledger(summary: dict, *, suite: str = "", thread_id: str = "",
@@ -77,6 +88,9 @@ def render_summary(summary: dict) -> str:
         f"completion {summary.get('completion_tokens', 0)})",
         f"wall: {summary.get('wall_seconds', 0)}s",
     ]
+    ratio = cache_ratio(summary)
+    if ratio is not None:
+        lines.append(f"cache: {summary.get('cached_tokens', 0)}/{summary.get('prompt_tokens', 0)} tokens ({ratio:.0%})")
     tools = summary.get("tool_calls") or {}
     if tools:
         calls = ", ".join(f"{k} x{v}" for k, v in sorted(tools.items()))
