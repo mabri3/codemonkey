@@ -767,6 +767,20 @@ journal key semantics that cycle 36-38 will build on.
 
 
 
+
+### loop14: cycles (selected from build/research-loop14.md, cycle R14)
+
+- [ ] CYCLE 47 — `loop14:` availability failover: config
+  `fallback_provider: <name>`; after transport/timeout errors exhaust retries,
+  exec re-runs the turn against the fallback provider; journal records the
+  route switch; no fallback on auth/tools-500 | est: 30m |
+  verify: `uv run pytest tests/test_failover.py -q` → exit 0 (≥6 tests:
+  fallback on transport+timeout, none on auth/tools-500, journal record,
+  retry-exhaustion precondition, config default off, unknown fallback
+  provider rejected); `uv run pytest -q` → exit 0.
+- [ ] CYCLE loop14-final — Loop 14 acceptance: sweep + report | est: 30m |
+  verify: sweep green (honest exceptions); suite green; report committed.
+
 ### loop13: cycles (selected from build/research-loop13.md, cycle R13)
 
 - [x] CYCLE 45 — `loop13:` lessons store + extraction + scoped retrieval:
@@ -960,7 +974,7 @@ that cycle, never pre-selected here. `loop10-final` still precedes all of them.
   measurements that killed it (an honest "no" is a valid exit). ENTRY
   CONDITION: >=2 loops of journal + eval history exist in volume. Core-design:
   PARTIAL — a cross-repo history store ends by asking.
-- [ ] CYCLE R14 — Loop 14 research: heterogeneous models and routing (the R8
+- [x] CYCLE R14 — Loop 14 research: heterogeneous models and routing (the R8
   deferral) — per-task-class routing scored on the golden suite, cheap model
   for compaction vs main model for edits, health checks that distinguish
   "unreachable" from "reachable but wedged" (the failure this repo keeps

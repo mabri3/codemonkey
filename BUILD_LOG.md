@@ -1730,3 +1730,10 @@ selected (out of scope for a local CLI / violates governance).
 **Completed:** lessons store (atomic), journal-class extraction into drafts,
 tag-overlap scoped retrieval via memory channel, verified-by-eval gate.
 LOOP 13 COMPLETE.
+
+## 2026-09-03 — CYCLE R14: Loop 14 research — availability failover selected
+
+**Completed:** `build/research-loop14.md` — availability failover selected
+(directly motivated by 3 home-server outages blocking acceptance);
+complexity/semantic routing and cascades deferred (no second local model;
+quality-judge cascade = offline eval's job).
