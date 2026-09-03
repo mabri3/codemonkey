@@ -768,6 +768,17 @@ journal key semantics that cycle 36-38 will build on.
 
 
 
+
+### loop15: cycles (selected from build/research-loop15.md, cycle R15)
+
+- [ ] CYCLE 48 — `loop15:` codemonkey status: aggregates jobs progress,
+  journal failure-class totals, sessions count, latest eval baseline,
+  cost-ledger totals, spill bytes; --json | est: 30m |
+  verify: `uv run pytest tests/test_status.py -q` → exit 0 (≥6 tests);
+  `uv run pytest -q` → exit 0.
+- [ ] CYCLE loop15-final — Loop 15 acceptance: sweep + report | est: 30m |
+  verify: sweep green (honest exceptions); suite green; report committed.
+
 ### loop14: cycles (selected from build/research-loop14.md, cycle R14)
 
 - [x] CYCLE 47 — `loop14:` availability failover: config
@@ -987,7 +998,7 @@ that cycle, never pre-selected here. `loop10-final` still precedes all of them.
   reachable at once — otherwise R14 records BLOCKED (routing cannot be
   measured on one endpoint). Core-design: YES (provider selection) — R14 ENDS
   BY ASKING.
-- [ ] CYCLE R15 — Loop 15 research: operator surface and observability — diff
+- [x] CYCLE R15 — Loop 15 research: operator surface and observability — diff
   preview before a mutation is applied (and a diff-gated approval mode), a run
   timeline over the JSONL stream, one inspector unifying journal/spill/
   checkpoints/cost, a REPL status line, structured run reports for CI | est:

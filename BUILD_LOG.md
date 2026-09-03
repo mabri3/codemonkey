@@ -1751,3 +1751,9 @@ fallback provider raises ExecUsageError (fail-closed). Config default "".
 **Completed:** fallback_provider wired in exec (transport/timeout only),
 journaled route switches, fail-closed validation. LOOP 14 COMPLETE.
 Loop 15 (operator surface & observability) opens.
+
+## 2026-09-03 — CYCLE R15: Loop 15 research — codemonkey status selected
+
+**Completed:** `build/research-loop15.md` — one-shot operator summary
+aggregating every store. Live TUI deferred (status + JSONL cover unattended
+supervision); OTLP export deferred (no local collector requirement).
