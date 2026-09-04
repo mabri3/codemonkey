@@ -2047,7 +2047,9 @@ loop 45's v4.0 acceptance. This section is a plan, not a queue.
 
 ### loop39: cycles (selected from build/research-loop39.md, cycle R39)
 
-- [ ] CYCLE 88 — `loop39:` failure taxonomy: `failclass.py` mapping journal
+- [x] CYCLE 88 — `loop39:` failure taxonomy: `failclass.py` mapping journal
+  DONE 2026-09-04: 4 per-record categories + honest unmapped; journal show
+  rows live; suite 630/630
   `error_class` → AgentRx nine-category labels (6 mapped by rule, 3 honestly
   unmappable with stated reasons); `journal show <thread>` prints taxonomy
   rows beside the class summary | est: 30m |

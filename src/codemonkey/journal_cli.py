@@ -42,3 +42,11 @@ def journal_show(thread: str = typer.Argument(help="Thread id.")) -> None:
     typer.echo("-- class summary --")
     for cls, count in sorted(summary.items()):
         typer.echo(f"  {cls}: {count}")
+    # loop39 cycle 88: taxonomy rows beside the class summary
+    from .failclass import summarize_taxonomy
+
+    tax = summarize_taxonomy(recs)
+    if tax:
+        typer.echo("-- failure taxonomy --")
+        for cat, count in sorted(tax.items()):
+            typer.echo(f"  {cat}: {count}")

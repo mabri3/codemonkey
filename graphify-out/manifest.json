@@ -370,9 +370,9 @@
     "semantic_hash": "6eff104f5fe4df1ba1506996e2fd67b3"
   },
   "src/codemonkey/journal_cli.py": {
-    "mtime": 1788416769.6809213,
-    "ast_hash": "73a2dd8973c83e2724dce7a6c5ac7e12",
-    "semantic_hash": "73a2dd8973c83e2724dce7a6c5ac7e12"
+    "mtime": 1788557516.356653,
+    "ast_hash": "959c857f3ba68db7b4a6905d9dfa0419",
+    "semantic_hash": "959c857f3ba68db7b4a6905d9dfa0419"
   },
   "src/codemonkey/matrix.py": {
     "mtime": 1788445278.211652,
@@ -863,5 +863,15 @@
     "mtime": 1788500463.0198379,
     "ast_hash": "e7c703ab0a770f7bb0349df7366d6043",
     "semantic_hash": "e7c703ab0a770f7bb0349df7366d6043"
+  },
+  "src/codemonkey/failclass.py": {
+    "mtime": 1788557494.4677594,
+    "ast_hash": "cba83fcd6827a7b26020a1b98910b159",
+    "semantic_hash": "cba83fcd6827a7b26020a1b98910b159"
+  },
+  "tests/test_failclass.py": {
+    "mtime": 1788557515.859909,
+    "ast_hash": "7d48f69f80c17be7dee068b5cf61f58e",
+    "semantic_hash": "7d48f69f80c17be7dee068b5cf61f58e"
   }
 }

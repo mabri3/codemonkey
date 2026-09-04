@@ -2471,3 +2471,26 @@ FULFILLED.
   ask round). No inference spent.
 - **Next step:** the R39+R40 ask to the user; then C88 on approval of
   report-only scope (C91/C92/C94-flip gated).
+
+## 2026-09-04 — CYCLE 88 (loop39): failure taxonomy over journal records
+
+- **Files changed:** `src/codemonkey/failclass.py` (new — deterministic
+  (tool, error_class, output) rules onto 4 AgentRx categories; looping +
+  recovery-failure reserved as trajectory-level for C89; goal-
+  misinterpretation / unsafe-trust / state-contamination documented
+  unmappable; timeout/transport deliberately unmapped as transient weather),
+  `src/codemonkey/journal_cli.py` (`journal show` prints taxonomy rows),
+  `tests/test_failclass.py` (new, 11 tests).
+- **Deviation from charter estimate, stated:** the charter guessed 6 of 9
+  mappable per record; the implementation earns 4 — looping-over-action and
+  recovery-failure need trajectory context no single record carries, so
+  they move to the C89 counter (6 of 9 across the loop either way).
+- **Tests run:** `uv run pytest -q tests/test_failclass.py` → **11
+  passed** (full-suite count in commit line).
+- **Probe results (literal, R-I):** scripted failing real-exec run (fake
+  provider, repeated disallowed writes) → `codemonkey journal show
+  <thread>` prints `-- failure taxonomy --` with `constraint-violation`
+  rows and counts.
+- **Known issues:** none. `summarize_taxonomy` skips ok/empty records by
+  design (taxonomy is a failure distribution, not a run census).
+- **Next step:** CYCLE 89 — stuck detector (no termination).
