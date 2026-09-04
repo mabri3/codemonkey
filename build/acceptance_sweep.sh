@@ -19,6 +19,8 @@ note() { printf '%s\n' "$1" | tee -a "$OUT/summary.txt"; }
 # sweep could not see it). Probe whatever the EFFECTIVE config resolves to,
 # through codemonkey's own provider layer, so the gate follows configuration
 # instead of a literal that silently rots.
+SWEEP_OFFLINE="${SWEEP_OFFLINE:-0}"
+if [ "$SWEEP_OFFLINE" = "0" ]; then
 HOME_ALIVE=$(uv run python -c "
 from codemonkey.config import load_config, resolve_api_key
 from codemonkey.providers import build_provider
@@ -37,6 +39,9 @@ try:
 except Exception:
     print('dead')
 " 2>/dev/null || echo dead)
+else
+  HOME_ALIVE=dead
+fi
 
 if [ "$HOME_ALIVE" = "pong" ]; then
   unset CODEMONKEY_PROVIDER CODEMONKEY_UNBLOCK2_KEY

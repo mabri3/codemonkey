@@ -51,3 +51,25 @@ requires_home = pytest.mark.skipif(
     not _home_reachable(),
     reason="home llama.cpp unreachable (network) — live probe undecidable",
 )
+
+
+# loop23 cycle 60: env quarantine for env-sensitive modules (A15 class)
+import pytest as _pytest
+
+
+@pytest.fixture(autouse=True)
+def _quarantine_codemonkey_env(request):
+    from codemonkey.envquarantine import (is_sensitive, restore_codemonkey_env,
+                                          snapshot_codemonkey_env)
+
+    snap = snapshot_codemonkey_env()
+    yield
+    restore_codemonkey_env(snap)
+
+
+@pytest.fixture()
+def scrubbed_env():
+    from codemonkey.envquarantine import scrub_codemonkey_env
+
+    removed = scrub_codemonkey_env()
+    yield removed
