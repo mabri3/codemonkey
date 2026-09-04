@@ -1915,3 +1915,8 @@ compute via args_key (jkey scope bug caught by test_batch_edit).
 `codemonkey digest <thread>` (+ --json). LOOP 21 COMPLETE. 500 tests.
 
 ## 2026-09-03 — CYCLE R22: Loop 22 research — exec --dry-run preview mode selected
+
+## 2026-09-03 — CYCLE 59+loop22-final (loop22): dry-run preview shipped
+
+**Completed:** dryrun.py previews + loop dry_run interception (pre-approval)
++ journal preview records + exec/CLI --dry-run flag. LOOP 22 COMPLETE.

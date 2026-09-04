@@ -813,3 +813,16 @@ ping-ponging.
 | Run digest (58) | tests/test_digest.py: empty tolerance, tool counts, failure section, route-fallback flag, JSON shape, header | ✅ 6/6 |
 
 **LOOP 21 COMPLETE.**
+
+
+---
+
+# Loop 22 — Final Acceptance (CYCLE loop22-final)
+
+**Suite:** 505 passed.
+
+| Improvement | Probe | Result |
+|---|---|---|
+| exec --dry-run (59) | tests/test_dry_run.py: write/edit/shell previews, mutating-set accuracy, journal preview record | ✅ 5/5 |
+
+**LOOP 22 COMPLETE.**

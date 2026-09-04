@@ -777,8 +777,8 @@ journal key semantics that cycle 36-38 will build on.
 
 ### loop22: cycles (from build/research-loop22.md, cycle R22)
 
-- [ ] CYCLE 59 — `loop22:` exec --dry-run preview mode
-- [ ] CYCLE loop22-final — Loop 22 acceptance: sweep + report + push
+- [x] CYCLE 59 — `loop22:` exec --dry-run preview mode
+- [x] CYCLE loop22-final — Loop 22 acceptance: sweep + report + push
 
 ### loop20: cycles (selected from build/research-loop20.md, cycle R20)
 
