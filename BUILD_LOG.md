@@ -2015,3 +2015,42 @@ FULFILLED.
   invalidate the loop-30 certificates loops 32–36 were measured against).
 - **Next step:** loops 38–45 forward-arc proposal (`build/loops-38-45-proposal.md`
   + `CYCLE R38`–`R45` appended unchecked to `build/plan.md`).
+
+## 2026-09-04 — Forward-arc proposal: loops 38–45 (PROPOSED, NOT AUTHORIZED)
+
+- **Files changed:** `build/loops-38-45-proposal.md` (new, 358 lines),
+  `build/critic-r37.md` (findings F7 + F8 appended), `build/plan.md`
+  (`CYCLE R38`–`R45` appended unchecked), `SPRINT.md` (arc mirror),
+  `features.html` (F7/F8 recorded under Known limitations; the v3.0.0
+  capability list is now qualified as "libraries built, not features shipped").
+- **What drove the arc.** Two further review findings, both reproduced:
+  - **F7 (HIGH):** seven of the ten loop-28..36 modules — `graphquery`,
+    `certify`, `branches`, `bestofn`, `rubrics`, `adaptivemem`, `learnedctx` —
+    are imported by **no source file**. `tools.SPECS` contains no graph tool,
+    `eval` never calls `sequential_verdict`, there is no `--best-of` flag and
+    no `branch` sub-command. Every one of their verify probes was written
+    against unit tests rather than an entry point, so all of them passed
+    honestly over features that cannot run.
+  - **F8 (MEDIUM):** `build/CAPABILITY_REGISTER.md` does not exist, though 13
+    references to it exist including R37's own verify probe.
+  Neither is fixed here: both are core-design/process work that AGENTS.md §4
+  says to stop and ask about. They are the premise of the proposed arc.
+- **The arc.** R38 reachability (wire the orphans or delete them; rebuild the
+  register) · R39 failure-anchored recovery · R40 the test loop as the primary
+  control signal · R41 repository-scale change that lands or rolls back whole ·
+  R42 the small-model compiler · R43 the caller contract (the loop-10 MCP
+  deferral finally decided) · R44 trustworthy autonomy budgets · R45 the
+  evidence pack + v4.0 closing acceptance. Two new arc rules: **R-H** (a
+  "certificate" is time-uniform or is renamed — the current `certify` bound is
+  fixed-n Hoeffding replayed after every observation) and **R-I** (a capability
+  is not shipped until its entry point is exercised; `pytest` alone may not
+  satisfy a verify probe). R41, R43 and R44 end by asking.
+- **Tests run:** `uv run pytest -q` → **587 passed**, 0 failed (unchanged —
+  this cycle is documentation and ledger only, no source change).
+- **Probe results (literal):** `grep -n "^- \[ \] CYCLE R" build/plan.md` →
+  R38, R39, R40, R41, R42, R43, R44, R45 — eight cycles, all unchecked.
+- **Known issues:** the arc carries **no authorization**. Every R38–R45 box
+  stays unchecked until the user authorizes it; four of the eight charters
+  touch approved core design and end by asking even then.
+- **Next step:** user decision on Gate 2 (v3.0.0 acceptance, now with F7/F8 on
+  the record) and on whether to authorize the 38–45 arc.

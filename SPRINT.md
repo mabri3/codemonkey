@@ -150,6 +150,23 @@ R-A…R-E carry over from the 17-27 arc; R-F (report cost with every quality
 number) and R-G (record published number, local number, AND the gap) are added.
 Also unauthorized until the user says otherwise.
 
+Post-v3.0.0 critic fix pass (DONE 2026-09-04): cycles `R37F1`-`R37F6` in
+`build/plan.md`, findings in `build/critic-r37.md` — two HIGH runtime defects
+(permission-rule hits killed any journaled run; `rules-compile` never ran), an
+exit-2 contract break, an adaptive-memory budget overrun, a missing import and
+a stale knowledge graph. Suite 579 -> 587.
+
+Utility arc loops 38-45 (PROPOSED 2026-09-04, NOT AUTHORIZED): eight research
+cycles `R38`-`R45` appended unchecked after R37F6 in `build/plan.md`. Charters:
+`build/loops-38-45-proposal.md`. The arc's premise is critic finding F7 —
+SEVEN of the ten loop-28..36 capability modules are imported by no source file
+and cannot affect a real run — so R38 wires or deletes them before any new
+capability is built. Rules R-A…R-G carry over; R-H (a "certificate" is
+time-uniform or is renamed) and R-I (a capability is not shipped until its
+ENTRY POINT is exercised — `pytest` alone may not satisfy a verify probe) are
+added. R41, R43 and R44 touch core design and END BY ASKING. Unauthorized
+until the user says otherwise.
+
 ## Ticks (every 5 min)
 
 Heartbeats are ~12/h but most are no-ops (check state, exit); cost is

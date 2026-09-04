@@ -1590,3 +1590,129 @@ and branching without defined crash semantics is undefined behavior.
   verify: `graphify . --update` then
   `grep -c "learnedctx" graphify-out/graph.json` → ≥ 1; graph committed in the
   same commit as the fix cycle
+
+## Forward arc — loops 38-45 (PROPOSED 2026-09-04, NOT AUTHORIZED)
+
+Charters, the literature each loop replicates, and the two added arc rules
+(R-H "a certificate must be what it says it is", R-I "a capability is not
+shipped until its entry point is exercised") live in
+`build/loops-38-45-proposal.md`. Rules R-A…R-G carry over from the 17-27 and
+28-37 arcs. These cycles stay unchecked until the user authorizes the arc.
+
+- [ ] CYCLE R38 — Loop 38 research + reachability: the seven loop-28..36 modules
+  that no source file imports (`graphquery`, `certify`, `branches`, `bestofn`,
+  `rubrics`, `adaptivemem`, `learnedctx`) are wired to a real entry point or
+  deleted; `build/CAPABILITY_REGISTER.md` reconstructed as the release record
+  | est: 40m |
+  verify: `build/research-loop38.md` committed in the standard shape (this one
+  cites in-repo evidence — `build/critic-r37.md` F7/F8 — rather than
+  literature, and says so); `build/plan.md` contains the `loop38:` cycles
+  (unchecked) in which EVERY probe is an R-I entry-point probe: the feature is
+  driven through `codemonkey exec` or a `codemonkey` sub-command and asserts an
+  observable difference in the run (a `graph_*` call appearing in `tools.SPECS`
+  AND in a real run's tool trace; `eval` printing a certificate; `exec
+  --best-of N` scoring N candidates; a strategy selectable by name; `codemonkey
+  branch` creating a worktree) — `pytest` alone may not satisfy any of them;
+  at least one module must end the loop marked DEAD and deleted if it cannot
+  earn a probe; the register has a row for every module in `src/codemonkey/`
+  reading PROVEN-LIVE / UNIT-ONLY (with reason) / DEAD. `certify` is rewired
+  only after R-H is discharged (time-uniform bound, or renamed).
+  ENTRY CONDITION: R37F1-R37F6 committed. Core-design: PARTIAL — new tools and
+  new registry strategies extend approved surfaces; `--best-of` spends N×
+  tokens and ends by asking per R-F.
+- [ ] CYCLE R39 — Loop 39 research: failure-anchored recovery — an online
+  failure taxonomy over the journal's existing `error_class`, localization of
+  the first unrecoverable step, and a recovery policy table (retry differently
+  / roll back to checkpoint / stop and report honestly) | est: 30m |
+  verify: `build/research-loop39.md` committed in the standard shape (citing
+  the failure-process and structured-recovery work, and the 12-82% longer
+  failure-trajectory result); `build/plan.md` contains the `loop39:` cycles
+  (unchecked) whose FIRST probe is an R-I scripted failing scenario through
+  `codemonkey exec` in which the pre-loop agent burns its full turn budget and
+  the post-loop agent stops early with a typed failure report — turn count AND
+  token cost for both per R-F. ENTRY CONDITION: R38 closed. Core-design:
+  PARTIAL — a policy that can terminate a run is adjacent to approval
+  semantics and ends by asking.
+- [ ] CYCLE R40 — Loop 40 research: the test loop as the primary control signal
+  — reproduction-test-first execution, the verify gate promoted to default-on
+  where a test command is discoverable, and generated-test quality as a
+  first-class risk (a test that never failed proves nothing) | est: 30m |
+  verify: `build/research-loop40.md` committed in the standard shape (citing
+  the reproduction-test generators and stating the published ~63% fail-to-pass
+  figure UP FRONT as a frontier-harness number this repo will not match);
+  `build/plan.md` contains the `loop40:` cycles (unchecked) whose probes report
+  golden-suite pass rate with the test loop ON vs OFF, the measured
+  fail-to-pass rate of generated tests next to the published one per R-G, and
+  cost/wall-clock per R-F, certified under R-H. ENTRY CONDITION: R38 closed
+  (certificates and best-of-N reachable). Core-design: PARTIAL — default-on
+  verification changes what "finished" means and ends by asking.
+- [ ] CYCLE R41 — Loop 41 research: repository-scale change that lands or rolls
+  back whole — the change plan as an explicit object, change-impact analysis
+  over the loop-28 graph, atomic apply/rollback on the 14F1 checkpoint group,
+  worktrees as the isolation boundary | est: 30m |
+  verify: `build/research-loop41.md` committed in the standard shape (citing
+  the ~81% multi-file-patch reduction from structural grounding and the
+  multi-hunk coordination work); `build/plan.md` contains the `loop41:` cycles
+  (unchecked) whose FIRST probe induces a mid-plan failure in a multi-file
+  refactor driven through `codemonkey exec` and asserts the tree is
+  byte-identical to its pre-plan state (`git status` clean, `git diff` empty),
+  plus a signature-change task where the graph-grounded plan touches callers a
+  `search`-driven plan misses, both counts reported. ENTRY CONDITION: R38 and
+  R39 closed. Core-design: YES — this changes how edits are applied and what
+  `undo` means. R41 ENDS BY ASKING.
+- [ ] CYCLE R42 — Loop 42 research: the small-model compiler — long-horizon
+  tasks compiled into short, individually verifiable segments with explicit
+  hand-off state (`jobs`), per-segment tool-surface restriction, and constrained
+  decoding where the endpoint supports it | est: 30m |
+  verify: `build/research-loop42.md` committed in the standard shape (citing
+  the open-weight capability-ladder work and stating UP FRONT that the
+  long-horizon tier may remain out of reach on a 27B endpoint — an honest "the
+  ceiling is the ceiling" is a valid exit, as R13 permitted); `build/plan.md`
+  contains the `loop42:` cycles (unchecked) whose probes report golden-suite
+  pass rate AND malformed-tool-call rate with segmentation ON vs OFF, certified
+  under R-H, with the published open-weight comparison per R-G. ENTRY
+  CONDITION: R40 closed — without a machine success signal this loop cannot be
+  measured. Core-design: PARTIAL — per-segment tool restriction changes the
+  advertised tool surface mid-run and ends by asking.
+- [ ] CYCLE R43 — Loop 43 research: the caller contract — the subprocess
+  contract specified (exit-code taxonomy, versioned JSONL event schema,
+  `--output-schema` guarantees, resumability), then the loop-10 MCP deferral
+  decided one way or the other (server vs client — pick one, with reasons),
+  plus a conformance suite a caller can run | est: 30m |
+  verify: `build/research-loop43.md` committed in the standard shape (citing
+  the interoperability-protocol survey and the current MCP/ACP/A2A split, and
+  recording the MCP decision with its reasons); `build/plan.md` contains the
+  `loop43:` cycles (unchecked) whose FIRST probe has a SECOND, independent
+  process drive codemonkey end-to-end using only the documented contract, with
+  the conformance suite green against the released binary and a deliberate
+  schema change shown to FAIL it. ENTRY CONDITION: R38 closed. Core-design:
+  YES — a published contract constrains every future loop and an MCP surface is
+  a new trust boundary. R43 ENDS BY ASKING.
+- [ ] CYCLE R44 — Loop 44 research: trustworthy autonomy budgets — declared
+  token/wall-clock/turn/cost/blast-radius budgets enforced by the runtime,
+  approval batching against finite human oversight capacity, and halting that
+  reports and resumes rather than degrading | est: 30m |
+  verify: `build/research-loop44.md` committed in the standard shape (citing
+  the runtime-contract and oversight-capacity work); `build/plan.md` contains
+  the `loop44:` cycles (unchecked) whose FIRST probe halts a real run at a
+  declared budget with a distinct exit code, a resumable job file and a
+  checkpointed workspace, PLUS a probe asserting a self-authored loop-34 rule
+  can never raise a budget. ENTRY CONDITION: R41 closed — blast radius needs a
+  change plan to bound. Core-design: YES — this defines what unattended
+  operation is. R44 ENDS BY ASKING.
+- [ ] CYCLE R45 — Loop 45 research + closing acceptance: v4.0 — the evidence
+  pack (claims linked to their supporting journal/command/diff/test evidence,
+  redacted, hash-chained, verifiable by another process) and the closing sweep
+  | est: 40m |
+  verify: `build/research-loop45.md` committed; `build/plan.md` contains the
+  `loop45:` cycles (unchecked) ending in `loop45-final` whose own probe is:
+  `bash build/acceptance_sweep.sh` → all exit 0, zero BLOCKED; `uv run pytest
+  -q` → exit 0; `uv run codemonkey --version` matches the tag; every
+  `build/CAPABILITY_REGISTER.md` row reads PROVEN-LIVE, UNIT-ONLY with a stated
+  reason, or DEAD — no UNVALIDATED rows; every loop-38..44 row carries its
+  local/published/gap triple per R-G and its cost per R-F; an evidence pack
+  from a real run VERIFIES IN A SEPARATE PROCESS WITH THE MODEL ENDPOINT
+  SWITCHED OFF; THREAT_MODEL.md refreshed (MCP surface, autonomy budgets,
+  evidence packs); report committed. ENTRY CONDITION: loops 38-44 closed
+  (shipped or explicitly rejected in writing), no open critic finding above
+  LOW. Core-design: NO.

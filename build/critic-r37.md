@@ -161,6 +161,87 @@ loop-34-era neighborhood.
 
 ---
 
+## F7 — HIGH (scope/honesty) — eight of the ten loop-28..36 capabilities are unreachable
+
+**Evidence.** Static reachability check over the shipped tree — for each
+loop-28..36 module, "which *source* file imports it?":
+
+| module (loop) | imported by any `src/` file | agent/CLI entry point |
+|---|---|---|
+| `graphquery.py` (28) | **no** | none — `tools.SPECS` has no `graph_*` tool |
+| `grounding.py` (29) | yes (`tools/write_file.py`) | ✅ reachable |
+| `certify.py` (30) | **no** | `eval` never calls `sequential_verdict` |
+| `branches.py` (31) | **no** | no `branch` sub-command in `--help` |
+| `bestofn.py` (32) | **no** | no caller, no flag |
+| `rubrics.py` (33) | **no** | `eval` scores without rubrics |
+| `compile_rules.py` (34) | yes (`rules_cli.py`) | ✅ (once F2 is fixed) |
+| `adaptivemem.py` (35) | **no** | `strategies/memory.py` never consults it |
+| `learnedctx.py` (36) | **no** | `instructions.py` assembles by hand |
+| `verifyhint.py` (26) | yes (`exec.py`) | ✅ reachable |
+
+Reproduce: `for m in graphquery certify branches bestofn rubrics adaptivemem
+learnedctx; do grep -rl "$m" src/codemonkey --include='*.py' | grep -v "/$m.py";
+done` → **empty**. And
+`python -c "from codemonkey import tools; print(sorted(tools.SPECS))"` →
+`delegate, delegate_batch, edit_file, glob, list_dir, read_file, repo_map,
+search, shell, update_memory, update_plan, web_fetch, write_file` — no graph
+tool, which was loop 28's entire premise ("expose the structural index to the
+agent itself").
+
+**Impact.** Each of these modules is correct, documented and unit-tested, and
+**none of them can affect a single real run.** `features.html` and the R37
+BUILD_REPORT describe them as shipped capabilities of v3.0.0 ("graph query …
+certificates, worktrees, best-of-N, rubrics … adaptive memory, learned
+context"). By the repo's own standard — SPRINT.md hard rule 5, and arc rule
+R-A "measure or delete" — a library with no caller is not a capability, and
+describing it as one in a release report is the failure mode that rule exists
+to prevent. The two HIGH bugs above (F1, F2) are the same disease in its
+milder form: code whose *logic* is tested and whose *entry point* is not.
+
+**Why it happened (structural, not careless).** Every loop-28..36 verify probe
+in `build/plan.md` is written against the module's unit tests. None is written
+against a user- or agent-visible surface. A probe of the form "`uv run pytest
+-q tests/test_bestofn.py` → N passed" is satisfiable without the feature ever
+being reachable, and it was satisfied honestly. The defect is in the probe
+grammar, not in anyone's diligence.
+
+**Not fixed here — chartered.** Wiring eight capabilities into `exec`, the tool
+registry, the strategy registry and the eval harness is eight cycles of design
+work that changes tool surface, strategy selection and eval semantics — squarely
+"core design" under AGENTS.md §4 (*stop and ask*). It is filed here and it is
+the premise of the forward arc: `build/loops-38-45-proposal.md` §B rule **R-I**
+("a capability is not shipped until its entry point is exercised") and CYCLE
+R38, which discharges this finding first, before any new capability is built.
+
+**Verify probe (for R38, not for this fix cycle).** For each of the seven
+unreachable modules: a probe that drives it through `codemonkey exec` or a
+`codemonkey` sub-command — not through `pytest` — and asserts an observable
+difference in the run (a tool call made, a certificate printed, a rule
+enforced, a shorter context, a branch created).
+
+---
+
+## F8 — MEDIUM (process) — `build/CAPABILITY_REGISTER.md` does not exist
+
+**Evidence.** `ls build/CAPABILITY_REGISTER.md` → no such file, while 13
+references to it exist across `build/plan.md`, the proposals and `BUILD_LOG.md`,
+including R37's own verify probe: "every `build/CAPABILITY_REGISTER.md` row
+reads PROVEN-LIVE, UNIT-ONLY with a stated reason, or DEAD — no UNVALIDATED
+rows". A probe over a nonexistent file cannot have been evaluated, yet R37 is
+ticked and v3.0.0 is tagged.
+
+**Impact.** The register is the arc's release record (rule R-E) and the only
+artifact that would have caught F7: every one of the seven unreachable modules
+is exactly an "UNIT-ONLY" row. Its absence is why an honest process still
+shipped an overstated report.
+
+**Not fixed here — chartered.** Reconstructing the register means re-deciding
+PROVEN-LIVE / UNIT-ONLY / DEAD for ~60 capabilities, which is a cycle with a
+live sweep attached, not an edit. Assigned to CYCLE R45 (closing acceptance)
+with R38 producing the initial rows.
+
+---
+
 ## Non-findings (looked at, deliberately not filed)
 
 - `bestofn.best_of_n` leaves the last candidate applied on total failure. That
@@ -179,5 +260,11 @@ loop-34-era neighborhood.
   `tools/update_memory.py`, `tools/repo_map.py` and ~20 unused imports: cosmetic,
   no behavior attached. Not worth a cycle; not worth churning the diff.
 
-**Summary: 2 HIGH, 3 MEDIUM, 1 LOW — all reproduced, all fixed in R37F1–R37F6,
-all regression-tested. Suite after the fix cycle: 587 passed (579 + 8).**
+**Summary: 3 HIGH, 4 MEDIUM, 1 LOW.** F1–F6 are reproduced, fixed in
+R37F1–R37F6 and regression-tested (suite 579 → **587 passed**). F7 and F8 are
+reproduced and **deliberately not fixed** — both are core-design/process work
+that AGENTS.md §4 says to stop and ask about, and both are discharged by the
+proposed forward arc (`build/loops-38-45-proposal.md`: R38 wires the orphans,
+R45 rebuilds the register). Until R38 lands, the honest statement of v3.0.0 is:
+**27 loops of shipped capability plus nine loop-28..36 libraries, two of which
+are reachable.**

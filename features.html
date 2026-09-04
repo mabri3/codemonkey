@@ -129,6 +129,8 @@ uv run codemonkey journal list    # execution-journal threads (now written by re
 
 <h2>Known limitations</h2>
 <ul>
+  <li><strong>Seven of the ten loop-28&ndash;36 capability modules are not reachable from any entry point</strong> (closing-critic finding F7, <code>build/critic-r37.md</code>): <code>graphquery</code>, <code>certify</code>, <code>branches</code>, <code>bestofn</code>, <code>rubrics</code>, <code>adaptivemem</code> and <code>learnedctx</code> are written and unit-tested but imported by no source file, so they cannot affect a real run &mdash; there is no <code>graph_*</code> tool in the agent's tool set, <code>eval</code> prints no certificate, and no <code>--best-of</code> flag exists. Their loop-28&ndash;36 verify probes were written against unit tests rather than entry points. Proposed CYCLE R38 wires or deletes each one; until then, read the v3.0.0 capability list above as <em>libraries built</em>, not <em>features shipped</em>.</li>
+  <li><code>build/CAPABILITY_REGISTER.md</code>, referenced by 13 places including R37's own verify probe, has never existed (finding F8). Reconstructing it is part of the proposed R38/R45 work.</li>
   <li>Streaming retries cover the response <em>status</em> only: once tokens have been handed to the caller a mid-stream failure propagates rather than replaying the turn.</li>
   <li><code>Retry-After</code> is honored in its delta-seconds form; the HTTP-date form falls back to jittered backoff.</li>
 
