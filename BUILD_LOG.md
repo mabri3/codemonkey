@@ -1896,3 +1896,9 @@ server-side). NVMe offload NOT selected (server-side).
 **Completed:** budget.py (kv_bytes_per_token, safe_context_limit with 85%
 safety factor + 1k rounding, validate honest errors) + `budget show` CLI +
 copiable YAML. LOOP 19 COMPLETE.
+
+## 2026-09-03 — CYCLE R20: Loop 20 research — pre-dispatch arg validation selected
+
+**Completed:** `build/research-loop20.md` — validate_args from SPECS with
+structured mismatch feedback into the self-heal loop (57, strict-unknown-keys
+folded). Completes the 51F1 wire-honesty story on the dispatch side.

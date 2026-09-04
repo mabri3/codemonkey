@@ -773,6 +773,17 @@ journal key semantics that cycle 36-38 will build on.
 
 
 
+
+### loop20: cycles (selected from build/research-loop20.md, cycle R20)
+
+- [ ] CYCLE 57 — `loop20:` tool-arg validation gate — validate_args(tool,
+  args) from SPECS (required/type/strict-unknown); mismatch → schema_mismatch
+  result feeding the self-heal loop | est: 30m |
+  verify: `uv run pytest tests/test_arg_validation.py -q` → exit 0 (≥6 tests);
+  `uv run pytest -q` → exit 0.
+- [ ] CYCLE loop20-final — Loop 20 acceptance: sweep + report + push |
+  est: 30m | verify: sweep green; suite green; report; pushed.
+
 ### loop19: cycles (selected from build/research-loop19.md, cycle R19)
 
 - [x] CYCLE 56 — `loop19:` codemonkey budget — VRAM→tokens calculator
@@ -1168,7 +1179,7 @@ live with zero BLOCKED rows.
   production runs (31F1, done) AND a reachable live endpoint; without one R19
   records BLOCKED rather than proving resume against mocks. Core-design: YES
   (what a resumed run may assume is session semantics) — R19 ENDS BY ASKING.
-- [ ] CYCLE R20 — Loop 20 research: containment for real (D2 — R16 researched
+- [x] CYCLE R20 — Loop 20 research: containment for real (D2 — R16 researched
   macOS `sandbox-exec`/Linux bwrap then dropped it from SELECTED, leaving the
   documented `shell` cwd-escape gap open under lexical containment alone) —
   per-level profiles, honest fail-closed fallback where no mechanism exists,
