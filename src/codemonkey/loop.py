@@ -76,6 +76,7 @@ def run_turns(
     journal_run: str = "",
     perm_rules: list | None = None,
     dry_run: bool = False,
+    recovery_budget: int = 8,
 ) -> ChatTurn:
     """Drive the model until a final text answer or max_turns.
 
@@ -101,6 +102,14 @@ def run_turns(
 
     stuck_det = (stuck_mod.StuckDetector()
                  if stuck_mod.enabled() else None)
+
+    # loop39 cycle 90: recovery policy + budget (report-only). The tracker
+    # counts post-first-error turns; the policy advises on stuck, never stops.
+    from . import recovery as recovery_mod
+
+    recovery_tracker = recovery_mod.RecoveryTracker(budget=recovery_budget)
+    turn_tokens = 0
+    turns_seen = 0
 
     mode = tool_protocol if tool_protocol in ("native", "prompt") else "auto"
     edit_retries_left = max(0, int(max_edit_retries))
@@ -222,6 +231,12 @@ def run_turns(
 
         if on_event:
             on_event({"type": "turn.completed", "usage": turn.usage})
+        # loop39 cycle 90: token burn ledger for the would-have-saved estimate
+        try:
+            turn_tokens += int((turn.usage or {}).get("total_tokens") or 0)
+        except (TypeError, ValueError, AttributeError):
+            pass
+        turns_seen += 1
 
         # loop3 bridge: native call returned TEXT that still looks like prompt-
         # protocol output (some models wrap tool calls in text even when native
@@ -557,6 +572,9 @@ def run_turns(
                         stuck_signal = _sig
                 except Exception:
                     stuck_signal = None
+            # loop39 cycle 90: first error signal starts the recovery budget
+            if not ok and recovery_tracker.first_error_turn is None:
+                recovery_tracker.note_error(_turn_no)
             # 35F1: `_jkey` is the journal key carried back from _run_one (it
             # is a LOCAL there — the old code read an unbound `jkey` in this
             # scope and the surrounding `except Exception` swallowed the
@@ -678,6 +696,69 @@ def run_turns(
             # resets the pair (the detector itself keeps counting otherwise)
             if stuck_det is not None:
                 stuck_det.record_reset()
+            # ---- recovery policy + budget (loop39, cycle 90 — report-only)
+            # Consult the class→action table, advise via a system reminder,
+            # and emit the typed report. The run CONTINUES in all cases:
+            # exhaustion verdicts are emitted, never enforced (C91).
+            recovery_tracker.note_stuck(_turn_no)
+            _policy = recovery_mod.consult(
+                stuck_signal["tool"], stuck_signal["error_class"],
+                stuck_signal.get("output", ""))
+            _attempts = stuck_det.fired if stuck_det is not None else 1
+            try:
+                from .checkpoints import list_checkpoints as _lc
+
+                _cps = _lc(workdir=ctx.workdir)
+                _cp_id = str(_cps[0]["dir"].name) if _cps else ""
+            except Exception:
+                _cp_id = ""
+            _report = recovery_mod.failure_report(
+                failure_class=stuck_signal["error_class"],
+                taxonomy=_policy["taxonomy"],
+                first_stuck_turn=recovery_tracker.first_stuck_turn,
+                attempts=_attempts,
+                checkpoint_id=_cp_id,
+                journal_thread=journal_thread)
+            messages.append({
+                "role": "user",
+                "content": (f"RECOVERY POLICY [{_policy['taxonomy']} → "
+                            f"{_policy['action']}]: {_policy['hint']}"),
+            })
+            if on_event:
+                on_event({"type": "failure_report.consulted",
+                          "report": _report, "policy": _policy["action"]})
+            if journal_thread:
+                try:
+                    from .journal import record as _jrp
+
+                    _jrp(journal_thread, "outcome",
+                         tool=stuck_signal["tool"],
+                         key=f"recovery:{journal_run}:{_turn_no}",
+                         status="recovery-consulted",
+                         error_class=stuck_signal["error_class"],
+                         output=(f"{_policy['taxonomy']} → {_policy['action']}"))
+                except OSError:
+                    pass
+            if recovery_tracker.exhausted(_turn_no) and not recovery_tracker.verdict_emitted:
+                recovery_tracker.verdict_emitted = True
+                _saved = recovery_tracker.saved_vs_max_turns(
+                    max_turns, _turn_no, turn_tokens, turns_seen)
+                if on_event:
+                    on_event({"type": "failure_report.budget_exhausted",
+                              "report": _report,
+                              "would_save_turns": _saved["turns"],
+                              "would_save_tokens": _saved["tokens"]})
+                messages.append({
+                    "role": "user",
+                    "content": (
+                        f"RECOVERY BUDGET EXHAUSTED: {recovery_tracker.post_error_turns(_turn_no)} "
+                        f"turns since the first error (budget {recovery_tracker.budget}). "
+                        f"Stopping now would have saved ~{_saved['turns']} turns and "
+                        f"~{_saved['tokens']} tokens vs burning to max_turns ({max_turns}). "
+                        f"Checkpoint to resume from: {_cp_id or '(none)'}. "
+                        "This is ADVISORY ONLY — the run continues; report honestly "
+                        "if you cannot make progress."),
+                })
 
         # ---- verify gate (loop4, cycle 19) ------------------------------
         # After any turn whose MUTATING tool calls succeeded, run the

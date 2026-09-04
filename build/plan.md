@@ -2107,7 +2107,7 @@ loop 45's v4.0 acceptance. This section is a plan, not a queue.
   burn N turns → `stuck` event with the repeated pair appears at turn 3 in
   the `--json` trace while the run still completes; `uv run pytest -q
   tests/test_stuck.py` → exit 0 (≥4 tests); full suite green.
-- [ ] CYCLE 90 — `loop39:` recovery policy table + budget cap + typed
+- [x] CYCLE 90 — `loop39:` recovery policy table + budget cap + typed
   failure report (report-only): policy (retry-differently hint / rollback
   suggestion / stop-and-report) consulted on stuck; recovery budget caps
   post-first-error turns; `failure_report.*` events + report object, but the

@@ -2562,3 +2562,20 @@ graphify refresh complete the close-out per the framework.
   AWAITING-ASK on the termination policy.
 - **Next step:** CYCLE 90 — recovery policy table + budget cap + typed failure
   report (report-only).
+
+## 2026-09-04 — CYCLE 90 (loop39): recovery policy + budget + typed report
+
+**Completed (report-only):** `src/codemonkey/recovery.py` — POLICY_TABLE
+(10 taxonomy rows: retry-differently vs stop-and-report), `consult()` reusing
+failclass taxonomy, `RecoveryTracker` (post-first-error budget, default 8,
+would-have-saved turns+tokens from the run's own burn rate, once-per-run
+verdict), `failure_report` typed object. Loop wiring: policy advisory
+appended on stuck, `failure_report.consulted` + `failure_report.budget_exhausted`
+events on the trace and in JSONL; run CONTINUES in all cases. `recovery_budget`
+config knob threaded through exec.
+**Tests:** `tests/test_recovery.py` 8/8 (table, tracker, saved-math, report
+shape, R-I scripted failing run: first_stuck_turn=3, would_save 3 turns +
+tokens, run completes). Full suite 654/5.
+- **Known issues:** none. C91/C92 remain AWAITING-ASK.
+- **Next step:** the R39 ask batch (C91/C92 termination + rollback policy,
+  C94-flip default-on) — user decision required before any worker starts them.

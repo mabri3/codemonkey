@@ -329,6 +329,15 @@ def run_exec(
                   "tool": ev.get("tool", ""),
                   "error_class": ev.get("error_class", ""),
                   "streak": ev.get("streak", 0)})
+        elif etype in ("failure_report.consulted", "failure_report.budget_exhausted"):
+            # loop39 cycle 90: typed recovery report rides the trace so the
+            # entry probe reads first_stuck_turn + would-have-saved off the
+            # wire (R-F: turns AND tokens, both printed by renderers).
+            emit({"type": etype, "thread_id": thread_id,
+                  "report": ev.get("report") or {},
+                  "policy": ev.get("policy", ""),
+                  "would_save_turns": ev.get("would_save_turns", 0),
+                  "would_save_tokens": ev.get("would_save_tokens", 0)})
         elif etype == "error":
             emit({"type": "error", "message": ev.get("message", "")})
         elif etype == "persist.drop":
@@ -513,6 +522,7 @@ def run_exec(
             journal_run=(_jrun or run_id),
             perm_rules=list(((cfg.get("permissions") or {}).get("rules")) or []),
             dry_run=dry_run,
+            recovery_budget=int(cfg.get("recovery_budget", 8) or 0),
         )
 
     # loop17 cycle 53: static model routing (first-match rules on prompt/role)
