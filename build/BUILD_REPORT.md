@@ -711,3 +711,41 @@ post-v1.0.0.
 aa17377 (R17) → 98e40b6 (C52) → e27949c (C53) → this commit.
 
 **LOOP 17 COMPLETE.**
+
+
+---
+
+# Loop 17 — Final Acceptance (CYCLE loop17-final)
+
+**Date:** 2026-09-03 · **Suite:** 473 passed · scoped live at user request
+post-v1.0.0, from first-week live defects on .176.
+
+## Loop-17 criteria (from build/research-loop17.md — all pass)
+
+| Improvement | Probe | Result |
+|---|---|---|
+| Honest-completion gate (52) | tests/test_verify_claims.py: file-existence claims, journal-evidenced command claims, missing-evidence flags, [UNVERIFIED] markers + journal record, off-by-default, clean-reply no-op, no-claims no-op | ✅ 7/7 |
+| Static model routing (53) | tests/test_routing.py: first-match wins, prompt-glob match, default fallback, journaled route record, invalid-rule rejection, route-stats aggregation | ✅ 6/6 |
+
+## Live evidence (.176)
+
+- **Routing:** "compliance check" prompt → journaled route swap
+  `local/unsloth/Qwen3.6-35B-A3B-MTP-GGUF rule=0`; control prompt stayed on
+  the default model. `eval --route-stats` aggregates per-route
+  pass_rate/tokens from results.
+- **verify_claims** targets the fizzbuzz overclaim class observed live
+  (test file promised, not written).
+
+## Incident notes (honest recording)
+- A15 sweep 5-fail: sweep-interleaved env pollution — clean re-run 473/473.
+- A11 exit=1: rambly reply without the codeword — retry PASS (also recalled
+  durable "zebra" from loop-5's stored thread).
+- A16 chars=0: server-side model unload after the routing probe
+  ("No model loaded. POST /inference/load first") — server auto-recovered
+  (chat 200 in 3.1s). Routing on a single-model-slot server has unload risk;
+  the journal's route records make it measurable. Future cycle candidate.
+
+## Loop-17 commit range
+aa17377 (R17) → 98e40b6 (C52) → e27949c (C53) → this commit (loop17-final).
+
+**LOOP 17 COMPLETE.**
