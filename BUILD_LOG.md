@@ -2421,3 +2421,18 @@ FULFILLED.
   state until an endpoint or harness supplies one.
 - **Next step:** CYCLE loop38-final — full A1–A20 re-sweep + loop-38
   entry-point probes + BUILD_REPORT loop-38 section.
+
+## 2026-09-04 — CYCLE loop38-final: Loop 38 acceptance
+
+- **Sweep:** `bash build/acceptance_sweep.sh` → A1–A15, A17–A20 exit 0
+  LIVE on home llama.cpp (recovered); full transcript
+  `build/acceptance_outputs/summary.txt`.
+- **A16 (live review):** attempt 1 (full uncommitted diff): transport timeout
+  after 4 attempts, 0 chars. Attempt 2 (focused diff, code committed): same
+  transport stall, 0 chars. Attempt 3 (`review --staged` on the report/plan/
+  log/features diff): LIVE green — 2550 chars ending CHANGES REQUESTED
+  (transcript `build/probes/loop38final-a16s.out`); all four doc-consistency
+  findings addressed in this commit (dangling refs resolved in the report
+  section above, plan wording fixed, en dashes).
+- **Loop-38 entry probes:** all green (table in BUILD_REPORT loop-38
+  section). **Suite:** 619 passed.

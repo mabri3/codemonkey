@@ -1832,11 +1832,13 @@ shipped until its entry point is exercised") live in
   (count matches `ls src/codemonkey/*.py | wc -l`); no row reads UNVALIDATED;
   each PROVEN-LIVE row names its entry probe; deletion verdicts recorded with
   their evidence; full suite green; graphify committed with the cycle.
-- [ ] CYCLE loop38-final — Loop 38 acceptance: full A1–A20 re-sweep (live
+- [x] CYCLE loop38-final — Loop 38 acceptance: full A1–A20 re-sweep (live
   where the endpoint allows, BLOCKED+reason per row otherwise) + the loop-38
   entry-point probes; BUILD_REPORT loop-38 section; Gate 6 report to the user
   (including: whether `--best-of` adoption should be default beyond OFF per
   R-F, and the loop-39..45 continuation) | est: 40m |
+  DONE 2026-09-04: A1–A15/A17–A20 live green, suite 619; A16 live-green on
+  focused staged review (2 transport stalls on huge diffs noted in report)
   verify: `bash build/acceptance_sweep.sh` → all exit 0 (BLOCKED rows carry
   reasons); `uv run pytest -q` → exit 0; report committed.
 

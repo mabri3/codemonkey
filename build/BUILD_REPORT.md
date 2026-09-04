@@ -941,3 +941,53 @@ rules-compile, adaptive memory, learned context assembly.
 Every CYCLE checkbox in build/plan.md: TICKED (157/157).
 
 **GATE 2: User acceptance is now the only standing decision.**
+
+
+---
+
+# Loop 38 — Final Acceptance (CYCLE loop38-final)
+
+**Date:** 2026-09-04 · **Suite:** 619 passed · **Sweep:** A1–A15, A17–A20
+exit 0 live on home llama.cpp (Qwen3.8-27B, inference recovered mid-loop);
+A16 below.
+
+## Loop-38 entry-point probes (all green)
+
+| Cycle | Capability | Probe |
+|---|---|---|
+| 74 | graph tools in registry + `graph` sub-command | real-exec run drives `graph_query` (tool trace) + `graph run_turns` prints node+edges |
+| 75 | context strategy (static\|learned) | real-run A/B: learned drops the non-overlapping fragment (observable system-prompt diff) |
+| 76 | adaptive memory strategy | real-run A/B: only budget-selected lines injected; `config` shows `memory: adaptive` |
+| 77 | R-H rename + eval early-stop | live trivial suite: `certificate: pass hoeffding-gate at_n=4 ran=4`, t5/t6 skipped |
+| 78 | eval rubrics | live rubric suite 2/3: stdout-pass + rubric-fail → ok=false |
+| 79 | `exec --best-of N` | scripted 2-attempt run wins on attempt 2, byte-identical reset, honest-failure exit 1, usage exit 2 |
+| 80 | `branch` sub-command | scratch-repo create/list/diff/remove + exit-2 contract |
+| 81 | capability register | 56 rows, zero UNVALIDATED; R-A deletes `lessons_gate`/`rolepresets`/`truthpass` |
+
+## A16 (live review)
+
+- Attempt 1 (full sweep): transport timeout after 4 attempts / ~17 min on
+  the full uncommitted diff generation — 0 chars. Same failure mode as the
+  R37 closing sweep (server-side generation stall on huge review contexts).
+- Attempt 2 (focused diff — report + sweep artifacts, all code committed):
+  same transport stall, 0 chars.
+- Attempt 3 (`review --staged` on the report/plan/log/features diff):
+  LIVE green — 2550 chars ending CHANGES REQUESTED (transcript
+  `build/probes/loop38final-a16s.out`); its four doc-consistency findings
+  (dangling "see below", circular report↔log refs, ambiguous plan note,
+  ASCII hyphens) are all addressed in the loop38-final commit.
+
+## R-F (cost): `--best-of` adoption
+
+`--best-of` stays default OFF (N=1). Each candidate is a full metered run
+(N× tokens for N attempts); the verifier gate is mandatory (exit 2 without
+one). Per R-F the cost is printed with the quality claim: the cycle-79
+scripted probe spent 2 runs for 1 verified result. No standing recommendation
+to change the default — revisit with loop-48's parallel-distill-refine data.
+
+## Gate 6 report
+
+Loop 38's charter (wire-or-delete the seven orphan capabilities) is
+FULFILLED: all seven F7 rows cleared with entry-point evidence, plus three
+pre-existing dead modules deleted and the register built. The run continues
+to R39 (authorized arc 38–45) next.

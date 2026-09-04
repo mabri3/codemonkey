@@ -1,7 +1,7 @@
-[usage] prompt=4128 completion=70
+[usage] prompt=4549 completion=79
 $ echo codemonkey_tool_test
 [exit 0] codemonkey_tool_test
 
-codemonkey_tool_test[usage] prompt=4144 completion=124
+codemonkey_tool_test[usage] prompt=4565 completion=51
 [agent] codemonkey_tool_test
 

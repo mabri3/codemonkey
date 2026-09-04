@@ -33,6 +33,8 @@
 ╭─ Commands ───────────────────────────────────────────────────────────────────╮
 │ config         Print the effective merged config (secrets masked).           │
 │ review         LLM review of the repo's uncommitted diff (read-only).        │
+│ graph          Print code-graph facts for SYMBOL from graphify-out/ (no      │
+│                model needed).                                                │
 │ undo           Undo: restore the most recent checkpoint (files snapshotted   │
 │                pre-mutation).                                                │
 │ eval           Run a golden evaluation suite against the real exec path.     │
@@ -43,6 +45,7 @@
 │ models         List models exposed by a provider endpoint.                   │
 │ sessions       List persisted sessions (thread id, updated time, first       │
 │                prompt).                                                      │
+│ branch         Worktree branches in .branches/.                              │
 │ journal        Execution-journal forensics.                                  │
 │ jobs           Durable, resumable job files.                                 │
 │ lessons        Lessons learned from run history.                             │

@@ -1,0 +1,1 @@
+error: provider failure: transport error contacting http://192.168.50.176:8080/v1/chat/completions: timed out (after 4 attempts)

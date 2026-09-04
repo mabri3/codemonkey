@@ -1,6 +1,8 @@
-[usage] prompt=4318 completion=177
-$ $ 
+[usage] prompt=4739 completion=137
+$ head -40 pyproject.toml 2>/dev/null; ls$ 
 
+[codemonkey] approval required: 'shell' needs approval (policy: on-request). Continued without running it. To allow: run with `--approval never` (or set approval: never in config) to auto-approve, or `--dangerously-bypass-approvals-and-sandbox` to lift both gates
+[exit 1] 
 [exit 0]      1| # Intent — CodeMonkey
      2| 
      3| ## Problem
@@ -9,55 +11,10 @@ $ $
      6| http://192.168.50.113:8080/v1) so it can be scripted by other agents
      7| (Claude Code, ChatGPT/Codex) and CI pipelines to write code by request —
      8| non-interactively, with machine
-[exit 0] dir .venv
-dir .pytest_cache
-dir src
-dir .codemonkey
-dir graphify-out
-dir demos
-dir build
-dir tests
-dir .git
-file .python-version 5B
-file .gitignore 239B
-file AGENTS.md 6299B
-file CLAUDE.md 966B
-file THREAT_MODEL.md 2684B
-file .env 155B
-file README.md 3644B
-file SPRINT.md 12068B
-file features.html 25663B
-file BUILD_LOG.md 108286B
-file pyproject.toml 619B
-file CHANGELOG.md 2989B
-file uv.lock 71993B
-[usage] prompt=5684 completion=175
-$ $ 
-
-[exit 0]      1| # codemonkey
-     2| 
-     3| A scriptable, headless coding-agent CLI for **OpenAI-style and Anthropic-style
-     4| endpoints** — built to run unattended against a **local llama.cpp server**
-     5| (~27B-class model, ~32k context), but happy in front of any OpenAI-compatible
-     6| API.
-     7| 
-     8| Python 3.11 · uv · Typer · Rich · httpx · zero LLM SDKs (raw wire protocol).
-     9|
-[exit 0]      1| [project]
-     2| name = "codemonkey"
-     3| version = "3.0.0"
-     4| description = "codemonkey — a scriptable coding-agent CLI (exec/review/sessions) for OpenAI-style and Anthropic-style endpoints"
-     5| readme = "README.md"
-     6| requires-python = ">=3.11"
-     7| dependencies = [
-     8|     "typer>=0.12",
-     9|     "rich>=13.7",
-    10|     "httpx>=0.27",
-    11|     "pyyaml>=6
 {
   "project_name": "codemonkey",
   "programming_languages": ["Python"],
-  "summary": "codemonkey is a scriptable, headless coding-agent CLI (Python 3.11 with Typer, Rich, and httpx, no LLM SDKs) for OpenAI-style and Anthropic-style endpoints, designed to run unattended against a local llama.cpp server or any OpenAI-compatible API. It offers an interactive REPL plus non-interactive commands (exec, review, sessions, journal, undo, eval) with JSONL event streams, structured output via JSON schema, session resume, checkpoints/undo, an execution journal, rule-based tool permissions, multi-provider YAML/.env configuration, and a pluggable strategy architecture for compaction, memory, and session state, so other agents and CI pipelines can drive it to write code by request with machine-readable output."
-}[usage] prompt=7448 completion=468
+  "summary": "CodeMonkey is a scriptable coding-agent CLI (Python 3.11, built with uv, Typer, Rich, and httpx) that runs against OpenAI-style (/v1/chat/completions) and Anthropic-style (/v1/messages) LLM endpoints, including local llama.cpp servers. It offers an interactive REPL when run bare and a non-interactive `codemonkey exec` mode with machine-readable JSONL event streams, structured output via JSON schema, session resume, stdin piping, sandbox/approval semantics modeled on `codex exec`, YAML/.env-based multi-provider configuration, a typical coding-agent tool set (shell, file read/write/edit, search, glob, plan updates, web fetch), and a pluggable strategy architecture for compaction, memory, and session state."
+}[usage] prompt=5966 completion=525
 [agent] {   "project_name": "codemonkey",   "programming_languages": [     "Python"   ],
 

@@ -1,0 +1,45 @@
+This diff is documentation-only, so there are no code-level security, error-handling, or API-misuse issues to flag directly. The main concerns are factual/consistency issues in the acceptance record.
+
+- In `BUILD_LOG.md`, this line points at content that is not present in the patch:
+  ```diff
+  + **A16 (live review):** attempt 1 ... Attempt 3 (staged docs diff, `review --staged`): see below.
+  ```
+  There is no “below” section in the added hunk, and the referenced result is not recorded here.
+
+- In `build/BUILD_REPORT.md`, the A16 section does not resolve the open question:
+  ```diff
+  + - Attempt 2 (focused diff — report + sweep artifacts, all code committed):
+  +   PENDING at report time; result recorded in BUILD_LOG.
+  ```
+  But `BUILD_LOG.md` only says “see below,” creating a circular reference and leaving the final A16 status ambiguous.
+
+- Marking the plan item complete is risky given A16 is not clearly resolved:
+  ```diff
+  -- [ ] CYCLE loop38-final — Loop 38 acceptance: full A1–A20 re-sweep (live
+  +- [x] CYCLE loop38-final — Loop 38 acceptance: full A1–A20 re-sweep (live
+  +  DONE 2026-09-04: A1-A15/A17-A20 live green, suite 619; A16 see report
+  ```
+  The original item required “full A1–A20 re-sweep … BLOCKED+reason per row otherwise.” The inserted note says “A16 see report,” but the report does not explicitly record A16 as `BLOCKED` with a final reason/outcome.
+
+- The inserted plan line also breaks the original sentence awkwardly:
+  ```diff
+  +  DONE 2026-09-04: A1-A15/A17-A20 live green, suite 619; A16 see report
+     where the endpoint allows, BLOCKED+reason per row otherwise)
+  ```
+  It reads as if “DONE…” is inside the parenthetical describing the sweep.
+
+- Minor style inconsistency: `A1-A15/A17-A20` uses ASCII hyphens while surrounding docs use en dashes, e.g. `A1–A15, A17–A20`.
+
+Suggested fixes before merging:
+
+1. Record the final A16 status explicitly, for example:
+   ```md
+   - **A16:** BLOCKED — live review unavailable after 4 attempts / transport timeout; 0 chars generated. See `build/BUILD_REPORT.md` §A16.
+   ```
+2. Remove or replace the dangling “see below” references with direct file/section pointers.
+3. If A16 is blocked, make that explicit in `build/plan.md` rather than only saying “A16 see report.”
+4. Clean up the plan checkbox wording so the DONE note does not interrupt the original requirement sentence.
+
+No test changes are present, and the claimed `Suite: 619 passed` cannot be verified from this diff alone.
+
+CHANGES REQUESTED
