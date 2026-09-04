@@ -591,3 +591,16 @@ final state, the tag, and the Gate 3 handoff.
 - **It does not add features to reach a number.** Nine of the eleven loops
   discharge a debt in §2. If §2 empties early, the correct move is to close
   the arc early and say so — not to invent loops to fill it.
+
+---
+
+## Successor arc
+
+`build/loops-28-37-proposal.md` — the capability arc (loops 28-37): graph-
+grounded retrieval, LSP grounding, certified/comparable measurement, fork-and-
+branch execution, best-of-N with an execution verifier, generative and rubric
+verifiers, corrections compiled into enforcement, adaptive memory, learned
+context assembly, v3.0 acceptance. It opens only after `loop27-final`, and its
+loops 31/32/35 carry hard entry conditions on loops 19, 20, 24 and 25 in this
+arc — the debt paid here is what makes that arc buildable rather than
+dangerous.

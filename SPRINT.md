@@ -142,6 +142,13 @@ contract, and the binding arc rules (R-A "measure or delete" … R-E "the
 register is the release record") live in `build/loops-17-27-proposal.md`. They
 carry no blanket authorization and stay unchecked until the user grants one.
 
+Capability arc loops 28-37 (PROPOSED 2026-09-03, NOT AUTHORIZED): ten research
+cycles `R28`-`R37` appended unchecked after R27 in `build/plan.md`. Charters and
+the 2026 literature each loop replicates: `build/loops-28-37-proposal.md`. Rules
+R-A…R-E carry over from the 17-27 arc; R-F (report cost with every quality
+number) and R-G (record published number, local number, AND the gap) are added.
+Also unauthorized until the user says otherwise.
+
 ## Ticks (every 5 min)
 
 Heartbeats are ~12/h but most are no-ops (check state, exit); cost is

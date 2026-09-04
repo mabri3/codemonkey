@@ -773,18 +773,18 @@ journal key semantics that cycle 36-38 will build on.
 
 ### loop17: cycles (selected from build/research-loop17.md, cycle R17 — scoped live at user request post-v1.0.0)
 
-- [ ] CYCLE 52 — `loop17:` honest-completion gate: exec `verify_claims`
+- [x] CYCLE 52 — `loop17:` honest-completion gate: exec `verify_claims`
   post-turn audit — file-existence + command-outcome claims checked against
   journal/state evidence; missing evidence → reply gets [UNVERIFIED] marker +
   journal unverified_claim record; off by default | est: 30m |
   verify: `uv run pytest tests/test_verify_claims.py -q` → exit 0 (≥7 tests);
   `uv run pytest -q` → exit 0.
-- [ ] CYCLE 53 — `loop17:` static model routing: `model_routing` first-match
+- [x] CYCLE 53 — `loop17:` static model routing: `model_routing` first-match
   rules (tool_role/prompt_glob) selecting provider+model; route journaled;
   `eval --route-stats` per-plan pass_rate/tokens | est: 30m |
   verify: `uv run pytest tests/test_routing.py -q` → exit 0 (≥6 tests);
   `uv run pytest -q` → exit 0.
-- [ ] CYCLE loop17-final — Loop 17 acceptance: sweep + report + push |
+- [x] CYCLE loop17-final — Loop 17 acceptance: sweep + report + push |
   est: 30m | verify: sweep green; suite green; report committed; pushed.
 
 ### loop16: cycles (selected from build/research-loop16.md, cycle R16 — the final loop)
@@ -1265,3 +1265,185 @@ live with zero BLOCKED rows.
   explicitly and defensibly rejected/BLOCKED in writing), no open critic
   finding above LOW severity, and a reachable live endpoint — if the endpoint
   is down loop 27 WAITS rather than closing dishonestly. Core-design: NO.
+
+## Cycle checklists — loops 28-37, the capability arc (PROPOSED 2026-09-03, ⚠️ NOT AUTHORIZED)
+
+Charters, the 2026 literature anchors each loop replicates, and the two extra
+arc rules: `build/loops-28-37-proposal.md`. The §0 handoff contract, §1
+verified current state, §2 debt ledger and §3 rules R-A…R-E of
+`build/loops-17-27-proposal.md` apply here unchanged. Two rules are added:
+**R-F** every quality number is reported with its cost multiplier and wall
+clock, and adoption defaults OFF above 2× cost; **R-G** each cycle records the
+published number, this repo's number, AND the gap, with a hypothesis for any
+large divergence — citing a paper's number as if it were ours is fabrication
+under SPRINT.md.
+
+These loops make the machine current; loops 17-27 make it honest. They open
+only after `loop27-final`, and several carry hard entry conditions on loops
+19/20/24/25 — N concurrent mutating workers without containment is a defect,
+and branching without defined crash semantics is undefined behavior.
+
+- [ ] CYCLE R28 — Loop 28 research: graph-grounded retrieval — this repo builds,
+  commits and mandates `graphify-out/` for human-side agents while the agent it
+  ships navigates by grep/glob and a heuristic repo_map; expose the structural
+  index as `graph_query`/`graph_path`/`graph_explain` tools, re-ground
+  `repomap.py` ranking on graph structure, detect staleness rather than
+  trusting it, and decide the no-graph fallback (build / degrade / refuse)
+  | est: 30m |
+  verify: `build/research-loop28.md` committed in the standard shape (>=5
+  candidates, real cited URLs incl. the ~10x token / 2.1x tool-call
+  structural-index result, ranked `SELECTED`); `build/plan.md` contains the
+  `loop28:` cycles (unchecked), EACH reporting tokens AND tool calls per task
+  for graph-on vs graph-off arms, with the published figures alongside per
+  rule R-G, and each carrying a staleness probe (graph older than HEAD → the
+  tool reports stale, never answers silently). ENTRY CONDITION:
+  `graphify-out/graph.json` present and current at HEAD AND loop 21's harness
+  can score two retrieval arms; else BLOCKED. Core-design: PARTIAL — new tools
+  are registry work; changing repo_map's ranking changes context assembly and
+  ends by asking.
+- [ ] CYCLE R29 — Loop 29 research: LSP grounding and pre-apply validation —
+  symbol-accurate navigation (definition/references/callers) replacing textual
+  search for symbol questions, and edit validation BEFORE apply (syntax → lint
+  → typecheck, edit rejected back to the model rather than committed and
+  undone), with a stated retry budget and an honest multi-language posture
+  | est: 30m |
+  verify: `build/research-loop29.md` committed in the standard shape;
+  `build/plan.md` contains the `loop29:` cycles (unchecked) with before/after
+  BROKEN-EDIT RATE on a fixed task set and per-edit latency cost; one cycle
+  must resolve authority between graph (loop 28) and LSP for "where is this
+  symbol used" rather than shipping both and confusing the model. ENTRY
+  CONDITION: a language server installable in this environment without
+  run-time network access; if not, R29 narrows to syntax+lint validation
+  (needs no server) and records the LSP portion BLOCKED. Core-design: PARTIAL
+  — making an edit conditional on typecheck changes edit semantics and ends by
+  asking.
+- [ ] CYCLE R30 — Loop 30 research: certified and comparable measurement —
+  anytime-valid sequential certificates (stop at significance instead of a
+  fixed N, which is the difference between affordable and unaffordable on one
+  slow 27B endpoint), adoption of a real benchmark subset (DeepSWE / SWE-EVO /
+  SWE-Bench Pro) alongside the homemade golden suite, a standing
+  arm-comparison report format carrying cost per R-F, and a regression gate so
+  a later loop cannot silently undo an earlier loop's win | est: 30m |
+  verify: `build/research-loop30.md` committed in the standard shape,
+  containing an explicit FEASIBILITY assessment of running the chosen
+  benchmark on this hardware (container-heavy, long-horizon; "we can run this
+  N-task subset and no more" is the expected honest outcome, not full-suite
+  numbers); `build/plan.md` contains the `loop30:` cycles (unchecked). ENTRY
+  CONDITION: loop 21 closed; benchmark adoption additionally needs a container
+  runtime and disk — without it that half records BLOCKED and the certificates
+  half proceeds. Core-design: NO. NOTE: once shipped, loop 30's certificate
+  machinery is MANDATORY for every quality claim in loops 31-36.
+- [ ] CYCLE R31 — Loop 31 research: fork-and-branch execution — a `branch`
+  primitive defined against the existing checkpoint+journal pair so a branch is
+  a REPLAYABLE object rather than a copied process; what is shared (transcript
+  prefix, prompt-cache prefix, filesystem snapshot) versus copied; discard
+  semantics; branch thread identity for forensics; explicit non-goal:
+  microVM-level forking is infrastructure this project does not own | est: 30m |
+  verify: `build/research-loop31.md` committed in the standard shape (citing
+  the 40.0-64.2% checkpoint-reuse rollout-token result); `build/plan.md`
+  contains the `loop31:` cycles (unchecked), each with a token-reuse
+  measurement stated against that published band per R-G, and a ZERO-RESIDUE
+  probe for a discarded branch (exact file-state comparison before fork vs
+  after discard — byte-level, not "looks clean"). ENTRY CONDITION: loops 19
+  AND 24 closed (branching is resume plus concurrency and inherits both); if
+  either was BLOCKED, R31 records BLOCKED rather than building forking on
+  undefined crash semantics. Core-design: YES (forking in-flight run state is
+  session and journal semantics) — R31 ENDS BY ASKING.
+- [ ] CYCLE R32 — Loop 32 research: best-of-N with an execution verifier —
+  `p -> 1-(1-p)^N` fan-out over `delegate_batch`, candidates ranked by running
+  the task's verify command (execution-based) with execution-free reranking
+  where no test exists, per-candidate isolation via loop 31's branch, early
+  abort once a candidate verifies, and the economic argument this repo exists
+  to test: N cheap local 27B attempts versus one frontier API call | est: 30m |
+  verify: `build/research-loop32.md` committed in the standard shape;
+  `build/plan.md` contains the `loop32:` cycles (unchecked) reporting pass
+  rate, tokens AND wall at N in {1,2,4,8}, certified by loop 30's sequential
+  test, with the observed curve compared to theoretical `1-(1-p)^N` per R-G;
+  adoption defaults OFF above 2x cost per R-F. ENTRY CONDITION — HARD: loops
+  20 (containment) and 31 (branching) both closed. WITHOUT CONTAINMENT, N
+  concurrent mutating workers is a defect, not a feature: R32 then narrows to
+  READ-ONLY fan-out (analysis/review tasks that mutate nothing) and records the
+  mutating case BLOCKED. Core-design: YES ("one prompt produces N runs and one
+  answer" changes what a run is, and multiplies cost) — R32 ENDS BY ASKING.
+- [ ] CYCLE R33 — Loop 33 research: generative verifiers, rubrics, step-level
+  rewards — a generative verifier on `delegate role=critic` scoring candidates
+  in [0,1] with justification, task rubrics as the contextual verifier where
+  execution cannot judge, hybrid scoring (execution dominates, rubric breaks
+  ties), and step-level process rewards over the journal's per-step intents
+  with compute spent only at high-uncertainty steps | est: 30m |
+  verify: `build/research-loop33.md` committed in the standard shape (citing
+  generative>regressive verifiers and rubric process reward work);
+  `build/plan.md` contains the `loop33:` cycles (unchecked) whose FIRST probe
+  measures VERIFIER ACCURACY against known-good/known-bad candidates before
+  any end-to-end claim — a verifier worse than random makes best-of-N actively
+  harmful and must be caught here, not inferred from a pass-rate wash — then
+  selection quality versus random and versus execution-only. ENTRY CONDITION:
+  loop 32 closed (a selection point exists) and loop 30's certificates exist.
+  Core-design: PARTIAL — a model-scored gate deciding whether work is ACCEPTED
+  is adjacent to approval semantics and ends by asking; ranking alone does not.
+- [ ] CYCLE R34 — Loop 34 research: corrections compiled into enforcement — a
+  correction taxonomy (mechanically enforceable / partially enforceable /
+  irreducibly advisory), a compilation path correction -> proposed rule -> USER
+  CONFIRMATION -> `permissions.rules` entry with provenance, and rule
+  lifecycle (expiry, conflict, precedence, `codemonkey rules
+  list|explain|revoke`) | est: 30m |
+  verify: `build/research-loop34.md` committed in the standard shape (citing
+  the corrections->runtime-enforcement work); `build/plan.md` contains the
+  `loop34:` cycles (unchecked) including a probe that replays a corrected
+  scenario and asserts the violation is REFUSED BY THE PERMISSION LAYER (deny
+  recorded in the journal), not merely avoided by the model, plus a
+  repeat-violation-rate before/after number; a self-authored rule must not
+  bind without confirmation (probe: synthesis proposes, nothing binds until
+  confirmed). ENTRY CONDITION: loop 21's verdict on `lessons` recorded — if
+  lessons were deleted there, this loop builds on the permissions engine
+  alone, which is sufficient. Core-design: PARTIAL — rules the agent authors
+  for itself change what the permission layer IS, and that ends by asking.
+- [ ] CYCLE R35 — Loop 35 research: adaptive memory management — an adaptive
+  write/retain/evict policy replacing tag-overlap heuristics, continual
+  learning measured over a TASK STREAM rather than isolated tasks, and honest
+  cross-domain transfer tested against loop 18's foreign repos (the failure
+  mode is memories that help on the source repo and mislead elsewhere)
+  | est: 30m |
+  verify: `build/research-loop35.md` committed in the standard shape (citing
+  SWE-MeM, SWE-Bench-CL, memory-transfer work) AND one of: `build/plan.md`
+  contains the `loop35:` cycles (unchecked, task-stream results certified by
+  loop 30, transfer measured on >=2 repos), OR the research file closes the
+  theme with the measurements that killed it — an honest "no" is a valid exit,
+  exactly as R13 permitted. ENTRY CONDITION: loop 25 closed (an adaptive
+  memory fighting an undefined GC policy is unmeasurable) AND >=2 repos' worth
+  of history exists (loop 18). Core-design: PARTIAL for a new strategy in the
+  registry; YES for a cross-repo store — that ends by asking.
+- [ ] CYCLE R36 — Loop 36 research: learned context assembly — assembly as an
+  explicit swappable, scored policy (loop 5's strategy matrix is the vehicle)
+  instead of hand-ordered parts; per-task-class assembly (a review task and an
+  edit task do not want the same window); budget allocation across sources
+  under a token ceiling, where loop 28's graph and loop 35's memory compete for
+  space | est: 30m |
+  verify: `build/research-loop36.md` committed in the standard shape (citing
+  the 89.1% vs 70.7% context-engineering result) and stating UP FRONT the
+  risk that the published delta came from a frontier model with a large window
+  and may not survive on a 27B-class one; `build/plan.md` contains the
+  `loop36:` cycles (unchecked) with per-policy scores certified by loop 30 and
+  the gap to the published result explained per R-G. ENTRY CONDITION: loops
+  28, 30 and 35 closed. This is the most speculative charter in the arc and is
+  deliberately last — if the budget runs out, THIS is the loop to drop.
+  Core-design: YES (context assembly is the architecture the CLI is built
+  around) — R36 ENDS BY ASKING.
+- [ ] CYCLE R37 — Loop 37 research + closing acceptance: v3.0 — full A1-A20 plus
+  every loop-2..36 criterion live with zero BLOCKED (or an individually
+  justified exception list), the register current with each loop-28..36 row
+  carrying LOCAL number / PUBLISHED number / GAP per R-G, a cost table per R-F,
+  deletion cycles for anything that did not survive its certificate, a closing
+  critic pass, THREAT_MODEL.md refreshed (best-of-N, branching and
+  self-authored permission rules each change the security surface; loop 34's
+  rules are a new trust boundary), final BUILD_REPORT for loops 28-37, tag,
+  Gate 4 handoff | est: 40m |
+  verify: `build/research-loop37.md` committed; `build/plan.md` contains the
+  `loop37:` cycles (unchecked) ending in `loop37-final` whose own probe is:
+  `bash build/acceptance_sweep.sh` → all exit 0, zero BLOCKED; `uv run pytest
+  -q` → exit 0; `uv run codemonkey --version` matches the tag; every
+  `build/CAPABILITY_REGISTER.md` row reads PROVEN-LIVE, UNIT-ONLY with a
+  stated reason, or DEAD — no UNVALIDATED rows; every loop-28..36 row carries
+  its local/published/gap triple; report committed. ENTRY CONDITION: loops
+  28-36 closed (shipped, or explicitly rejected/BLOCKED in writing), no open
+  critic finding above LOW, live endpoint reachable. Core-design: NO.
