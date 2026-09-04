@@ -1869,3 +1869,9 @@ LM Studio's single-model unload of Qwen3.8-27B. Server auto-recovered
 (chat 200). **Design note for a future cycle:** routing rules against a
 single-model-slot server should record the unload risk; --route-stats plus
 the journal route records make this measurable.
+
+## 2026-09-03 — CYCLE R18: Loop 18 research — unload-fallback + affinity batching selected
+
+**Completed:** `build/research-loop18.md` — client-side unload detection +
+one-shot default-model fallback (54), model-affinity batching to minimize
+slot swaps (55). Server-side routers/llama-swap documented not adopted.

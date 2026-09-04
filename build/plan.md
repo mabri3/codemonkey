@@ -771,6 +771,21 @@ journal key semantics that cycle 36-38 will build on.
 
 
 
+
+### loop18: cycles (selected from build/research-loop18.md, cycle R18)
+
+- [ ] CYCLE 54 — `loop18:` unload-fallback rerouting: 400 "No model loaded"
+  class → retry once against default provider/model, journal
+  model_unload_fallback, tag task result; delegate children inherit |
+  est: 30m | verify: `uv run pytest tests/test_unload_fallback.py -q` → exit 0
+  (≥5 tests); `uv run pytest -q` → exit 0.
+- [ ] CYCLE 55 — `loop18:` model-affinity batching: batch_by_model() groups
+  tasks by routed model (first-appearance order); eval task loop uses it |
+  est: 30m | verify: `uv run pytest tests/test_batch_by_model.py -q` → exit 0
+  (≥4 tests); `uv run pytest -q` → exit 0.
+- [ ] CYCLE loop18-final — Loop 18 acceptance: sweep + report + push |
+  est: 30m | verify: sweep green; suite green; report; pushed.
+
 ### loop17: cycles (selected from build/research-loop17.md, cycle R17 — scoped live at user request post-v1.0.0)
 
 - [x] CYCLE 52 — `loop17:` honest-completion gate: exec `verify_claims`
@@ -1112,7 +1127,7 @@ live with zero BLOCKED rows.
   superseded-by — never silently ticked). ENTRY CONDITION: none; this loop is
   always openable and blocks the rest of the arc. Core-design: NO (behavioral
   defects become `17BF<n>` critic-style fix cycles, not design rewrites).
-- [ ] CYCLE R18 — Loop 18 research: foreign-repo dogfood (D11) — the tool has
+- [x] CYCLE R18 — Loop 18 research: foreign-repo dogfood (D11) — the tool has
   never been run on a codebase it did not author; N real tasks on >=2 external
   repos, each producing a kept journal thread, and a ranked friction log where
   every entry cites the transcript line proving it | est: 30m |
