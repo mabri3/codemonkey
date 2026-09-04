@@ -139,7 +139,7 @@ mechanisms, and the v2.0 record is worth no more than the v1.0 one.
 | D5 | **Lessons ROI unrecorded.** Same shape: `lessons` + verified-by-eval gate shipped; no measured delta on the golden suite is recorded. R13 explicitly permitted a documented "no" as a valid exit and that exit was never evaluated. | `BUILD_REPORT.md` Loop 13 section | **Loop 21** |
 | D6 | **Diff-gated approval + run timeline not shipped.** R15's narrow-scope fallback was "the diff-preview approval mode alone"; loop 15 shipped `status` and deferred live TUI + OTLP. No `diff` handling exists in `approvals.py` or `exec.py`. | `grep -n diff src/codemonkey/approvals.py src/codemonkey/exec.py` → no hits | **Loop 23** |
 | D7 | **Anthropic native tool shape is unit-tested only.** The `input_schema` fix (51F1b) has never run against a live Anthropic endpoint; no key was available. A second protocol that has never spoken to its own server is a claim, not a capability. | `BUILD_REPORT.md` "Known gap" at close | **Loop 26** |
-| D8 | **Two closing cycles are unchecked in the ledger.** `loop6-final` (`build/plan.md:595`) and `loop10-final` (`build/plan.md:951`) were never re-run. The ledger is ground truth, and it currently disagrees with the "loops complete" narrative. | `grep -n "^- \[ \] CYCLE" build/plan.md` → exactly these two | **Loop 17** |
+| D8 | **Two closing cycles are unchecked in the ledger.** `loop6-final` (`build/plan.md:595`) and `loop10-final` (`build/plan.md:951`) were never re-run. The ledger is ground truth, and it currently disagrees with the "loops complete" narrative. | `grep -n "^- \[ \] CYCLE" build/plan.md` → exactly these two | **Loop 17B** |
 | D9 | **Shared job state is single-writer.** The multi-agent shared job store was deferred at loop 12 for want of file locking, while `delegate_batch` already runs workers concurrently. Concurrency exists; the state it would share does not tolerate it. | `BUILD_REPORT.md` Loop 12 notes; `src/codemonkey/jobs.py` | **Loop 24** |
 | D10 | **Streaming partial responses are lost.** A mid-stream transport failure propagates and the partial tokens are discarded (documented at cycle 23, carried through R14 as a routing/retry concern, never closed). | `src/codemonkey/providers/openai.py:129` `_request_stream` | **Loop 22** |
 | D11 | **Never run on a foreign repo.** Every task this agent has performed has been inside the repo that built it, on tasks written by the same process. No evidence exists about behavior on a codebase it did not author. | absence of evidence — no eval task, journal thread, or report outside this repo | **Loop 18** |
@@ -180,7 +180,7 @@ answer and nothing else; `exec --json` prints JSONL and nothing else. Every
 new surface writes to stderr or its own file. Any cycle in loops 23 and 25
 carries a probe asserting this explicitly.
 
-**R-E — The register is the release record.** Loop 17 produces
+**R-E — The register is the release record.** Loop 17B produces
 `build/CAPABILITY_REGISTER.md`; every loop after it updates the rows it
 touches; loop 27 closes against it rather than against prose.
 
@@ -190,7 +190,7 @@ touches; loop 27 closes against it rather than against prose.
 
 | Loop | Theme | Pays | Entry condition | Exit artifact |
 |---|---|---|---|---|
-| 17 | Truth pass: claims vs evidence | D8, sets up D4/D5 | none — always openable | `build/CAPABILITY_REGISTER.md`: every feature marked PROVEN-LIVE / UNIT-ONLY / UNVALIDATED / DEAD |
+| 17B | Truth pass: claims vs evidence | D8, sets up D4/D5 | none — always openable | `build/CAPABILITY_REGISTER.md`: every feature marked PROVEN-LIVE / UNIT-ONLY / UNVALIDATED / DEAD |
 | 18 | Foreign-repo dogfood | D11 | register exists | A friction log from real external tasks; the frictions become cycles and re-rank loops 23/25 |
 | 19 | Mid-turn resume and crash truth | D1 | journal wired into production runs (done, 31F1) | A run killed mid-turn resumes and applies the interrupted mutation exactly once |
 | 20 | Containment for real | D2 | register marks the sandbox row honestly | Process-level containment behind existing sandbox levels; `THREAT_MODEL.md` claims match enforcement |
@@ -203,7 +203,7 @@ touches; loop 27 closes against it rather than against prose.
 | 27 | v2.0 closing acceptance | all | loops 17–26 closed; no open critic finding above LOW | Full re-sweep against the register, refreshed threat model, tag, Gate 3 handoff |
 
 The ordering is a dependency chain, not a preference. Loop 21 cannot delete
-anything until loop 17 says what is unproven. Loop 22's claims are
+anything until loop 17B says what is unproven. Loop 22's claims are
 unfalsifiable without loop 21's harness. Loop 24 cannot define concurrent
 crash behavior before loop 19 defines single-run crash behavior. Loop 25 has
 nothing to garbage-collect until 19 and 24 produce week-long runs. Loop 26's
@@ -212,7 +212,21 @@ release claim is worthless if any of them left an open finding.
 
 ---
 
-## CYCLE R17 — Loop 17: truth pass, claims versus evidence
+## CYCLE R17B — Loop 17B: truth pass, claims versus evidence
+
+> **Relabelled 2026-09-03.** Loop 17 proper was opened and closed by a
+> concurrent session while this arc was being written: its own `R17` selected
+> an honest-completion gate (cycle 52) and static model routing (cycle 53),
+> and `loop17-final` is committed. That work does **not** discharge this
+> charter — no capability register was produced and D8 is untouched — so the
+> truth pass keeps its position at the head of the arc under the label 17B.
+> Everywhere these two arcs say "loop 17", they mean this cycle.
+>
+> Two notes for whoever runs it: cycle 52's claim-auditing gate is genuinely
+> aligned with this charter and should be *credited* in the register, not
+> re-derived. Cycle 53 shipped `model_routing` **and** `eval --route-stats`
+> — the instrument that measures whether routing pays — and never ran it, so
+> routing enters the register as UNVALIDATED and D3 stays open for loop 22.
 
 **Question.** The v1.0 record says loops 1–16 are complete and A1–A20 are
 green. §2 shows at least twelve places where a shipped mechanism, a charter
@@ -263,7 +277,7 @@ resemble real ones at all (this bears directly on loop 21's harness). An
 explicit anti-goal: do **not** fix frictions inside this loop — log them,
 rank them, and let them become cycles here or re-scope loops 23/25.
 
-**Entry condition.** `build/CAPABILITY_REGISTER.md` exists (loop 17 closed).
+**Entry condition.** `build/CAPABILITY_REGISTER.md` exists (loop 17B closed).
 External repos must be ones the user is willing to have the agent operate in;
 if none is available, R18 records BLOCKED with that reason and appends no
 cycles — do not substitute a synthetic repo and call it foreign.
@@ -328,7 +342,7 @@ both platforms or is documented as not doing so. An escape test suite that
 attempts the documented cwd escape and asserts denial. Cost: containment that
 doubles per-tool latency is a real regression and must be measured.
 
-**Entry condition.** Loop 17's register records the sandbox row honestly (a
+**Entry condition.** Loop 17B's register records the sandbox row honestly (a
 containment loop that starts from an overclaimed baseline cannot tell whether
 it improved anything).
 
@@ -363,7 +377,7 @@ does not separate, including removal of the CLI surface and tests, with the
 numbers recorded in the register.
 
 **Entry condition.** `build/CAPABILITY_REGISTER.md` lists the UNVALIDATED set
-(loop 17 closed). A reachable endpoint is required; without one, R21 records
+(loop 17B closed). A reachable endpoint is required; without one, R21 records
 BLOCKED — this loop cannot be run on mocks by construction.
 
 **Core-design flag: NO** for measurement; **PARTIAL** for deletion — removing
@@ -548,7 +562,7 @@ outran their evidence?
 
 **Seeds.** Full A1–A20 re-sweep plus every loop-2..26 criterion, live, with
 zero BLOCKED rows or an explicit, individually justified exception list. The
-capability register from loop 17 brought current, since rule R-E makes it the
+capability register from loop 17B brought current, since rule R-E makes it the
 release record — every row PROVEN-LIVE, UNIT-ONLY with a stated reason, or
 DEAD. A closing critic pass in `build/critic-cycle6.md` style with no finding
 above LOW left open. `THREAT_MODEL.md` refreshed against whatever loop 20
@@ -573,7 +587,7 @@ final state, the tag, and the Gate 3 handoff.
 
 ## What this design deliberately does not do
 
-- **It does not authorize anything.** `R17`–`R27` are appended to
+- **It does not authorize anything.** `R17B`–`R27` are appended to
   `build/plan.md` unchecked and stay unchecked until the user says otherwise.
   Loops 6–10 held a blanket authorization; this arc does not inherit it.
 - **It does not pre-rank capabilities.** Every seed above is a candidate for

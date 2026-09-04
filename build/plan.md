@@ -1093,22 +1093,25 @@ appended by that cycle, never pre-selected here.
 Baseline for the arc: `ca601e5`, v1.0.0, suite 460 passed, A1-A20 all exit 0
 live with zero BLOCKED rows.
 
-- [ ] CYCLE R17 — Loop 17 research: truth pass, claims versus evidence — an
+- [ ] CYCLE R17B — Loop 17B research: truth pass, claims versus evidence (NOTE: loop 17 proper was consumed 2026-09-03 by concurrent work — the
+  honest-completion gate (52) + static model routing (53), closed at
+  `loop17-final`. This charter keeps its arc position and is relabelled 17B;
+  every "loop 17" reference in the 17-27 and 28-37 arcs means THIS cycle) — an
   evidence class (PROVEN-LIVE / UNIT-ONLY / UNVALIDATED / DEAD) for every
   capability loops 1-16 claim; resolution of the two unchecked closing cycles
   (D8: `loop6-final` at plan.md:595, `loop10-final` at plan.md:951); a
   README/features.html/THREAT_MODEL audit against reality; a dead-surface pass
   | est: 30m |
-  verify: `build/research-loop17.md` committed in the loops 2-16 shape (>=5
+  verify: `build/research-loop17b.md` committed in the loops 2-16 shape (>=5
   candidates with real cited URLs, ranked `SELECTED` section);
   `build/CAPABILITY_REGISTER.md` committed with one row per shipped capability
   carrying name, entry point, strongest evidence (literal probe or test path),
   evidence class, and the debt row it carries; `build/plan.md` contains the
-  `loop17:` cycles (unchecked) for every demotion and doc correction; D8
+  `loop17b:` cycles (unchecked) for every demotion and doc correction; D8
   resolved (both boxes ticked with re-run probe output, or annotated
   superseded-by — never silently ticked). ENTRY CONDITION: none; this loop is
   always openable and blocks the rest of the arc. Core-design: NO (behavioral
-  defects become `17F<n>` critic-style fix cycles, not design rewrites).
+  defects become `17BF<n>` critic-style fix cycles, not design rewrites).
 - [ ] CYCLE R18 — Loop 18 research: foreign-repo dogfood (D11) — the tool has
   never been run on a codebase it did not author; N real tasks on >=2 external
   repos, each producing a kept journal thread, and a ranked friction log where
@@ -1118,7 +1121,7 @@ live with zero BLOCKED rows.
   file/transcript evidence; `build/plan.md` contains the `loop18:` cycles
   (unchecked), each with a probe that reproduces the friction BEFORE the fix
   and shows it gone after. ENTRY CONDITION: `build/CAPABILITY_REGISTER.md`
-  exists (loop 17 closed) AND the user has named external repos the agent may
+  exists (loop 17B closed) AND the user has named external repos the agent may
   operate in — otherwise R18 records BLOCKED and appends no cycles (a
   synthetic repo is not a foreign repo). Core-design: NO for the log; PARTIAL
   if a friction's only fix changes tool semantics — that fix ends by asking.
@@ -1150,7 +1153,7 @@ live with zero BLOCKED rows.
   carrying an escape probe (attempt the documented cwd escape → assert denial,
   exit code and message) AND a per-tool latency before/after measurement, plus
   a THREAT_MODEL.md revision cycle whose probe asserts every promise in the
-  document maps to an enforcing test. ENTRY CONDITION: loop 17's register
+  document maps to an enforcing test. ENTRY CONDITION: loop 17B's register
   records the sandbox row honestly. Core-design: YES (containment redefines
   what the sandbox levels promise) — R20 ENDS BY ASKING.
 - [ ] CYCLE R21 — Loop 21 research: a harness that can say no (D4, D5) —
@@ -1165,7 +1168,7 @@ live with zero BLOCKED rows.
   carrying RAW per-arm numbers (pass rate, tokens, wall) inside its verify
   probe; `build/CAPABILITY_REGISTER.md` updated so every UNVALIDATED row
   becomes PROVEN, DEAD, or "measured, did not separate, kept because
-  <reason>". ENTRY CONDITION: register lists the UNVALIDATED set (loop 17
+  <reason>". ENTRY CONDITION: register lists the UNVALIDATED set (loop 17B
   closed) AND a reachable live endpoint — this loop cannot run on mocks by
   construction; without one R21 records BLOCKED. Core-design: NO for
   measurement; PARTIAL for deletion — removing shipped, documented surface
