@@ -592,7 +592,7 @@ map to an A-criterion, a loop selection, or a cited research selection).
   verbatim, marker contains path, under-budget untouched, prune, read_file
   slice retrieval, head+tail shape); `uv run pytest -q` → exit 0; LIVE: big
   seq output spills and the model reads the slice (transcript committed).
-- [ ] CYCLE loop6-final — Loop 6 acceptance: full A1–A20 re-sweep + loop-6
+- [x] CYCLE loop6-final — Loop 6 acceptance: full A1–A20 re-sweep + loop-6
   probes; BUILD_REPORT loop-6 section | est: 30m |
   verify: `bash build/acceptance_sweep.sh` → all green (A9 slow-hardware
   exception per loop5-final precedent, recorded honestly); `uv run pytest -q`
@@ -812,7 +812,7 @@ journal key semantics that cycle 36-38 will build on.
   result feeding the self-heal loop | est: 30m |
   verify: `uv run pytest tests/test_arg_validation.py -q` → exit 0 (≥6 tests);
   `uv run pytest -q` → exit 0.
-- [ ] CYCLE loop20-final — Loop 20 acceptance: sweep + report + push |
+- [x] CYCLE loop20-final — Loop 20 acceptance: sweep + report + push |
   est: 30m | verify: sweep green; suite green; report; pushed.
 
 ### loop19: cycles (selected from build/research-loop19.md, cycle R19)
@@ -1034,7 +1034,7 @@ that cycle, never pre-selected here. Gate 2 remains open.
   verify: `build/research-loop10.md` committed in the standard shape;
   `build/plan.md` contains the `loop10:` cycles (unchecked) ending in
   `loop10-final`. ENTRY CONDITION: no open critic finding above LOW severity.
-- [ ] CYCLE loop10-final — closing acceptance: full A1-A20 re-sweep plus every
+- [x] CYCLE loop10-final — closing acceptance: full A1-A20 re-sweep plus every
   loop-2..9 criterion, final `build/BUILD_REPORT.md` (all loops, criteria
   table, git log range, gaps), commit | est: 40m |
   verify: `bash build/acceptance_sweep.sh` → all green; `uv run pytest -q` →
@@ -1225,7 +1225,7 @@ live with zero BLOCKED rows.
   document maps to an enforcing test. ENTRY CONDITION: loop 17B's register
   records the sandbox row honestly. Core-design: YES (containment redefines
   what the sandbox levels promise) — R20 ENDS BY ASKING.
-- [ ] CYCLE R21 — Loop 21 research: a harness that can say no (D4, D5) —
+- [x] CYCLE R21 — Loop 21 research: a harness that can say no (D4, D5) —
   loops 11 and 13 shipped delegation roles/review_rounds/matrix and
   lessons+verified-gate, each chartered "kept only on a measured win", with no
   delta recorded anywhere; make scoring cheap enough to be routine on one slow
@@ -1258,7 +1258,7 @@ live with zero BLOCKED rows.
   provider R22 records BLOCKED, appends NO routing cycles, and may append only
   the D10 streaming cycle (which needs one endpoint). Core-design: YES
   (provider selection) — R22 ENDS BY ASKING.
-- [ ] CYCLE R23 — Loop 23 research: the operator's eyes (D6 — R15's own
+- [x] CYCLE R23 — Loop 23 research: the operator's eyes (D6 — R15's own
   narrow-scope fallback was the diff-preview approval mode and it did not
   ship; `grep -n diff src/codemonkey/approvals.py src/codemonkey/exec.py`
   returns nothing) — diff computed before a mutation is applied and an
