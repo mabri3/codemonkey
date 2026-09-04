@@ -801,6 +801,13 @@ journal key semantics that cycle 36-38 will build on.
 - [x] CYCLE loop24-final — Loop 24 acceptance: sweep + report + push
 
 
+
+### R28: graph-grounded retrieval (sprint appended 2026-09-03)
+
+- [x] CYCLE 65 — `graph_query` tool substrate: graphify-out/ discovery
+  (honest-absent), graph load/merge, pinned-symbol + edge-neighbor lookup
+  (graphquery.py); tests 5/5.
+
 ### R23B: diff-preview approval mode (sprint appended 2026-09-03)
 
 - [x] CYCLE diffpreview — approval=preview computes pre-apply unified diffs

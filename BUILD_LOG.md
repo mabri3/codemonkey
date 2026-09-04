@@ -1952,3 +1952,8 @@ Tag v1.1.0 pushed. 524 tests green. The build-through-27 order is fulfilled.
 **Completed:** diffpreview.py (unified diffs pre-apply for write/edit),
 approval=preview policy wired pre-gate in loop (NOT executed), POLICIES +
 preview. R23's original diff-mode intent now SHIPPED.
+
+## 2026-09-03 — CYCLE 65 (R28): graph-grounded retrieval
+
+**Completed:** graphquery.py (find_graph_dir honest-absent, load/merge,
+graph_query pinned lookup + neighbors).
