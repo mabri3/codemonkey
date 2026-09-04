@@ -28,7 +28,7 @@ def test_symbol_index_defines(tmp_path):
     (tmp_path / "m.py").write_text("def run_exec(x):\n    return x\n\n\nclass Runa:\n    pass\n")
     idx = symbol_index(tmp_path)
     assert idx["run_exec"] == ["m.py:1"]
-    assert idx["Runa"] == ["m.py:4"]
+    assert idx["Runa"] == ["m.py:5"]
 
 
 def test_locate_exact_and_prefix(tmp_path):
