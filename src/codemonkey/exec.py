@@ -148,6 +148,7 @@ def run_exec(
     emit_fn=None,  # override for tests: (event_dict) -> None
     job_id: str = "",
     verify_claims: bool = False,
+    dry_run: bool = False,
 ) -> int:
     """Run one non-interactive exec turn-group. Returns the exit code."""
     from .config import ConfigError, load_config
@@ -470,6 +471,7 @@ def run_exec(
             journal_thread=thread_id,
             journal_run=run_id,
             perm_rules=list(((cfg.get("permissions") or {}).get("rules")) or []),
+            dry_run=dry_run,
         )
 
     # loop17 cycle 53: static model routing (first-match rules on prompt/role)

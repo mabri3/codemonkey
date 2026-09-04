@@ -75,6 +75,7 @@ def run_turns(
     journal_thread: str = "",
     journal_run: str = "",
     perm_rules: list | None = None,
+    dry_run: bool = False,
 ) -> ChatTurn:
     """Drive the model until a final text answer or max_turns.
 
@@ -392,6 +393,26 @@ def run_turns(
                             f"error: {_bad['detail']}", {"error_class": "schema_mismatch"})
             except OSError:
                 pass
+
+            # loop22 cycle 59: dry-run preview for mutating tools
+            if dry_run and name in _MUTATING_TOOLS:
+                from .dryrun import preview_for
+
+                pv = preview_for(name, call.get("args") or {})
+                try:
+                    from .journal import record as _jr, args_key as _akd
+
+                    if journal_thread:
+                        _jr(journal_thread, "preview", tool=name,
+                            key=_akd(journal_thread, _turn_no, idx,
+                                     call.get("args") or {}, run=journal_run),
+                        status="preview", output=pv)
+                except OSError:
+                    pass
+                if on_event:
+                    on_event({"type": "tool.completed", "name": name,
+                              "ok": True, "preview": True})
+                return (idx, name, True, pv, {"preview": True})
 
             # Approval gate (cycle 8): evaluate policy BEFORE dispatch.
             # (rule_decision == 'ask' forces the gate on; 'allow' skips it)

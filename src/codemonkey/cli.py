@@ -585,6 +585,10 @@ def exec(
         str,
         typer.Option("--job", help="Durable job id: inject goal/steps, persist JOB_STEP transitions."),
     ] = "",
+    dry_run: Annotated[
+        bool,
+        typer.Option("--dry-run", help="Preview mutating tool calls without executing."),
+    ] = False,
     ignore_user_config: Annotated[
         bool,
         typer.Option("--ignore-user-config", help="Skip ~/.codemonkey/config.yaml."),
@@ -635,6 +639,7 @@ def exec(
             project_instructions=(False if no_project_instructions else None),
             cost_summary=cost_summary,
             job_id=job,
+            dry_run=dry_run,
         )
     except ExecUsageError as exc:
         typer.secho(f"error: {exc}", err=True, fg=typer.colors.RED)
