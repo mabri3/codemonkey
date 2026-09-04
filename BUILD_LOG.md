@@ -2436,3 +2436,23 @@ FULFILLED.
   section above, plan wording fixed, en dashes).
 - **Loop-38 entry probes:** all green (table in BUILD_REPORT loop-38
   section). **Suite:** 619 passed.
+
+## 2026-09-04 — CYCLE R39 (loop39): failure-anchored recovery research
+
+- **Files changed:** `build/research-loop39.md` (new — 7 candidates with
+  cited URLs, ranked SELECTED, 2 rejections with reasons), `build/plan.md`
+  (`loop39:` cycles 88–92 + `loop39-final` appended unchecked).
+- **Sources:** Failure-as-a-Process (1,794 trajectories, recovery-window
+  + 82%-burn findings), Beyond Resolution Rates (12–82% gaps + difficulty
+  confound caveat), TraceProbe (search-loop stability), thought-action
+  result-sensitivity rates, MAST (14 modes, step-repetition 17.14%),
+  AgentRx nine-category taxonomy via AgentAtlas.
+- **In-repo anchors:** journal `error_class` (unread mid-run),
+  `compile_rules` offline repeat-signal, 14F1 checkpoints (no policy),
+  `max_turns` bail (no typed report).
+- **Numbering:** loop-39 builds continue at 88 (82–87 reserved by the
+  appended-but-unauthorized loop-46 arc).
+- **Ask owed:** C91 (enforced stop) + C92 (rollback) are AWAITING-ASK —
+  autonomous termination needs explicit user approval (charter: ends by
+  asking). No inference spent (research only).
+- **Next step:** CYCLE R40 research, then the R39 termination-policy ask.

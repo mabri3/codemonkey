@@ -1628,7 +1628,9 @@ shipped until its entry point is exercised") live in
   ENTRY CONDITION: R37F1-R37F6 committed. Core-design: PARTIAL — new tools and
   new registry strategies extend approved surfaces; `--best-of` spends N×
   tokens and ends by asking per R-F.
-- [ ] CYCLE R39 — Loop 39 research: failure-anchored recovery — an online
+- [x] CYCLE R39 — Loop 39 research: failure-anchored recovery — an online
+  DONE 2026-09-04: research-loop39.md (7 candidates, SELECTED 88-92);
+  C91/C92 AWAITING-ASK (termination policy)
   failure taxonomy over the journal's existing `error_class`, localization of
   the first unrecoverable step, and a recovery policy table (retry differently
   / roll back to checkpoint / stop and report honestly) | est: 30m |
@@ -2040,3 +2042,54 @@ loop 45's v4.0 acceptance. This section is a plan, not a queue.
   scored task contributed a skill; `build/CAPABILITY_REGISTER.md` has no
   UNVALIDATED row; `bash build/acceptance_sweep.sh` → all exit 0;
   `uv run pytest -q` → exit 0; report committed.
+
+### loop39: cycles (selected from build/research-loop39.md, cycle R39)
+
+- [ ] CYCLE 88 — `loop39:` failure taxonomy: `failclass.py` mapping journal
+  `error_class` → AgentRx nine-category labels (6 mapped by rule, 3 honestly
+  unmappable with stated reasons); `journal show <thread>` prints taxonomy
+  rows beside the class summary | est: 30m |
+  verify (R-I): scripted failing real-exec run (fake provider, repeated tool
+  errors) → `codemonkey journal show <thread>` prints the taxonomy category
+  rows with counts; `uv run pytest -q tests/test_failclass.py` → exit 0
+  (≥5 tests: mapped classes, unmappable trio, unknown error_class honesty);
+  full suite green.
+- [ ] CYCLE 89 — `loop39:` stuck detector in the loop: same
+  `(tool, error_class)` ×3 (or K result-neutral turns) → `stuck` event +
+  system nudge naming the failure; never terminates | est: 30m |
+  verify (R-I): scripted failing real-exec run (fake provider) that used to
+  burn N turns → `stuck` event with the repeated pair appears at turn 3 in
+  the `--json` trace while the run still completes; `uv run pytest -q
+  tests/test_stuck.py` → exit 0 (≥4 tests); full suite green.
+- [ ] CYCLE 90 — `loop39:` recovery policy table + budget cap + typed
+  failure report (report-only): policy (retry-differently hint / rollback
+  suggestion / stop-and-report) consulted on stuck; recovery budget caps
+  post-first-error turns; `failure_report.*` events + report object, but the
+  run still completes (termination NOT wired) | est: 40m |
+  verify (R-I): scripted failing scenario — the trace shows the report with
+  `first_stuck_turn` + the would-have-saved turns/tokens vs burning to
+  `max_turns` (both printed, R-F); `uv run pytest -q
+  tests/test_recovery.py` → exit 0 (≥5 tests); full suite green.
+- [ ] CYCLE 91 — `loop39:` ENFORCE the stop (AWAITING-ASK — no worker starts
+  this before the user approves autonomous termination in the R39 ask):
+  policy stop → early exit with the typed failure report + checkpoint
+  pointer; exit code distinguishes gave-up (3) from error (1) | est: 30m |
+  verify (R-I): the charter FIRST probe — scripted failing scenario through
+  `codemonkey exec`: pre-loop agent burns the full turn budget, post-loop
+  agent stops early with the typed report; turn count AND token cost for
+  both printed (R-F); `uv run pytest -q tests/test_enforced_stop.py` → exit
+  0; full suite green.
+- [ ] CYCLE 92 — `loop39:` checkpoint-rollback recovery (AWAITING-ASK —
+  same gate as 91): clobber-class + rollback policy → `restore_latest`,
+  journaled, run continues from the restored tree; default SUGGEST | est:
+  30m |
+  verify (R-I): scripted clobber-then-verify real-exec run → rollback event,
+  final tree carries pre-clobber content, verifier passes; `uv run pytest -q
+  tests/test_rollback_recovery.py` → exit 0 (≥4 tests); full suite green.
+- [ ] CYCLE loop39-final — Loop 39 acceptance: policy table + budget + report
+  re-verified (91/92 only if ASK approved, else recorded as approved-scope
+  exclusions with the ask transcript pointer); BUILD_REPORT loop-39 section;
+  Gate report (including the measured pre/post turn+token deltas per R-F) |
+  est: 30m |
+  verify: loop39 entry probes green; `uv run pytest -q` → exit 0; report
+  committed.
