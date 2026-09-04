@@ -37,3 +37,13 @@ A15 exit=0  460 passed in 78.82s (0:01:18)
 A17 exit=0 (13 passed) | A18 OK | A19 valid=0 invalid=2 | A20 exit=0 (18 passed)
 All 20 acceptance criteria verified against http://192.168.50.176:8080/v1
 (authenticated, model unsloth/Qwen3.8-27B-GGUF) — ZERO BLOCKED rows.
+A16 exit=0 chars=6713 (verdict check: 1)
+--- A17: sandbox unit tests (incl. read-only denies write_file+shell) ---
+A17 exit=0  13 passed in 0.08s  (denial coverage: 9 assertion sites)
+--- A18: help lists the five commands ---
+A18 exit=0
+--- A19: strategy selector + invalid exit 2 ---
+A19 valid_exit=0 invalid_exit2=0 (exit=2)  msg=error: unknown strategy 'bogus' for 'compaction'. Valid compaction strategies: summarizing, sliding-window 
+--- A20: strategy unit tests ---
+A20 exit=0  18 passed in 0.03s
+=== sweep complete ===

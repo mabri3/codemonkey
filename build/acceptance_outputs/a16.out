@@ -1,0 +1,174 @@
+This diff has several problems that should be fixed before merge.
+
+1. **Stray README marker is accidental and user-visible**
+
+```diff
+@@ -76,3 +76,4 @@ the approval policies (untrusted / on-request / never).
+ ## License
+ 
+ MIT
++# acceptance sweep scratch
+```
+
+This appends a top-level Markdown heading after the license block. It looks like local scratch text and should not be committed.
+
+2. **Generated, non-deterministic acceptance output is being committed**
+
+The diff rewrites many files under `build/acceptance_outputs/`, including raw terminal output, token usage, session IDs, timestamps, local paths, and model names. For example:
+
+```diff
++file .env 155B
+...
++a66abf1f0009  2026-09-03 16:02  local/unsloth/Qwen3.8-27B-GGUF  6 msgs  Remember this codeword: zebra. Reply with ok.
+```
+
+and:
+
+```diff
+-error: '/private/var/folders/xb/kzc31shn1pz2s_5l2fy6d7rh0000gn/T/tmp.Pnbl1pcfvv' is not inside a git repository; use --skip-git-repo-check to run anyway
++error: '/private/var/folders/xb/kzc31shn1pz2s_5l2fy6d7rh0000gn/T/tmp.fDGGqePUz5' is not inside a git repository; use --skip-git-repo-check to run anyway
+```
+
+These are local run artifacts, not stable fixtures. They make future diffs noisy and leak environment/session details that do not belong in version control. If they are runtime outputs, ignore them or generate them in CI. If they are intended as fixtures, replace them with small deterministic files and add tests against those fixtures.
+
+3. **The acceptance summary is now incomplete**
+
+```diff
+-A16 exit=0 chars=5170 (verdict check: 0)
+---- A17: sandbox unit tests (incl. read-only denies write_file+shell) ---
+-A17 exit=0  13 passed in 0.19s  (denial coverage: 9 assertion sites)
+...
+-=== sweep complete ===
+```
+
+The new `summary.txt` stops after `A15` and no longer contains `=== sweep complete ===`. If this file is meant to record a completed acceptance sweep, that is a correctness problem. Either restore the full summary or update the sweep script/tests so the expected output is intentional.
+
+4. **`tests/conftest.py` now loads `.env` globally at import time**
+
+```diff
++def _load_dotenv_once():
++    from pathlib import Path
++
++    env_file = Path(__file__).parent.parent / ".env"
++    if not env_file.is_file():
++        return
++    for line in env_file.read_text().splitlines():
++        line = line.strip()
++        if not line or line.startswith("#") or "=" not in line:
++            continue
++        k, _, v = line.partition("=")
++        os.environ.setdefault(k.strip(), v.strip())
++
++_load_dotenv_once()
+```
+
+This is risky for tests:
+
+- It mutates the process environment during collection.
+- Secrets from `.env` can be inherited by every test and subprocess.
+- Tests become dependent on a local, git-ignored file.
+- The parser is naive: it does not handle `export FOO=bar`, quoted values, inline comments, or read errors gracefully.
+- It can mask missing configuration instead of failing explicitly.
+
+If tests need an API key or base URL, inject it through fixtures/`monkeypatch` or a dedicated test-only environment setup rather than globally loading the repository `.env`.
+
+5. **New `CODEMONKEY_BASE_URL` env override is untested and ambiguously named**
+
+```diff
++    "CODEMONKEY_BASE_URL": "providers.local.base_url",
+```
+
+The name sounds global, but it only affects `providers.local.base_url`. There is no test in this diff covering the new mapping. Either add a test, or rename it to something more explicit such as `CODEMONKEY_LOCAL_BASE_URL`.
+
+6. **Hardcoded private IPs are still scattered through source/docs/tests**
+
+```diff
+-            "base_url": "http://192.168.50.113:8080/v1",
++            "base_url": "http://192.168.50.176:8080/v1",
+```
+
+and:
+
+```diff
+-HOME_BASE = "http://192.168.50.113:8080/v1"
++HOME_BASE = "http://192.168.50.176:8080/v1"
+```
+
+Changing a local network endpoint across defaults, README, HTML docs, tests, and acceptance scripts is brittle. A LAN IP should normally come from configuration or environment, not be baked into product defaults and test assertions.
+
+7. **Docs are now inconsistent with the new model name**
+
+`features.html` updates the host but not the model:
+
+```diff
+-llama.cpp server (<code>http://192.168.50.113:8080/v1</code>,
++llama.cpp server (<code>http://192.168.50.176:8080/v1</code>,
+ <code>Qwen3.8-27B-NVFP4-MTP-VERY-HIGH.gguf</code>).
+```
+
+But the code default changed to:
+
+```diff
++            "model": "unsloth/Qwen3.8-27B-GGUF",
+```
+
+The docs should either match the new default or stop naming a specific local model.
+
+8. **The acceptance sweep comment change is historically confusing**
+
+```diff
+-# 51F6: this probe used to hardcode http://192.168.50.113:8080 and the old
++# 51F6: this probe used to hardcode http://192.168.50.176:8080 and the old
+```
+
+The point of that comment appears to be that an old hardcoded endpoint caused false `BLOCKED` results after the server moved. Rewriting it as if the old bug was `192.168.50.176` obscures the history. Keep the stale IP or reword the comment.
+
+9. **`test_delegate.py` adds an unchecked `git init`**
+
+```diff
++    import subprocess as sp2
++
++    sp2.run(["git", "init", "-q"], cwd=ctx.workdir)  # child needs a git repo
+```
+
+This does not check the result. If `git` is missing, fails, or the directory is not writable, the test will fail later with a less obvious error. At minimum:
+
+```python
+res = sp2.run(["git", "init", "-q"], cwd=ctx.workdir)
+assert res.returncode == 0
+```
+
+or skip/fail explicitly if `git` is unavailable.
+
+10. **Minor style/clarity issue in the health probe**
+
+```diff
++        _headers = {}
++        _key = os.environ.get(dflt.get("api_key_env") or "")
++        if _key:
++            _headers["Authorization"] = f"Bearer {_key}"
+```
+
+This works, but the underscore-prefixed locals in a function are odd. A clearer version would be:
+
+```python
+env_name = dflt.get("api_key_env")
+key = os.environ.get(env_name) if env_name else None
+headers = {"Authorization": f"Bearer {key}"} if key else {}
+```
+
+11. **The committed config dump looks inconsistent**
+
+```diff
+   anthropic:
+     protocol: anthropic
+-    base_url: http://192.168.50.176:8080/v1
++    base_url: https://api.anthropic.com
+     model: unsloth/Qwen3.8-27B-GGUF
+```
+
+Pointing the `anthropic` provider at the real Anthropic API while keeping a local GGUF model name is suspicious. If this file is only generated output, that is another reason not to commit it. If it is meant as a fixture or expected config, it should be corrected.
+
+Overall: remove the README scratch line, stop committing raw acceptance outputs, fix the incomplete summary, avoid global `.env` loading in tests, add coverage for the new env var, and reconcile the docs/model/IP changes.
+
+CHANGES REQUESTED

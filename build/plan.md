@@ -770,6 +770,23 @@ journal key semantics that cycle 36-38 will build on.
 
 
 
+
+### loop17: cycles (selected from build/research-loop17.md, cycle R17 — scoped live at user request post-v1.0.0)
+
+- [ ] CYCLE 52 — `loop17:` honest-completion gate: exec `verify_claims`
+  post-turn audit — file-existence + command-outcome claims checked against
+  journal/state evidence; missing evidence → reply gets [UNVERIFIED] marker +
+  journal unverified_claim record; off by default | est: 30m |
+  verify: `uv run pytest tests/test_verify_claims.py -q` → exit 0 (≥7 tests);
+  `uv run pytest -q` → exit 0.
+- [ ] CYCLE 53 — `loop17:` static model routing: `model_routing` first-match
+  rules (tool_role/prompt_glob) selecting provider+model; route journaled;
+  `eval --route-stats` per-plan pass_rate/tokens | est: 30m |
+  verify: `uv run pytest tests/test_routing.py -q` → exit 0 (≥6 tests);
+  `uv run pytest -q` → exit 0.
+- [ ] CYCLE loop17-final — Loop 17 acceptance: sweep + report + push |
+  est: 30m | verify: sweep green; suite green; report committed; pushed.
+
 ### loop16: cycles (selected from build/research-loop16.md, cycle R16 — the final loop)
 
 - [x] CYCLE 49 — `loop16:` hardening + release record: secret redaction pass

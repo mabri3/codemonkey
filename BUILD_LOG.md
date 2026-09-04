@@ -1840,3 +1840,11 @@ loop). Secret hygiene re-checked: the key value appears in NO tracked file.
 **This satisfies `loop16-final`'s verify probe** ("all green, zero BLOCKED"),
 which was unsatisfiable while the endpoint was unreachable; both it and CYCLE
 51 are now marked `[x]` on evidence rather than on a note.
+
+## 2026-09-03 — CYCLE R17: Loop 17 research — honest completion + static routing selected
+
+**Completed:** `build/research-loop17.md` — post-v1.0.0 loop scoped from live
+defects: fizzbuzz test-file overclaim + A11 date hallucination (both =
+"trust narration not claims") → cycle 52 honest-completion gate; .176 serving
+3 models unused → cycle 53 static routing rules. LLM-judge verification NOT
+selected (self-agreement evidence); trained router NOT selected.
