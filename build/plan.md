@@ -1062,3 +1062,189 @@ that cycle, never pre-selected here. `loop10-final` still precedes all of them.
   verify: `bash build/acceptance_sweep.sh` → all green, zero BLOCKED;
   `uv run pytest -q` → exit 0; `uv run codemonkey --version` matches the tag;
   report updated and committed.
+
+## Cycle checklists — loops 17-27 (PROPOSED 2026-09-03, ⚠️ NOT AUTHORIZED)
+
+Charters, the debt ledger this arc discharges (D1-D12), the handoff contract
+for an implementer with no conversation context, and the binding arc rules
+(R-A "measure or delete" … R-E "the register is the release record"):
+`build/loops-17-27-proposal.md`. Like loops 11-16 and unlike loops 6-10, these
+carry NO blanket authorization: they stay unchecked until the user authorizes
+the arc. Each loop opens with its research cycle; `loop<N>:` build cycles are
+appended by that cycle, never pre-selected here.
+
+Baseline for the arc: `ca601e5`, v1.0.0, suite 460 passed, A1-A20 all exit 0
+live with zero BLOCKED rows.
+
+- [ ] CYCLE R17 — Loop 17 research: truth pass, claims versus evidence — an
+  evidence class (PROVEN-LIVE / UNIT-ONLY / UNVALIDATED / DEAD) for every
+  capability loops 1-16 claim; resolution of the two unchecked closing cycles
+  (D8: `loop6-final` at plan.md:595, `loop10-final` at plan.md:951); a
+  README/features.html/THREAT_MODEL audit against reality; a dead-surface pass
+  | est: 30m |
+  verify: `build/research-loop17.md` committed in the loops 2-16 shape (>=5
+  candidates with real cited URLs, ranked `SELECTED` section);
+  `build/CAPABILITY_REGISTER.md` committed with one row per shipped capability
+  carrying name, entry point, strongest evidence (literal probe or test path),
+  evidence class, and the debt row it carries; `build/plan.md` contains the
+  `loop17:` cycles (unchecked) for every demotion and doc correction; D8
+  resolved (both boxes ticked with re-run probe output, or annotated
+  superseded-by — never silently ticked). ENTRY CONDITION: none; this loop is
+  always openable and blocks the rest of the arc. Core-design: NO (behavioral
+  defects become `17F<n>` critic-style fix cycles, not design rewrites).
+- [ ] CYCLE R18 — Loop 18 research: foreign-repo dogfood (D11) — the tool has
+  never been run on a codebase it did not author; N real tasks on >=2 external
+  repos, each producing a kept journal thread, and a ranked friction log where
+  every entry cites the transcript line proving it | est: 30m |
+  verify: `build/research-loop18.md` committed in the standard shape;
+  `build/friction-loop18.md` committed with ranked entries, each carrying
+  file/transcript evidence; `build/plan.md` contains the `loop18:` cycles
+  (unchecked), each with a probe that reproduces the friction BEFORE the fix
+  and shows it gone after. ENTRY CONDITION: `build/CAPABILITY_REGISTER.md`
+  exists (loop 17 closed) AND the user has named external repos the agent may
+  operate in — otherwise R18 records BLOCKED and appends no cycles (a
+  synthetic repo is not a foreign repo). Core-design: NO for the log; PARTIAL
+  if a friction's only fix changes tool semantics — that fix ends by asking.
+- [ ] CYCLE R19 — Loop 19 research: mid-turn resume and crash truth (D1,
+  deferred in loop 7, chartered and missed in loop 12) — exactly-once replay
+  of the in-flight intent off the journal, a crash-point taxonomy (before the
+  call / after call before journal write / after journal write before effect /
+  after effect), reconciliation against checkpoints, loud refusal when the
+  crash point cannot be established, interaction with `--job` step write-back
+  | est: 30m |
+  verify: `build/research-loop19.md` committed in the standard shape;
+  `build/plan.md` contains the `loop19:` cycles (unchecked) including,
+  mandatorily, a probe of this literal shape — start a run performing a known
+  mutation, `kill -9` it mid-turn, resume it, assert the mutation is present
+  EXACTLY once by byte-compare or count assertion (not "looks right") — plus
+  one probe per crash-point class. ENTRY CONDITION: journal wired into
+  production runs (31F1, done) AND a reachable live endpoint; without one R19
+  records BLOCKED rather than proving resume against mocks. Core-design: YES
+  (what a resumed run may assume is session semantics) — R19 ENDS BY ASKING.
+- [ ] CYCLE R20 — Loop 20 research: containment for real (D2 — R16 researched
+  macOS `sandbox-exec`/Linux bwrap then dropped it from SELECTED, leaving the
+  documented `shell` cwd-escape gap open under lexical containment alone) —
+  per-level profiles, honest fail-closed fallback where no mechanism exists,
+  enforcement parity across levels and platforms, and what THREAT_MODEL.md
+  must stop promising | est: 30m |
+  verify: `build/research-loop20.md` committed in the standard shape (with
+  current, cited status for `sandbox-exec` deprecation — assumed, not
+  recalled); `build/plan.md` contains the `loop20:` cycles (unchecked), each
+  carrying an escape probe (attempt the documented cwd escape → assert denial,
+  exit code and message) AND a per-tool latency before/after measurement, plus
+  a THREAT_MODEL.md revision cycle whose probe asserts every promise in the
+  document maps to an enforcing test. ENTRY CONDITION: loop 17's register
+  records the sandbox row honestly. Core-design: YES (containment redefines
+  what the sandbox levels promise) — R20 ENDS BY ASKING.
+- [ ] CYCLE R21 — Loop 21 research: a harness that can say no (D4, D5) —
+  loops 11 and 13 shipped delegation roles/review_rounds/matrix and
+  lessons+verified-gate, each chartered "kept only on a measured win", with no
+  delta recorded anywhere; make scoring cheap enough to be routine on one slow
+  27B endpoint, then actually score those arms and delete what does not
+  separate | est: 30m |
+  verify: `build/research-loop21.md` committed in the standard shape,
+  including a stated minimum-N / significance rule for small-sample pass-rate
+  claims; `build/plan.md` contains the `loop21:` cycles (unchecked), each
+  carrying RAW per-arm numbers (pass rate, tokens, wall) inside its verify
+  probe; `build/CAPABILITY_REGISTER.md` updated so every UNVALIDATED row
+  becomes PROVEN, DEAD, or "measured, did not separate, kept because
+  <reason>". ENTRY CONDITION: register lists the UNVALIDATED set (loop 17
+  closed) AND a reachable live endpoint — this loop cannot run on mocks by
+  construction; without one R21 records BLOCKED. Core-design: NO for
+  measurement; PARTIAL for deletion — removing shipped, documented surface
+  ends by asking before it lands.
+- [ ] CYCLE R22 — Loop 22 research: routing, actually measured (D3 — deferred
+  by R8, blocked at R14 on a single provider) — per-task-class routing scored
+  per class, health checks that distinguish unreachable / reachable-but-wedged
+  / degraded (the failure this repo lost four loops to), failover chains where
+  every fallback is journal-recorded and never silent, cost-aware routing
+  against the cycle-26 ledger, and D10 (a mid-stream transport failure
+  currently discards partial tokens in `providers/openai.py::_request_stream`)
+  | est: 30m |
+  verify: `build/research-loop22.md` committed in the standard shape;
+  `build/plan.md` contains the `loop22:` cycles (unchecked) with raw
+  before/after tables PER TASK CLASS, plus the D10 streaming decision
+  (retain / retry / explicitly drop) as a testable cycle. ENTRY CONDITION —
+  HARD: >=2 usable providers reachable AT THE SAME TIME. Without a second
+  provider R22 records BLOCKED, appends NO routing cycles, and may append only
+  the D10 streaming cycle (which needs one endpoint). Core-design: YES
+  (provider selection) — R22 ENDS BY ASKING.
+- [ ] CYCLE R23 — Loop 23 research: the operator's eyes (D6 — R15's own
+  narrow-scope fallback was the diff-preview approval mode and it did not
+  ship; `grep -n diff src/codemonkey/approvals.py src/codemonkey/exec.py`
+  returns nothing) — diff computed before a mutation is applied and an
+  approval mode gating on the diff rather than the tool name, a run timeline
+  over the existing JSONL stream, one inspector unifying journal/undo/spill/
+  checkpoints, a REPL status line, structured CI run reports | est: 30m |
+  verify: `build/research-loop23.md` committed in the standard shape;
+  `build/plan.md` contains the `loop23:` cycles (unchecked), EACH carrying a
+  probe asserting exec stdout purity is unchanged (text mode = final answer
+  only; `--json` = JSONL only) per arc rule R-D. ENTRY CONDITION: loop 18's
+  friction log exists and RE-RANKS these seeds; if loop 18 was BLOCKED, R23
+  narrows to the diff-gated approval mode alone (justified by D6 independent
+  of friction evidence). Core-design: PARTIAL — the diff-gated approval mode
+  changes approval semantics and ends by asking; read-only viewers do not.
+- [ ] CYCLE R24 — Loop 24 research: concurrency and shared state (D9 —
+  `delegate_batch` already runs workers concurrently while `jobs.py` is
+  single-writer, deferred at loop 12 for want of file locking) — locking or
+  lock-free design for every store two processes can touch, conflict semantics
+  when two delegates advance one step, crash behavior UNDER concurrency, proof
+  (not assertion) of journal thread isolation for a dead delegate | est: 30m |
+  verify: `build/research-loop24.md` committed in the standard shape;
+  `build/plan.md` contains the `loop24:` cycles (unchecked) including a probe
+  that runs N concurrent writers against one store and asserts NO LOST UPDATE
+  by exact count — or a written refusal recording the reasoning that produced
+  it (a documented "these must not share state" is a valid exit). ENTRY
+  CONDITION: loop 19 closed (single-run crash semantics defined); if loop 19
+  was BLOCKED, R24 narrows to locking with a tested single-writer guarantee
+  and defers concurrent crash semantics explicitly. Core-design: YES (shared
+  mutable state across processes; the standing R8/R11 concurrent-model-turns
+  flag may be RAISED here, never assumed) — R24 ENDS BY ASKING.
+- [ ] CYCLE R25 — Loop 25 research: long-thread economy (D12 — journals,
+  spills, checkpoints and session stores grow unbounded; GC was an R12 seed
+  never taken; no job here has outlived a single run by days) — measured
+  growth per store under a long job BEFORE any policy is designed, retention
+  weighed against the journal's role as the evidence base for resume and the
+  register, compaction policy for week-long threads, multi-day cost
+  accounting, resumable long-horizon eval tasks | est: 30m |
+  verify: `build/research-loop25.md` committed in the standard shape;
+  `build/plan.md` contains the `loop25:` cycles (unchecked), each with
+  measured before/after disk AND context numbers, plus a compaction survival
+  probe asserting a specific named fact still answerable after N compactions;
+  every cycle also carries the R-D stdout-purity assertion. ENTRY CONDITION:
+  loops 19 and 24 closed AND at least one job has actually run across multiple
+  sessions/days — without a real long job R25 records BLOCKED rather than
+  modeling a hypothetical curve. Core-design: PARTIAL — retention that deletes
+  journal history changes what the framework can later prove, and that
+  decision ends by asking.
+- [ ] CYCLE R26 — Loop 26 research: someone else's machine (D7) — clean-machine
+  install from the committed lockfile, Linux parity (especially for loop 20's
+  platform-specific containment), LIVE verification of the Anthropic native
+  tool shape (`input_schema`, fixed in 51F1b and unit-tested only because no
+  key was available), distribution/upgrade/rollback, and first-run experience
+  with an empty `~/.codemonkey/` | est: 30m |
+  verify: `build/research-loop26.md` committed in the standard shape;
+  `build/plan.md` contains the `loop26:` cycles (unchecked) with per-platform
+  probe results and an explicit honest table of what remains unverified.
+  ENTRY CONDITION: loop 20 closed. Per-seed blockers are recorded, not routed
+  around: no Linux host → Linux rows record BLOCKED; no Anthropic key → D7
+  stays OPEN and is carried into loop 27's record as an open gap, never
+  declared passing on unit tests. Core-design: NO (packaging/platform); a
+  containment difference forcing a semantic change ends by asking.
+- [ ] CYCLE R27 — Loop 27 research + closing acceptance: v2.0 — full A1-A20
+  re-sweep plus every loop-2..26 criterion live with zero BLOCKED rows (or an
+  individually justified exception list), the capability register brought
+  current as the release record (arc rule R-E), a closing critic pass in
+  `build/critic-cycle6.md` style, THREAT_MODEL.md refreshed against what loop
+  20 actually enforces, final BUILD_REPORT for loops 17-27 with the git range,
+  version tag, Gate 3 handoff | est: 40m |
+  verify: `build/research-loop27.md` committed (acceptance-record method,
+  cited); `build/plan.md` contains the `loop27:` cycles (unchecked) ending in
+  `loop27-final` whose own probe is: `bash build/acceptance_sweep.sh` → all
+  exit 0, zero BLOCKED; `uv run pytest -q` → exit 0; `uv run codemonkey
+  --version` matches the tag; every `build/CAPABILITY_REGISTER.md` row reads
+  PROVEN-LIVE, UNIT-ONLY with a stated reason, or DEAD — no UNVALIDATED rows
+  remain; report committed. ENTRY CONDITION: loops 17-26 closed (shipped, or
+  explicitly and defensibly rejected/BLOCKED in writing), no open critic
+  finding above LOW severity, and a reachable live endpoint — if the endpoint
+  is down loop 27 WAITS rather than closing dishonestly. Core-design: NO.

@@ -135,6 +135,13 @@ list" — its findings become new unchecked cycles appended to plan.md
 (preserve checked boxes; cap stays none). The critic sees spec + diff
 only.
 
+Forward arc loops 17-27 (PROPOSED 2026-09-03, NOT AUTHORIZED): eleven research
+cycles `R17`-`R27` are appended unchecked at the end of `build/plan.md`. Their
+charters, the D1-D12 debt ledger they discharge, the no-context handoff
+contract, and the binding arc rules (R-A "measure or delete" … R-E "the
+register is the release record") live in `build/loops-17-27-proposal.md`. They
+carry no blanket authorization and stay unchecked until the user grants one.
+
 ## Ticks (every 5 min)
 
 Heartbeats are ~12/h but most are no-ops (check state, exit); cost is
