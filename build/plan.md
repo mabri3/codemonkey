@@ -1742,7 +1742,9 @@ shipped until its entry point is exercised") live in
   and registry probes still run); `uv run pytest -q tests/test_graph_tools.py`
   → exit 0 (≥5 tests: registry/SPECS presence, read-only allowance, stale-graph
   marker, missing-graph honesty, path lookups).
-- [ ] CYCLE 75 — `loop38:` strategy domain `context`: `static` (default —
+- [x] CYCLE 75 — `loop38:` strategy domain `context`: `static` (default —
+  DONE 2026-09-04, commit 5febf08; checkbox + features.html backfilled by the
+  cycle-76 tick which found them missing)
   byte-identical to today's block assembly) | `learned` (learnedctx.assemble
   over project-context / instructions / memory / repo-map fragments under a
   token budget); config `strategies.context` + env
@@ -1755,7 +1757,9 @@ shipped until its entry point is exercised") live in
   `context: learned` effective (A19 surface); unknown name → exit 2 listing
   valid names; `uv run pytest -q tests/test_context_strategy.py` → exit 0
   (≥5 tests); full suite green.
-- [ ] CYCLE 76 — `loop38:` memory strategy `adaptive`: registered in the
+- [x] CYCLE 76 — `loop38:` memory strategy `adaptive`: registered in the
+  DONE 2026-09-04 (resumed uncommitted work: implementation complete, fixed
+  the real-run probe budget 12→11 words and the stale VALID_MEMORY tripwire)
   memory domain (default stays `file`); token-budgeted recency-decay
   selection over the memory file via adaptivemem; config/env selectable |
   est: 30m |

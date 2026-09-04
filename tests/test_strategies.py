@@ -251,7 +251,7 @@ def test_build_with_env_selection(cfg, monkeypatch):
 
 
 def test_valid_sets():
-    assert set(VALID_MEMORY) == {"file", "none"}
+    assert set(VALID_MEMORY) == {"adaptive", "file", "none"}
     assert set(VALID_STORES) == {"jsonl", "sqlite"}
     assert set(VALID_COMPACTORS) == {"sliding-window", "summarizing"}
 

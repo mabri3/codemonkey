@@ -64,16 +64,24 @@ _MEMORY = {
     "file": FileMemory,
     "none": NoMemory,
 }
-
-VALID_MEMORY = sorted(_MEMORY)
+_VALID_MEMORY_TUPLE = ("adaptive",)
 
 
 def get_memory(name: str, path: Path | None = None):
     """Instantiate a memory strategy by config name (unknown -> ValueError)."""
+    if name in _VALID_MEMORY_TUPLE:
+        # loop38 cycle 76: adaptivemem wired as a selectable strategy
+        # (imported lazily so `file`/`none` never pay for it).
+        from .adaptivememory import AdaptiveMemory
+
+        import os
+
+        budget = int(os.environ.get("CODEMONKEY_MEMORY_TOKEN_BUDGET", 300) or 300)
+        return AdaptiveMemory(path, token_budget=budget)
     if name not in _MEMORY:
         raise ValueError(
             f"unknown memory strategy '{name}'. "
-            f"Valid memory strategies: {', '.join(VALID_MEMORY)}"
+            f"Valid memory strategies: {', '.join(sorted(list(_MEMORY) + list(_VALID_MEMORY_TUPLE)))}"
         )
     return _MEMORY[name](path) if name == "file" else _MEMORY[name]()
 

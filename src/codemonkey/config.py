@@ -215,7 +215,7 @@ def resolve_api_key(cfg: dict, provider: str | None = None) -> str | None:
 # works from cycle 1 onward).
 KNOWN_STRATEGIES: dict[str, list[str]] = {
     "compaction": ["summarizing", "sliding-window"],
-    "memory": ["file", "none"],
+    "memory": ["adaptive", "file", "none"],
     "session_state": ["jsonl", "sqlite"],
     "context": ["static", "learned"],
 }

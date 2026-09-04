@@ -16,9 +16,14 @@ import os
 from typing import Optional
 
 from .compaction import get_compactor, VALID_COMPACTORS
-from .memory import get_memory, VALID_MEMORY
+from .memory import get_memory
 from .session_state import get_store, VALID_STORES
 from .context import get_context_assembler, VALID_CONTEXT
+
+# VALID_MEMORY lives in memory.py's get_memory contract; expose it here for
+# the DOMAINS table (static import would drag adaptivemem in eagerly — fine,
+# it is a pure stdlib module).
+VALID_MEMORY = ("adaptive", "file", "none")
 
 DOMAINS = {
     "compaction": {"env": "CODEMONKEY_STRATEGY_COMPACTION", "valid": VALID_COMPACTORS, "default": "summarizing"},

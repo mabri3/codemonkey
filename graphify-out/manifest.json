@@ -25,9 +25,9 @@
     "semantic_hash": "432e895897a2b1a5d1336f3e25aeada8"
   },
   "src/codemonkey/config.py": {
-    "mtime": 1788536578.8998034,
-    "ast_hash": "a3f81cff865a669e9b7d9fbbfa9f409f",
-    "semantic_hash": "a3f81cff865a669e9b7d9fbbfa9f409f"
+    "mtime": 1788536736.4575582,
+    "ast_hash": "4c7dc95bf1a05ba9539d572ba5931b74",
+    "semantic_hash": "4c7dc95bf1a05ba9539d572ba5931b74"
   },
   "src/codemonkey/events.py": {
     "mtime": 1788353233.2128239,
@@ -115,9 +115,9 @@
     "semantic_hash": "e2c82b8da5b4608bbef0cae9dc1a4ada"
   },
   "src/codemonkey/strategies/__init__.py": {
-    "mtime": 1788536560.8176432,
-    "ast_hash": "dc1a5640b9aa70c83e0035d5b2b858d6",
-    "semantic_hash": "dc1a5640b9aa70c83e0035d5b2b858d6"
+    "mtime": 1788536733.325267,
+    "ast_hash": "f5fb23559f5a1bbf8bc79cc095f1cd71",
+    "semantic_hash": "f5fb23559f5a1bbf8bc79cc095f1cd71"
   },
   "src/codemonkey/strategies/compaction.py": {
     "mtime": 1788370768.2501202,
@@ -125,9 +125,9 @@
     "semantic_hash": "370ac18e66d13deee99612515e334ed0"
   },
   "src/codemonkey/strategies/memory.py": {
-    "mtime": 1788365236.97302,
-    "ast_hash": "8fcbb136398b70502c86f4ae256daded",
-    "semantic_hash": "8fcbb136398b70502c86f4ae256daded"
+    "mtime": 1788536729.113706,
+    "ast_hash": "29f8c6bcfa1526f595ab47ff34dc618f",
+    "semantic_hash": "29f8c6bcfa1526f595ab47ff34dc618f"
   },
   "src/codemonkey/strategies/session_state.py": {
     "mtime": 1788367891.2676747,
@@ -310,9 +310,9 @@
     "semantic_hash": "07eaa087634e37f3c8f3efa79f208ffc"
   },
   "tests/test_strategies.py": {
-    "mtime": 1788365375.2825015,
-    "ast_hash": "d822fa0fef8b64d042a264389242e21f",
-    "semantic_hash": "d822fa0fef8b64d042a264389242e21f"
+    "mtime": 1788550530.5671654,
+    "ast_hash": "bad1630a63ff0a5e4a9c61a902f55650",
+    "semantic_hash": "bad1630a63ff0a5e4a9c61a902f55650"
   },
   "tests/test_tools.py": {
     "mtime": 1788536431.605775,
@@ -863,5 +863,15 @@
     "mtime": 1788536631.8967454,
     "ast_hash": "4afa0cf6b584c8d2492ae2d4dcb83ca4",
     "semantic_hash": "4afa0cf6b584c8d2492ae2d4dcb83ca4"
+  },
+  "src/codemonkey/strategies/adaptivememory.py": {
+    "mtime": 1788536724.2332902,
+    "ast_hash": "fe0007f31723ef9cbb9216186928c681",
+    "semantic_hash": "fe0007f31723ef9cbb9216186928c681"
+  },
+  "tests/test_memory_adaptive.py": {
+    "mtime": 1788550530.6287234,
+    "ast_hash": "9d9c4316f87679b056eb05523aadfcce",
+    "semantic_hash": "9d9c4316f87679b056eb05523aadfcce"
   }
 }

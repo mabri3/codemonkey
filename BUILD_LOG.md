@@ -2219,3 +2219,46 @@ FULFILLED.
   fragments outside the budget (they were appended unconditionally before
   too); budgeting them is a later tuning decision, not a wiring gap.
 - **Next step:** CYCLE 76 — memory strategy `adaptive`.
+
+## 2026-09-04 — CYCLE 76 (loop38): memory strategy `adaptive` (adaptivemem wired)
+
+- **Resume note:** tick started with uncommitted cycle-76 work (a prior worker
+  died mid-cycle per the SPRINT uncommitted-work rule): `config.py`,
+  `strategies/__init__.py`, `strategies/memory.py` modified +
+  `strategies/adaptivememory.py` + `tests/test_memory_adaptive.py` untracked.
+  Implementation was complete; two probe failures fixed in this tick (below).
+  Also backfilled cycle-75 bookkeeping its tick skipped: plan.md `[x]` for 75
+  + features.html entries for 75/76.
+- **Files changed:** `src/codemonkey/strategies/adaptivememory.py` (new —
+  `AdaptiveMemory(FileMemory)`; `load()` applies
+  `adaptivemem.adaptive_select` under `token_budget`),
+  `src/codemonkey/strategies/memory.py` (`get_memory("adaptive")` lazy import,
+  budget from `CODEMONKEY_MEMORY_TOKEN_BUDGET`, default 300),
+  `src/codemonkey/strategies/__init__.py` (`VALID_MEMORY` now
+  `("adaptive", "file", "none")`; default stays `file`),
+  `src/codemonkey/config.py` (`KNOWN_STRATEGIES["memory"]` gains `adaptive`),
+  `tests/test_memory_adaptive.py` (new, 8 tests),
+  `tests/test_strategies.py` (`test_valid_sets` gains `adaptive`).
+- **Fixes in this tick:** (1) real-run probe budget 12→11 words — each fixture
+  line is 6 words so 12 admitted two lines (implementation correct, probe
+  arithmetic wrong); (2) `test_valid_sets` still pinned `{"file", "none"}`.
+- **F7 row cleared for `adaptivemem`:** imported by `strategies/memory.py` →
+  selectable by name, A/B-measurable per charter (default OFF).
+- **Tests run:** `uv run pytest -q tests/test_memory_adaptive.py
+  tests/test_strategies.py` → **26 passed**; `uv run pytest -q` → **612
+  passed**, 0 failed (604 + 8).
+- **Probe results (literal, R-I):**
+  - REAL-RUN A/B through the REAL `run_exec` with a recording provider:
+    `CODEMONKEY_STRATEGY_MEMORY=adaptive` + budget 11 injects only the
+    selected line (`topic-1` present, `topic-2..24` absent from `## Memory`);
+    `file` arm injects all 24 lines — observable difference.
+  - `CODEMONKEY_STRATEGY_MEMORY=adaptive uv run codemonkey config` → exit 0,
+    stdout `memory: adaptive`.
+  - `CODEMONKEY_STRATEGY_MEMORY=telepathy uv run codemonkey config` → exit 2,
+    stderr lists `adaptive, file, none`.
+- **Known issues:** undated memory lines all score 1.0 so ties keep earliest
+  lines (documented adaptivemem behavior); dated `[YYYY-MM-DD]` lines decay
+  normally. `CODEMONKEY_MEMORY_TOKEN_BUDGET` is env-only (no config-file key)
+  — consistent with loop-38 scope, revisit if the register demands it.
+- **Next step:** CYCLE 77 — R-H rename (`certify` → `hoeffding_gate`) + eval
+  early-stop.
