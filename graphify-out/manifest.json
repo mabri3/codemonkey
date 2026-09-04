@@ -390,9 +390,9 @@
     "semantic_hash": "7052dbd52a7b461aa1e357e552ef6bb2"
   },
   "tests/conftest.py": {
-    "mtime": 1788500463.0206926,
-    "ast_hash": "3dfc68410ba559b0449c297a92d83528",
-    "semantic_hash": "3dfc68410ba559b0449c297a92d83528"
+    "mtime": 1788552637.398633,
+    "ast_hash": "297eefb215a003a77d6f60639c2bcf76",
+    "semantic_hash": "297eefb215a003a77d6f60639c2bcf76"
   },
   "tests/test_batch_edit.py": {
     "mtime": 1788420490.3307574,
@@ -484,11 +484,6 @@
     "ast_hash": "5fe6f3474918fe567a5efc7006aa0d6d",
     "semantic_hash": "5fe6f3474918fe567a5efc7006aa0d6d"
   },
-  "src/codemonkey/lessons_gate.py": {
-    "mtime": 1788447104.6776247,
-    "ast_hash": "26f556575d6d21929e797954a10c29fa",
-    "semantic_hash": "26f556575d6d21929e797954a10c29fa"
-  },
   "src/codemonkey/permissions.py": {
     "mtime": 1788421616.499863,
     "ast_hash": "105ab35d452c34a25435474c58a84af9",
@@ -563,11 +558,6 @@
     "mtime": 1788447028.152476,
     "ast_hash": "9157568cefff3965733dc67bff8e27c1",
     "semantic_hash": "9157568cefff3965733dc67bff8e27c1"
-  },
-  "tests/test_lessons_gate.py": {
-    "mtime": 1788447131.5603983,
-    "ast_hash": "dde4dec73d615cc63e40d116931c974b",
-    "semantic_hash": "dde4dec73d615cc63e40d116931c974b"
   },
   "tests/test_permissions.py": {
     "mtime": 1788421836.0616288,
@@ -664,11 +654,6 @@
     "ast_hash": "67ad26a43ca493c8ca246b0dfadbd6ea",
     "semantic_hash": "67ad26a43ca493c8ca246b0dfadbd6ea"
   },
-  "src/codemonkey/envquarantine.py": {
-    "mtime": 1788500463.0198379,
-    "ast_hash": "e7c703ab0a770f7bb0349df7366d6043",
-    "semantic_hash": "e7c703ab0a770f7bb0349df7366d6043"
-  },
   "src/codemonkey/graphquery.py": {
     "mtime": 1788504170.6101012,
     "ast_hash": "42b5972f222c999a49f23be693ffac00",
@@ -684,11 +669,6 @@
     "ast_hash": "9a7c042d7abc9d8bcf0231018296e204",
     "semantic_hash": "9a7c042d7abc9d8bcf0231018296e204"
   },
-  "src/codemonkey/rolepresets.py": {
-    "mtime": 1788500628.0340483,
-    "ast_hash": "7729c3e60bafb8a8f7eb2311b9dd89e6",
-    "semantic_hash": "7729c3e60bafb8a8f7eb2311b9dd89e6"
-  },
   "src/codemonkey/routing.py": {
     "mtime": 1788495449.710107,
     "ast_hash": "eb952ee8d1acf4b93384f86c25fa0204",
@@ -703,11 +683,6 @@
     "mtime": 1788530808.3233101,
     "ast_hash": "0f62b50ab545e84079a006025a81f74e",
     "semantic_hash": "0f62b50ab545e84079a006025a81f74e"
-  },
-  "src/codemonkey/truthpass.py": {
-    "mtime": 1788503656.0276237,
-    "ast_hash": "669a4c55e5db8cd7ba429c5694a8d7ad",
-    "semantic_hash": "669a4c55e5db8cd7ba429c5694a8d7ad"
   },
   "src/codemonkey/unload.py": {
     "mtime": 1788498517.3840542,
@@ -775,9 +750,9 @@
     "semantic_hash": "8d94a89771db1247dc9ec34664291dfa"
   },
   "tests/test_envquarantine.py": {
-    "mtime": 1788500471.2133207,
-    "ast_hash": "20c7f915f620be8d9ee91068e875f9e1",
-    "semantic_hash": "20c7f915f620be8d9ee91068e875f9e1"
+    "mtime": 1788552637.409991,
+    "ast_hash": "3dc08232963fb50f3393aac989bbf330",
+    "semantic_hash": "3dc08232963fb50f3393aac989bbf330"
   },
   "tests/test_graphquery.py": {
     "mtime": 1788504177.4564576,
@@ -799,11 +774,6 @@
     "ast_hash": "6a4427a53a1dda3ad3d91bd8434d495c",
     "semantic_hash": "6a4427a53a1dda3ad3d91bd8434d495c"
   },
-  "tests/test_role_presets.py": {
-    "mtime": 1788500633.9114597,
-    "ast_hash": "a2ba1d9b17329c27b4cfac2753bed1b8",
-    "semantic_hash": "a2ba1d9b17329c27b4cfac2753bed1b8"
-  },
   "tests/test_routing.py": {
     "mtime": 1788495462.2370224,
     "ast_hash": "203c5b57994ea011573ee9f0dba97d8e",
@@ -813,11 +783,6 @@
     "mtime": 1788504880.713455,
     "ast_hash": "f9bf150db5242345726caa439bbcdd06",
     "semantic_hash": "f9bf150db5242345726caa439bbcdd06"
-  },
-  "tests/test_truthpass.py": {
-    "mtime": 1788503771.1037855,
-    "ast_hash": "229789fd6050d159545ac4c478e6974c",
-    "semantic_hash": "229789fd6050d159545ac4c478e6974c"
   },
   "tests/test_unload_fallback.py": {
     "mtime": 1788498627.564958,
@@ -893,5 +858,10 @@
     "mtime": 1788552148.3093781,
     "ast_hash": "21222e316db4cb37ce6838a82b6b0b4b",
     "semantic_hash": "21222e316db4cb37ce6838a82b6b0b4b"
+  },
+  "tests/envquarantine.py": {
+    "mtime": 1788500463.0198379,
+    "ast_hash": "e7c703ab0a770f7bb0349df7366d6043",
+    "semantic_hash": "e7c703ab0a770f7bb0349df7366d6043"
   }
 }

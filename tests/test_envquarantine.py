@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import os
 
-from codemonkey.envquarantine import (SENSITIVE_MODULES, is_sensitive,
+from envquarantine import (SENSITIVE_MODULES, is_sensitive,
                                       restore_codemonkey_env,
                                       scrub_codemonkey_env,
                                       snapshot_codemonkey_env)

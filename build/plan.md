@@ -1821,7 +1821,8 @@ shipped until its entry point is exercised") live in
   `branch diff demo` → exit 0; `branch remove demo` → exit 0 and gone;
   `branch create demo` outside a git repo → exit 2 with a clear error;
   `uv run pytest -q tests/test_branch_cli.py` → exit 0 (≥5 tests).
-- [ ] CYCLE 81 — `loop38:` the register: reconstruct
+- [x] CYCLE 81 — `loop38:` the register: reconstruct
+  DONE 2026-09-04: 56 rows + 3 R-A deletions; suite 619/619
   `build/CAPABILITY_REGISTER.md` — one row per module in `src/codemonkey/`
   reading PROVEN-LIVE (entry probe named) / UNIT-ONLY (reason) / DEAD;
   R-A armed: any module that cannot earn an entry probe is DELETED in this

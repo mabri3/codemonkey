@@ -20,9 +20,9 @@
     "semantic_hash": "45b5ecd8e0d9e22cdc08d4dd8260f701"
   },
   "src/codemonkey/cli.py": {
-    "mtime": 1788551723.5120094,
-    "ast_hash": "51e47f7b07302d3b53563d5bb6b9de0f",
-    "semantic_hash": "51e47f7b07302d3b53563d5bb6b9de0f"
+    "mtime": 1788552128.0771215,
+    "ast_hash": "8a6dd955d106aa68b81370ddb396b991",
+    "semantic_hash": "8a6dd955d106aa68b81370ddb396b991"
   },
   "src/codemonkey/config.py": {
     "mtime": 1788536736.4575582,
@@ -615,9 +615,9 @@
     "semantic_hash": "6f992272c21c665849d72c3d54347a75"
   },
   "src/codemonkey/branches.py": {
-    "mtime": 1788504661.897537,
-    "ast_hash": "be58f648489cdb7b234bef5806ce4989",
-    "semantic_hash": "be58f648489cdb7b234bef5806ce4989"
+    "mtime": 1788552166.650267,
+    "ast_hash": "c8d7180aaafcc840e1c2969b9f6ab0aa",
+    "semantic_hash": "c8d7180aaafcc840e1c2969b9f6ab0aa"
   },
   "src/codemonkey/budget.py": {
     "mtime": 1788498935.821579,
@@ -883,5 +883,15 @@
     "mtime": 1788551850.129143,
     "ast_hash": "27b55a06256490eb140e826a790756fc",
     "semantic_hash": "27b55a06256490eb140e826a790756fc"
+  },
+  "src/codemonkey/branches_cli.py": {
+    "mtime": 1788552127.7170794,
+    "ast_hash": "a6a31bb9bb2dc04f65ce4c81dc450643",
+    "semantic_hash": "a6a31bb9bb2dc04f65ce4c81dc450643"
+  },
+  "tests/test_branch_cli.py": {
+    "mtime": 1788552148.3093781,
+    "ast_hash": "21222e316db4cb37ce6838a82b6b0b4b",
+    "semantic_hash": "21222e316db4cb37ce6838a82b6b0b4b"
   }
 }

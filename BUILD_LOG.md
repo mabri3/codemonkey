@@ -2388,3 +2388,36 @@ FULFILLED.
 - **Known issues:** none. Worktree-internal `.git` files are git's own
   bookkeeping, covered by the `.branches/` ignore.
 - **Next step:** CYCLE 81 — the capability register.
+
+## 2026-09-04 — CYCLE 81 (loop38): the capability register + R-A disposals
+
+- **Files changed:** `build/CAPABILITY_REGISTER.md` (new — 56 active rows:
+  53 PROVEN-LIVE with a named entry probe, 3 UNIT-ONLY with a stated reason,
+  zero UNVALIDATED; 3 deletion verdicts; envquarantine relocation note),
+  DELETED `src/codemonkey/lessons_gate.py`,
+  `src/codemonkey/rolepresets.py`, `src/codemonkey/truthpass.py` (+ their
+  tests), MOVED `src/codemonkey/envquarantine.py` → `tests/envquarantine.py`
+  (imports updated in `tests/conftest.py`, `tests/test_envquarantine.py`).
+- **R-A verdicts (mechanical — no entry point, deleted with evidence):**
+  `lessons_gate.gate_lesson_with_eval` zero src callers (`lessons_cli`
+  manages flags via `mark_verified` directly); `rolepresets` zero callers
+  and no `role_presets` config key; `truthpass` no CLI and zero src
+  importers (ledger role superseded by this register). `envquarantine` is
+  test support, not a capability — relocated, suite intact.
+- **New entry probes run this cycle (thin rows that lacked runnable
+  evidence):** 17/17 CLI sweep green at HEAD incl. live `models`
+  (`build/probes/cycle81_cli_sweep.out`); `budget show --vram-gb 80` →
+  real computed limits; real-`run_exec` routing probe (model_routing rule →
+  journal `route` record); real-`run_exec` claims probe
+  (`verify_claims=True` on a false file claim → `[UNVERIFIED...]` marker +
+  journal `flagged`).
+- **Register self-check:** `ls src/codemonkey/*.py | wc -l` → 56; data rows
+  59 = 56 active + 3 deletion verdicts; "UNVALIDATED" appears only in the
+  header sentence; every PROVEN-LIVE row names its probe.
+- **Tests run:** `uv run pytest -q` → **619 passed**, 0 failed (635 − 16
+  removed-module tests; envquarantine tests still green after the move).
+- **Known issues:** none. `native`/`retry`/`unload` stay UNIT-ONLY with
+  stated reasons (no live fault-induction path); that is the honest terminal
+  state until an endpoint or harness supplies one.
+- **Next step:** CYCLE loop38-final — full A1–A20 re-sweep + loop-38
+  entry-point probes + BUILD_REPORT loop-38 section.

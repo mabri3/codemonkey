@@ -1,0 +1,18 @@
+[0] help ::                                                                                 
+[0] config :: ---
+[0] models :: unsloth/Qwen3.8-27B-GGUF
+[0] sessions :: 
+[0] status :: jobs: none
+[0] lessons-list :: (no lessons)
+[0] digest-help ::                                                                                 
+[0] jobs-list :: (no jobs)
+[0] budget-help ::                                                                                 
+[0] eval-help ::                                                                                 
+[0] exec-help ::                                                                                 
+[0] review-help ::                                                                                 
+[0] redact-help ::                                                                                 
+[0] rules-compile-help ::                                                                                 
+[0] graph-help ::                                                                                 
+[0] branch-help ::                                                                                 
+[0] journal-list :: 
+sweep-exit=0

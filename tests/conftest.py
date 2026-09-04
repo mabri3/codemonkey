@@ -59,8 +59,8 @@ import pytest as _pytest
 
 @pytest.fixture(autouse=True)
 def _quarantine_codemonkey_env(request):
-    from codemonkey.envquarantine import (is_sensitive, restore_codemonkey_env,
-                                          snapshot_codemonkey_env)
+    from envquarantine import (is_sensitive, restore_codemonkey_env,
+                               snapshot_codemonkey_env)
 
     snap = snapshot_codemonkey_env()
     yield
@@ -69,7 +69,7 @@ def _quarantine_codemonkey_env(request):
 
 @pytest.fixture()
 def scrubbed_env():
-    from codemonkey.envquarantine import scrub_codemonkey_env
+    from envquarantine import scrub_codemonkey_env
 
     removed = scrub_codemonkey_env()
     yield removed
