@@ -1,3 +1,95 @@
+674b3f200e93  2026-09-03 17:07  local/unsloth/Qwen3.8-27B-GGUF  6 msgs  Remember this codeword: zebra. Reply with ok.
+5d3355b8a07a  2026-09-03 17:06  local/unsloth/Qwen3.8-27B-GGUF  7 msgs  Fill the schema for a repository named codemonkey whose lang
+fda2432bcfb6  2026-09-03 17:06  local/unsloth/Qwen3.8-27B-GGUF  4 msgs  Use the shell tool to run: echo codemonkey_tool_test. Then r
+6c7cda2fcdce  2026-09-03 17:06  local/unsloth/Qwen3.8-27B-GGUF  2 msgs  Reply with exactly the word banana and nothing else.
+cfbf82e63353  2026-09-03 17:06  local/unsloth/Qwen3.8-27B-GGUF  2 msgs  Reply with exactly the word pong and nothing else.
+99f1b00d38a1  2026-09-03 17:05  local/unsloth/Qwen3.8-27B-GGUF  2 msgs  Reply with exactly the word pong and nothing else.
+331c91318ba7  2026-09-03 17:05  local/  0 msgs  
+8f154cb85719  2026-09-03 17:05  local/  2 msgs  Reply with exactly the word pong and nothing else.
+b182ce794869  2026-09-03 17:05  local/  2 msgs  hi
+44d9fc428e6d  2026-09-03 17:05  local/  2 msgs  some context  the question
+0dfb8a73781d  2026-09-03 17:05  local/  2 msgs  Reply with exactly: banana
+92df3f72d344  2026-09-03 17:05  local/  2 msgs  Reply with exactly the word pong and nothing else.
+dff85c40e0dd  2026-09-03 17:05  local/  2 msgs  Reply with exactly the word pong and nothing else.
+63f689097133  2026-09-03 17:05  local/  2 msgs  Reply with exactly the word pong and nothing else.
+244e63ceb7e5  2026-09-03 17:05  local/  2 msgs  Reply with exactly the word pong and nothing else.
+534e4f890029  2026-09-03 17:03  local/  0 msgs  
+0dddb34e7cbb  2026-09-03 17:03  local/  2 msgs  Reply with exactly the word pong and nothing else.
+7c39f737fe5b  2026-09-03 17:03  local/  2 msgs  hi
+239edd796762  2026-09-03 17:03  local/  2 msgs  some context  the question
+e4eabd71ffb7  2026-09-03 17:03  local/  2 msgs  Reply with exactly: banana
+141a97aab369  2026-09-03 17:03  local/  2 msgs  Reply with exactly the word pong and nothing else.
+a14b29ca33ce  2026-09-03 17:03  local/  2 msgs  Reply with exactly the word pong and nothing else.
+46f8e48a2e1b  2026-09-03 17:03  local/  2 msgs  Reply with exactly the word pong and nothing else.
+01e338604ac7  2026-09-03 17:03  local/  2 msgs  Reply with exactly the word pong and nothing else.
+e186add3ae54  2026-09-03 17:01  local/  0 msgs  
+123f57f4f0d8  2026-09-03 17:01  local/  2 msgs  Reply with exactly the word pong and nothing else.
+615b55f08c09  2026-09-03 17:01  local/  2 msgs  hi
+71160fbc452b  2026-09-03 17:01  local/  2 msgs  some context  the question
+6aec9711e8fc  2026-09-03 17:01  local/  2 msgs  Reply with exactly: banana
+43ff45221ef4  2026-09-03 17:01  local/  2 msgs  Reply with exactly the word pong and nothing else.
+90d587d6ee20  2026-09-03 17:01  local/  2 msgs  Reply with exactly the word pong and nothing else.
+0f8ad79d5379  2026-09-03 17:01  local/  2 msgs  Reply with exactly the word pong and nothing else.
+a3cf7d54c734  2026-09-03 17:01  local/  2 msgs  Reply with exactly the word pong and nothing else.
+2125013272a3  2026-09-03 17:00  local/  0 msgs  
+f12a231afcee  2026-09-03 17:00  local/  2 msgs  Reply with exactly the word pong and nothing else.
+5a36409a0ff3  2026-09-03 17:00  local/  2 msgs  hi
+5e51459bd2d7  2026-09-03 17:00  local/  2 msgs  some context  the question
+637197a9c50c  2026-09-03 17:00  local/  2 msgs  Reply with exactly: banana
+192d0f5e845d  2026-09-03 17:00  local/  2 msgs  Reply with exactly the word pong and nothing else.
+e10fba8bf097  2026-09-03 17:00  local/  2 msgs  Reply with exactly the word pong and nothing else.
+f7cb3d4cbbcb  2026-09-03 17:00  local/  2 msgs  Reply with exactly the word pong and nothing else.
+48e34644f705  2026-09-03 17:00  local/  2 msgs  Reply with exactly the word pong and nothing else.
+dba0d78a6441  2026-09-03 16:59  local/  0 msgs  
+84c230b8a863  2026-09-03 16:59  local/  2 msgs  Reply with exactly the word pong and nothing else.
+2893ef139af5  2026-09-03 16:59  local/  2 msgs  hi
+629f532ed60f  2026-09-03 16:59  local/  2 msgs  some context  the question
+9fddc5dd410b  2026-09-03 16:59  local/  2 msgs  Reply with exactly: banana
+1a6ceaa7ac43  2026-09-03 16:59  local/  2 msgs  Reply with exactly the word pong and nothing else.
+7a7bb938f5b5  2026-09-03 16:59  local/  2 msgs  Reply with exactly the word pong and nothing else.
+810185ab9926  2026-09-03 16:59  local/  2 msgs  Reply with exactly the word pong and nothing else.
+b301ad8f39f0  2026-09-03 16:59  local/  2 msgs  Reply with exactly the word pong and nothing else.
+84bfb2f15c7a  2026-09-03 16:34  local/  0 msgs  
+5a54cc8bbd81  2026-09-03 16:34  local/  2 msgs  Reply with exactly the word pong and nothing else.
+c4696ec09ec9  2026-09-03 16:34  local/  2 msgs  hi
+09e406382ab5  2026-09-03 16:34  local/  2 msgs  some context  the question
+6ecb08e877a3  2026-09-03 16:34  local/  2 msgs  Reply with exactly: banana
+38fb5f3a5560  2026-09-03 16:34  local/  2 msgs  Reply with exactly the word pong and nothing else.
+348f5615bf1b  2026-09-03 16:34  local/  2 msgs  Reply with exactly the word pong and nothing else.
+bef0f959448e  2026-09-03 16:34  local/  2 msgs  Reply with exactly the word pong and nothing else.
+27813421889c  2026-09-03 16:34  local/  2 msgs  Reply with exactly the word pong and nothing else.
+ed13df2fa96f  2026-09-03 16:33  local/unsloth/Qwen3.8-27B-GGUF  4 msgs  Remember this token word: zebra. Just acknowledge.
+6c3ea7234053  2026-09-03 16:30  unblock2/kimi-k2.7-code  6 msgs  Remember the codeword: pineapple. Reply ok.
+b26275a824cc  2026-09-03 16:20  local/unsloth/Qwen3.8-27B-GGUF  2 msgs  Say the word banana and nothing else. --json --ephemeral --s
+f08c8c862c49  2026-09-03 16:19  local/unsloth/Qwen3.8-27B-GGUF  2 msgs  Say the word banana and nothing else. --json --ephemeral --s
+d5fe42a996cb  2026-09-03 16:18  local/unsloth/Qwen3.8-27B-GGUF  2 msgs  Reply with exactly one word: pong --ephemeral --sandbox read
+693ee05acd34  2026-09-03 16:10  local/  0 msgs  
+8b4601e251fb  2026-09-03 16:10  local/  2 msgs  Reply with exactly the word pong and nothing else.
+d7b09c584989  2026-09-03 16:10  local/  2 msgs  hi
+a2e8fae5134c  2026-09-03 16:10  local/  2 msgs  some context  the question
+d5e80e6a762a  2026-09-03 16:10  local/  2 msgs  Reply with exactly: banana
+514840838205  2026-09-03 16:10  local/  2 msgs  Reply with exactly the word pong and nothing else.
+ff0906408b65  2026-09-03 16:10  local/  2 msgs  Reply with exactly the word pong and nothing else.
+99ca420963de  2026-09-03 16:10  local/  2 msgs  Reply with exactly the word pong and nothing else.
+22a2da56ba1c  2026-09-03 16:10  local/  2 msgs  Reply with exactly the word pong and nothing else.
+994414ec73cf  2026-09-03 16:09  local/  0 msgs  
+87d977f0d66a  2026-09-03 16:09  local/  2 msgs  Reply with exactly the word pong and nothing else.
+d149e4274214  2026-09-03 16:09  local/  2 msgs  hi
+ce31bce32681  2026-09-03 16:09  local/  2 msgs  some context  the question
+238920686e63  2026-09-03 16:09  local/  2 msgs  Reply with exactly: banana
+86ac5ba69557  2026-09-03 16:09  local/  2 msgs  Reply with exactly the word pong and nothing else.
+6da7b894e24f  2026-09-03 16:09  local/  2 msgs  Reply with exactly the word pong and nothing else.
+b0ee91d4ab28  2026-09-03 16:09  local/  2 msgs  Reply with exactly the word pong and nothing else.
+c21acb21adac  2026-09-03 16:09  local/  2 msgs  Reply with exactly the word pong and nothing else.
+e8afd910f79c  2026-09-03 16:03  local/  0 msgs  
+4be89d90ebcc  2026-09-03 16:03  local/  2 msgs  Reply with exactly the word pong and nothing else.
+f040dd2b2fd4  2026-09-03 16:03  local/  2 msgs  hi
+adcba54e7ca3  2026-09-03 16:03  local/  2 msgs  some context  the question
+2f60e1bdbfe7  2026-09-03 16:03  local/  2 msgs  Reply with exactly: banana
+f1b9a63e043a  2026-09-03 16:03  local/  2 msgs  Reply with exactly the word pong and nothing else.
+31a6db2b5b2e  2026-09-03 16:03  local/  2 msgs  Reply with exactly the word pong and nothing else.
+a1440532f3e0  2026-09-03 16:03  local/  2 msgs  Reply with exactly the word pong and nothing else.
+87851ebb8959  2026-09-03 16:03  local/  2 msgs  Reply with exactly the word pong and nothing else.
 a66abf1f0009  2026-09-03 16:02  local/unsloth/Qwen3.8-27B-GGUF  6 msgs  Remember this codeword: zebra. Reply with ok.
 462ee7a32194  2026-09-03 16:02  local/unsloth/Qwen3.8-27B-GGUF  7 msgs  Fill the schema for a repository named codemonkey whose lang
 355a67796540  2026-09-03 16:01  local/unsloth/Qwen3.8-27B-GGUF  4 msgs  Use the shell tool to run: echo codemonkey_tool_test. Then r

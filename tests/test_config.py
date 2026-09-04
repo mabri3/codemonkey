@@ -60,8 +60,8 @@ def test_config_shows_local_defaults(tmp_path):
     # happens to have in the repo's own .env / .codemonkey.yaml.
     r = run_cli("config", cwd=tmp_path)
     assert r.returncode == 0, r.stderr
-    assert "http://192.168.50.113:8080/v1" in r.stdout
-    assert "Qwen3.8-27B-NVFP4-MTP-VERY-HIGH.gguf" in r.stdout
+    assert "http://192.168.50.176:8080/v1" in r.stdout
+    assert "unsloth/Qwen3.8-27B-GGUF" in r.stdout
     assert "sk-" not in r.stdout
 
 

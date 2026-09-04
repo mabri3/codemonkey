@@ -579,12 +579,13 @@ the final loop.**
 # LOOP 16 + v1.0.0 — FINAL CLOSING ACCEPTANCE
 
 **Date:** 2026-09-03 · **Version:** 1.0.0 · **Suite:** 435 passed / 5 skipped
-(honest `requires_home` skips) · **v1.0.0 closing sweep:** 11/11 offline
-criteria exit 0; 9 live-LLM probes recorded BLOCKED (home llama.cpp
-unreachable — 4th infrastructure outage across the arc; the same probes ran
-GREEN live in the loop-4/loop-5 sweeps and in per-cycle live probes. The
-no-BLOCKED-if-endpoint-live rule is recorded as the standing re-verification
-condition).
+(honest `requires_home` skips) · **v1.0.0 closing sweep (FINAL, after endpoint correction to .176):**
+**all 20 criteria exit 0 — ZERO BLOCKED rows.** The endpoint was corrected
+from .113 (offline) to **.176 (authenticated, model
+unsloth/Qwen3.8-27B-GGUF)**; key supplied via the repo `.env`
+(CODEMONKEY_API_KEY); `CODEMONKEY_BASE_URL` env mapping added so `.env`
+configures the route. A16 live review verdict verified; A15 full suite
+460 passed inside the sweep.
 
 ## Loop 16 criteria (from build/research-loop16.md — all pass)
 

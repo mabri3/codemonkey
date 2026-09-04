@@ -39,8 +39,8 @@ def test_child_executes_and_returns_result(ctx, monkeypatch):
     import httpx
 
     try:
-        httpx.post("http://192.168.50.113:8080/v1/chat/completions",
-                   json={"model": "Qwen3.8-27B-NVFP4-MTP-VERY-HIGH.gguf",
+        httpx.post("http://192.168.50.176:8080/v1/chat/completions",
+                   json={"model": "unsloth/Qwen3.8-27B-GGUF",
                          "messages": [{"role": "user", "content": "ping"}],
                          "max_tokens": 8}, timeout=15)
         alive = True
@@ -48,6 +48,9 @@ def test_child_executes_and_returns_result(ctx, monkeypatch):
         alive = False
     if not alive:
         pytest.skip("home llama.cpp unreachable")
+    import subprocess as sp2
+
+    sp2.run(["git", "init", "-q"], cwd=ctx.workdir)  # child needs a git repo
     res = run({"task": "Reply with exactly: delegate-ok"}, ctx)
     assert res.ok, res.output
     assert "delegate-ok" in res.output

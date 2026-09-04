@@ -17,7 +17,7 @@ default_provider: local
 sandbox: workspace-write
 approval: on-request
 max_turns: 30
-timeout_seconds: 240
+timeout_seconds: 120
 add_dirs: []
 web_fetch: false
 context_limit: 32000
@@ -25,7 +25,7 @@ project_instructions: true
 verify_command: ''
 max_verify_retries: 1
 max_edit_retries: 1
-observation_budget: 24000
+observation_budget: 800
 repo_map: false
 repo_map_budget: 4000
 max_retries: 3

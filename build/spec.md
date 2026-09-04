@@ -15,7 +15,7 @@ hand-rolled SSE parsing so adding a provider = config, not code):
 providers:
   local:
     protocol: openai            # openai | anthropic
-    base_url: http://192.168.50.113:8080/v1
+    base_url: http://192.168.50.176:8080/v1
     model: Qwen3.8-27B-NVFP4-MTP-VERY-HIGH.gguf
     api_key_env: CODEMONKEY_API_KEY
     tool_protocol: auto         # auto | native | prompt (auto = native if the protocol+server supports it, else prompt)
@@ -149,7 +149,7 @@ verify→commit→mark process. User reviews once, after loop 3.
 ## Acceptance criteria (exact probes; all must pass)
 
 A1. `uv run codemonkey --version` → exit 0, stdout matches `codemonkey x.y.z` (semver).
-A2. `uv run codemonkey config` → exit 0; stdout contains `local`, `http://192.168.50.113:8080/v1`, and `Qwen3.8-27B-NVFP4-MTP-VERY-HIGH.gguf`; contains no value matching `sk-`.
+A2. `uv run codemonkey config` → exit 0; stdout contains `local`, `http://192.168.50.176:8080/v1`, and `Qwen3.8-27B-NVFP4-MTP-VERY-HIGH.gguf`; contains no value matching `sk-`.
 A3. `CODEMONKEY_MODEL=override-test uv run codemonkey config` → stdout contains `override-test` (env overrides YAML).
 A4. `uv run codemonkey models` → exit 0; stdout contains `Qwen3.8-27B-NVFP4-MTP-VERY-HIGH.gguf` (live server call).
 A5. `uv run codemonkey exec "Reply with exactly the word pong and nothing else."` → exit 0; stdout (stderr suppressed) contains `pong`.
@@ -170,5 +170,5 @@ A19. Strategy selectors: `strategies.compaction=sliding-window uv run codemonkey
 A20. Session-state backends: unit tests `uv run pytest tests/test_strategies.py -q` → exit 0; includes round-trip tests for BOTH `jsonl` and `sqlite` backends (append then restore yields identical messages) and a `sliding-window` compaction test (old messages dropped, last N kept, no LLM call).
 
 Live-LLM probes (A5, A6, A7, A9, A10, A11, A16) run against
-http://192.168.50.113:8080/v1 and are the ground-truth gate for the
+http://192.168.50.176:8080/v1 and are the ground-truth gate for the
 prompt-tool-protocol path on the local model.

@@ -15,6 +15,7 @@
 from __future__ import annotations
 
 import json
+import os
 import time
 
 import pytest
@@ -33,8 +34,13 @@ def _home_server_inference_alive() -> bool:
 
     dflt = cfg_mod.DEFAULTS["providers"]["local"]
     try:
+        _headers = {}
+        _key = os.environ.get(dflt.get("api_key_env") or "")
+        if _key:
+            _headers["Authorization"] = f"Bearer {_key}"
         r = httpx.post(
             f"{dflt['base_url']}/chat/completions",
+            headers=_headers,
             json={
                 "model": dflt["model"],
                 "messages": [{"role": "user", "content": "Reply with exactly: pong"}],

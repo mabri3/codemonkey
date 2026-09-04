@@ -13,7 +13,7 @@ note() { printf '%s\n' "$1" | tee -a "$OUT/summary.txt"; }
 # local provider. Fallback to the (removed-from-defaults) unblock2 provider only
 # if home inference is wedged again — the key is env-injected per process and
 # never written to disk.
-# 51F6: this probe used to hardcode http://192.168.50.113:8080 and the old
+# 51F6: this probe used to hardcode http://192.168.50.176:8080 and the old
 # model name, so it reported the live probes BLOCKED even when a perfectly
 # healthy endpoint was configured (the endpoint moved to another host and the
 # sweep could not see it). Probe whatever the EFFECTIVE config resolves to,

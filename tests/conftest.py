@@ -11,7 +11,25 @@ import os
 import httpx
 import pytest
 
-HOME_BASE = "http://192.168.50.113:8080/v1"
+# loop16 addendum: the operator keeps the server key in the repo .env (git-
+# ignored). Tests rely on exec loading it; give the whole test session env
+# parity (without printing values).
+def _load_dotenv_once():
+    from pathlib import Path
+
+    env_file = Path(__file__).parent.parent / ".env"
+    if not env_file.is_file():
+        return
+    for line in env_file.read_text().splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        k, _, v = line.partition("=")
+        os.environ.setdefault(k.strip(), v.strip())
+
+_load_dotenv_once()
+
+HOME_BASE = "http://192.168.50.176:8080/v1"
 
 
 def _home_reachable() -> bool:
@@ -20,7 +38,7 @@ def _home_reachable() -> bool:
     try:
         httpx.post(
             f"{HOME_BASE}/chat/completions",
-            json={"model": "Qwen3.8-27B-NVFP4-MTP-VERY-HIGH.gguf",
+            json={"model": "unsloth/Qwen3.8-27B-GGUF",
                   "messages": [{"role": "user", "content": "ping"}], "max_tokens": 8},
             timeout=15,
         )

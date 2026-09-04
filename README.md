@@ -17,7 +17,7 @@ uv run codemonkey --version   # 1.0.0-rc1
 ```
 
 Configure providers in `~/.codemonkey/config.yaml` (defaults: `local`
-llama.cpp at 192.168.50.113:8080 + `anthropic`) or via `CODEMONKEY_*` env
+llama.cpp at 192.168.50.176:8080 + `anthropic`) or via `CODEMONKEY_*` env
 vars. Secrets are referenced by env-var NAME (`api_key_env`), never stored.
 
 ## Commands (8 + interactive REPL)
@@ -76,3 +76,4 @@ the approval policies (untrusted / on-request / never).
 ## License
 
 MIT
+# acceptance sweep scratch

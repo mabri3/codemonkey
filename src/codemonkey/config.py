@@ -23,8 +23,8 @@ DEFAULTS: dict = {
     "providers": {
         "local": {
             "protocol": "openai",
-            "base_url": "http://192.168.50.113:8080/v1",
-            "model": "Qwen3.8-27B-NVFP4-MTP-VERY-HIGH.gguf",
+            "base_url": "http://192.168.50.176:8080/v1",
+            "model": "unsloth/Qwen3.8-27B-GGUF",
             "api_key_env": "CODEMONKEY_API_KEY",
             "tool_protocol": "auto",
         },
@@ -78,6 +78,7 @@ ENV_MAP: dict[str, str] = {
     "CODEMONKEY_REPO_MAP": "repo_map",
     "CODEMONKEY_REPO_MAP_BUDGET": "repo_map_budget",
     "CODEMONKEY_MAX_RETRIES": "max_retries",
+    "CODEMONKEY_BASE_URL": "providers.local.base_url",
     "CODEMONKEY_STRATEGY_COMPACTION": "strategies.compaction",
     "CODEMONKEY_STRATEGY_MEMORY": "strategies.memory",
     "CODEMONKEY_STRATEGY_SESSION_STATE": "strategies.session_state",
