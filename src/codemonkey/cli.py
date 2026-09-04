@@ -281,6 +281,10 @@ def eval(
         bool,
         typer.Option("--delegation-matrix", help="Bake off delegation off vs on (implementer role)."),
     ] = False,
+    route_stats_flag: Annotated[
+        bool,
+        typer.Option("--route-stats", help="Print per-route pass_rate/token aggregates from the last results."),
+    ] = False,
 ) -> None:
     """Run a golden evaluation suite against the real exec path."""
     if delegation_matrix:
@@ -303,6 +307,10 @@ def eval(
     from .eval import write_baseline as _write_baseline
 
     results = _run_suite(suite, out_dir=out_dir)
+    if route_stats_flag:
+        from .routing import route_stats as _rs
+
+        typer.echo(json.dumps(_rs(results), indent=2))
     typer.echo(f"suite: {results['suite']}  pass_rate: {results['pass_rate']}  "
                f"tokens: {results['total_tokens']}  wall: {results['wall_seconds']}s")
     for t in results["tasks"]:

@@ -472,6 +472,34 @@ def run_exec(
             perm_rules=list(((cfg.get("permissions") or {}).get("rules")) or []),
         )
 
+    # loop17 cycle 53: static model routing (first-match rules on prompt/role)
+    _routing_rules = cfg.get("model_routing") or []
+    if _routing_rules:
+        from .routing import select_route as _sel, validate_rules as _vr
+
+        _err = _vr(_routing_rules)
+        if _err:
+            raise ExecUsageError(f"model_routing: {_err}")
+        _route = _sel(_routing_rules,
+                      prompt=str(full_prompt),
+                      tool_role="",  # top-level exec runs have no delegate role
+                      default_provider=provider_name or "local",
+                      default_model=model)
+        if _route["rule_index"] is not None and (
+                _route["provider"] != provider_name or
+                (_route["model"] and _route["model"] != model)):
+            provider_name = _route["provider"]
+            if _route["model"]:
+                model = _route["model"]
+            try:
+                from .journal import record as _jr
+
+                _jr(thread_id, "outcome", tool="route", key=run_id,
+                    status="applied",
+                    output=f"{_route['provider']}/{model} rule={_route['rule_index']}")
+            except OSError:
+                pass
+
     # loop14 cycle 47: availability failover — after transport/timeout errors
     # exhaust retries, re-run against fallback_provider (if configured and
     # existing). Auth and tools-500 never fail over (wrong-credentials and
