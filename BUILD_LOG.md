@@ -2456,3 +2456,18 @@ FULFILLED.
   autonomous termination needs explicit user approval (charter: ends by
   asking). No inference spent (research only).
 - **Next step:** CYCLE R40 research, then the R39 termination-policy ask.
+
+## 2026-09-04 — CYCLE R40 (loop40): test-loop-as-control-signal research
+
+- **Files changed:** `build/research-loop40.md` (new — published 63% F2P
+  stated up front as a frontier number per charter; SELECTED 93–95; C4/C5 +
+  full-mutation rejected with reasons), `build/plan.md` (`loop40:` cycles
+  93–95 + `loop40-final` appended unchecked, continuing at 93).
+- **Sources:** e-Otter++ 63.0% F2P TDD-Bench-Verified, EvoOtter 75.3%,
+  SWE-Doctor (F2P limits + multi-facet), AssertFlip (passing-first
+  generation), Beyond-Fail-to-Pass (Rigorous +8.5 / Lax 0.0 / 1.87×
+  correlation), Prove-It pattern, execution cost-effectiveness.
+- **Ask owed:** C94 default-ON flip AWAITING-ASK (joins R39's C91/C92 in one
+  ask round). No inference spent.
+- **Next step:** the R39+R40 ask to the user; then C88 on approval of
+  report-only scope (C91/C92/C94-flip gated).

@@ -1643,7 +1643,9 @@ shipped until its entry point is exercised") live in
   token cost for both per R-F. ENTRY CONDITION: R38 closed. Core-design:
   PARTIAL — a policy that can terminate a run is adjacent to approval
   semantics and ends by asking.
-- [ ] CYCLE R40 — Loop 40 research: the test loop as the primary control signal
+- [x] CYCLE R40 — Loop 40 research: the test loop as the primary control signal
+  DONE 2026-09-04: research-loop40.md (63% stated up front, SELECTED 93-95);
+  C94-flip AWAITING-ASK (default-on verification)
   — reproduction-test-first execution, the verify gate promoted to default-on
   where a test command is discoverable, and generated-test quality as a
   first-class risk (a test that never failed proves nothing) | est: 30m |
@@ -2092,4 +2094,40 @@ loop 45's v4.0 acceptance. This section is a plan, not a queue.
   Gate report (including the measured pre/post turn+token deltas per R-F) |
   est: 30m |
   verify: loop39 entry probes green; `uv run pytest -q` → exit 0; report
+  committed.
+
+### loop40: cycles (selected from build/research-loop40.md, cycle R40)
+
+- [ ] CYCLE 93 — `loop40:` repro-first gate: `repro.py` state machine
+  (write-test → run-expect-FAIL → allow-patch → run-expect-PASS) around the
+  run's test command; a patch with no observed pre-fail does not count as
+  verified | est: 40m |
+  verify (R-I): scripted fix run (fake provider: test written, fails,
+  patch, passes) → verify report shows the fail→pass transition and the run
+  counts verified; variant with no pre-fail → UNVERIFIED verdict; `uv run
+  pytest -q tests/test_repro_gate.py` → exit 0 (≥5 tests); full suite green.
+- [ ] CYCLE 94 — `loop40:` discoverable default-on (BUILT default-OFF,
+  flip AWAITING-ASK): repo-declared test-command discovery (pytest/tox/
+  pyproject/package.json/Makefile) auto-setting the run verifier; no
+  declaration → behavior unchanged | est: 30m |
+  verify (R-I): scratch repo WITH pytest config → exec auto-verifies
+  (trace shows the discovered command ran); scratch repo WITHOUT → no
+  verifier attached; `uv run pytest -q tests/test_discover_verify.py` →
+  exit 0 (≥4 tests); full suite green. The default-ON flip waits for the
+  R40 ask.
+- [ ] CYCLE 95 — `loop40:` F2P quality gate + measurement: generated tests
+  labeled by observed transition (fail→pass counts, pass-only = UNPROVEN);
+  golden-suite ON-vs-OFF arms reporting pass rate, LOCAL fail-to-pass rate
+  next to published 63% (R-G), cost/wall per arm (R-F), gate verdict (R-H) |
+  est: 40m |
+  verify (R-I): `uv run codemonkey eval <suite> --arms repro-on,repro-off`
+  (or equivalent two-arm run) → exit 0 printing both arms, the local F2P
+  rate beside 63%, and per-arm cost/wall (BLOCKED+reason for live arms if
+  the endpoint is down — the gate plumbing still probes offline); `uv run
+  pytest -q tests/test_f2p_gate.py` → exit 0 (≥4 tests); full suite green.
+- [ ] CYCLE loop40-final — Loop 40 acceptance: repro gate + discovery +
+  quality gate re-verified (94-flip only if ASK approved, else recorded as
+  approved-scope exclusion); BUILD_REPORT loop-40 section with the ON/OFF
+  numbers + R-G/R-F/R-H rows | est: 30m |
+  verify: loop40 entry probes green; `uv run pytest -q` → exit 0; report
   committed.
