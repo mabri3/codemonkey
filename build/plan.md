@@ -774,6 +774,12 @@ journal key semantics that cycle 36-38 will build on.
 
 
 
+
+### loop22: cycles (from build/research-loop22.md, cycle R22)
+
+- [ ] CYCLE 59 — `loop22:` exec --dry-run preview mode
+- [ ] CYCLE loop22-final — Loop 22 acceptance: sweep + report + push
+
 ### loop20: cycles (selected from build/research-loop20.md, cycle R20)
 
 - [x] CYCLE 57 — `loop20:` tool-arg validation gate — validate_args(tool,
@@ -1211,7 +1217,7 @@ live with zero BLOCKED rows.
   construction; without one R21 records BLOCKED. Core-design: NO for
   measurement; PARTIAL for deletion — removing shipped, documented surface
   ends by asking before it lands.
-- [ ] CYCLE R22 — Loop 22 research: routing, actually measured (D3 — deferred
+- [x] CYCLE R22 — Loop 22 research: routing, actually measured (D3 — deferred
   by R8, blocked at R14 on a single provider) — per-task-class routing scored
   per class, health checks that distinguish unreachable / reachable-but-wedged
   / degraded (the failure this repo lost four loops to), failover chains where
