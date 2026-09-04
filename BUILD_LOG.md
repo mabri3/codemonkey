@@ -1908,3 +1908,8 @@ folded). Completes the 51F1 wire-honesty story on the dispatch side.
 **Completed:** 57 validate_args gate (PARAMS table, required/type/strict-unknown),
 structured schema_mismatch fed back through self-heal; journal key fixed to
 compute via args_key (jkey scope bug caught by test_batch_edit).
+
+## 2026-09-03 — CYCLE 58+loop21-final (loop21): run digest shipped
+
+**Completed:** digest.py (tools/failures/flags from journal) +
+`codemonkey digest <thread>` (+ --json). LOOP 21 COMPLETE. 500 tests.

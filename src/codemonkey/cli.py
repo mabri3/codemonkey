@@ -362,6 +362,12 @@ try:
     app.add_typer(_budget_app, name="budget", help="VRAM→tokens budget calculator.")
 except ImportError:  # pragma: no cover
     pass
+try:
+    from .digest_cli import digest_cmd
+
+    app.command(name="digest", help="Plain-text digest of one run (thread).")(digest_cmd)
+except ImportError:  # pragma: no cover
+    pass
 
 
 @app.command()

@@ -800,3 +800,16 @@ ping-ponging.
 | Tool-arg validation gate (57) | tests/test_arg_validation.py: missing-required naming, type check, strict-unknown, pass-through, non-dict, unknown-tool, journal roundtrip | ✅ 7/7 |
 
 **LOOP 20 COMPLETE.**
+
+
+---
+
+# Loop 21 — Final Acceptance (CYCLE loop21-final)
+
+**Suite:** 500 passed.
+
+| Improvement | Probe | Result |
+|---|---|---|
+| Run digest (58) | tests/test_digest.py: empty tolerance, tool counts, failure section, route-fallback flag, JSON shape, header | ✅ 6/6 |
+
+**LOOP 21 COMPLETE.**
