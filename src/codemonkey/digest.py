@@ -57,3 +57,24 @@ def render_digest(d: dict) -> str:
         lines.extend(f"  - {f}" for f in d["flags"])
     lines.append(f"journal records: {d['records']}")
     return "\n".join(lines)
+
+
+def digest_recent(n: int) -> list[dict]:
+    """Digest the N most recent threads (newest first)."""
+    from .journal import list_threads
+
+    threads = [t for t in list_threads() if isinstance(t, str)]
+    out = []
+    for tid in list(reversed(threads))[:n]:
+        try:
+            out.append(build_digest(tid))
+        except Exception:
+            continue
+    return out
+
+
+def render_multi(digests: list[dict]) -> str:
+    parts = [render_digest(d) for d in digests]
+    if not parts:
+        return "(no threads)"
+    return ("\n\n---\n\n").join(parts)

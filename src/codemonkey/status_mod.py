@@ -116,3 +116,17 @@ def render(status: dict) -> str:
     sp = status.get("spill", {})
     lines.append(f"spill: {sp.get('files', 0)} files, {sp.get('bytes', 0)} bytes")
     return "\n".join(lines)
+
+
+def render_frame(data: dict, frame_no: int) -> str:
+    """Pure function for watch cycles: timestamped frame."""
+    import time as _t
+
+    return (_t.strftime("%H:%M:%S") + "\n" + render(data))
+
+
+def collect_latest_sessions(n: int) -> list[str]:
+    """Session thread ids, newest first."""
+    from .journal import list_threads as _lt
+
+    return [t for t in _lt() if isinstance(t, str)][:n]
