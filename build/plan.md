@@ -776,7 +776,7 @@ journal key semantics that cycle 36-38 will build on.
 
 ### loop20: cycles (selected from build/research-loop20.md, cycle R20)
 
-- [ ] CYCLE 57 — `loop20:` tool-arg validation gate — validate_args(tool,
+- [x] CYCLE 57 — `loop20:` tool-arg validation gate — validate_args(tool,
   args) from SPECS (required/type/strict-unknown); mismatch → schema_mismatch
   result feeding the self-heal loop | est: 30m |
   verify: `uv run pytest tests/test_arg_validation.py -q` → exit 0 (≥6 tests);

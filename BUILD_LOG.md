@@ -1902,3 +1902,9 @@ copiable YAML. LOOP 19 COMPLETE.
 **Completed:** `build/research-loop20.md` — validate_args from SPECS with
 structured mismatch feedback into the self-heal loop (57, strict-unknown-keys
 folded). Completes the 51F1 wire-honesty story on the dispatch side.
+
+## 2026-09-03 — CYCLE loop20-final: LOOP 20 COMPLETE — arg validation gate
+
+**Completed:** 57 validate_args gate (PARAMS table, required/type/strict-unknown),
+structured schema_mismatch fed back through self-heal; journal key fixed to
+compute via args_key (jkey scope bug caught by test_batch_edit).

@@ -787,3 +787,16 @@ ping-ponging.
 | VRAM→tokens budget calculator (56) | tests/test_budget.py: KV formula, 1k rounding, YAML render, honest errors (weights-exceed, partial-internals), override flags, 40% split | ✅ 6/6 |
 
 **LOOP 19 COMPLETE.** (Commit range d8594b0 → budget.py/budget_cli.py → this.)
+
+
+---
+
+# Loop 20 — Final Acceptance (CYCLE loop20-final)
+
+**Suite:** 494 passed.
+
+| Improvement | Probe | Result |
+|---|---|---|
+| Tool-arg validation gate (57) | tests/test_arg_validation.py: missing-required naming, type check, strict-unknown, pass-through, non-dict, unknown-tool, journal roundtrip | ✅ 7/7 |
+
+**LOOP 20 COMPLETE.**
