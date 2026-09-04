@@ -88,6 +88,7 @@ llama.cpp server (<code>http://192.168.50.176:8080/v1</code>,
   <li class="done">Loop 20: tool-arg validation gate (schema_mismatch → self-heal)<span class="badge">LOOP 20</span></li>
   <li class="done">Loop 21: <code>codemonkey digest</code> one-run narrative report<span class="badge">LOOP 21</span></li>
   <li class="done">Loop 22: <code>exec --dry-run</code> preview mode (plan before commit)<span class="badge">LOOP 22</span></li>
+  <li class="done">Loop 23: env quarantine for env-sensitive tests + sweep offline guard<span class="badge">LOOP 23</span></li>
   <li class="done">Loop 5 acceptance: 19/20 re-verified green (13 live on home llama.cpp); A9 tool-loop honestly BLOCKED-slow on local hardware; streaming wall-clock guard added<span class="badge">LOOP 5 ✓</span></li>
   <li class="done">Provider resilience: exponential backoff + full jitter honoring <code>Retry-After</code> on 429/500/502/503/504/529 and on transport errors, across the non-streaming, <em>streaming</em>, and anthropic request paths; <code>max_retries</code> config/env knob; the tools-parameter 500 and <code>AuthError</code> are never retried so the A9 prompt-fallback stays intact<span class="badge">CYCLE 23</span></li>
   <li class="done">Verify-gate events report the verify command's <em>real</em> exit status (was a fabricated 0/1) &mdash; <code>--json</code> consumers and the renderer now see e.g. <code>exit_code: 7</code>, timeouts <code>124</code><span class="badge">CYCLE 19F1</span></li>

@@ -1920,3 +1920,9 @@ compute via args_key (jkey scope bug caught by test_batch_edit).
 
 **Completed:** dryrun.py previews + loop dry_run interception (pre-approval)
 + journal preview records + exec/CLI --dry-run flag. LOOP 22 COMPLETE.
+
+## 2026-09-03 — CYCLE 60+loop23-final (loop23): env quarantine shipped
+
+**Completed:** envquarantine.py (snapshot/restore/scrub + SENSITIVE_MODULES),
+autouse restore fixture + scrubbed_env fixture, sweep SWEEP_OFFLINE=1 guard.
+LOOP 23 COMPLETE. 510 tests.

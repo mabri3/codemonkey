@@ -826,3 +826,16 @@ ping-ponging.
 | exec --dry-run (59) | tests/test_dry_run.py: write/edit/shell previews, mutating-set accuracy, journal preview record | ✅ 5/5 |
 
 **LOOP 22 COMPLETE.**
+
+
+---
+
+# Loop 23 — Final Acceptance (CYCLE loop23-final)
+
+**Suite:** 510 passed.
+
+| Improvement | Probe | Result |
+|---|---|---|
+| Env quarantine (60) | tests/test_envquarantine.py: snapshot/restore, prefixed scrub, extras, sensitive filter, autouse behavior | ✅ 5/5 |
+
+**LOOP 23 COMPLETE.**
