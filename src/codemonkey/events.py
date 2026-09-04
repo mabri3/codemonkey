@@ -42,6 +42,12 @@ def emit(event: dict, *, json_mode: bool, stream=None) -> None:
             if pt is not None or ct is not None:
                 print(f"[usage] prompt={pt} completion={ct}", file=sink, flush=True)
             return
+        if etype == "stuck":
+            print(f"[stuck] {event.get('tool')} failed "
+                  f"{event.get('streak')}x in a row "
+                  f"({event.get('error_class')}) — nudge appended",
+                  file=sink, flush=True)
+            return
         if etype == "error":
             print(f"error: {event.get('message')}", file=sink, flush=True)
             return
@@ -102,6 +108,14 @@ def item_start_sink(
         elif etype == "notice":
             emit(
                 {"type": "notice", "message": ev.get("message", "")},
+                json_mode=json_mode,
+                stream=stream,
+            )
+        elif etype == "stuck":
+            emit(
+                {"type": "stuck", "tool": ev.get("tool", ""),
+                 "error_class": ev.get("error_class", ""),
+                 "streak": ev.get("streak", 0)},
                 json_mode=json_mode,
                 stream=stream,
             )

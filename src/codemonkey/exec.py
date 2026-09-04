@@ -324,6 +324,11 @@ def run_exec(
             emit({"type": "turn.completed", "usage": ev.get("usage") or {}})
         elif etype == "notice":
             emit({"type": "notice", "message": ev.get("message", "")})
+        elif etype == "stuck":
+            emit({"type": "stuck", "thread_id": thread_id,
+                  "tool": ev.get("tool", ""),
+                  "error_class": ev.get("error_class", ""),
+                  "streak": ev.get("streak", 0)})
         elif etype == "error":
             emit({"type": "error", "message": ev.get("message", "")})
         elif etype == "persist.drop":

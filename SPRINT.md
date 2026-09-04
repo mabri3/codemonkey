@@ -177,15 +177,13 @@ and run every CLI-level probe (the probe grammar still forbids pytest-only
 satisfaction: in-process CliRunner + fake provider + real `run_exec` counts as
 an entry-point probe).
 
-**Cycle 74 review gate (added 2026-09-04)** — cycle 74 (loop 38, graph tools)
-is IN FLIGHT and uncommitted with a red suite (`uv run pytest -q` → 4 failed,
-592 passed). Critic report: `build/critic-cycle74.md`; six findings appended to
-`build/plan.md` as cycles `74F1`-`74F6` plus `74F7` (close 74 properly). The
-load-bearing one is F1: `graph_path` and `graph_explain` are advertised in
-`tools.SPECS` but dispatch into the `graph_query` implementation and always
-fail — the same declared-but-unreachable defect class as critic-r37 F7, inside
-the cycle chartered to end it. Per the uncommitted-work rule these fixes land
-in cycle 74's OWN commit; 74 is not marked `[x]` until 74F7's probes pass.
+**Cycle 74 review gate (added 2026-09-04; RESOLVED 2026-09-04, commit 18d054f)** —
+critic report `build/critic-cycle74.md`: seven findings, 74F1–74F3 fixed by the
+concurrent tick, 74F4–74F7 closed by the 2026-09-04 worker (file-fallback
+layout loads, uniform ok=True no-match contract, `--to` unused load removed +
+documented exit codes, full-suite green 633/5, LIVE F7 probe BLOCKED with the
+sanctioned in-process `run_exec` fallback green, plan/BUILD_LOG/features/
+graphify updated). CYCLE 74 and 74F1–74F7 are all `[x]`.
 
 **Compounding arc — loops 46-50 (PROPOSED 2026-09-04, NOT AUTHORIZED)** —
 user brief: "propose the next improvement loops (46-50) … items that can truly

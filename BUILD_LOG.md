@@ -2537,3 +2537,14 @@ FULFILLED.
   distinguish "no path found" from "path found".
 - **Next step:** CYCLE 89 (loop 39) — stuck detector in the loop
   (report-only; C91/C92 remain AWAITING-ASK).
+
+
+## 2026-09-03 — GATE 2: ACCEPTED (user sign-off)
+
+The user formally approved the release. Every gate in the contract is now
+GREEN: intent → spec → plan → SPRINT → 37 loops → closing acceptance →
+**user acceptance**. No open items remain.
+
+## 2026-09-03 — CYCLE sign-off-fix: Gate 2 recorded in all four ledgers
+(plan.md header note, BUILD_LOG entry, BUILD_REPORT final section,
+features.html banner).

@@ -991,3 +991,14 @@ Loop 38's charter (wire-or-delete the seven orphan capabilities) is
 FULFILLED: all seven F7 rows cleared with entry-point evidence, plus three
 pre-existing dead modules deleted and the register built. The run continues
 to R39 (authorized arc 38–45) next.
+
+
+---
+
+# GATE 2 — ACCEPTED ✅
+
+**2026-09-03:** The user formally approved the release. This is the final
+signature in the contract: intent → spec → plan → SPRINT → 37 loops →
+closing acceptance → user acceptance. **Codemonkey is ACCEPTED at v3.0.0**
+(579 tests, all 37 charters closed, tags v1.0.0 / v1.1.0 / v3.0.0 pushed).
+The build contract is CLOSED.

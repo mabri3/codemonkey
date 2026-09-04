@@ -94,6 +94,14 @@ def run_turns(
     if system_extra:
         system = system_extra + "\n\n" + system
 
+    # loop39 cycle 89: stuck detector (report-only). Same (tool, error_class)
+    # failure pair x3 in a row -> a `stuck` event + a system nudge naming the
+    # failure. NEVER terminates the run (C91 enforcement is AWAITING-ASK).
+    from . import stuck as stuck_mod
+
+    stuck_det = (stuck_mod.StuckDetector()
+                 if stuck_mod.enabled() else None)
+
     mode = tool_protocol if tool_protocol in ("native", "prompt") else "auto"
     edit_retries_left = max(0, int(max_edit_retries))
     obs_spent = 0
@@ -536,7 +544,19 @@ def run_turns(
 
         outcomes.sort(key=lambda o: o[0])  # deterministic call order
         edit_retry_hint = None
+        stuck_signal = None
         for idx, name, ok, result_output, meta in outcomes:
+            # loop39 cycle 89: feed every outcome to the stuck detector
+            # BEFORE the observation budget splices `result_output`; the
+            # detector classifies on the real output, the model sees the
+            # (possibly spilled) one.
+            if stuck_det is not None:
+                try:
+                    _sig = stuck_det.record(name, ok, result_output, meta)
+                    if _sig is not None and stuck_signal is None:
+                        stuck_signal = _sig
+                except Exception:
+                    stuck_signal = None
             # 35F1: `_jkey` is the journal key carried back from _run_one (it
             # is a LOCAL there — the old code read an unbound `jkey` in this
             # scope and the surrounding `except Exception` swallowed the
@@ -621,6 +641,43 @@ def run_turns(
                 on_event({"type": "notice",
                           "message": "self-heal: edit failed — retrying with error feedback"})
             continue
+
+        # ---- stuck signal (loop39, cycle 89 — report-only) -------------
+        # The detector has seen the third consecutive identical failure pair:
+        # emit the typed event, journal it, and append ONE system nudge. The
+        # run CONTINUES — forced termination is cycle 91 (AWAITING-ASK).
+        if stuck_signal is not None:
+            if on_event:
+                on_event({
+                    "type": "stuck",
+                    "tool": stuck_signal["tool"],
+                    "error_class": stuck_signal["error_class"],
+                    "streak": stuck_signal["streak"],
+                })
+            if journal_thread:
+                try:
+                    from .journal import record as _jrs
+
+                    _jrs(journal_thread, "outcome", tool=stuck_signal["tool"],
+                         key=f"stuck:{journal_run}:{_turn_no}",
+                         status="stuck", error_class=stuck_signal["error_class"],
+                         output=stuck_signal["output"][:2000])
+                except OSError:
+                    pass
+            messages.append({
+                "role": "user",
+                "content": stuck_signal["nudge"],
+            })
+            if on_event:
+                on_event({"type": "notice",
+                          "message": f"stuck detector: {stuck_signal['tool']} "
+                                     f"failed {stuck_signal['streak']}x in a row "
+                                     f"({stuck_signal['error_class']}) — system "
+                                     "nudge appended; run continues (report-only)"})
+            # re-arm: a SECOND identical streak may fire again after a success
+            # resets the pair (the detector itself keeps counting otherwise)
+            if stuck_det is not None:
+                stuck_det.record_reset()
 
         # ---- verify gate (loop4, cycle 19) ------------------------------
         # After any turn whose MUTATING tool calls succeeded, run the

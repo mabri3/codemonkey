@@ -1,5 +1,11 @@
 # Plan — CodeMonkey
 
+> **GATE 2: ACCEPTED ✅ (2026-09-03)** — The user formally approved the
+> release. All 37 chartered loops complete; v1.0.0 / v1.1.0 / v3.0.0 tagged
+> and pushed; 579/579 tests; closing sweep live-verified, zero BLOCKED.
+> Recorded in plan.md, BUILD_LOG.md, BUILD_REPORT.md, features.html.
+> **The build contract is CLOSED.**
+
 ```
 cycles: 11 (loop 1 base, before loops 2-3 appends)
 cap: none
@@ -2084,9 +2090,19 @@ loop 45's v4.0 acceptance. This section is a plan, not a queue.
   rows with counts; `uv run pytest -q tests/test_failclass.py` → exit 0
   (≥5 tests: mapped classes, unmappable trio, unknown error_class honesty);
   full suite green.
-- [ ] CYCLE 89 — `loop39:` stuck detector in the loop: same
+- [x] CYCLE 89 — `loop39:` stuck detector in the loop: same
   `(tool, error_class)` ×3 (or K result-neutral turns) → `stuck` event +
   system nudge naming the failure; never terminates | est: 30m |
+  status: DONE 2026-09-04 — `stuck.py` (StuckDetector over consecutive
+  (tool, error_class) pairs; deterministic classify_outcome mirroring the
+  journal's error_class vocabulary; CODEMONKEY_STUCK=0 kill switch; re-arm
+  after fire), wired into run_turns (report-only: event + journal `stuck`
+  row + ONE nudge message; run continues to its natural end), surfaced in
+  exec/events (json `stuck{tool,error_class,streak}`, text `[stuck] …`).
+  R-I probe green: scripted failing real-exec run → `stuck` event at turn 3
+  with pair (write_file, tool-error) while the run still burns to max_turns
+  (no early exit); kill-switch variant shows no event. 13 tests
+  (tests/test_stuck.py); suite 646/5.
   verify (R-I): scripted failing real-exec run (fake provider) that used to
   burn N turns → `stuck` event with the repeated pair appears at turn 3 in
   the `--json` trace while the run still completes; `uv run pytest -q
