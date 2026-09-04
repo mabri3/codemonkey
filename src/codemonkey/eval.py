@@ -129,7 +129,19 @@ def run_suite(suite_path: Path, *, exec_fn=None,
     suite = load_suite(suite_path)
     results = {"suite": suite.get("name", Path(suite_path).stem),
                "tasks": [], "started": time.time()}
-    for task in suite["tasks"]:
+
+    # loop18 cycle 55: model-affinity ordering — resolve a route key per task,
+    # run same-model tasks contiguously (single-slot servers: fewer swaps),
+    # but report results in suite order for stable baselines.
+    from .affinity import route_key as _rk, batch_by_model as _bbm
+
+    for pos, task in enumerate(suite["tasks"]):
+        task["_suite_pos"] = pos
+        task["_route_key"] = _rk({"route": {"provider": task.get("provider") or "",
+                                            "model": task.get("model") or ""}})
+    ordered = [t for group in _bbm(suite["tasks"]) for t in group]
+    results_by_pos = {}
+    for task in ordered:
         events: list = []
         started = time.time()
 
@@ -174,7 +186,11 @@ def run_suite(suite_path: Path, *, exec_fn=None,
                 scored["journal_classes"] = _cs(_rt(jt))
         except OSError:
             pass
-        results["tasks"].append(scored)
+        scored["route_key"] = task.get("_route_key", "")
+        results_by_pos[task["_suite_pos"]] = scored
+
+    # restore suite order for stable baselines
+    results["tasks"] = [results_by_pos[p] for p in sorted(results_by_pos)]
 
     results["pass_rate"] = round(
         sum(1 for t in results["tasks"] if t["ok"]) / max(1, len(results["tasks"])), 3
