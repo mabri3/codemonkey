@@ -378,9 +378,12 @@ def run_turns(
                 if _bad is not None:
                     if journal_thread:
                         try:
-                            from .journal import record as _jr
+                            from .journal import args_key as _akv, record as _jr
 
-                            _jr(journal_thread, "outcome", tool=name, key=jkey,
+                            _jr(journal_thread, "outcome", tool=name,
+                                key=_akv(journal_thread, _turn_no, idx,
+                                         call.get("args") or {},
+                                         run=journal_run),
                                 status="error", error_class="schema_mismatch",
                                 output=_bad["detail"])
                         except OSError:
