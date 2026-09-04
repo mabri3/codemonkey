@@ -673,6 +673,14 @@ def exec(
         bool,
         typer.Option("--dry-run", help="Preview mutating tool calls without executing."),
     ] = False,
+    best_of: Annotated[
+        int,
+        typer.Option("--best-of", help="N candidate attempts; first verifier-pass wins (default 1 = off). Requires --verify-command."),
+    ] = 1,
+    verify_command: Annotated[
+        Optional[str],
+        typer.Option("--verify-command", help="Machine verifier for --best-of N>1 (or config verify_command)."),
+    ] = None,
     ignore_user_config: Annotated[
         bool,
         typer.Option("--ignore-user-config", help="Skip ~/.codemonkey/config.yaml."),
@@ -724,6 +732,8 @@ def exec(
             cost_summary=cost_summary,
             job_id=job,
             dry_run=dry_run,
+            best_of=best_of,
+            verify_command=verify_command,
         )
     except ExecUsageError as exc:
         typer.secho(f"error: {exc}", err=True, fg=typer.colors.RED)

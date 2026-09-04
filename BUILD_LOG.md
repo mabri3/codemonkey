@@ -2329,3 +2329,38 @@ FULFILLED.
   trajectories) — matches the charter; trajectory rubrics would be a new
   research item.
 - **Next step:** CYCLE 79 — `exec --best-of N`.
+
+## 2026-09-04 — CYCLE 79 (loop38): `exec --best-of N` with machine verification
+
+- **Files changed:** `src/codemonkey/bestofn.py` (+ `snapshot_tree` /
+  `restore_tree`: full-tree in-memory snapshot minus `.git`/symlinks,
+  byte-identical reset incl. new-file deletion + empty-dir pruning),
+  `src/codemonkey/exec.py` (`run_exec(..., best_of=1, verify_command=None)`;
+  `_attempt` takes a per-attempt journal scope; the unload-retry + failover
+  block refactored into `_run_once` with the provider closing once after all
+  attempts; best-of loop emits `bestofn.attempt` / `bestofn.completed`;
+  exit 2 without a verifier, exit 2 with `--dry-run`, exit 1 on honest
+  failure), `src/codemonkey/cli.py` (`exec --best-of N --verify-command`,
+  wired through), `tests/test_bestofn_exec.py` (new, 7 tests).
+- **Correctness point:** the journal idempotency key is scoped per attempt
+  (`run_id:bN`) — otherwise attempt 2's identical tool calls would replay
+  attempt 1's recorded outcomes instead of executing.
+- **F7 row cleared for `bestofn`:** reachable from the `exec` entry point;
+  `score_with_verifier` decides real runs.
+- **Tests run:** `uv run pytest -q tests/test_bestofn_exec.py` → **7
+  passed**; `uv run pytest -q` → **628 passed**, 0 failed.
+- **Probe results (literal, R-I):**
+  - Scripted real-exec run (fake scripted provider, attempt 1 writes WRONG /
+    attempt 2 writes RIGHT, verify command checks the file) → exit 0, final
+    tree carries `RIGHT`, `bestofn.attempt` × 2, `bestofn.completed{ok: True,
+    index: 1}`; attempt-1 `junk.txt` ABSENT after the reset.
+  - Honest failure (both wrong) → exit 1, last attempt's `WRONG2` kept,
+    `completed{ok: False, index: None}`.
+  - Usage: `codemonkey exec --best-of 2` with no verify command → exit 2,
+    `error: --best-of N>1 requires a verify command...` (transcript
+    `build/probes/cycle79-cli.out`); `--dry-run` + best-of refused the same
+    way; default run emits no `bestofn.*` events.
+- **Known issues:** snapshot is in-memory (documented ceiling: GB+ trees;
+  tempdir copy is the upgrade path). Matrix arms do not best-of (comparable
+  single runs only) — same scope line as early-stop.
+- **Next step:** CYCLE 80 — `codemonkey branch` sub-command.

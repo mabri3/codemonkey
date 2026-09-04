@@ -149,6 +149,8 @@ def run_exec(
     job_id: str = "",
     verify_claims: bool = False,
     dry_run: bool = False,
+    best_of: int = 1,
+    verify_command: Optional[str] = None,
 ) -> int:
     """Run one non-interactive exec turn-group. Returns the exit code."""
     from .config import ConfigError, load_config
@@ -475,7 +477,7 @@ def run_exec(
             cwd=str(workdir),
         )
 
-    def _attempt(prov):
+    def _attempt(prov, _jrun=None):
         return run_turns(
             prov,
             full_prompt,
@@ -503,7 +505,7 @@ def run_exec(
             # journal file; a per-invocation run id scopes the idempotency key
             # so a resumed thread cannot replay an earlier run's write.
             journal_thread=thread_id,
-            journal_run=run_id,
+            journal_run=(_jrun or run_id),
             perm_rules=list(((cfg.get("permissions") or {}).get("rules")) or []),
             dry_run=dry_run,
         )
@@ -550,65 +552,123 @@ def run_exec(
                 f"Valid providers: {', '.join(cfg.get('providers', {}))}")
         if _fall_name != p_name:
             pass  # fallback provider built lazily only if the primary fails
-    _unload_retried = False
+    # loop38 cycle 79: --best-of N candidates. _run_once runs one full
+    # attempt (unload-retry + failover intact, journal scoped per attempt so
+    # an identical tool call in attempt 2 is not mistaken for a replay);
+    # the best-of loop runs it up to N times with a zero-residue workspace
+    # reset between attempts and a machine verifier deciding. The provider
+    # stays open across attempts and closes once, after the loop.
     try:
+        _eff_best_of = int(best_of or 1)
+    except (TypeError, ValueError):
+        raise ExecUsageError("--best-of must be an integer >= 1") from None
+    if _eff_best_of < 1:
+        raise ExecUsageError("--best-of must be an integer >= 1")
+    _eff_verify = (verify_command or cfg.get("verify_command") or "").strip()
+    if _eff_best_of > 1 and not _eff_verify:
+        raise ExecUsageError(
+            "--best-of N>1 requires a verify command: pass --verify-command "
+            "or set config verify_command")
+    if _eff_best_of > 1 and dry_run:
+        raise ExecUsageError(
+            "--best-of N>1 cannot combine with --dry-run: candidates never "
+            "materialize for the verifier")
+
+    def _run_once(_jrun):
+        _unload_retried = False
         try:
-            turn = _attempt(provider)
-        except Exception as _first_err:
-            # loop18 cycle 54: single-slot model-unload fallback. If the routed
-            # model isn't resident (LM Studio auto-evict), retry ONCE against
-            # the default route instead of failing the run.
-            from .unload import is_model_unloaded_error as _is_unload
+            try:
+                turn = _attempt(provider, _jrun)
+            except Exception as _first_err:
+                # loop18 cycle 54: single-slot model-unload fallback. If the routed
+                # model isn't resident (LM Studio auto-evict), retry ONCE against
+                # the default route instead of failing the run.
+                from .unload import is_model_unloaded_error as _is_unload
 
-            if not _is_unload(_first_err):
-                raise
-            try:
-                from .journal import record as _jr
-
-                _jr(thread_id, "outcome", tool="route", key=run_id,
-                    status="model_unload_fallback",
-                    output=f"{p_name}/{model} not resident; retrying default route")
-            except OSError:
-                pass
-            if on_event:
-                on_event({"type": "notice",
-                          "message": "model unload detected; retrying against default route"})
-            _unload_retried = True
-            try:
-                turn = _attempt(provider)
-                turn.route_meta = {"model_unload_fallback": True}
-            except Exception as _retry_err:
-                raise _retry_err
-    except Exception as _exc:
-        _err_text = str(_exc).lower()
-        _transport = ("transport" in _err_text or "timeout" in _err_text
-                      or "timed out" in _err_text or "deadline" in _err_text)
-        _auth = ("auth" in _err_text or "401" in _err_text or "403" in _err_text)
-        _tools_rej = "tools parameter" in _err_text
-        if (_fall_name and _transport and not _auth and not _tools_rej
-                and _fall_name != p_name
-                and (cfg.get("providers") or {}).get(_fall_name)):
-            if on_event:
-                on_event({"type": "notice",
-                          "message": f"failover: primary failed ({type(_exc).__name__}); "
-                                     f"retrying against fallback_provider '{_fall_name}'"})
-            try:
-                from .journal import classify_error as _ce, record as _jr
-
-                _jr(thread_id, "outcome", tool="failover", key=run_id + ":failover",
-                    status="switch", error_class=_ce(_exc))
-            except OSError:
-                pass
-            _fb_name, _fb = _provider_from_config(cfg, _fall_name, model)
-            try:
-                turn = _attempt(_fb)
-            finally:
+                if not _is_unload(_first_err):
+                    raise
                 try:
-                    _fb.close()
-                except Exception:
+                    from .journal import record as _jr
+
+                    _jr(thread_id, "outcome", tool="route", key=_jrun,
+                        status="model_unload_fallback",
+                        output=f"{p_name}/{model} not resident; retrying default route")
+                except OSError:
                     pass
+                if on_event:
+                    on_event({"type": "notice",
+                              "message": "model unload detected; retrying against default route"})
+                _unload_retried = True
+                try:
+                    turn = _attempt(provider, _jrun)
+                    turn.route_meta = {"model_unload_fallback": True}
+                except Exception as _retry_err:
+                    raise _retry_err
+        except Exception as _exc:
+            _err_text = str(_exc).lower()
+            _transport = ("transport" in _err_text or "timeout" in _err_text
+                          or "timed out" in _err_text or "deadline" in _err_text)
+            _auth = ("auth" in _err_text or "401" in _err_text or "403" in _err_text)
+            _tools_rej = "tools parameter" in _err_text
+            if (_fall_name and _transport and not _auth and not _tools_rej
+                    and _fall_name != p_name
+                    and (cfg.get("providers") or {}).get(_fall_name)):
+                if on_event:
+                    on_event({"type": "notice",
+                              "message": f"failover: primary failed ({type(_exc).__name__}); "
+                                         f"retrying against fallback_provider '{_fall_name}'"})
+                try:
+                    from .journal import classify_error as _ce, record as _jr
+
+                    _jr(thread_id, "outcome", tool="failover", key=_jrun + ":failover",
+                        status="switch", error_class=_ce(_exc))
+                except OSError:
+                    pass
+                _fb_name, _fb = _provider_from_config(cfg, _fall_name, model)
+                try:
+                    turn = _attempt(_fb, _jrun)
+                finally:
+                    try:
+                        _fb.close()
+                    except Exception:
+                        pass
+            else:
+                raise
+        return turn
+
+    _base_history = list(history)
+    _bestofn_ok: Optional[bool] = None  # None = best-of not engaged
+    try:
+        if _eff_best_of > 1:
+            from .bestofn import restore_tree as _bo_restore
+            from .bestofn import score_with_verifier as _bo_verify
+            from .bestofn import snapshot_tree as _bo_snapshot
+
+            _bo_snap = _bo_snapshot(workdir)
+            _bo_tail = ""
+            for _bi in range(_eff_best_of):
+                if _bi > 0:
+                    _bo_restore(workdir, _bo_snap)
+                    history = list(_base_history)
+                emit({"type": "bestofn.attempt", "thread_id": thread_id,
+                      "index": _bi, "tries": _eff_best_of})
+                turn = _run_once(f"{run_id}:b{_bi}")
+                _ok, _bo_tail = _bo_verify(_eff_verify, workdir)
+                if _ok:
+                    _bestofn_ok = True
+                    emit({"type": "bestofn.completed", "thread_id": thread_id,
+                          "ok": True, "index": _bi, "tries": _bi + 1,
+                          "verify_tail": _bo_tail})
+                    break
+            else:
+                # Honest failure: the last attempt's tree and turn stand as
+                # the evidence; nothing is restored away.
+                _bestofn_ok = False
+                emit({"type": "bestofn.completed", "thread_id": thread_id,
+                      "ok": False, "index": None, "tries": _eff_best_of,
+                      "last_fail_tail": _bo_tail})
         else:
-            raise
+            turn = _run_once(run_id)
     finally:
         try:
             provider.close()
@@ -758,4 +818,8 @@ def run_exec(
         except OSError as exc:
             sys.stderr.write(f"[warn] could not persist session: {exc}\n")
 
+    if _bestofn_ok is False:
+        # best-of ran and no candidate passed the verifier: the tree keeps
+        # the last attempt's evidence and the exit code says so.
+        return 1
     return 0 if schema_ok else 1

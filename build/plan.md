@@ -1795,7 +1795,9 @@ shipped until its entry point is exercised") live in
   rubric detail in the output and results.json (transcript
   `build/probes/cycle78-*`); `uv run pytest -q tests/test_eval_rubrics.py` →
   exit 0 (≥4 tests).
-- [ ] CYCLE 79 — `loop38:` `exec --best-of N` (default OFF, N=1) behind a
+- [x] CYCLE 79 — `loop38:` `exec --best-of N` (default OFF, N=1) behind a
+  DONE 2026-09-04: scripted 2-attempt run wins on attempt 2, byte-identical
+  reset, honest-failure exit 1, usage exit 2; suite 628/628
   verify command (config `verify_command` or `--verify-command`; exit 2 when
   N>1 without one); N full attempts, zero-residue workspace reset between
   candidates (full-tree snapshot incl. new files), first verifier-pass wins,

@@ -1,0 +1,3 @@
+$ codemonkey exec --best-of 2 --skip-git-repo-check "say hi"
+error: --best-of N>1 requires a verify command: pass --verify-command or set config verify_command
+exit=2

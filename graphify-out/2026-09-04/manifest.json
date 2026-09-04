@@ -20,9 +20,9 @@
     "semantic_hash": "45b5ecd8e0d9e22cdc08d4dd8260f701"
   },
   "src/codemonkey/cli.py": {
-    "mtime": 1788550822.6893551,
-    "ast_hash": "4f8700b9879d3a9f63580ef607033ca1",
-    "semantic_hash": "4f8700b9879d3a9f63580ef607033ca1"
+    "mtime": 1788551100.0200717,
+    "ast_hash": "6ce08e6c3f3bdcf49d4c0284fbe91ca5",
+    "semantic_hash": "6ce08e6c3f3bdcf49d4c0284fbe91ca5"
   },
   "src/codemonkey/config.py": {
     "mtime": 1788536736.4575582,
@@ -360,9 +360,9 @@
     "semantic_hash": "0be571560509b6bd6e59799a47ae3c53"
   },
   "src/codemonkey/eval.py": {
-    "mtime": 1788550813.3471315,
-    "ast_hash": "dd714b78ff92606d26e663f63467b992",
-    "semantic_hash": "dd714b78ff92606d26e663f63467b992"
+    "mtime": 1788551100.0882423,
+    "ast_hash": "a80a7df263b09a2115ef58e0a9df9e12",
+    "semantic_hash": "a80a7df263b09a2115ef58e0a9df9e12"
   },
   "src/codemonkey/journal.py": {
     "mtime": 1788420138.9222817,
@@ -873,5 +873,10 @@
     "mtime": 1788550530.6287234,
     "ast_hash": "9d9c4316f87679b056eb05523aadfcce",
     "semantic_hash": "9d9c4316f87679b056eb05523aadfcce"
+  },
+  "tests/test_eval_rubrics.py": {
+    "mtime": 1788551113.0522585,
+    "ast_hash": "5d60a4672c8e7d23991179192eff83c6",
+    "semantic_hash": "5d60a4672c8e7d23991179192eff83c6"
   }
 }

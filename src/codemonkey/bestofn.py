@@ -40,3 +40,86 @@ def best_of_n(candidates: list[str], *,
         last_fail = tail
     return {"ok": False, "index": None, "candidates_scored": len(candidates),
             "last_fail_tail": last_fail}
+
+
+# --- loop38 cycle 79: zero-residue workspace snapshot ---------------------
+# ponytail: in-memory snapshot (relpath -> bytes); ceiling = very large
+# trees (GB+ workspaces would balloon RAM) — upgrade path is a tempdir
+# copy. Skips symlinks and the .git subtree (version control is the outer
+# safety net, not candidate state).
+
+def snapshot_tree(workdir: Path) -> dict:
+    """Capture every regular file under workdir (minus .git/symlinks)."""
+    workdir = Path(workdir).resolve()
+    snap: dict[str, bytes] = {}
+    for p in workdir.rglob("*"):
+        if p.is_symlink():
+            continue
+        try:
+            rel = p.relative_to(workdir)
+        except ValueError:
+            continue
+        if rel.parts and rel.parts[0] == ".git":
+            continue
+        if p.is_file():
+            try:
+                snap[str(rel)] = p.read_bytes()
+            except OSError:
+                continue
+    return snap
+
+
+def restore_tree(workdir: Path, snap: dict) -> None:
+    """Reset workdir to the snapshot: delete new files, rewrite changed,
+    restore deleted, prune newly-created empty dirs. Byte-identical."""
+    import os
+
+    workdir = Path(workdir).resolve()
+
+    def _tracked(p: Path):
+        if p.is_symlink():
+            return None
+        try:
+            rel = p.relative_to(workdir)
+        except ValueError:
+            return None
+        if rel.parts and rel.parts[0] == ".git":
+            return None
+        return str(rel) if p.is_file() else None
+
+    current = set()
+    for p in workdir.rglob("*"):
+        rel = _tracked(p)
+        if rel is not None:
+            current.add(rel)
+    for rel in current - set(snap):
+        try:
+            (workdir / rel).unlink()
+        except OSError:
+            pass
+    for rel, content in snap.items():
+        dest = workdir / rel
+        try:
+            if dest.is_file() and dest.read_bytes() == content:
+                continue
+        except OSError:
+            pass
+        try:
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            dest.write_bytes(content)
+        except OSError:
+            pass
+    # prune newly-created dirs that are now empty (deepest first)
+    for p in sorted(workdir.rglob("*"), reverse=True):
+        if p.is_symlink() or not p.is_dir():
+            continue
+        try:
+            p.relative_to(workdir)
+        except ValueError:
+            continue
+        if ".git" in p.relative_to(workdir).parts:
+            continue
+        try:
+            p.rmdir()
+        except OSError:
+            pass
