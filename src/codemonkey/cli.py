@@ -366,6 +366,9 @@ try:
     from .digest_cli import digest_cmd
 
     app.command(name="digest", help="Plain-text digest of one run (thread).")(digest_cmd)
+    from .rules_cli import rules_compile
+
+    app.command(name="rules-compile", help="Journal failures → draft permission rules.")(rules_compile)
 except ImportError:  # pragma: no cover
     pass
 
