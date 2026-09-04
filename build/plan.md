@@ -778,6 +778,12 @@ journal key semantics that cycle 36-38 will build on.
 
 
 
+
+### loop26: cycles (from build/research-loop26.md, cycle R26)
+
+- [x] CYCLE 63 — `loop26:` verify_command auto-suggestion
+- [x] CYCLE loop26-final — Loop 26 acceptance
+
 ### loop25: cycles (from build/research-loop25.md, cycle R25)
 
 - [x] CYCLE 62 — `loop25:` status --watch frames + digest --last
@@ -1294,7 +1300,7 @@ live with zero BLOCKED rows.
   modeling a hypothetical curve. Core-design: PARTIAL — retention that deletes
   journal history changes what the framework can later prove, and that
   decision ends by asking.
-- [ ] CYCLE R26 — Loop 26 research: someone else's machine (D7) — clean-machine
+- [x] CYCLE R26 — Loop 26 research: someone else's machine (D7) — clean-machine
   install from the committed lockfile, Linux parity (especially for loop 20's
   platform-specific containment), LIVE verification of the Anthropic native
   tool shape (`input_schema`, fixed in 51F1b and unit-tested only because no

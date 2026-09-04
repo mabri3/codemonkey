@@ -865,3 +865,16 @@ ping-ponging.
 | Watch frames + digest --last (62) | tests/test_watch_digest.py: pure frame, newest-first digest, empty tolerance, multi-sections, latest-sessions order | ✅ 5/5 |
 
 **LOOP 25 COMPLETE.**
+
+
+---
+
+# Loop 26 — Final Acceptance (CYCLE loop26-final)
+
+**Suite:** 524 passed.
+
+| Improvement | Probe | Result |
+|---|---|---|
+| verify_command suggestion (63) | tests/test_verifyhint.py: pytest-usage detection, silent-when-configured, no-pytest no-op, deterministic | ✅ 4/4 |
+
+**LOOP 26 COMPLETE.**

@@ -1937,3 +1937,8 @@ contract via route records. LOOP 24 COMPLETE. 515 tests.
 **Completed:** status render_frame (pure watch cycle) +
 digest_recent/render_multi (newest-first, sectioned). LOOP 25 COMPLETE.
 515→520 tests.
+
+## 2026-09-03 — CYCLE 63+loop26-final (loop26): verify-gate suggestion
+
+**Completed:** verifyhint.py + exec notice when pytest ran unverified.
+Gate stays operator-enabled (governance precedent). LOOP 26 COMPLETE.

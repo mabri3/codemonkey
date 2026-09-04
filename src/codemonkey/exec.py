@@ -644,6 +644,18 @@ def run_exec(
         except OSError:
             pass
 
+    # loop26 cycle 63: verify-gate suggestion
+    if not (cfg.get("verify_command") or "").strip():
+        try:
+            from .verifyhint import suggest_verify_command as _svc
+            from .journal import read_thread as _rt
+
+            _hint = _svc(_rt(thread_id), configured=None)
+            if _hint and on_event:
+                on_event({"type": "notice", "message": _hint})
+        except OSError:
+            pass
+
     # -- cost telemetry (loop5, cycle 26) --------------------------------
     if cost_summary and event_sink is not None:
         import time as _t
