@@ -147,6 +147,7 @@ def run_exec(
     cost_summary: bool = False,
     emit_fn=None,  # override for tests: (event_dict) -> None
     job_id: str = "",
+    verify_claims: bool = False,
 ) -> int:
     """Run one non-interactive exec turn-group. Returns the exit code."""
     from .config import ConfigError, load_config
@@ -524,6 +525,19 @@ def run_exec(
             pass
 
     schema_ok, normalized = _schema_turn_check(turn, schema)
+    if verify_claims:
+        try:
+            from .claims import annotate as _vc_annotate
+
+            final_text_pre = normalized if (schema_ok and normalized is not None) else (turn.content or "")
+            _annotated, _vc_res = _vc_annotate(final_text_pre, workdir=Path(workdir), thread_id=thread_id)
+            if _vc_res["unverified"]:
+                if schema_ok and normalized is not None:
+                    normalized = _annotated
+                else:
+                    turn.content = _annotated
+        except OSError:
+            pass
     final_text = normalized if (schema_ok and normalized is not None) else (turn.content or "")
     if turn.reasoning:
         emit(
