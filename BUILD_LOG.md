@@ -2548,3 +2548,17 @@ GREEN: intent → spec → plan → SPRINT → 37 loops → closing acceptance �
 ## 2026-09-03 — CYCLE sign-off-fix: Gate 2 recorded in all four ledgers
 (plan.md header note, BUILD_LOG entry, BUILD_REPORT final section,
 features.html banner).
+
+## 2026-09-04 — CYCLE 89 close-out (loop 39): stuck detector landed
+
+**Completed:** report-only stuck detector in the loop (`src/codemonkey/stuck.py`,
+`StuckDetector`, enabled via env; same `(tool, error_class)` failure pair ×3
+in a row — or K result-neutral turns — emits a `stuck` event plus a system
+nudge naming the pair; no termination). Covered by `tests/test_stuck.py`
+(≥4 tests); full suite green (646 passed, 5 skipped). Code had landed under
+the Gate-2 acceptance commit; this entry plus the `features.html` badge and
+graphify refresh complete the close-out per the framework.
+- **Known issues:** none; C91/C92 (enforce-stop, checkpoint-rollback) remain
+  AWAITING-ASK on the termination policy.
+- **Next step:** CYCLE 90 — recovery policy table + budget cap + typed failure
+  report (report-only).
