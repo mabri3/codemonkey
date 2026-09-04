@@ -514,8 +514,35 @@ def run_exec(
                 f"Valid providers: {', '.join(cfg.get('providers', {}))}")
         if _fall_name != p_name:
             pass  # fallback provider built lazily only if the primary fails
+    _unload_retried = False
     try:
-        turn = _attempt(provider)
+        try:
+            turn = _attempt(provider)
+        except Exception as _first_err:
+            # loop18 cycle 54: single-slot model-unload fallback. If the routed
+            # model isn't resident (LM Studio auto-evict), retry ONCE against
+            # the default route instead of failing the run.
+            from .unload import is_model_unloaded_error as _is_unload
+
+            if not _is_unload(_first_err):
+                raise
+            try:
+                from .journal import record as _jr
+
+                _jr(thread_id, "outcome", tool="route", key=run_id,
+                    status="model_unload_fallback",
+                    output=f"{p_name}/{model} not resident; retrying default route")
+            except OSError:
+                pass
+            if on_event:
+                on_event({"type": "notice",
+                          "message": "model unload detected; retrying against default route"})
+            _unload_retried = True
+            try:
+                turn = _attempt(provider)
+                turn.route_meta = {"model_unload_fallback": True}
+            except Exception as _retry_err:
+                raise _retry_err
     except Exception as _exc:
         _err_text = str(_exc).lower()
         _transport = ("transport" in _err_text or "timeout" in _err_text
