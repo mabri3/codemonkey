@@ -126,3 +126,72 @@ def test_run_suite_with_fake_exec(tmp_path):
     data = json.loads((tmp_path / "eval" / "results.json").read_text())
     assert data["suite"] == "fake-suite"
     assert len(data["tasks"]) == 2
+
+
+# ---------------- early-stop gate (loop38, cycle 77, R-H) ----------------
+
+def _all_pass_fake(prompt, **kwargs):
+    events = kwargs.get("event_sink")
+    events.append({"type": "item.completed",
+                   "item": {"type": "agent_message", "text": "pong"}})
+    events.append({"type": "turn.completed", "usage": {"total_tokens": 1}})
+    return 0
+
+
+def _six_task_suite(tmp_path):
+    return _write_suite(tmp_path, {
+        "name": "trivial",
+        "tasks": [
+            {"id": f"t{i}", "prompt": "say pong",
+             "expect_stdout_contains": ["pong"], "expect_exit": 0}
+            for i in range(1, 7)
+        ],
+    })
+
+
+def test_early_stop_settles_before_task_6(tmp_path):
+    """R-I (offline arm): 6 all-pass tasks, delta 0.2 → gate settles at n=4,
+    tasks 5-6 never run, certificate names the hoeffding-gate."""
+    suite_path = _six_task_suite(tmp_path)
+    calls = []
+
+    def counting_fake(prompt, **kwargs):
+        calls.append(prompt)
+        return _all_pass_fake(prompt, **kwargs)
+
+    results = run_suite(suite_path, exec_fn=counting_fake,
+                        out_dir=tmp_path / "eval",
+                        early_stop=True, delta=0.2)
+    assert len(calls) == 4  # stopped before task 6 (tasks 5, 6 skipped)
+    assert len(results["tasks"]) == 4
+    assert results["stopped_early"] is True
+    cert = results["certificate"]
+    assert cert["kind"] == "hoeffding-gate"
+    assert cert["certified_pass"] is True
+    assert cert["at_n"] == 4
+
+
+def test_no_early_stop_runs_everything(tmp_path):
+    suite_path = _six_task_suite(tmp_path)
+    results = run_suite(suite_path, exec_fn=_all_pass_fake,
+                        out_dir=tmp_path / "eval")
+    assert len(results["tasks"]) == 6
+    assert results["stopped_early"] is False
+    assert "certificate" not in results
+
+
+def test_early_stop_undecided_runs_everything(tmp_path):
+    suite_path = _write_suite(tmp_path, {
+        "name": "tied",
+        "tasks": [
+            {"id": f"t{i}", "prompt": "say pong",
+             "expect_stdout_contains": ["pong"] if i % 2 else ["nope"],
+             "expect_exit": 0}
+            for i in range(6)
+        ],
+    })
+    results = run_suite(suite_path, exec_fn=_all_pass_fake,
+                        out_dir=tmp_path / "eval",
+                        early_stop=True, delta=0.2)
+    assert len(results["tasks"]) == 6  # never settles: full run
+    assert results["stopped_early"] is False

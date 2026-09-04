@@ -2262,3 +2262,42 @@ FULFILLED.
   — consistent with loop-38 scope, revisit if the register demands it.
 - **Next step:** CYCLE 77 — R-H rename (`certify` → `hoeffding_gate`) + eval
   early-stop.
+
+## 2026-09-04 — CYCLE 77 (loop38): R-H rename + eval early-stop
+
+- **Files changed:** `src/codemonkey/certify.py` (R-H: `hoeffding_gate`
+  is the primary API, verdicts carry `kind: "hoeffding-gate"`;
+  `sequential_verdict` kept one release as a `DeprecationWarning` alias;
+  module docstring states the fixed-n-not-anytime-valid finding),
+  `src/codemonkey/eval.py` (`run_suite(..., early_stop=False, delta=0.05)` —
+  gate replayed over observed outcomes after each task; settle → skip rest,
+  `results["certificate"]` + `stopped_early`), `src/codemonkey/cli.py`
+  (`eval --early-stop --delta`, prints
+  `certificate: <pass|fail> hoeffding-gate at_n=N ran=M delta=D
+  stopped_early=`), `tests/test_certify.py` (rewritten: kind-carrying verdicts
+  + old-name-warns-but-works, 7 tests), `tests/test_eval.py` (+3 early-stop
+  tests: settles at 4/6, off runs all, undecided runs all),
+  `build/suites/trivial.yaml` (new, 6 pong tasks).
+- **R-H discharge:** bound unchanged, only the name + validity claim changed,
+  so loop-30-era numbers are re-labeled not re-measured (research C4). No
+  measured numbers exist under the old name anyway — `certify` had no callers
+  (critic F7) — so there is nothing to re-state; the cycle-81 capability
+  register will carry the `hoeffding-gate` label for the certify rows with
+  this superseded note.
+- **Tests run:** `uv run pytest -q tests/test_certify.py tests/test_eval.py`
+  → **16 passed**; `uv run pytest -q` → **616 passed**, 0 failed.
+- **Probe results (literal):**
+  - R-H: `uv run pytest -q tests/test_certify.py` → exit 0 (renamed API; old
+    name warns via DeprecationWarning but returns the identical verdict).
+  - LIVE (home llama.cpp `local`, inference RECOVERED — first live CodeMonkey
+    run against home since the wedge): `uv run codemonkey eval
+    build/suites/trivial.yaml --early-stop --delta 0.2` → exit 0,
+    `suite: trivial pass_rate: 1.0`,
+    `certificate: pass hoeffding-gate at_n=4 ran=4 delta=0.2
+    stopped_early=True`, t1–t4 PASS, t5/t6 never ran (transcript
+    `build/probes/cycle77-eval.out`, results
+    `build/probes/cycle77-eval/results.json`).
+- **Known issues:** none. `--delta` without `--early-stop` is inert (gate
+  never consulted); matrix arms (`--strategy-matrix`) do not early-stop
+  (per-arm comparability) — documented scope, not a gap.
+- **Next step:** CYCLE 78 — eval rubrics.

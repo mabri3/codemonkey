@@ -20,9 +20,9 @@
     "semantic_hash": "45b5ecd8e0d9e22cdc08d4dd8260f701"
   },
   "src/codemonkey/cli.py": {
-    "mtime": 1788534510.0728252,
-    "ast_hash": "432e895897a2b1a5d1336f3e25aeada8",
-    "semantic_hash": "432e895897a2b1a5d1336f3e25aeada8"
+    "mtime": 1788550822.6893551,
+    "ast_hash": "4f8700b9879d3a9f63580ef607033ca1",
+    "semantic_hash": "4f8700b9879d3a9f63580ef607033ca1"
   },
   "src/codemonkey/config.py": {
     "mtime": 1788536736.4575582,
@@ -360,9 +360,9 @@
     "semantic_hash": "0be571560509b6bd6e59799a47ae3c53"
   },
   "src/codemonkey/eval.py": {
-    "mtime": 1788498774.1637943,
-    "ast_hash": "12470ee570eb4849632dff835e0d2b83",
-    "semantic_hash": "12470ee570eb4849632dff835e0d2b83"
+    "mtime": 1788550813.3471315,
+    "ast_hash": "dd714b78ff92606d26e663f63467b992",
+    "semantic_hash": "dd714b78ff92606d26e663f63467b992"
   },
   "src/codemonkey/journal.py": {
     "mtime": 1788420138.9222817,
@@ -410,9 +410,9 @@
     "semantic_hash": "ce413a3134036497c1ec3d4eb84eebf7"
   },
   "tests/test_eval.py": {
-    "mtime": 1788383058.9484599,
-    "ast_hash": "1521a73e561772d52c45c1697d67da6c",
-    "semantic_hash": "1521a73e561772d52c45c1697d67da6c"
+    "mtime": 1788550837.47509,
+    "ast_hash": "5a528de5a46ff8d0010f70f883f9da6b",
+    "semantic_hash": "5a528de5a46ff8d0010f70f883f9da6b"
   },
   "tests/test_golden.py": {
     "mtime": 1788416303.979087,
@@ -630,9 +630,9 @@
     "semantic_hash": "5e951fa1e8a18da290d2e524f2dfadd1"
   },
   "src/codemonkey/certify.py": {
-    "mtime": 1788504556.2164004,
-    "ast_hash": "4de97f073227dce6a36bf1bc9d87fdd2",
-    "semantic_hash": "4de97f073227dce6a36bf1bc9d87fdd2"
+    "mtime": 1788550788.188393,
+    "ast_hash": "3eb573ca68d8eb32a0261a31fc88f45e",
+    "semantic_hash": "3eb573ca68d8eb32a0261a31fc88f45e"
   },
   "src/codemonkey/claims.py": {
     "mtime": 1788495384.5842679,
@@ -750,9 +750,9 @@
     "semantic_hash": "4b8d737cd9ff350fa837976353fa3afb"
   },
   "tests/test_certify.py": {
-    "mtime": 1788504566.1396768,
-    "ast_hash": "0fe63dcec4a5cedceb364977eaff718c",
-    "semantic_hash": "0fe63dcec4a5cedceb364977eaff718c"
+    "mtime": 1788550829.8531847,
+    "ast_hash": "c289d471f7887878b804af862fa55616",
+    "semantic_hash": "c289d471f7887878b804af862fa55616"
   },
   "tests/test_compile_rules.py": {
     "mtime": 1788504977.0156004,

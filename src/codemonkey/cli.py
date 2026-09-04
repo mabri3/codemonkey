@@ -345,6 +345,14 @@ def eval(
         bool,
         typer.Option("--route-stats", help="Print per-route pass_rate/token aggregates from the last results."),
     ] = False,
+    early_stop: Annotated[
+        bool,
+        typer.Option("--early-stop", help="Stop the suite when the hoeffding-gate certificate settles (loop38)."),
+    ] = False,
+    delta: Annotated[
+        float,
+        typer.Option("--delta", help="Gate level for --early-stop (default 0.05)."),
+    ] = 0.05,
 ) -> None:
     """Run a golden evaluation suite against the real exec path."""
     if delegation_matrix:
@@ -366,13 +374,19 @@ def eval(
     from .eval import run_suite as _run_suite
     from .eval import write_baseline as _write_baseline
 
-    results = _run_suite(suite, out_dir=out_dir)
+    results = _run_suite(suite, out_dir=out_dir, early_stop=early_stop, delta=delta)
     if route_stats_flag:
         from .routing import route_stats as _rs
 
         typer.echo(json.dumps(_rs(results), indent=2))
     typer.echo(f"suite: {results['suite']}  pass_rate: {results['pass_rate']}  "
                f"tokens: {results['total_tokens']}  wall: {results['wall_seconds']}s")
+    cert = results.get("certificate") or {}
+    if cert.get("certified_pass") is not None:
+        verdict = "pass" if cert["certified_pass"] else "fail"
+        typer.echo(f"certificate: {verdict} {cert.get('kind', 'hoeffding-gate')} "
+                   f"at_n={cert.get('at_n')} ran={cert.get('total')} delta={delta} "
+                   f"stopped_early={results.get('stopped_early', False)}")
     for t in results["tasks"]:
         mark = "PASS" if t["ok"] else "FAIL"
         typer.echo(f"  [{mark}] {t['id']}")

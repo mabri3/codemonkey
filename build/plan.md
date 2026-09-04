@@ -1769,7 +1769,8 @@ shipped until its entry point is exercised") live in
   `memory: adaptive`; `uv run pytest -q tests/test_memory_adaptive.py` →
   exit 0 (≥4 tests: round-trip, budget honored, non-selected lines absent,
   unknown name exit 2); full suite green.
-- [ ] CYCLE 77 — `loop38:` R-H FIRST, then eval early-stop: `certify`'s
+- [x] CYCLE 77 — `loop38:` R-H FIRST, then eval early-stop: `certify`'s
+  DONE 2026-09-04, LIVE on home server (recovered): gate settles at n=4
   fixed-n Hoeffding bound RENAMED to what it is (`hoeffding_gate`, verdicts
   carry `kind: "hoeffding-gate"`; `sequential_verdict` deprecated alias kept
   one release with a warning), then `eval --early-stop --delta 0.05` prints

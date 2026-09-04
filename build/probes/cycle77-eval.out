@@ -1,0 +1,9 @@
+$ uv run codemonkey eval build/suites/trivial.yaml --early-stop --delta 0.2 --out build/probes/cycle77-eval
+suite: trivial  pass_rate: 1.0  tokens: 36902  wall: 47.1s
+certificate: pass hoeffding-gate at_n=4 ran=4 delta=0.2 stopped_early=True
+  [PASS] t1
+  [PASS] t2
+  [PASS] t3
+  [PASS] t4
+no regressions
+(provider: home llama.cpp local, Qwen3.8-27B — inference recovered; t5/t6 never ran)

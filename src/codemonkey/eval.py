@@ -116,12 +116,17 @@ def _window_depth_from_events(events: list) -> int:
 
 
 def run_suite(suite_path: Path, *, exec_fn=None,
-              out_dir: Optional[Path] = None) -> dict:
+              out_dir: Optional[Path] = None,
+              early_stop: bool = False, delta: float = 0.05) -> dict:
     """Run every task through the real exec path and score it.
 
     `exec_fn` defaults to codemonkey.exec.run_exec; tests may inject a fake
-    with the same signature. Returns the results dict and (if out_dir given)
-    writes results.json there.
+    with the same signature. With `early_stop`, the fixed-n Hoeffding gate
+    (certify.hoeffding_gate, kind "hoeffding-gate") is replayed over the
+    observed outcomes after each task; when it settles, the remaining tasks
+    are skipped and `results["certificate"]` carries the gate verdict.
+    Returns the results dict and (if out_dir given) writes results.json
+    there.
     """
     if exec_fn is None:
         from .exec import run_exec as exec_fn
@@ -141,6 +146,8 @@ def run_suite(suite_path: Path, *, exec_fn=None,
                                             "model": task.get("model") or ""}})
     ordered = [t for group in _bbm(suite["tasks"]) for t in group]
     results_by_pos = {}
+    outcomes: list[bool] = []
+    certificate: Optional[dict] = None
     for task in ordered:
         events: list = []
         started = time.time()
@@ -188,9 +195,26 @@ def run_suite(suite_path: Path, *, exec_fn=None,
             pass
         scored["route_key"] = task.get("_route_key", "")
         results_by_pos[task["_suite_pos"]] = scored
+        if early_stop:
+            outcomes.append(bool(scored["ok"]))
+            if len(outcomes) >= 2:
+                from .certify import hoeffding_gate as _gate
+
+                gate = _gate(outcomes, delta=delta)
+                if gate["certified_pass"] is not None:
+                    gate["stopped_at_task"] = task["id"]
+                    certificate = gate
+                    break
 
     # restore suite order for stable baselines
     results["tasks"] = [results_by_pos[p] for p in sorted(results_by_pos)]
+    if certificate is not None:
+        certificate["total"] = len(outcomes)
+        certificate["stopped_early"] = len(outcomes) < len(ordered)
+        results["certificate"] = certificate
+        results["stopped_early"] = True
+    else:
+        results["stopped_early"] = False
 
     results["pass_rate"] = round(
         sum(1 for t in results["tasks"] if t["ok"]) / max(1, len(results["tasks"])), 3
