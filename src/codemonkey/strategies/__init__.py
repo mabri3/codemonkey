@@ -18,11 +18,13 @@ from typing import Optional
 from .compaction import get_compactor, VALID_COMPACTORS
 from .memory import get_memory, VALID_MEMORY
 from .session_state import get_store, VALID_STORES
+from .context import get_context_assembler, VALID_CONTEXT
 
 DOMAINS = {
     "compaction": {"env": "CODEMONKEY_STRATEGY_COMPACTION", "valid": VALID_COMPACTORS, "default": "summarizing"},
     "memory": {"env": "CODEMONKEY_STRATEGY_MEMORY", "valid": VALID_MEMORY, "default": "file"},
     "session_state": {"env": "CODEMONKEY_STRATEGY_SESSION_STATE", "valid": VALID_STORES, "default": "jsonl"},
+    "context": {"env": "CODEMONKEY_STRATEGY_CONTEXT", "valid": VALID_CONTEXT, "default": "static"},
 }
 
 

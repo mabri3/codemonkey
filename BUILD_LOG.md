@@ -2184,3 +2184,38 @@ FULFILLED.
   deterministic). Edge deduplication is left to `max_results` truncation
   (graphify emits symmetric duplicate edges; harmless.
 - **Next step:** CYCLE 75 — strategy domain `context` (static|learned).
+
+## 2026-09-04 — CYCLE 75 (loop38): strategy domain `context` (static | learned)
+
+- **Files changed:** `src/codemonkey/strategies/context.py` (new — domain
+  registry: static|learned + env/config resolution via get_context_assembler),
+  `src/codemonkey/strategies/staticctx.py` (new — the ORIGINAL block assembly
+  extracted verbatim), `src/codemonkey/strategies/__init__.py` (DOMAINS +
+  context), `src/codemonkey/config.py` (DEFAULTS.strategies.context=static,
+  KNOWN_STRATEGIES, ENV_MAP: CODEMONKEY_STRATEGY_CONTEXT +
+  CODEMONKEY_CONTEXT_BUDGET → context_budget=600), `src/codemonkey/exec.py`
+  (block assembly routed through the selected strategy; static path is the
+  untouched original; learned scores instructions/memory fragments via
+  learnedctx under the budget with job/repo-map appended; fail-soft to the
+  original on any strategy error), `tests/test_context_strategy.py` (new,
+  8 tests).
+- **F7 row cleared for `learnedctx`:** imported by
+  `strategies/context.py` → selectable by name, A/B-measurable per charter
+  (default OFF — static stays byte-identical).
+- **Tests run:** `uv run pytest -q tests/test_context_strategy.py` → 8 passed;
+  `uv run pytest -q` → **604 passed**, 0 failed (596 + 8).
+- **Probe results (literal, R-I):**
+  - REAL-RUN A/B (`test_real_run_static_vs_learned_observable_difference`):
+    recording provider through the REAL `run_exec`; static arm carries the
+    AGENTS.md fragment in the system prompt; `CODEMONKEY_STRATEGY_CONTEXT=
+    learned` + budget 10 drops the non-overlapping fragment — the provider
+    receives a different system string between arms.
+  - `CODEMONKEY_STRATEGY_CONTEXT=learned uv run codemonkey config` → exit 0,
+    stdout shows `context: learned` (A19 surface).
+  - `CODEMONKEY_STRATEGY_CONTEXT=chaos uv run codemonkey config` → exit 2,
+    stderr `unknown strategy 'chaos' for 'context'. Valid context
+    strategies: static, learned`.
+- **Known issues:** learned treats job/repo-map texts as always-include
+  fragments outside the budget (they were appended unconditionally before
+  too); budgeting them is a later tuning decision, not a wiring gap.
+- **Next step:** CYCLE 76 — memory strategy `adaptive`.

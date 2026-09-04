@@ -25,9 +25,9 @@
     "semantic_hash": "432e895897a2b1a5d1336f3e25aeada8"
   },
   "src/codemonkey/config.py": {
-    "mtime": 1788480151.6180444,
-    "ast_hash": "2191f391d98c2a5aae4ff9fa23ce0491",
-    "semantic_hash": "2191f391d98c2a5aae4ff9fa23ce0491"
+    "mtime": 1788536578.8998034,
+    "ast_hash": "a3f81cff865a669e9b7d9fbbfa9f409f",
+    "semantic_hash": "a3f81cff865a669e9b7d9fbbfa9f409f"
   },
   "src/codemonkey/events.py": {
     "mtime": 1788353233.2128239,
@@ -35,9 +35,9 @@
     "semantic_hash": "0562b87055009c2ca7f4ade7f9f342e3"
   },
   "src/codemonkey/exec.py": {
-    "mtime": 1788500932.3099282,
-    "ast_hash": "283b6143553428f7018848d76ec3bf99",
-    "semantic_hash": "283b6143553428f7018848d76ec3bf99"
+    "mtime": 1788536599.3560183,
+    "ast_hash": "cbe6491966b994b7ec8440c056c93f57",
+    "semantic_hash": "cbe6491966b994b7ec8440c056c93f57"
   },
   "src/codemonkey/instructions.py": {
     "mtime": 1788373203.899547,
@@ -115,9 +115,9 @@
     "semantic_hash": "e2c82b8da5b4608bbef0cae9dc1a4ada"
   },
   "src/codemonkey/strategies/__init__.py": {
-    "mtime": 1788365237.1379538,
-    "ast_hash": "0d0b8db1328385a0e1e69705e4e884cb",
-    "semantic_hash": "0d0b8db1328385a0e1e69705e4e884cb"
+    "mtime": 1788536560.8176432,
+    "ast_hash": "dc1a5640b9aa70c83e0035d5b2b858d6",
+    "semantic_hash": "dc1a5640b9aa70c83e0035d5b2b858d6"
   },
   "src/codemonkey/strategies/compaction.py": {
     "mtime": 1788370768.2501202,
@@ -848,5 +848,20 @@
     "mtime": 1788536279.5536196,
     "ast_hash": "5d3f566bf214a10f66b06b4f35e02051",
     "semantic_hash": "5d3f566bf214a10f66b06b4f35e02051"
+  },
+  "src/codemonkey/strategies/context.py": {
+    "mtime": 1788536551.986423,
+    "ast_hash": "fa69e27af76067af53ae8ffe1e98c5f6",
+    "semantic_hash": "fa69e27af76067af53ae8ffe1e98c5f6"
+  },
+  "src/codemonkey/strategies/staticctx.py": {
+    "mtime": 1788536556.5615757,
+    "ast_hash": "0b329e9dcb37dd5813c85fdba6c730f9",
+    "semantic_hash": "0b329e9dcb37dd5813c85fdba6c730f9"
+  },
+  "tests/test_context_strategy.py": {
+    "mtime": 1788536631.8967454,
+    "ast_hash": "4afa0cf6b584c8d2492ae2d4dcb83ca4",
+    "semantic_hash": "4afa0cf6b584c8d2492ae2d4dcb83ca4"
   }
 }

@@ -51,6 +51,7 @@ DEFAULTS: dict = {
     "observation_budget": 24000,
     "repo_map": False,
     "repo_map_budget": 4000,
+    "context_budget": 600,
     "max_retries": 3,
     "permissions": {"rules": []},
     "fallback_provider": "",
@@ -59,6 +60,7 @@ DEFAULTS: dict = {
         "compaction": "summarizing",
         "memory": "file",
         "session_state": "jsonl",
+        "context": "static",
     },
 }
 
@@ -82,6 +84,8 @@ ENV_MAP: dict[str, str] = {
     "CODEMONKEY_STRATEGY_COMPACTION": "strategies.compaction",
     "CODEMONKEY_STRATEGY_MEMORY": "strategies.memory",
     "CODEMONKEY_STRATEGY_SESSION_STATE": "strategies.session_state",
+    "CODEMONKEY_STRATEGY_CONTEXT": "strategies.context",
+    "CODEMONKEY_CONTEXT_BUDGET": "context_budget",
 }
 
 # Suffix of var name → provider field, e.g. CODEMONKEY_MODEL → providers.<active>.model
@@ -213,6 +217,7 @@ KNOWN_STRATEGIES: dict[str, list[str]] = {
     "compaction": ["summarizing", "sliding-window"],
     "memory": ["file", "none"],
     "session_state": ["jsonl", "sqlite"],
+    "context": ["static", "learned"],
 }
 
 _ENUMS: dict[str, list] = {

@@ -403,10 +403,44 @@ def run_exec(
         block = build_project_context_block(
             Path(workdir), instructions=instr_text, memory_text=memory_text
         )
-        if job_text:
-            block = f"{block}\n\n{job_text}" if block else job_text
-        if repo_map_text:
-            block = (block + "\n\n" if block else "") + repo_map_text
+        # loop38 cycle 75: context assembly is a strategy domain now.
+        # `static` (default) reproduces the original assembly byte-for-byte;
+        # `learned` ranks the source fragments by learned utility under a
+        # token budget (learnedctx). Strategy problems fail soft, exactly
+        # like the compaction wiring — they must never block exec.
+        try:
+            from .strategies import select_strategy as _sel_ctx
+            from .strategies.context import get_context_assembler
+
+            _ctx_name = _sel_ctx("context", cfg)
+        except Exception:
+            _ctx_name = "static"
+        if _ctx_name == "learned":
+            try:
+                from .strategies.context import get_context_assembler
+
+                _assembler = get_context_assembler("learned", cfg)
+                _fragments = []
+                if instr_text.strip():
+                    _fragments.append({"source": "instructions", "text": instr_text})
+                if memory_text.strip():
+                    _fragments.append({"source": "memory", "text": memory_text})
+                block = _assembler(full_prompt, _fragments,
+                                   job_text=job_text, repo_map_text=repo_map_text)
+            except Exception:
+                block = build_project_context_block(
+                    Path(workdir), instructions=instr_text, memory_text=memory_text
+                )
+                if job_text:
+                    block = f"{block}\n\n{job_text}" if block else job_text
+                if repo_map_text:
+                    block = (block + "\n\n" if block else "") + repo_map_text
+        else:
+            # static: the original assembly, untouched
+            if job_text:
+                block = f"{block}\n\n{job_text}" if block else job_text
+            if repo_map_text:
+                block = (block + "\n\n" if block else "") + repo_map_text
         if block:
             system_extra = system_extra + "\n\n" + block
 
