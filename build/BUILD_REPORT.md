@@ -774,3 +774,16 @@ ping-ponging.
 6c6b257 (R18) → 9ca9553 (C54) → a0e8921 (C55) → this commit.
 
 **LOOP 18 COMPLETE.**
+
+
+---
+
+# Loop 19 — Final Acceptance (CYCLE loop19-final)
+
+**Date:** 2026-09-03 · **Suite:** 487 passed.
+
+| Improvement | Probe | Result |
+|---|---|---|
+| VRAM→tokens budget calculator (56) | tests/test_budget.py: KV formula, 1k rounding, YAML render, honest errors (weights-exceed, partial-internals), override flags, 40% split | ✅ 6/6 |
+
+**LOOP 19 COMPLETE.** (Commit range d8594b0 → budget.py/budget_cli.py → this.)

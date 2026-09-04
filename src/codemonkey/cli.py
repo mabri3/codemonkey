@@ -356,6 +356,12 @@ try:
     app.add_typer(_redact_app, name="redact", help="Secret-redaction repair pass.")
 except ImportError:  # pragma: no cover
     pass
+try:
+    from .budget_cli import app as _budget_app
+
+    app.add_typer(_budget_app, name="budget", help="VRAM→tokens budget calculator.")
+except ImportError:  # pragma: no cover
+    pass
 
 
 @app.command()

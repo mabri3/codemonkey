@@ -1890,3 +1890,9 @@ same-model tasks contiguously, restores suite order for stable baselines.
 KV math + safe context_limit/observation split. BaKlaVa per-layer allocation
 adopted as design note (client shows per-component priority; allocator is
 server-side). NVMe offload NOT selected (server-side).
+
+## 2026-09-03 — CYCLE 56+loop19-final (loop19): budget calculator shipped
+
+**Completed:** budget.py (kv_bytes_per_token, safe_context_limit with 85%
+safety factor + 1k rounding, validate honest errors) + `budget show` CLI +
+copiable YAML. LOOP 19 COMPLETE.
