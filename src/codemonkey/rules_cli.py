@@ -6,7 +6,7 @@ from collections import Counter
 
 import typer
 
-from .compile_rules import compile_corrections, merge_rules
+from .compile_rules import compile_corrections
 from .journal import list_threads, read_thread
 
 
@@ -22,6 +22,20 @@ def rules_compile(
             if r.get("type") == "outcome" and r.get("status") == "error":
                 classes[(r.get("tool", "?"),
                          r.get("error_class") or "error")] += 1
+    # R37F2: `cfg` was never loaded here — the command raised NameError on
+    # every invocation. Load the effective config the same way the other
+    # sub-commands do, and degrade to "no existing rules" if it is unreadable
+    # (a broken config must not hide the draft list).
+    from pathlib import Path
+
+    from .config import ConfigError, load_config
+
+    try:
+        cfg = load_config(cwd=Path.cwd())
+    except ConfigError as exc:
+        typer.echo(f"warning: config unreadable ({exc}); "
+                   "drafting against no existing rules", err=True)
+        cfg = {}
     current = (cfg.get("permissions") or {}).get("rules") or []
     drafts = compile_corrections(dict(classes), threshold=threshold,
                                  existing_rules=current)

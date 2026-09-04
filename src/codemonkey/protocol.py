@@ -12,6 +12,7 @@ exceptions), a marker line followed by a fenced body, and stray prose.
 from __future__ import annotations
 
 import json
+from typing import Optional  # R37F5: used by _extract_json_object's annotation
 
 MARKER = "TOOL_CALL:"
 

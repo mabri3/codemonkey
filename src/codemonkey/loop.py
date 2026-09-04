@@ -332,6 +332,21 @@ def run_turns(
         def _run_one(idx: int, call: dict):
             """Execute one parsed call. Returns (idx, name, ok, output, meta)."""
             name = call.get("name", "")
+            # R37F1: the journal key is needed by the permission-rule audit
+            # record BELOW as well as by the dispatch bookkeeping further
+            # down. It used to be assigned only after the approval gate, so
+            # `jkey + ":rule"` read an UNBOUND local and every rule hit on a
+            # journaled run died with UnboundLocalError (not caught by the
+            # surrounding `except ValueError`). Compute it once, up front.
+            jkey = ""
+            if journal_thread:
+                try:
+                    from .journal import args_key as _ak0
+
+                    jkey = _ak0(journal_thread, _turn_no, idx,
+                                call.get("args") or {}, run=journal_run)
+                except OSError:
+                    jkey = ""
             if on_event:
                 # 51F5: the text renderer prints `$ {item.command}` and
                 # `[exit {item.exit_code}]`, but nothing ever populated those
@@ -461,13 +476,11 @@ def run_turns(
                             approvals_mod.tool_result_notice(name, decision),
                             {"approval": "soft-deny"})
             # loop7 cycle 31/32: journal intent + idempotent replay
-            jkey = ""
+            # (jkey computed at the top of _run_one — R37F1)
             if journal_thread:
                 try:
-                    from .journal import args_key as _ak, find_outcome as _fo, record as _jr
+                    from .journal import find_outcome as _fo, record as _jr
 
-                    jkey = _ak(journal_thread, _turn_no, idx, call.get("args") or {},
-                               run=journal_run)
                     hit = _fo(journal_thread, jkey) if name in _MUTATING_TOOLS else None
                     if hit is not None:
                         _jr(journal_thread, "outcome", tool=name, key=jkey,

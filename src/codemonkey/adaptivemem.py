@@ -40,18 +40,22 @@ def adaptive_select(lines: list[str], *, token_budget: int = 300,
                     now: float | None = None) -> tuple[str, list[str]]:
     """Highest-scoring lines first while under budget (tokens ≈ words)."""
     scored = score_lines(lines, now=now)
-    ranked = sorted(scored, key=lambda sv: (-sv[0], lines.index(sv[1])))
-    kept: list[str] = []
+    # R37F4: rank and keep by POSITION, not by line text. The old code sorted
+    # ties with `lines.index(line)` (the first duplicate's index) and rebuilt
+    # the output with a membership test against a set of kept *strings*, so a
+    # repeated memory line was re-emitted for every occurrence — output blew
+    # past the budget and the same text appeared in both kept and dropped.
+    ranked = sorted(enumerate(scored), key=lambda iv: (-iv[1][0], iv[0]))
+    kept_idx: set[int] = set()
     dropped: list[str] = []
     used = 0
-    for w, line in ranked:
+    for i, (_w, line) in ranked:
         cost = len(line.split())
         if used + cost <= token_budget:
-            kept.append(line)
+            kept_idx.add(i)
             used += cost
         else:
             dropped.append(line)
     # restore original order for stable injection
-    kept_set = set(kept)
-    out = [ln for ln in lines if ln in kept_set]
+    out = [ln for i, ln in enumerate(lines) if i in kept_idx]
     return "\n".join(out), dropped

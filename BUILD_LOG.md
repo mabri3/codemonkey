@@ -1963,3 +1963,55 @@ graph_query pinned lookup + neighbors).
 Closing sweep: 19/20 exit-lines 0 LIVE + A16 re-verified green live after
 honest BLOCKED-slow. All checkboxes ticked. v3.0.0 tagged. BUILD THROUGH R37
 FULFILLED.
+
+## 2026-09-04 — CYCLE R37F1–R37F6: post-v3.0.0 closing-critic fix pass
+
+- **Review artifact:** `build/critic-r37.md` — 6 findings (2 HIGH, 3 MEDIUM,
+  1 LOW), each reproduced live before any edit, each with a literal probe.
+  Method: full suite, `uvx pyflakes src/codemonkey tests`, targeted read of the
+  loop-30..36 modules and their CLI wiring, graphify query for structure.
+- **Files changed:** `src/codemonkey/loop.py` (F1 — hoist `jkey` to the top of
+  `_run_one`; the permission-rule audit record read it unbound and every
+  journaled run with a matching rule died with `UnboundLocalError`),
+  `src/codemonkey/rules_cli.py` (F2 — `cfg` was never loaded, so
+  `rules-compile` raised NameError on every invocation; load the effective
+  config, warn-and-degrade if unreadable, drop the dead `merge_rules` import),
+  `src/codemonkey/schema.py` (F3 — `except jsonschema.JsonSchemaException`
+  named an unbound module alias AND a nonexistent class; an invalid
+  `--output-schema` crashed instead of exiting 2), `src/codemonkey/adaptivemem.py`
+  (F4 — duplicate memory lines were emitted once per occurrence but charged to
+  the budget once, and appeared in kept AND dropped; rank/keep by position),
+  `src/codemonkey/protocol.py` (F5 — missing `Optional` import),
+  `graphify-out/*` (F6 — the graph did not contain `learnedctx.py` or
+  `adaptivemem.py`; `graphify . --update --code-only` + `cluster-only`),
+  `tests/test_r37_fixes.py` (new, 8 tests), `build/plan.md` (R37F1–R37F6
+  appended and ticked), `build/critic-r37.md` (new).
+- **Root-cause note (F1/F2):** both HIGH findings are *wiring* defects in code
+  whose *logic* is unit-tested. `grep -rn perm_rules tests/` returned zero hits
+  before this cycle — `permissions.evaluate` was tested in isolation while the
+  loop that consumes its verdict never was, and `compile_corrections` was
+  tested purely while its Typer command was never invoked. The suite was green
+  over two features that could not run. That gap is the motivation for the
+  loops 38–45 arc rule R-I (a capability is not shipped until its *entry point*
+  is exercised).
+- **Tests run:** `uv run pytest -q` → **587 passed** (579 before + 8 new), 0
+  failed. Docs guard: `uv run codemonkey --help` still lists exec/review/
+  sessions/config/models (A18).
+- **Probe results (literal):**
+  - `uv run pytest -q tests/test_r37_fixes.py -k r37f1` → 3 passed
+  - `uv run pytest -q tests/test_r37_fixes.py -k r37f2` → 1 passed
+  - `uv run codemonkey rules-compile` → exit 0, `(no recurring failures over
+    threshold)`, no traceback (pre-fix: `NameError: name 'cfg' is not defined`)
+  - `uv run pytest -q tests/test_r37_fixes.py -k r37f3` → 1 passed
+  - `uv run pytest -q tests/test_r37_fixes.py -k r37f4` → 2 passed
+  - `uv run pytest -q tests/test_r37_fixes.py -k r37f5` → 1 passed
+  - `graphify . --update --code-only` → 1978 nodes / 3692 edges;
+    `grep -c "learnedctx" graphify-out/graph.json` → 87 (pre-fix: 0)
+- **Known issues:** `graphify label` (LLM community naming) not re-run — no key
+  in this environment; communities are hub-named, which the report states.
+  Non-findings deliberately left alone are listed at the end of
+  `build/critic-r37.md` (the `certify.py` fixed-n Hoeffding bound is carried to
+  the 38–45 arc rather than changed under a fix pass, because moving it would
+  invalidate the loop-30 certificates loops 32–36 were measured against).
+- **Next step:** loops 38–45 forward-arc proposal (`build/loops-38-45-proposal.md`
+  + `CYCLE R38`–`R45` appended unchecked to `build/plan.md`).

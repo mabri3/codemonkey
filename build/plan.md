@@ -1550,3 +1550,43 @@ and branching without defined crash semantics is undefined behavior.
   its local/published/gap triple; report committed. ENTRY CONDITION: loops
   28-36 closed (shipped, or explicitly rejected/BLOCKED in writing), no open
   critic finding above LOW, live endpoint reachable. Core-design: NO.
+
+## Post-R37 closing critic — fix cycles (findings in `build/critic-r37.md`)
+
+- [x] CYCLE R37F1 — loop.py: `jkey` unbound at the permission-rule audit record
+  (F1, HIGH) — every journaled run whose tool call matches a `permissions.rules`
+  entry died with `UnboundLocalError` before the rule could be enforced; hoist
+  the action-key computation to the top of `_run_one` | est: 10m |
+  verify: `uv run pytest -q tests/test_r37_fixes.py -k r37f1` → 3 passed
+  (deny blocks the write AND the run completes; the rule hit is journaled with
+  a real 24-char action key, not a bare `":rule"`; an allow rule still executes)
+- [x] CYCLE R37F2 — rules_cli.py: `cfg` never loaded → `codemonkey rules-compile`
+  raised NameError on every invocation (F2, HIGH); load the effective config as
+  the other sub-commands do, warn-and-degrade on an unreadable config, drop the
+  dead `merge_rules` import | est: 10m |
+  verify: `uv run codemonkey rules-compile` → exit 0, prints
+  `(no recurring failures over threshold)` on an empty journal, no traceback;
+  `uv run pytest -q tests/test_r37_fixes.py -k r37f2` → 1 passed
+- [x] CYCLE R37F3 — schema.py: invalid `--output-schema` raised NameError from
+  inside the `except` clause instead of `SchemaError`/exit 2 (F3, MEDIUM) —
+  the module is bound as `_js` and `jsonschema.JsonSchemaException` does not
+  exist; split the ImportError guard and catch `_js.exceptions.SchemaError`
+  | est: 10m |
+  verify: `uv run pytest -q tests/test_r37_fixes.py -k r37f3` → 1 passed
+  (`SchemaError` raised, message names the offending keyword)
+- [x] CYCLE R37F4 — adaptivemem.py: duplicate memory lines were emitted once per
+  occurrence while charged once, and appeared in kept AND dropped (F4, MEDIUM)
+  — rank and keep by position, never by line text | est: 10m |
+  verify: `uv run pytest -q tests/test_r37_fixes.py -k r37f4` → 2 passed
+  (budget 3 over `["a b c","a b c","x"]` → exactly `["a b c"]`, ≤3 tokens;
+  budget 7 → all three lines, nothing dropped)
+- [x] CYCLE R37F5 — protocol.py: `Optional` annotation with no import (F5, LOW)
+  — runtime-safe under PEP 563 but `typing.get_type_hints()` raises | est: 5m |
+  verify: `uv run pytest -q tests/test_r37_fixes.py -k r37f5` → 1 passed
+- [x] CYCLE R37F6 — graphify-out/ stale relative to HEAD (F6, MEDIUM, process):
+  cycles 72–73 shipped `learnedctx.py` and `adaptivemem.py` without the
+  mandated `graphify . --update`, so AGENTS.md §graphify rule 1 was
+  unenforceable | est: 10m |
+  verify: `graphify . --update` then
+  `grep -c "learnedctx" graphify-out/graph.json` → ≥ 1; graph committed in the
+  same commit as the fix cycle

@@ -36,12 +36,17 @@ def load_schema_file(path) -> dict:
     # Fail fast if jsonschema cannot process it.
     try:
         import jsonschema as _js
-
-        _js.validators.validator_for(schema).check_schema(schema)
-    except jsonschema.JsonSchemaException as exc:  # type: ignore[attr-defined]
-        raise SchemaError(f"invalid JSON Schema: {exc}") from exc
     except ImportError:
         raise SchemaError("jsonschema is required for --output-schema") from None
+    # R37F3: the handler named a bare `jsonschema` (the module is bound as
+    # `_js`) AND a class that does not exist in the package, so an invalid
+    # schema raised NameError instead of the SchemaError that maps to exit 2.
+    try:
+        _js.validators.validator_for(schema).check_schema(schema)
+    except _js.exceptions.SchemaError as exc:
+        raise SchemaError(f"invalid JSON Schema: {exc}") from exc
+    except Exception as exc:  # malformed enough that the validator itself blew up
+        raise SchemaError(f"invalid JSON Schema: {exc}") from exc
     return schema
 
 
