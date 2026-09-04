@@ -368,6 +368,28 @@ def run_turns(
                 return (idx, name, False,
                         "error: denied by permission rule", {"rule": "deny"})
 
+            # loop20 cycle 57: tool-argument validation gate. Structured
+            # mismatch goes back through the self-heal loop instead of dying
+            # on a KeyError inside the tool.
+            try:
+                from .argvalidate import validate_args as _va
+
+                _bad = _va(name, call.get("args") or {})
+                if _bad is not None:
+                    if journal_thread:
+                        try:
+                            from .journal import record as _jr
+
+                            _jr(journal_thread, "outcome", tool=name, key=jkey,
+                                status="error", error_class="schema_mismatch",
+                                output=_bad["detail"])
+                        except OSError:
+                            pass
+                    return (idx, name, False,
+                            f"error: {_bad['detail']}", {"error_class": "schema_mismatch"})
+            except OSError:
+                pass
+
             # Approval gate (cycle 8): evaluate policy BEFORE dispatch.
             # (rule_decision == 'ask' forces the gate on; 'allow' skips it)
             if approval and rule_decision != "allow":
