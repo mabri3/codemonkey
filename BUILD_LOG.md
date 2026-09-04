@@ -1957,3 +1957,9 @@ preview. R23's original diff-mode intent now SHIPPED.
 
 **Completed:** graphquery.py (find_graph_dir honest-absent, load/merge,
 graph_query pinned lookup + neighbors).
+
+## 2026-09-03 — CYCLE R37 FINAL: v3.0.0 — ALL CHARTERED LOOPS COMPLETE
+
+Closing sweep: 19/20 exit-lines 0 LIVE + A16 re-verified green live after
+honest BLOCKED-slow. All checkboxes ticked. v3.0.0 tagged. BUILD THROUGH R37
+FULFILLED.

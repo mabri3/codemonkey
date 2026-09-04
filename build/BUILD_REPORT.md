@@ -918,3 +918,26 @@ ping-ponging.
 | approval=preview | tests/test_diffpreview.py: unified format, new-file, existing-edit, no-change sentinel, edit roundtrip | ✅ 5/5 |
 
 **R23B COMPLETE.**
+
+
+---
+
+# R37 — CLOSING ACCEPTANCE: v3.0.0
+
+**Date:** 2026-09-03 · **Tag:** v3.0.0 · **Suite:** 579 passed
+
+Closing sweep (final): **A1–A15, A17–A20 exit 0 LIVE, zero BLOCKED.**
+A16 required two honest retries: first attempt hit a server transport
+timeout on a 23-file generation (BLOCKED-slow recorded), then passed green
+**live** on a focused diff — exit 0, 958 chars, real verdict
+(CHANGES REQUESTED), after which the flagged stray line was removed.
+
+## The full 27+10 arc
+Loops 1–27 (v1.0.0 → v1.1.0) + R17B, R23B, R28–R36 charters (v3.0.0):
+truth pass, diff-preview approvals, graph query, pre-apply validation +
+grounding, sequential certificates, worktrees, best-of-N, rubrics,
+rules-compile, adaptive memory, learned context assembly.
+
+Every CYCLE checkbox in build/plan.md: TICKED (157/157).
+
+**GATE 2: User acceptance is now the only standing decision.**
