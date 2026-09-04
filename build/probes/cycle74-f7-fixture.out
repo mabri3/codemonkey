@@ -1,0 +1,14 @@
+$ 
+[exit 0] matches for 'run_turns':
+  tests_test_knobs_test_exec_passes_knobs_to_run_turns [test_exec_passes_knobs_to_run_turns()]
+  src_codemonkey_loop_run_turns [run_turns()]
+  $graphify-root$_src_codemonkey_loop_run_turns [run_turns()]
+  $graphify-root$_tests_test_knobs_test_exec_passes_knobs_to_run_turns [test_exec_passes_knobs_to_run_turns()]
+edges:
+- $graphify-root$_src_codemonkey_loop_py -> $graphify-
+[agent] done — looked up run_turns in the graph
+done — looked up run_turns in the graph
+exit_code=0
+tool names: ['graph_query']
+provider turns used: 2
+PROBE OK: real run_exec executed graph_query; trace shows the match block + edges from this repo's graphify-out

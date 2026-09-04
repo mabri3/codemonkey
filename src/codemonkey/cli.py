@@ -234,8 +234,13 @@ def graph(
     """Print code-graph facts for SYMBOL from graphify-out/ (no model needed).
 
     Plain lookup: nodes matching the symbol + their edges. With `--to SYM2`:
-    the shortest relation path SYMBOL -> SYM2. Reports `[stale]` in-band when
-    the graph is older than HEAD; refuses honestly when there is no graph.
+    the shortest relation path SYMBOL -> SYM2. Reports a \\[stale] marker
+    in-band when the graph is older than HEAD; refuses honestly when there
+    is no graph.
+
+    Exit codes (74F6, for scripting callers): 0 = match/path found;
+    1 = no match / no path (explicit message on stdout); 2 = no usable
+    graph in this workspace.
     """
     from . import graphquery
     from .tools.graph import _check_staleness
@@ -249,16 +254,21 @@ def graph(
     stale = _check_staleness(gdir, cwd)
     if stale:
         typer.secho(stale, err=True, fg=typer.colors.YELLOW)
-    graph = graphquery.load_graph(gdir)
     if to:
+        # 74F6: graph_path_lookup loads the graph itself — no unused read here.
         from .tools.graph import graph_path_lookup
 
         res = graph_path_lookup(cwd, symbol, to, max_depth=6)
-        if not res["ok"]:
+        if res["kind"] == "ok":
+            typer.echo("path: " + " -> ".join(res["path"]))
+            return
+        if res["kind"] == "no_path":
+            # explicit no-match on stdout, exit 1 (documented)
+            typer.echo(res["error"])
+        else:
             typer.secho(f"error: {res['error']}", err=True, fg=typer.colors.RED)
-            raise typer.Exit(1)
-        typer.echo("path: " + " -> ".join(res["path"]))
-        return
+        raise typer.Exit(1)
+    graph = graphquery.load_graph(gdir)
     res = graphquery.graph_query(graph, symbol, max_results=max_results)
     if not res["matches"]:
         typer.echo(f"(no node matches '{symbol}')")

@@ -1,0 +1,54 @@
+=== probe 1: graph nosuchsymbol_zzz (expect exit 1) ===
+(no node matches 'nosuchsymbol_zzz')
+exit: 1
+=== probe 2: graph run_turns (expect exit 0, >=1 edge) ===
+tests_test_knobs_test_exec_passes_knobs_to_run_turns [test_exec_passes_knobs_to_run_turns()]
+src_codemonkey_loop_run_turns [run_turns()]
+$graphify-root$_src_codemonkey_loop_run_turns [run_turns()]
+$graphify-root$_tests_test_knobs_test_exec_passes_knobs_to_run_turns [test_exec_passes_knobs_to_run_turns()]
+- $graphify-root$_src_codemonkey_loop_py -> $graphify-root$_src_codemonkey_loop_run_turns [contains]
+- $graphify-root$_src_codemonkey_loop_run_turns -> providerbase [references]
+- $graphify-root$_src_codemonkey_loop_run_turns -> toolcontext [references]
+- $graphify-root$_src_codemonkey_loop_run_turns -> $graphify-root$_src_codemonkey_loop_fallbackrecorded [references]
+- $graphify-root$_src_codemonkey_loop_run_turns -> chatturn [references]
+- $graphify-root$_src_codemonkey_loop_run_turns -> $graphify-root$_src_codemonkey_loop_fallbackrecorded [calls]
+- $graphify-root$_src_codemonkey_loop_run_turns -> chatturn [calls]
+- $graphify-root$_src_codemonkey_loop_run_turns -> $graphify-root$_src_codemonkey_loop_fallbackrecorded_must_prompt [calls]
+- $graphify-root$_src_codemonkey_loop_run_turns -> $graphify-root$_src_codemonkey_loop_native_specs [calls]
+- $graphify-root$_src_codemonkey_loop_run_turns -> $graphify-root$_src_codemonkey_loop_looks_like_tools_rejection [calls]
+- $graphify-root$_src_codemonkey_loop_run_turns -> $graphify-root$_src_codemonkey_loop_fallbackrecorded_remember [calls]
+- $graphify-root$_src_codemonkey_loop_rationale_69 -> $graphify-root$_src_codemonkey_loop_run_turns [rationale_for]
+- $graphify-root$_src_codemonkey_loop_py -> $graphify-root$_src_codemonkey_loop_run_turns [contains]
+- $graphify-root$_src_codemonkey_loop_run_turns -> providerbase [references]
+- $graphify-root$_src_codemonkey_loop_run_turns -> toolcontext [references]
+- $graphify-root$_src_codemonkey_loop_run_turns -> $graphify-root$_src_codemonkey_loop_fallbackrecorded [references]
+- $graphify-root$_src_codemonkey_loop_run_turns -> chatturn [references]
+- $graphify-root$_src_codemonkey_loop_run_turns -> $graphify-root$_src_codemonkey_loop_fallbackrecorded [calls]
+- $graphify-root$_src_codemonkey_loop_run_turns -> chatturn [calls]
+- $graphify-root$_src_codemonkey_loop_run_turns -> $graphify-root$_src_codemonkey_loop_fallbackrecorded_must_prompt [calls]
+exit: 0
+=== probe 3: graph --help states exit codes ===
+                                                                                
+ Usage: codemonkey graph [OPTIONS] {symbol}                                     
+                                                                                
+ Print code-graph facts for SYMBOL from graphify-out/ (no model needed).        
+                                                                                
+ Plain lookup: nodes matching the symbol + their edges. With `--to SYM2`:       
+ the shortest relation path SYMBOL -> SYM2. Reports `` in-band when             
+ the graph is older than HEAD; refuses honestly when there is no graph.         
+                                                                                
+ Exit codes (74F6, for scripting callers): 0 = match/path found;                
+ 1 = no match / no path (explicit message on stdout); 2 = no usable             
+ graph in this workspace.                                                       
+                                                                                
+╭─ Arguments ──────────────────────────────────────────────────────────────────╮
+│ *    symbol      <str>  Symbol/file/concept to look up in graphify-out/.     │
+│                         [required]                                           │
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ Options ────────────────────────────────────────────────────────────────────╮
+│ --to                 <str>  With --path: end symbol of the relation path.    │
+│ --max-results        <int>  Maximum edges to print. [default: 20]            │
+│ --help                      Show this message and exit.                      │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+exit: 0

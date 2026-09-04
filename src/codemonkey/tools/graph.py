@@ -9,6 +9,11 @@ If graphify-out/ is absent the tools say so honestly (no fake results). If the
 graph is older than HEAD (mtime of graph.json < the newest commit date), the
 output carries an in-band `[stale: ...]` marker — a stale graph is worse than
 none, so it is never silently trusted (AGENTS.md §graphify rule 2).
+
+No-match contract (74F5, same rule for all three tools): a well-formed query
+that matches nothing is a SUCCESSFUL result (ok=True) carrying an explicit
+no-match line (`(no node matches '...')` / `no path: ...`). ok=False is
+reserved for an unusable graph (none present) or bad arguments.
 """
 
 from __future__ import annotations
@@ -28,7 +33,10 @@ def _check_staleness(graph_dir: Path, workdir: Path) -> str:
     try:
         import os
 
-        graph_files = [p for p in Path(graph_dir).rglob("*.json")]
+        if Path(graph_dir).is_file():  # single-file fallback layout (74F4)
+            graph_files = [Path(graph_dir)]
+        else:
+            graph_files = [p for p in Path(graph_dir).rglob("*.json")]
         if not graph_files:
             return "[stale: no graph json found]"
         graph_mtime = max(os.path.getmtime(p) for p in graph_files)
@@ -90,7 +98,12 @@ def run(args: dict, ctx) -> "object":
         if stale:
             lines.append(stale)
         if not res["matches"]:
+            # 74F5 no-match contract: a well-formed query matching nothing is
+            # ok=True with an explicit no-match line — only an unusable graph
+            # or bad arguments is ok=False.
             lines.append(f"(no node matches '{symbol}')")
+            return ToolResult(output="\n".join(lines),
+                              meta={"stale": bool(stale), "matches": 0})
         else:
             lines.append(f"matches for '{symbol}':")
             for nid, n in list(res["matches"].items())[:10]:
@@ -104,14 +117,23 @@ def run(args: dict, ctx) -> "object":
 
 
 def graph_path_lookup(workdir, a: str, b: str, *, max_depth: int = 4) -> dict:
-    """Shortest relation path a -> b over graph edges (BFS). Staleness-aware."""
+    """Shortest relation path a -> b over graph edges (BFS). Staleness-aware.
+
+    Result kinds (74F5 contract): "ok" = a real path; "no_path" = a
+    well-formed query matching nothing (endpoints known or not, but no
+    connectable path — a successful, explicit no-match answer); "error" =
+    unusable graph or bad arguments.
+    """
+    if not a or not b:
+        return {"kind": "error", "error": "both endpoints are required",
+                "stale": "", "ok": False}
     gdir = graphquery.find_graph_dir(workdir)
     if gdir is None:
-        return {"ok": False, "error": "no graphify-out/ graph in this workspace",
+        return {"kind": "error", "ok": False,
+                "error": "no graphify-out/ graph in this workspace",
                 "stale": ""}
     stale = _check_staleness(gdir, Path(workdir))
     graph = graphquery.load_graph(gdir)
-    nodes = graph["nodes"]
     edges = graph["edges"]
 
     def resolve(sym: str):
@@ -122,9 +144,11 @@ def graph_path_lookup(workdir, a: str, b: str, *, max_depth: int = 4) -> dict:
 
     sa, sb = resolve(a), resolve(b)
     if sa is None or sb is None:
+        # 74F5: unresolved endpoints on a usable graph = a successful
+        # no-match answer (ok=True, kind=no_path), not an error.
         missing = [name for name, val in ((a, sa), (b, sb)) if val is None]
-        return {"ok": False,
-                "error": "unresolved endpoint(s): " + ", ".join(repr(m) for m in missing),
+        return {"kind": "no_path", "ok": True,
+                "error": "no path: unresolved endpoint(s) " + ", ".join(repr(m) for m in missing),
                 "stale": stale}
     # BFS over adjacency
     from collections import deque
@@ -148,7 +172,8 @@ def graph_path_lookup(workdir, a: str, b: str, *, max_depth: int = 4) -> dict:
                     q = []
                     break
     if sb not in prev:
-        return {"ok": False, "error": f"no path {a!r} -> {b!r} within {max_depth} hops",
+        return {"kind": "no_path", "ok": True,
+                "error": f"no path: {a!r} -> {b!r} within {max_depth} hops",
                 "stale": stale}
     path = []
     n = sb
@@ -156,7 +181,7 @@ def graph_path_lookup(workdir, a: str, b: str, *, max_depth: int = 4) -> dict:
         path.append(n)
         n = prev[n]
     path.reverse()
-    return {"ok": True, "path": path, "stale": stale}
+    return {"kind": "ok", "ok": True, "path": path, "stale": stale}
 
 
 def run_path(args: dict, ctx) -> "object":
@@ -176,11 +201,17 @@ def run_path(args: dict, ctx) -> "object":
         lines = []
         if res.get("stale"):
             lines.append(res["stale"])
-        if not res["ok"]:
-            lines.append(f"error: {res['error']}")
-            return ToolResult(output="\n".join(lines), ok=False)
+        if res["kind"] != "ok":
+            # no_path = successful no-match (74F5); error = unusable graph/args
+            lines.append(f"error: {res['error']}" if res["kind"] == "error"
+                         else res["error"])
+            return ToolResult(output="\n".join(lines),
+                              ok=(res["kind"] != "error"),
+                              meta={"stale": bool(res.get("stale")),
+                                    "kind": res["kind"]})
         lines.append("path: " + " -> ".join(res["path"]))
-        return ToolResult(output="\n".join(lines), meta={"stale": bool(res.get("stale"))})
+        return ToolResult(output="\n".join(lines), meta={"stale": bool(res.get("stale")),
+                                                         "kind": "ok"})
     except Exception as e:
         return _err(e)
 
@@ -188,7 +219,7 @@ def run_path(args: dict, ctx) -> "object":
 def _explain_local(workdir, name: str) -> dict:
     gdir = graphquery.find_graph_dir(workdir)
     if gdir is None:
-        return {"ok": False, "error": "no graphify-out/ graph in this workspace",
+        return {"kind": "error", "ok": False, "error": "no graphify-out/ graph in this workspace",
                 "text": ""}
     stale = _check_staleness(gdir, Path(workdir))
     graph = graphquery.load_graph(gdir)
@@ -197,6 +228,7 @@ def _explain_local(workdir, name: str) -> dict:
     if stale:
         lines.append(stale)
     if not res["matches"]:
+        # 74F5: well-formed query matching nothing = ok=True, explicit line
         lines.append(f"(no node matches '{name}')")
     else:
         for nid, n in list(res["matches"].items())[:5]:
@@ -208,7 +240,9 @@ def _explain_local(workdir, name: str) -> dict:
         edges_txt = _edges_text(res["edges"], 20)
         lines.append("edges:")
         lines.append(edges_txt)
-    return {"ok": bool(res["matches"]), "text": "\n".join(lines),
+    matched = bool(res["matches"])
+    return {"kind": ("ok" if matched else "no_match"), "ok": True,
+            "text": "\n".join(lines),
             "stale": stale}
 
 
@@ -223,8 +257,10 @@ def run_explain(args: dict, ctx) -> "object":
 
         workdir = validate_root(ctx, ".")
         res = _explain_local(workdir, name)
-        return ToolResult(output=res["text"] or res["error"], ok=res["ok"],
-                          meta={"stale": bool(res.get("stale"))})
+        return ToolResult(output=res["text"] or res.get("error", ""),
+                          ok=res["ok"],
+                          meta={"stale": bool(res.get("stale")),
+                                "kind": res["kind"]})
     except Exception as e:
         return _err(e)
 

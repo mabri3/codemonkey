@@ -119,19 +119,20 @@ def test_graph_path_lookup(tmp_path):
     from codemonkey.tools.graph import graph_path_lookup
 
     res = graph_path_lookup(tmp_path, "exec.py", "loop.py")
-    assert res["ok"] is True
+    assert res["ok"] is True and res["kind"] == "ok"
     assert res["path"][0] == "exec.py"
     assert res["path"][-1] == "loop.py"
     assert "run_turns" in res["path"]
 
 
-def test_graph_path_unresolved_endpoint_honest(tmp_path):
+def test_graph_path_unresolved_endpoint_is_no_path_not_error(tmp_path):
+    # 74F5: unresolved endpoints on a usable graph = successful no-match.
     _write_graph(tmp_path)
     from codemonkey.tools.graph import graph_path_lookup
 
     res = graph_path_lookup(tmp_path, "exec.py", "does-not-exist")
-    assert res["ok"] is False
-    assert "unresolved" in res["error"]
+    assert res["ok"] is True and res["kind"] == "no_path"
+    assert "no path" in res["error"]
 
 
 def test_graph_explain(tmp_path):
@@ -141,3 +142,131 @@ def test_graph_explain(tmp_path):
     res = dispatch("graph_explain", {"name": "run_turns"}, _Ctx(tmp_path))
     assert res.ok is True
     assert "run_turns" in res.output
+
+
+# ---------------- 74F4: single-file fallback layout loads ----------------
+
+def test_f4_single_file_layout_loads_clean(tmp_path):
+    # graph.json directly at workspace root (find_graph_dir's file fallback):
+    # must answer from the graph, with NO stale marker and NO empty answer.
+    data = {
+        "nodes": [{"id": "run_turns", "src": "src/codemonkey/loop.py",
+                   "label": "run_turns"}],
+        "edges": [{"source": "exec.py", "target": "run_turns",
+                   "relation": "calls"}],
+    }
+    (tmp_path / "graph.json").write_text(json.dumps(data))
+    from codemonkey.tools import dispatch
+
+    res = dispatch("graph_query", {"symbol": "run_turns"}, _Ctx(tmp_path))
+    assert res.ok is True, res.output
+    assert "run_turns" in res.output
+    assert "exec.py" in res.output            # edge endpoint printed
+    assert "[stale:" not in res.output        # staleness must not misfire
+
+
+def test_f4_single_file_layout_bfs_path(tmp_path):
+    data = {
+        "nodes": [{"id": "a"}, {"id": "b"}, {"id": "c"}],
+        "edges": [{"source": "a", "target": "b", "relation": "x"},
+                  {"source": "b", "target": "c", "relation": "x"}],
+    }
+    (tmp_path / "graph.json").write_text(json.dumps(data))
+    from codemonkey.tools.graph import graph_path_lookup
+
+    res = graph_path_lookup(tmp_path, "a", "c")
+    assert res["kind"] == "ok" and res["path"] == ["a", "b", "c"]
+
+
+# ---------------- 74F5: uniform no-match contract ----------------
+
+def test_f5_no_match_is_ok_true_query_tool(tmp_path):
+    # graph_query: well-formed query, zero hits -> ok=True + explicit line.
+    _write_graph(tmp_path)
+    from codemonkey.tools import dispatch
+
+    res = dispatch("graph_query", {"symbol": "zzz_nonexistent"}, _Ctx(tmp_path))
+    assert res.ok is True
+    assert "no node matches" in res.output
+
+
+def test_f5_no_match_is_ok_true_explain_tool(tmp_path):
+    # graph_explain: same contract (was ok=False before 74F5).
+    _write_graph(tmp_path)
+    from codemonkey.tools import dispatch
+
+    res = dispatch("graph_explain", {"name": "zzz_nonexistent"}, _Ctx(tmp_path))
+    assert res.ok is True
+    assert "no node matches" in res.output
+
+
+def test_f5_no_match_is_ok_true_path_tool(tmp_path):
+    # graph_path: connectable-graph miss -> no_path answer, ok=True.
+    _write_graph(tmp_path)
+    from codemonkey.tools import dispatch
+
+    res = dispatch("graph_path", {"from": "run_turns",
+                                  "to": "zzz_nonexistent"}, _Ctx(tmp_path))
+    assert res.ok is True
+    assert "no path" in res.output
+
+
+# ---------------- 74F6: CLI graph exit codes + no unused load ----------------
+
+def test_f6_cli_graph_exit_codes(tmp_path, monkeypatch):
+    from typer.testing import CliRunner
+    from codemonkey import cli as cli_mod
+    from pathlib import Path as _P
+
+    _write_graph(tmp_path)
+    monkeypatch.chdir(tmp_path)
+    runner = CliRunner()
+    # 0 = match found
+    r0 = runner.invoke(cli_mod.app, ["graph", "run_turns"])
+    assert r0.exit_code == 0
+    # 1 = no match (documented for scripting callers)
+    r1 = runner.invoke(cli_mod.app, ["graph", "nosuchsymbol_zzz"])
+    assert r1.exit_code == 1, r1.output
+    # 2 = no usable graph
+    empty = tmp_path / "empty"
+    empty.mkdir()
+    monkeypatch.chdir(empty)
+    r2 = runner.invoke(cli_mod.app, ["graph", "run_turns"])
+    assert r2.exit_code == 2
+
+
+def test_f6_cli_graph_to_path_skips_unused_load(tmp_path, monkeypatch):
+    # The --to branch must not load the graph twice (74F6): patch load_graph
+    # to explode and prove the --to path never calls it directly.
+    import codemonkey.cli as cli_mod
+    from typer.testing import CliRunner
+
+    _write_graph(tmp_path)
+    monkeypatch.chdir(tmp_path)
+
+    import codemonkey.graphquery as gq_mod
+    called = {"n": 0}
+    real_load = gq_mod.load_graph
+    def spy_load(graph_dir):
+        called["n"] += 1
+        return real_load(graph_dir)
+    monkeypatch.setattr(gq_mod, "load_graph", spy_load)
+    runner = CliRunner()
+    r = runner.invoke(cli_mod.app, ["graph", "exec.py", "--to", "loop.py"])
+    assert r.exit_code == 0, r.output
+    assert "path: exec.py -> run_turns -> loop.py" in r.output
+    # exactly ONE load: inside graph_path_lookup — the CLI's own pre-load is
+    # gone from the --to branch (74F6).
+    assert called["n"] == 1
+
+
+def test_f6_cli_help_documents_exit_codes():
+    from typer.testing import CliRunner
+    from codemonkey import cli as cli_mod
+
+    runner = CliRunner()
+    r = runner.invoke(cli_mod.app, ["graph", "--help"])
+    assert r.exit_code == 0
+    assert "Exit codes" in r.output
+    for code in ("0 =", "1 =", "2 ="):
+        assert code in r.output

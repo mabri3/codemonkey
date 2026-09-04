@@ -2494,3 +2494,46 @@ FULFILLED.
 - **Known issues:** none. `summarize_taxonomy` skips ok/empty records by
   design (taxonomy is a failure distribution, not a run census).
 - **Next step:** CYCLE 89 — stuck detector (no termination).
+
+## 2026-09-04 — CYCLE 74 close-out (74F4–74F7): graph tools review gate
+
+- **Context:** cycle 74's code was committed (0a0364a) by a worker that died
+  mid-cycle: 74 itself and critic fixes 74F4–74F7 were still open. This
+  close-out finishes 74 per the review-gate rule (fixes land in cycle 74's
+  own close commit).
+- **Files changed:** `src/codemonkey/graphquery.py` (`load_graph` accepts the
+  single-file `graph.json` fallback layout — 74F4), `src/codemonkey/tools/
+  graph.py` (`_check_staleness` handles the file layout — 74F4; no-match
+  contract documented + enforced across all three entries — 74F5;
+  `graph_path_lookup` gains result `kind` ok/no_path/error, unresolved
+  endpoints and unconnectable endpoints are now successful no-match answers,
+  ok=True), `src/codemonkey/cli.py` (unused graph load removed from the
+  `--to` branch — 74F6; exit codes 0/1/2 documented in `--help`; rich markup
+  escape so `[stale]` renders), `tests/test_graph_tools.py` (+9 tests: 2×F4,
+  3×F5, 3×F6 + renamed unresolved-endpoint test to the new contract),
+  `build/probes/cycle74_f6_cli.sh` + transcripts `build/probes/
+  cycle74-f4f5f6.out`, `cycle74-f7-fixture.out`, probe script
+  `cycle74_f7_fixture.py`.
+- **Tests run:** `uv run pytest -q` → **633 passed, 5 skipped**, 0 failed.
+- **Probe results (literal, R-I):**
+  - `uv run codemonkey graph nosuchsymbol_zzz; echo $?` → exit **1**
+    (`(no node matches 'nosuchsymbol_zzz')`).
+  - `uv run codemonkey graph run_turns; echo $?` → exit **0**, node + edges
+    printed from this repo's graphify-out.
+  - `uv run codemonkey graph --help` → exit codes 0/1/2 documented.
+  - F4 fixture (workspace with only `graph.json` at root): `graph_query`
+    returns the node + ≥1 edge, output contains **no** `[stale:` — ≥2 tests
+    cover both layouts.
+  - F7 entry-point probe: LIVE `exec` probe **BLOCKED** — the endpoint
+    network probe was refused by the terminal consent gate (do-not-retry;
+    same environment quirk SPRINT.md documents). Sanctioned in-process
+    fallback used instead: scripted fake provider driving the REAL
+    `run_exec` → `graph_query` appears in the tool trace, trace carries
+    `matches for 'run_turns'` + edges from this repo's graph
+    (`build/probes/cycle74-f7-fixture.out`, exit 0).
+- **Known issues:** the three graph tools now uniformly treat well-formed
+  no-match queries as ok=True (deliberate contract per the critic finding,
+  not a regression); `kind` metadata added for callers that need to
+  distinguish "no path found" from "path found".
+- **Next step:** CYCLE 89 (loop 39) — stuck detector in the loop
+  (report-only; C91/C92 remain AWAITING-ASK).

@@ -1731,11 +1731,16 @@ shipped until its entry point is exercised") live in
 
 ### loop38: cycles (selected from build/research-loop38.md, cycle R38)
 
-- [ ] CYCLE 74 — `loop38:` graph tools in the registry: `graph_query` /
+- [x] CYCLE 74 — `loop38:` graph tools in the registry: `graph_query` /
   `graph_path` / `graph_explain` tool modules + SPECS/PARAMS entries +
   read-only sandbox classification; staleness check in-band (`[stale: graph
   older than HEAD]`, never silent); `codemonkey graph <symbol>` print
   sub-command | est: 40m |
+  status: DONE 2026-09-04 (closed via 74F1–74F7; this checkbox ticked at F7).
+  Code committed at 0a0364a; review-gate fixes landed in the close commit.
+  LIVE F7 probe BLOCKED (network-probe consent gate) → in-process R-I
+  fallback probe green (real run_exec + real graph_query call, transcript
+  `build/probes/cycle74-f7-fixture.out`).
   verify (R-I): `uv run codemonkey graph run_turns` → exit 0, prints the node
   + ≥1 edge from THIS repo's graphify-out; `uv run python -c "from codemonkey
   import tools; assert 'graph_query' in tools.SPECS"` → exit 0; LIVE probe:
@@ -1882,38 +1887,59 @@ commit, and 74 is not marked `[x]` until every probe below passes.
   and add the cycle attribution comment | est: 10m |
   verify: `uv run pytest -q tests/test_tools.py` → exit 0;
   `grep -c "thirteen" tests/test_tools.py` → 0.
-- [ ] CYCLE 74F4 — F4 (MEDIUM): `graphquery.find_graph_dir` may return a FILE
+- [x] CYCLE 74F4 — F4 (MEDIUM): `graphquery.find_graph_dir` may return a FILE
   (`graph.json` fallback, `graphquery.py:22-24`) while `load_graph`
   (`graphquery.py:32`) and `tools/graph.py::_check_staleness` both `rglob` it
   as a directory — in that layout the tools emit
   `[stale: no graph json found]` AND answer from an empty graph, i.e. a wrong
   structural answer under a stale marker that fired for the wrong reason |
   est: 20m |
+  status: DONE 2026-09-04 — both `load_graph` and `_check_staleness` handle
+  the file layout (`[graph_dir]` when `is_file()`); tests
+  `test_f4_single_file_layout_loads_clean` / `test_f4_single_file_layout_bfs_path`.
   verify: fixture workspace containing only `graph.json` at its root →
   `graph_query` returns the node and ≥1 edge and the output contains no
   `[stale:`; the `graphify-out/` case is unchanged; ≥2 tests cover both
   layouts.
-- [ ] CYCLE 74F5 — F5 (LOW→MEDIUM): the three tools disagree on what a miss
+- [x] CYCLE 74F5 — F5 (LOW→MEDIUM): the three tools disagree on what a miss
   means — `graph.run` returns `ok=True` for `(no node matches …)` (dataclass
   default, `tools/base.py:18`) while `run_explain` returns `ok=False` for the
   identical condition. State the rule in the module docstring — a well-formed
   query matching nothing is `ok=True` with an explicit no-match line; only an
   unusable graph or bad arguments is `ok=False` — and enforce it | est: 15m |
+  status: DONE 2026-09-04 — contract documented in the module docstring and
+  enforced in all three entries (`graph_query` no-match → ok=True;
+  `graph_path` gains result `kind` ok/no_path/error with no-match → ok=True;
+  `graph_explain` no-match → ok=True); one test per tool
+  (`test_f5_no_match_is_ok_true_{query,explain,path}_tool`).
   verify: one test per tool asserting the no-match contract;
   `uv run pytest -q tests/test_graph_tools.py` → exit 0.
-- [ ] CYCLE 74F6 — F6 (LOW): `cli.py::graph` loads the graph then does not use
+- [x] CYCLE 74F6 — F6 (LOW): `cli.py::graph` loads the graph then does not use
   it on the `--to` branch (and shadows the command name), and its exit codes
   (0 match / 1 no match / 2 no graph) are undocumented for the scripting
   callers the intent doc exists for | est: 10m |
+  status: DONE 2026-09-04 — unused load removed (the `--to` branch no longer
+  pre-loads; spy test proves exactly 1 load, inside `graph_path_lookup`);
+  exit codes documented in `--help` and enforced (`0/1/2` tested in-process;
+  literal CLI probes exit 1/0 recorded in `build/probes/cycle74-f4f5f6.out`);
+  help markup escape fixed so `[stale]` renders instead of being eaten by
+  rich.
   verify: no unused load on the `--to` path; `codemonkey graph --help` states
   the three exit codes; `uv run codemonkey graph nosuchsymbol_zzz; echo $?`
   → 1; `uv run codemonkey graph run_turns; echo $?` → 0 with ≥1 edge printed.
-- [ ] CYCLE 74F7 — close cycle 74 properly: full suite green, the cycle's own
+- [x] CYCLE 74F7 — close cycle 74 properly: full suite green, the cycle's own
   LIVE probe run (`exec --ephemeral --approval never --json "Use the
   graph_query tool …"` → tool trace contains `graph_query`, transcript under
   `build/probes/cycle74-*`; BLOCKED + reason recorded if the endpoint is
   down), `BUILD_LOG.md` entry, `features.html` update, `graphify . --update`
   committed with the cycle, and only then `- [x] CYCLE 74` | est: 20m |
+  status: DONE 2026-09-04 — suite 633 passed / 5 skipped; LIVE probe BLOCKED
+  (endpoint network probe refused by the terminal consent gate — same quirk
+  SPRINT.md documents) and replaced with the sanctioned in-process R-I
+  fallback (fake provider driving REAL `run_exec`; `graph_query` in the tool
+  trace with repo edges; transcript `build/probes/cycle74-f7-fixture.out` +
+  `cycle74-f4f5f6.out`); BUILD_LOG/features.html/graphify updated in the
+  close commit.
   verify: `uv run pytest -q` → exit 0 (0 failed); `git status --short` clean
   after the commit; `grep -c "cycle 74" BUILD_LOG.md` → ≥1;
   `grep -c "graph_query" features.html` → ≥1.

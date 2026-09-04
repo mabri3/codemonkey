@@ -26,10 +26,17 @@ def find_graph_dir(workdir) -> Optional[Path]:
 
 
 def load_graph(graph_dir: Path) -> dict:
-    """Merge all JSON artifacts into {nodes: {id: node}, edges: [...]}."""
+    """Merge all JSON artifacts into {nodes: {id: node}, edges: [...]}.
+
+    Accepts both layouts `find_graph_dir` can return: a directory (rglob
+    *.json) or the single-file fallback (graph.json itself). 74F4: the file
+    layout must be LOADABLE, not silently answered from an empty graph.
+    """
     nodes: dict = {}
     edges: list = []
-    for p in sorted(graph_dir.rglob("*.json")):
+    paths = ([graph_dir] if graph_dir.is_file()
+             else sorted(graph_dir.rglob("*.json")))
+    for p in paths:
         try:
             data = json.loads(p.read_text())
         except (OSError, json.JSONDecodeError):
