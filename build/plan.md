@@ -800,6 +800,13 @@ journal key semantics that cycle 36-38 will build on.
 - [x] CYCLE 61 — `loop24:` role_presets (done)
 - [x] CYCLE loop24-final — Loop 24 acceptance: sweep + report + push
 
+
+### R23B: diff-preview approval mode (sprint appended 2026-09-03)
+
+- [x] CYCLE diffpreview — approval=preview computes pre-apply unified diffs
+  for write/edit (not executed, surfaced to model + operator); POLICIES gains
+  "preview"; diffpreview.py + tests 5/5.
+
 ### loop22: cycles (from build/research-loop22.md, cycle R22)
 
 - [x] CYCLE 59 — `loop22:` exec --dry-run preview mode

@@ -394,6 +394,34 @@ def run_turns(
             except OSError:
                 pass
 
+            # R23B: diff-preview approval mode ("preview" policy)
+            if approval == "preview" and name in _MUTATING_TOOLS:
+                try:
+                    from .diffpreview import (preview_diff_edit,
+                                              preview_diff_write)
+
+                    _a = call.get("args") or {}
+                    if name == "write_file":
+                        pv = preview_diff_write(str(_a.get("path", "")),
+                                                str(_a.get("content", "")),
+                                                ctx.workdir)
+                    elif name == "edit_file":
+                        pv = preview_diff_edit(
+                            str(_a.get("path", "")),
+                            str(_a.get("old_string") or _a.get("search", "")),
+                            str(_a.get("new_string") or _a.get("replace", "")),
+                            ctx.workdir,
+                            bool(_a.get("replace_all", False)))
+                    else:
+                        pv = ""
+                    msg = (f"PREVIEW (approval=preview; not executed):\n{pv}"
+                           if pv else
+                           "PREVIEW (approval=preview; not executed): "
+                           f"{name} on {_a.get('path', '')}")
+                except OSError as _pe:
+                    msg = f"PREVIEW unavailable: {_pe}"
+                return (idx, name, False, msg, {"preview": True})
+
             # loop22 cycle 59: dry-run preview for mutating tools
             if dry_run and name in _MUTATING_TOOLS:
                 from .dryrun import preview_for

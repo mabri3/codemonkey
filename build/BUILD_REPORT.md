@@ -905,3 +905,16 @@ ping-ponging.
 1825ee7 (loop26-final) → R27 → 64 → this commit → v1.1.0 tag.
 
 **LOOP 27 COMPLETE — the 27-loop arc is done.**
+
+
+---
+
+# R23B — Diff-Preview Approval Mode
+
+**Suite:** 535 passed.
+
+| Improvement | Probe | Result |
+|---|---|---|
+| approval=preview | tests/test_diffpreview.py: unified format, new-file, existing-edit, no-change sentinel, edit roundtrip | ✅ 5/5 |
+
+**R23B COMPLETE.**

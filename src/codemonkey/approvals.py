@@ -32,7 +32,7 @@ ALLOW = "allow"
 SOFT_DENY = "soft-deny"
 ASK = "ask"
 
-POLICIES = ("untrusted", "on-request", "never")
+POLICIES = ("untrusted", "on-request", "never", "preview")
 
 
 @dataclass

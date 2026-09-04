@@ -1946,3 +1946,9 @@ Gate stays operator-enabled (governance precedent). LOOP 26 COMPLETE.
 ## 2026-09-03 — CYCLE loop27-final: v1.1.0 — ALL 27 LOOPS COMPLETE
 
 Tag v1.1.0 pushed. 524 tests green. The build-through-27 order is fulfilled.
+
+## 2026-09-03 — CYCLE R23B: diff-preview approval mode shipped
+
+**Completed:** diffpreview.py (unified diffs pre-apply for write/edit),
+approval=preview policy wired pre-gate in loop (NOT executed), POLICIES +
+preview. R23's original diff-mode intent now SHIPPED.
