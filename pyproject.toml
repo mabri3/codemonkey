@@ -1,6 +1,6 @@
 [project]
 name = "codemonkey"
-version = "1.1.0"
+version = "3.0.0"
 description = "codemonkey — a scriptable coding-agent CLI (exec/review/sessions) for OpenAI-style and Anthropic-style endpoints"
 readme = "README.md"
 requires-python = ">=3.11"

@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.0.0 (2026-09-03)
+
+Loops 17B, R23B, R28-R36: truth pass (ledger claims-vs-evidence audit),
+diff-preview approval mode, graph-grounded retrieval (graph_query),
+pre-apply validation + symbol grounding, anytime-valid sequential
+certificates, fork-and-branch execution (worktrees), best-of-N with an
+execution verifier, rubrics + step-level scoring, corrections compiled into
+enforcement (rules-compile), adaptive memory management, learned context
+assembly. Closing acceptance: every criterion verified, zero BLOCKED.
+
 ## 1.1.0 (2026-09-03)
 
 Loops 17-26: honest-completion gate (`--verify-claims`), static model routing

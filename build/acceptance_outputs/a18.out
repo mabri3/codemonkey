@@ -31,20 +31,25 @@
 │ --help                                         Show this message and exit.   │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭─ Commands ───────────────────────────────────────────────────────────────────╮
-│ config    Print the effective merged config (secrets masked).                │
-│ review    LLM review of the repo's uncommitted diff (read-only).             │
-│ undo      Undo: restore the most recent checkpoint (files snapshotted        │
-│           pre-mutation).                                                     │
-│ eval      Run a golden evaluation suite against the real exec path.          │
-│ status    Operator surface: aggregate jobs/journal/sessions/eval/cost/spill. │
-│ models    List models exposed by a provider endpoint.                        │
-│ sessions  List persisted sessions (thread id, updated time, first prompt).   │
-│ journal   Execution-journal forensics.                                       │
-│ jobs      Durable, resumable job files.                                      │
-│ lessons   Lessons learned from run history.                                  │
-│ redact    Secret-redaction repair pass.                                      │
-│ exec      Non-interactive exec: run the agent once, print the final          │
-│           response. Use `exec resume [--last|THREAD_ID] [PROMPT]` to         │
-│           continue a session.                                                │
+│ config         Print the effective merged config (secrets masked).           │
+│ review         LLM review of the repo's uncommitted diff (read-only).        │
+│ undo           Undo: restore the most recent checkpoint (files snapshotted   │
+│                pre-mutation).                                                │
+│ eval           Run a golden evaluation suite against the real exec path.     │
+│ digest         Plain-text digest of one run (thread).                        │
+│ rules-compile  Journal failures → draft permission rules.                    │
+│ status         Operator surface: aggregate                                   │
+│                jobs/journal/sessions/eval/cost/spill.                        │
+│ models         List models exposed by a provider endpoint.                   │
+│ sessions       List persisted sessions (thread id, updated time, first       │
+│                prompt).                                                      │
+│ journal        Execution-journal forensics.                                  │
+│ jobs           Durable, resumable job files.                                 │
+│ lessons        Lessons learned from run history.                             │
+│ redact         Secret-redaction repair pass.                                 │
+│ budget         VRAM→tokens budget calculator.                                │
+│ exec           Non-interactive exec: run the agent once, print the final     │
+│                response. Use `exec resume [--last|THREAD_ID] [PROMPT]` to    │
+│                continue a session.                                           │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 

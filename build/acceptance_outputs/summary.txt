@@ -1,7 +1,7 @@
-=== acceptance sweep 2026-09-03 21:29:30 ===
+=== acceptance sweep 2026-09-04 00:03:44 ===
 live-LLM probes via provider: local (home llama.cpp, live)
 --- A1: --version ---
-A1 exit=0 out=codemonkey 1.0.0
+A1 exit=0 out=codemonkey 1.1.0
 --- A2: config contains local/llama endpoints, no sk- secrets ---
 A2 exit=0  endpoint=base_url:http://192.168.50.176:8080/v1  model=model:unsloth/Qwen3.8-27B-GGUF
 --- A3: env override ---
@@ -15,30 +15,30 @@ A6 exit=0
 --- A7: stdin-as-prompt banana ---
 A7 exit=0  out=banana 
 --- A8: non-git dir guard ---
-A8 exit=0  err=error: '/private/var/folders/xb/kzc31shn1pz2s_5l2fy6d7rh0000gn/T/tmp.yVOSItG8uH' is not inside a git repository; use --s
+A8 exit=0  err=error: '/private/var/folders/xb/kzc31shn1pz2s_5l2fy6d7rh0000gn/T/tmp.FVTyP1AZQ0' is not inside a git repository; use --s
 --- A9: tool loop shell echo (prompt protocol) ---
 A9 exit=0  out=codemonkey_tool_test 
 --- A10: structured output schema ---
 A10 exit=0  out={   "project_name": "codemonkey",   "programming_languages": [     "Python"   ],   "summary": "codemonkey is a scriptable, headless coding-agent CLI (
 --- A11: resume with token word ---
-A11 thread=f4ac64218379
-A11 exit=1  out=
+A11 thread=1c1a97c6bed4
+A11 exit=0  out=The codeword you asked me to remember is **zebra**. 
 --- A12: sessions lists the thread ---
 A12 exit=0
 --- A13: anthropic provider selection ---
 A13 exit=0
 --- A14: anthropic unit tests ---
-A14 exit=0  13 passed in 0.01s
+A14 exit=0  13 passed in 0.02s
 --- A15: full suite ---
-A15 exit=1  5 failed, 468 passed in 15.67s
+A15 exit=0  579 passed in 77.29s (0:01:17)
 --- A16: live review of uncommitted diff ---
 A16 exit=1 chars=0 (verdict check: 0)
 --- A17: sandbox unit tests (incl. read-only denies write_file+shell) ---
-A17 exit=0  13 passed in 0.07s  (denial coverage: 9 assertion sites)
+A17 exit=0  13 passed in 0.32s  (denial coverage: 9 assertion sites)
 --- A18: help lists the five commands ---
 A18 exit=0
 --- A19: strategy selector + invalid exit 2 ---
 A19 valid_exit=0 invalid_exit2=0 (exit=2)  msg=error: unknown strategy 'bogus' for 'compaction'. Valid compaction strategies: summarizing, sliding-window 
 --- A20: strategy unit tests ---
-A20 exit=0  18 passed in 0.12s
+A20 exit=0  18 passed in 0.14s
 === sweep complete ===

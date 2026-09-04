@@ -802,6 +802,23 @@ journal key semantics that cycle 36-38 will build on.
 
 
 
+
+
+### R28-R37 sprint (appended 2026-09-03 — build-through-37 authorized)
+
+- [x] CYCLE 65 (R28) — graph_query over graphify-out/ (honest-absent)
+- [x] CYCLE 66 (R29) — pre_apply_validate + symbol_index/locate grounding
+- [x] CYCLE 67 (R30) — anytime-valid sequential certificates (Hoeffding)
+- [x] CYCLE 68 (R31) — branches.py (git worktree fork list remove diff)
+- [x] CYCLE 69 (R32) — best-of-N machine-verified candidates
+- [x] CYCLE 70 (R33) — rubrics + step-level scoring + yaml sugar
+- [x] CYCLE 71 (R34) — corrections compiled into enforcement (rules-compile)
+- [x] CYCLE 72 (R35) — adaptive memory (recency decay + budget selection)
+- [x] CYCLE 73 (R36) — learned context assembly (utility-ranked fragments)
+- [x] CYCLE R37 — v3.0 closing acceptance (all loops live-verified, zero
+  open BLOCKED; full sweep recorded below)
+
+
 ### R28: graph-grounded retrieval (sprint appended 2026-09-03)
 
 - [x] CYCLE 65 — `graph_query` tool substrate: graphify-out/ discovery
@@ -1369,7 +1386,7 @@ only after `loop27-final`, and several carry hard entry conditions on loops
 19/20/24/25 — N concurrent mutating workers without containment is a defect,
 and branching without defined crash semantics is undefined behavior.
 
-- [ ] CYCLE R28 — Loop 28 research: graph-grounded retrieval — this repo builds,
+- [x] CYCLE R28 — Loop 28 research: graph-grounded retrieval — this repo builds,
   commits and mandates `graphify-out/` for human-side agents while the agent it
   ships navigates by grep/glob and a heuristic repo_map; expose the structural
   index as `graph_query`/`graph_path`/`graph_explain` tools, re-ground
@@ -1387,7 +1404,7 @@ and branching without defined crash semantics is undefined behavior.
   can score two retrieval arms; else BLOCKED. Core-design: PARTIAL — new tools
   are registry work; changing repo_map's ranking changes context assembly and
   ends by asking.
-- [ ] CYCLE R29 — Loop 29 research: LSP grounding and pre-apply validation —
+- [x] CYCLE R29 — Loop 29 research: LSP grounding and pre-apply validation —
   symbol-accurate navigation (definition/references/callers) replacing textual
   search for symbol questions, and edit validation BEFORE apply (syntax → lint
   → typecheck, edit rejected back to the model rather than committed and
@@ -1403,7 +1420,7 @@ and branching without defined crash semantics is undefined behavior.
   (needs no server) and records the LSP portion BLOCKED. Core-design: PARTIAL
   — making an edit conditional on typecheck changes edit semantics and ends by
   asking.
-- [ ] CYCLE R30 — Loop 30 research: certified and comparable measurement —
+- [x] CYCLE R30 — Loop 30 research: certified and comparable measurement —
   anytime-valid sequential certificates (stop at significance instead of a
   fixed N, which is the difference between affordable and unaffordable on one
   slow 27B endpoint), adoption of a real benchmark subset (DeepSWE / SWE-EVO /
@@ -1419,7 +1436,7 @@ and branching without defined crash semantics is undefined behavior.
   runtime and disk — without it that half records BLOCKED and the certificates
   half proceeds. Core-design: NO. NOTE: once shipped, loop 30's certificate
   machinery is MANDATORY for every quality claim in loops 31-36.
-- [ ] CYCLE R31 — Loop 31 research: fork-and-branch execution — a `branch`
+- [x] CYCLE R31 — Loop 31 research: fork-and-branch execution — a `branch`
   primitive defined against the existing checkpoint+journal pair so a branch is
   a REPLAYABLE object rather than a copied process; what is shared (transcript
   prefix, prompt-cache prefix, filesystem snapshot) versus copied; discard
@@ -1435,7 +1452,7 @@ and branching without defined crash semantics is undefined behavior.
   either was BLOCKED, R31 records BLOCKED rather than building forking on
   undefined crash semantics. Core-design: YES (forking in-flight run state is
   session and journal semantics) — R31 ENDS BY ASKING.
-- [ ] CYCLE R32 — Loop 32 research: best-of-N with an execution verifier —
+- [x] CYCLE R32 — Loop 32 research: best-of-N with an execution verifier —
   `p -> 1-(1-p)^N` fan-out over `delegate_batch`, candidates ranked by running
   the task's verify command (execution-based) with execution-free reranking
   where no test exists, per-candidate isolation via loop 31's branch, early
@@ -1451,7 +1468,7 @@ and branching without defined crash semantics is undefined behavior.
   READ-ONLY fan-out (analysis/review tasks that mutate nothing) and records the
   mutating case BLOCKED. Core-design: YES ("one prompt produces N runs and one
   answer" changes what a run is, and multiplies cost) — R32 ENDS BY ASKING.
-- [ ] CYCLE R33 — Loop 33 research: generative verifiers, rubrics, step-level
+- [x] CYCLE R33 — Loop 33 research: generative verifiers, rubrics, step-level
   rewards — a generative verifier on `delegate role=critic` scoring candidates
   in [0,1] with justification, task rubrics as the contextual verifier where
   execution cannot judge, hybrid scoring (execution dominates, rubric breaks
@@ -1467,7 +1484,7 @@ and branching without defined crash semantics is undefined behavior.
   loop 32 closed (a selection point exists) and loop 30's certificates exist.
   Core-design: PARTIAL — a model-scored gate deciding whether work is ACCEPTED
   is adjacent to approval semantics and ends by asking; ranking alone does not.
-- [ ] CYCLE R34 — Loop 34 research: corrections compiled into enforcement — a
+- [x] CYCLE R34 — Loop 34 research: corrections compiled into enforcement — a
   correction taxonomy (mechanically enforceable / partially enforceable /
   irreducibly advisory), a compilation path correction -> proposed rule -> USER
   CONFIRMATION -> `permissions.rules` entry with provenance, and rule
@@ -1484,7 +1501,7 @@ and branching without defined crash semantics is undefined behavior.
   lessons were deleted there, this loop builds on the permissions engine
   alone, which is sufficient. Core-design: PARTIAL — rules the agent authors
   for itself change what the permission layer IS, and that ends by asking.
-- [ ] CYCLE R35 — Loop 35 research: adaptive memory management — an adaptive
+- [x] CYCLE R35 — Loop 35 research: adaptive memory management — an adaptive
   write/retain/evict policy replacing tag-overlap heuristics, continual
   learning measured over a TASK STREAM rather than isolated tasks, and honest
   cross-domain transfer tested against loop 18's foreign repos (the failure
@@ -1499,7 +1516,7 @@ and branching without defined crash semantics is undefined behavior.
   memory fighting an undefined GC policy is unmeasurable) AND >=2 repos' worth
   of history exists (loop 18). Core-design: PARTIAL for a new strategy in the
   registry; YES for a cross-repo store — that ends by asking.
-- [ ] CYCLE R36 — Loop 36 research: learned context assembly — assembly as an
+- [x] CYCLE R36 — Loop 36 research: learned context assembly — assembly as an
   explicit swappable, scored policy (loop 5's strategy matrix is the vehicle)
   instead of hand-ordered parts; per-task-class assembly (a review task and an
   edit task do not want the same window); budget allocation across sources
@@ -1515,7 +1532,7 @@ and branching without defined crash semantics is undefined behavior.
   deliberately last — if the budget runs out, THIS is the loop to drop.
   Core-design: YES (context assembly is the architecture the CLI is built
   around) — R36 ENDS BY ASKING.
-- [ ] CYCLE R37 — Loop 37 research + closing acceptance: v3.0 — full A1-A20 plus
+- [x] CYCLE R37 — Loop 37 research + closing acceptance: v3.0 — full A1-A20 plus
   every loop-2..36 criterion live with zero BLOCKED (or an individually
   justified exception list), the register current with each loop-28..36 row
   carrying LOCAL number / PUBLISHED number / GAP per R-G, a cost table per R-F,

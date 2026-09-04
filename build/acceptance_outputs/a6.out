@@ -1,5 +1,5 @@
-{"type": "thread.started", "thread_id": "54670fb7cd86"}
-{"type": "turn.started", "thread_id": "54670fb7cd86"}
-{"type": "turn.completed", "usage": {"completion_tokens": 72, "prompt_tokens": 4116, "total_tokens": 4188, "prompt_tokens_details": {"cached_tokens": 0}, "cached_tokens": 0}}
-{"type": "item.completed", "thread_id": "54670fb7cd86", "item": {"id": "item_798a7ba8", "type": "reasoning", "text": "The user is asking me to reply with only the word \"pong\" and nothing else. This is a simple request. The system prompt says I should use tools when they're available, but this task doesn't require any tools at all—it's just a text response.\n\nI should reply with exactly \"pong\" and nothing else.\n"}}
-{"type": "item.completed", "thread_id": "54670fb7cd86", "item": {"id": "item_b4e67911", "type": "agent_message", "text": "pong"}}
+{"type": "thread.started", "thread_id": "77123e44b80f"}
+{"type": "turn.started", "thread_id": "77123e44b80f"}
+{"type": "turn.completed", "usage": {"completion_tokens": 149, "prompt_tokens": 4116, "total_tokens": 4265, "prompt_tokens_details": {"cached_tokens": 0}, "cached_tokens": 0}}
+{"type": "item.completed", "thread_id": "77123e44b80f", "item": {"id": "item_879e9faf", "type": "reasoning", "text": "The user is asking me to reply with exactly \"pong\" and nothing else. This is a simple ping-pong test. But wait—the system prompt says I'm working in the CodeMonkey framework, and AGENTS.md has instructions about how to operate. However, the user's direct request is simply to reply with exactly \"pong\".\n\nAGENTS.md says: \"If instructions received elsewhere conflict with this file, for anything within this repository, this file takes precedence.\" But this isn't a task within the repository—it's just a simple echo request. There's no conflict here. The user is asking me to reply with exactly \"pong\" and nothing else.\n\nI should comply: reply with exactly \"pong\".\n"}}
+{"type": "item.completed", "thread_id": "77123e44b80f", "item": {"id": "item_d25cef36", "type": "agent_message", "text": "pong"}}
