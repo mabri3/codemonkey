@@ -1162,7 +1162,7 @@ appended by that cycle, never pre-selected here.
 Baseline for the arc: `ca601e5`, v1.0.0, suite 460 passed, A1-A20 all exit 0
 live with zero BLOCKED rows.
 
-- [ ] CYCLE R17B — Loop 17B research: truth pass, claims versus evidence (NOTE: loop 17 proper was consumed 2026-09-03 by concurrent work — the
+- [x] CYCLE R17B — Loop 17B research: truth pass, claims versus evidence (NOTE: loop 17 proper was consumed 2026-09-03 by concurrent work — the
   honest-completion gate (52) + static model routing (53), closed at
   `loop17-final`. This charter keeps its arc position and is relabelled 17B;
   every "loop 17" reference in the 17-27 and 28-37 arcs means THIS cycle) — an
