@@ -217,6 +217,66 @@ def review(
 
 
 @app.command()
+def graph(
+    symbol: Annotated[
+        str,
+        typer.Argument(help="Symbol/file/concept to look up in graphify-out/."),
+    ],
+    to: Annotated[
+        Optional[str],
+        typer.Option("--to", help="With --path: end symbol of the relation path."),
+    ] = None,
+    max_results: Annotated[
+        int,
+        typer.Option("--max-results", help="Maximum edges to print."),
+    ] = 20,
+) -> None:
+    """Print code-graph facts for SYMBOL from graphify-out/ (no model needed).
+
+    Plain lookup: nodes matching the symbol + their edges. With `--to SYM2`:
+    the shortest relation path SYMBOL -> SYM2. Reports `[stale]` in-band when
+    the graph is older than HEAD; refuses honestly when there is no graph.
+    """
+    from . import graphquery
+    from .tools.graph import _check_staleness
+
+    cwd = Path.cwd()
+    gdir = graphquery.find_graph_dir(cwd)
+    if gdir is None:
+        typer.secho("error: no graphify-out/ graph in this workspace "
+                    "(build one with `graphify .`)", err=True, fg=typer.colors.RED)
+        raise typer.Exit(2)
+    stale = _check_staleness(gdir, cwd)
+    if stale:
+        typer.secho(stale, err=True, fg=typer.colors.YELLOW)
+    graph = graphquery.load_graph(gdir)
+    if to:
+        from .tools.graph import graph_path_lookup
+
+        res = graph_path_lookup(cwd, symbol, to, max_depth=6)
+        if not res["ok"]:
+            typer.secho(f"error: {res['error']}", err=True, fg=typer.colors.RED)
+            raise typer.Exit(1)
+        typer.echo("path: " + " -> ".join(res["path"]))
+        return
+    res = graphquery.graph_query(graph, symbol, max_results=max_results)
+    if not res["matches"]:
+        typer.echo(f"(no node matches '{symbol}')")
+        raise typer.Exit(1)
+    for nid, n in list(res["matches"].items())[:10]:
+        src = n.get("src", n.get("loc", ""))
+        label = n.get("label", n.get("name", ""))
+        line = nid + (f" [{label}]" if label and label != nid else "")
+        if src:
+            line += f" ({src})"
+        typer.echo(line)
+    for e in res["edges"][:max_results]:
+        rel = e.get("relation", e.get("type", ""))
+        typer.echo(f"- {e.get('source', '?')} -> {e.get('target', '?')}"
+                   + (f" [{rel}]" if rel else ""))
+
+
+@app.command()
 def undo(
     list_only: Annotated[
         bool,

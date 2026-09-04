@@ -51,7 +51,9 @@ def test_required_arguments_are_declared(name, required):
 def test_declared_properties_match_what_the_tool_reads():
     """Guard against schema drift: every declared arg is named in the source."""
     for name, schema in PARAMS.items():
-        src = inspect.getsource(_MODULES[name])
+        # cycle 74: multi-tool modules register shim classes exposing .run —
+        # grade the code that actually reads the args (the run function).
+        src = inspect.getsource(_MODULES[name].run)
         for prop in schema["properties"]:
             assert f'"{prop}"' in src or f"'{prop}'" in src, f"{name}.{prop} unused"
 

@@ -1,0 +1,24 @@
+{
+  "tool_trace": [
+    "graph_query"
+  ],
+  "exit_code": 0,
+  "events": [
+    "thread.started",
+    "turn.started",
+    "turn.started",
+    "turn.completed",
+    "turn.completed",
+    "notice",
+    "notice",
+    "tool.started",
+    "item.started",
+    "tool.completed",
+    "item.completed",
+    "turn.started",
+    "turn.started",
+    "turn.completed",
+    "turn.completed",
+    "item.completed"
+  ]
+}

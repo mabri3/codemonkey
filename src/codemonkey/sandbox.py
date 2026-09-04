@@ -27,7 +27,8 @@ from typing import Optional
 LEVELS = ("read-only", "workspace-write", "danger-full-access")
 
 _READ_TOOLS = frozenset(
-    {"read_file", "list_dir", "glob", "search", "update_plan", "web_fetch", "repo_map", "update_memory"}
+    {"read_file", "list_dir", "glob", "search", "update_plan", "web_fetch", "repo_map", "update_memory",
+     "graph_query", "graph_path", "graph_explain"}
 )
 _WRITE_TOOLS = frozenset({"write_file", "edit_file"})
 _SHELL_TOOLS = frozenset({"shell"})

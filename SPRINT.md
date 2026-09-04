@@ -177,6 +177,38 @@ and run every CLI-level probe (the probe grammar still forbids pytest-only
 satisfaction: in-process CliRunner + fake provider + real `run_exec` counts as
 an entry-point probe).
 
+**Cycle 74 review gate (added 2026-09-04)** — cycle 74 (loop 38, graph tools)
+is IN FLIGHT and uncommitted with a red suite (`uv run pytest -q` → 4 failed,
+592 passed). Critic report: `build/critic-cycle74.md`; six findings appended to
+`build/plan.md` as cycles `74F1`-`74F6` plus `74F7` (close 74 properly). The
+load-bearing one is F1: `graph_path` and `graph_explain` are advertised in
+`tools.SPECS` but dispatch into the `graph_query` implementation and always
+fail — the same declared-but-unreachable defect class as critic-r37 F7, inside
+the cycle chartered to end it. Per the uncommitted-work rule these fixes land
+in cycle 74's OWN commit; 74 is not marked `[x]` until 74F7's probes pass.
+
+**Compounding arc — loops 46-50 (PROPOSED 2026-09-04, NOT AUTHORIZED)** —
+user brief: "propose the next improvement loops (46-50) … items that can truly
+10x the utility of codemonkey … look at the state of the art." Five research
+cycles `R46`-`R50` appended unchecked in `build/plan.md`. Charter:
+`build/loops-46-50-proposal.md`. Premise: loops 38-45 all improve a SINGLE run;
+this arc makes a run leave something behind that the next run picks up —
+46 the skill library (agent-synthesized tools, quarantined + gated + revocable)
+· 47 the ACE-style delta-curated playbook · 48 parallel-distill-refine (the
+correct form of loop 38's `--best-of`) · 49 provenance/taint-gated persistence
+· 50 continual-learning measurement + long-horizon suite + v5.0 acceptance.
+Rules R-A…R-I carry over; **R-J** (anything the agent writes that outlives the
+run enters quarantined, is admitted by a mechanical gate, records provenance,
+and is revocable by one command) and **R-K** ("learned" requires forward
+transfer AND a retention check under R-H's statistic, else say "changed") are
+added. Self-modifying scaffold (Darwin Godel Machine) was CONSIDERED AND
+REJECTED for this arc — it is a core-design change requiring its own
+authorization. R46 research is DONE (2026-09-04): `build/research-loop46.md`
+committed; `loop46:` build cycles 82-87 appended — 82 skill store · 83
+admission gate · 84 `skill_create` + `skills` strategy domain · 85 coarse taint
+rule · 86 revocation CLI · 87 R-K measurement + acceptance. **Ordering is
+binding: nothing in this arc starts before loop 45's v4.0 acceptance.**
+
 ## Ticks (every 5 min)
 
 Heartbeats are ~12/h but most are no-ops (check state, exit); cost is

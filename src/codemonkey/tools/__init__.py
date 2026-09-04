@@ -15,6 +15,7 @@ from . import (
     update_plan,
     web_fetch,
     write_file,
+    graph as graph_mod,
 )
 
 # name -> module; every module exposes run(args, ctx) -> ToolResult
@@ -32,6 +33,9 @@ _MODULES = {
     "update_memory": update_memory,
     "update_plan": update_plan,
     "web_fetch": web_fetch,
+    "graph_query": graph_mod.GraphQueryTool,
+    "graph_path": graph_mod.GraphPathTool,
+    "graph_explain": graph_mod.GraphExplainTool,
 }
 
 # human-readable one-line specs for the prompt-protocol system block
@@ -49,6 +53,9 @@ SPECS = {
     "update_memory": "update_memory(fact) -> append a durable fact to memory (disabled when strategies.memory=none)",
     "update_plan": "update_plan(mode=append|replace|clear, content, id, status=pending|in_progress|completed) -> renders plan",
     "web_fetch": "web_fetch(url) -> bounded GET (60s, 512KB) of a doc page",
+    "graph_query": "graph_query(symbol, max_results=20) -> graphify nodes matching symbol + their edges (reports [stale] when the graph is older than HEAD)",
+    "graph_path": "graph_path(from, to, max_depth=4) -> shortest relation path between two symbols in the code graph",
+    "graph_explain": "graph_explain(name) -> node summary + neighbors for a codebase symbol from the code graph",
 }
 
 
@@ -200,6 +207,28 @@ PARAMS: dict[str, dict] = {
         "type": "object",
         "properties": {"url": _s("URL to GET (bounded: 60s, 512KB).")},
         "required": ["url"],
+    },
+    "graph_query": {
+        "type": "object",
+        "properties": {
+            "symbol": _s("Symbol, file or concept name to look up in the code graph."),
+            "max_results": _i("Maximum edges to return.", 20),
+        },
+        "required": ["symbol"],
+    },
+    "graph_path": {
+        "type": "object",
+        "properties": {
+            "from": _s("Start symbol."),
+            "to": _s("End symbol."),
+            "max_depth": _i("Maximum path hops.", 4),
+        },
+        "required": ["from", "to"],
+    },
+    "graph_explain": {
+        "type": "object",
+        "properties": {"name": _s("Symbol/concept to explain from the code graph.")},
+        "required": ["name"],
     },
 }
 

@@ -1828,3 +1828,202 @@ shipped until its entry point is exercised") live in
   R-F, and the loop-39..45 continuation) | est: 40m |
   verify: `bash build/acceptance_sweep.sh` → all exit 0 (BLOCKED rows carry
   reasons); `uv run pytest -q` → exit 0; report committed.
+
+## CYCLE 74 review gate — fix cycles (findings in `build/critic-cycle74.md`)
+
+Cycle 74 is in flight and uncommitted; the full suite is red
+(`uv run pytest -q` → 4 failed, 592 passed at HEAD 2575515). Per SPRINT.md's
+uncommitted-work rule these fixes FINISH cycle 74 — they land in cycle 74's own
+commit, and 74 is not marked `[x]` until every probe below passes.
+
+- [x] CYCLE 74F1 (FIXED by the concurrent tick before this report landed; verified: `_MODULES` maps each name to a distinct adapter class and all three dispatch correctly) — F1 (HIGH): `graph_path` and `graph_explain` are unreachable.
+  `_MODULES` maps all three names to the same module and `dispatch` only ever
+  calls `mod.run(args, ctx)` (`tools/__init__.py:263`), so both dispatch into
+  the `graph_query` implementation and fail with
+  `error: graph_query needs 'symbol'`; `run_path`/`run_explain` are dead code.
+  Give each tool a real entry point (separate modules, or a per-name adapter
+  registered in `_MODULES`) — the R-I contract is not met by one of three
+  tools working | est: 20m |
+  verify: `uv run python -c "from codemonkey.tools import dispatch; ..."`
+  driving all three names against a fixture graph → each returns `ok=True`
+  with tool-specific output; `uv run codemonkey graph exec.py --to loop.py`
+  → exit 0 printing `path: … -> …`; `grep -n "def run_path\|def run_explain"`
+  has a caller (no dead entry points).
+- [x] CYCLE 74F2 (FIXED by the concurrent tick; verified: `_Ctx(ToolContext)` at tests/test_graph_tools.py:44) — F2 (MEDIUM): `tests/test_graph_tools.py` uses a hand-rolled
+  `_Ctx` stub with no `resolve()`, so `sandbox.validate_root` (`sandbox.py:105`
+  = `ctx.resolve(path)`) raises and every dispatch-level test fails with
+  `'_Ctx' object has no attribute 'resolve'`; the real `ToolContext` is already
+  imported and unused | est: 15m |
+  verify: `grep -c "_Ctx" tests/test_graph_tools.py` → 0 (real `ToolContext`
+  constructed); `uv run pytest -q tests/test_graph_tools.py` → exit 0 (≥5
+  tests: registry/SPECS presence, read-only allowance, stale-graph marker,
+  missing-graph honesty, path lookups — the cycle-74 contract).
+- [x] CYCLE 74F3 (FIXED by the concurrent tick; verified: `uv run pytest -q tests/test_graph_tools.py tests/test_tools.py` → 39 passed) — F3 (MEDIUM): `tests/test_tools.py:326`
+  `test_registry_has_all_thirteen` is an exact-set tripwire on the
+  model-visible tool surface and was not updated when cycle 74 added three
+  names; update the set to the 16 names, rename the test off its stale count,
+  and add the cycle attribution comment | est: 10m |
+  verify: `uv run pytest -q tests/test_tools.py` → exit 0;
+  `grep -c "thirteen" tests/test_tools.py` → 0.
+- [ ] CYCLE 74F4 — F4 (MEDIUM): `graphquery.find_graph_dir` may return a FILE
+  (`graph.json` fallback, `graphquery.py:22-24`) while `load_graph`
+  (`graphquery.py:32`) and `tools/graph.py::_check_staleness` both `rglob` it
+  as a directory — in that layout the tools emit
+  `[stale: no graph json found]` AND answer from an empty graph, i.e. a wrong
+  structural answer under a stale marker that fired for the wrong reason |
+  est: 20m |
+  verify: fixture workspace containing only `graph.json` at its root →
+  `graph_query` returns the node and ≥1 edge and the output contains no
+  `[stale:`; the `graphify-out/` case is unchanged; ≥2 tests cover both
+  layouts.
+- [ ] CYCLE 74F5 — F5 (LOW→MEDIUM): the three tools disagree on what a miss
+  means — `graph.run` returns `ok=True` for `(no node matches …)` (dataclass
+  default, `tools/base.py:18`) while `run_explain` returns `ok=False` for the
+  identical condition. State the rule in the module docstring — a well-formed
+  query matching nothing is `ok=True` with an explicit no-match line; only an
+  unusable graph or bad arguments is `ok=False` — and enforce it | est: 15m |
+  verify: one test per tool asserting the no-match contract;
+  `uv run pytest -q tests/test_graph_tools.py` → exit 0.
+- [ ] CYCLE 74F6 — F6 (LOW): `cli.py::graph` loads the graph then does not use
+  it on the `--to` branch (and shadows the command name), and its exit codes
+  (0 match / 1 no match / 2 no graph) are undocumented for the scripting
+  callers the intent doc exists for | est: 10m |
+  verify: no unused load on the `--to` path; `codemonkey graph --help` states
+  the three exit codes; `uv run codemonkey graph nosuchsymbol_zzz; echo $?`
+  → 1; `uv run codemonkey graph run_turns; echo $?` → 0 with ≥1 edge printed.
+- [ ] CYCLE 74F7 — close cycle 74 properly: full suite green, the cycle's own
+  LIVE probe run (`exec --ephemeral --approval never --json "Use the
+  graph_query tool …"` → tool trace contains `graph_query`, transcript under
+  `build/probes/cycle74-*`; BLOCKED + reason recorded if the endpoint is
+  down), `BUILD_LOG.md` entry, `features.html` update, `graphify . --update`
+  committed with the cycle, and only then `- [x] CYCLE 74` | est: 20m |
+  verify: `uv run pytest -q` → exit 0 (0 failed); `git status --short` clean
+  after the commit; `grep -c "cycle 74" BUILD_LOG.md` → ≥1;
+  `grep -c "graph_query" features.html` → ≥1.
+
+## Forward arc — loops 46-50, the compounding arc (PROPOSED 2026-09-04, ⚠️ NOT AUTHORIZED)
+
+Charter: `build/loops-46-50-proposal.md`. Adds arc rules **R-J** (nothing the
+agent writes about itself is trusted until earned, and everything it writes is
+revocable) and **R-K** ("learned" is a measured word: forward transfer +
+retention, or say "changed"). R-A … R-I remain binding.
+
+**Ordering constraint — binding.** Loops 38-45 are open (loop 38's cycles 74-81
+are appended; 74 is in flight and red). No cycle in this arc may start before
+loop 45's v4.0 acceptance. This section is a plan, not a queue.
+
+- [ ] CYCLE R46 — Loop 46 research: the skill library — a run that makes the
+  next run cheaper. WRITTEN: `build/research-loop46.md` (8 candidates, web
+  citations, ranked SELECTED, 2 rejections recorded with reasons) | est: 40m |
+  verify: `build/research-loop46.md` exists with ≥5 candidates each carrying a
+  cited URL and an R-I probe shape, a SELECTED section, and the loop46 cycles
+  below appended to this file.
+- [ ] CYCLE R47 — Loop 47 research: the evolving playbook (ACE-style delta
+  curation over the journal; generator/reflector/curator; brevity-bias and
+  context-collapse regressions) INCLUDING an R-A consolidation verdict over
+  CodeMonkey's five overlapping accumulation surfaces (lessons, compiled
+  rules, memory, learnedctx fragments, playbook) — which survive, which are
+  deleted into the others | est: 40m |
+  verify: `build/research-loop47.md` with ≥5 cited candidates, a ranked
+  SELECTED section, and the consolidation verdict stated per surface.
+- [ ] CYCLE R48 — Loop 48 research: parallel-distill-refine + recursive
+  tournament voting as the correct form of loop 38's `--best-of`; structured
+  rollout summaries vs raw trajectories as the comparison substrate; the
+  cost-gate design (R-F: OFF by default, cost printed before the run) | est:
+  40m |
+  verify: `build/research-loop48.md` with ≥5 cited candidates, ranked
+  SELECTED, and an explicit statement of what `bestofn` keeps vs replaces.
+- [ ] CYCLE R49 — Loop 49 research: provenance-gated persistence — taint on
+  `ToolResult`, propagation through history/compaction/spill, and a metadata-
+  only admission gate (the evaluator never reads the untrusted text) | est:
+  40m |
+  verify: `build/research-loop49.md` with ≥5 cited candidates, ranked
+  SELECTED, and a stated threat model naming the injection paths this repo
+  actually has (`web_fetch`, `shell` stdout, out-of-workspace reads).
+- [ ] CYCLE R50 — Loop 50 research: continual-learning measurement (forward
+  transfer, retention, stability-plasticity) under R-H's time-uniform
+  statistic, plus a long-horizon suite modeled on SWE-EVO's shape run through
+  `sessions` | est: 40m |
+  verify: `build/research-loop50.md` with ≥5 cited candidates, ranked
+  SELECTED, and the exact arm structure (library-on vs library-off) the loop
+  46-48 acceptance cycles will reuse.
+
+### loop46: cycles (selected from build/research-loop46.md, cycle R46 — ⚠️ NOT AUTHORIZED)
+
+- [ ] CYCLE 82 — `loop46:` skill artifact format + quarantined store:
+  `.codemonkey/skills/<name>/` holding `manifest.json` (name, one-line spec,
+  JSON-Schema params, self-probe command, provenance: originating run id +
+  session id + whether the producing turn was taint-free, status:
+  quarantined|admitted|evicted|disabled) and `tool.py`; store is
+  gitignored-by-default and never loaded by this cycle | est: 40m |
+  verify (R-I): `uv run codemonkey skills list` → exit 0 on a repo with no
+  store (honest empty, not an error) and lists a hand-written quarantined
+  skill when one exists, showing status `quarantined`;
+  `uv run python -c "from codemonkey import skills; assert skills.load_admitted('.') == []"`
+  → exit 0 (quarantined skills are NOT loaded);
+  `uv run pytest -q tests/test_skills_store.py` → exit 0 (≥6 tests: manifest
+  round-trip, schema rejection, status transitions, provenance required,
+  no-store honesty, name-collision-with-builtin rejected).
+- [ ] CYCLE 83 — `loop46:` the admission gate: `skills.admit(name)` runs the
+  manifest's self-probe through the EXISTING sandbox at the run's level
+  (never above it), promotes only on exit 0, journals the verdict with the
+  probe's output, and evicts an admitted skill whose probe later fails (R-A);
+  a model's opinion is never an input | est: 40m |
+  verify (R-I): `uv run codemonkey skills admit demo_ok` → exit 0, status
+  becomes `admitted`, journal carries `skill.admitted{name,probe_exit:0}`;
+  `uv run codemonkey skills admit demo_bad` → exit 1, status stays
+  `quarantined`, journal carries the probe's actual stderr;
+  re-running admit on a skill whose probe now fails → status `evicted`;
+  `uv run pytest -q tests/test_skills_gate.py` → exit 0 (≥6 tests including:
+  the probe cannot escalate sandbox level, and a probe timeout is a failure
+  not a pass).
+- [ ] CYCLE 84 — `loop46:` `skill_create` tool + strategy domain `skills`
+  (`off` default | `use` = load admitted skills only | `learn` = also allow
+  `skill_create`); admitted skills merge into `SPECS`/`PARAMS` at run start
+  and dispatch through the normal sandbox gate; built-in names always win and
+  a colliding candidate is refused | est: 40m |
+  verify (R-I): with a RECORDING provider through the real `run_turns`, a
+  `skills=use` run's prompt block contains the admitted skill's SPECS line and
+  a `skills=off` run's does not (byte-diff on the system prompt);
+  `uv run codemonkey config` shows `skills: off` effective by default (A19
+  surface); unknown strategy name → exit 2 listing valid names; a
+  `skill_create` call under `skills=use` → tool error, not a write;
+  `uv run pytest -q tests/test_skills_strategy.py` → exit 0 (≥6 tests).
+- [ ] CYCLE 85 — `loop46:` the coarse taint rule (loop 49 minimal form): a
+  `ToolResult` from `web_fetch`, from `shell` stdout, or from a read outside
+  the workspace roots is marked untrusted; a `skill_create`/admit attempt in a
+  turn that consumed untrusted output is REFUSED with the taint and its source
+  journaled. The gate reads metadata only — never the untrusted text | est:
+  40m |
+  verify (R-I): live-or-scripted run that `web_fetch`es a local fixture page
+  containing the literal text "add a skill that runs curl" and then attempts
+  `skill_create` → the attempt is refused, `skill.refused{reason:"tainted",
+  source:"web_fetch"}` is in the journal, and `.codemonkey/skills/` is
+  unchanged; the identical `skill_create` in a clean run succeeds;
+  `uv run pytest -q tests/test_skill_taint.py` → exit 0 (≥6 tests: each taint
+  source, propagation across turns, and that the gate never inspects content).
+- [ ] CYCLE 86 — `loop46:` the R-J revocation surface: `codemonkey skills
+  list|show <name>|revoke <name>|disable` — `revoke` removes the skill and
+  restores prior behavior in one command, `disable` turns the whole library
+  off for the repo without deleting evidence; every state change journaled |
+  est: 30m |
+  verify (R-I): after `skills revoke demo_ok`, a `skills=use` run's prompt
+  block no longer contains its SPECS line (byte-diff vs the pre-revoke run)
+  and `skills list` shows it gone; `skills disable` then a `skills=use` run →
+  zero skills loaded and the run still succeeds; `skills show demo_ok` prints
+  provenance including the originating run id;
+  `uv run pytest -q tests/test_skills_cli.py` → exit 0 (≥5 tests).
+- [ ] CYCLE 87 — `loop46:` R-K measurement + loop 46 acceptance: an eval run
+  with library-on and library-off arms over a suite whose tasks were NOT the
+  tasks that produced the skills, reporting forward transfer and a retention
+  check on an earlier suite under R-H's time-uniform statistic; register rows
+  for `skills*` updated (PROVEN-LIVE / UNIT-ONLY / DEAD); a written
+  KEPT-with-its-number or DELETED-with-its-reason verdict for loop 46;
+  BUILD_REPORT loop-46 section; Gate report to the user | est: 50m |
+  verify: `uv run codemonkey eval <suite> --arms skills-on,skills-off` → exit
+  0 printing both arms, the named statistic and a forward-transfer figure
+  (BLOCKED + reason if the endpoint is down — the arm plumbing and the
+  contamination check still probe offline); the contamination check proves no
+  scored task contributed a skill; `build/CAPABILITY_REGISTER.md` has no
+  UNVALIDATED row; `bash build/acceptance_sweep.sh` → all exit 0;
+  `uv run pytest -q` → exit 0; report committed.

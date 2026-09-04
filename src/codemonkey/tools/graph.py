@@ -1,0 +1,243 @@
+"""Graph-grounded retrieval tools (loop 28 → wired in loop 38, cycle 74).
+
+Exposes `graphify-out/graph.json` to the agent itself:
+  graph_query(symbol)  — pinned nodes + their edges (both ends)
+  graph_path(a, b)     — BFS multi-hop relation path between two symbols
+  graph_explain(name)  — the node + prose snippets that mention it
+
+If graphify-out/ is absent the tools say so honestly (no fake results). If the
+graph is older than HEAD (mtime of graph.json < the newest commit date), the
+output carries an in-band `[stale: ...]` marker — a stale graph is worse than
+none, so it is never silently trusted (AGENTS.md §graphify rule 2).
+"""
+
+from __future__ import annotations
+
+import subprocess
+from pathlib import Path
+
+from .base import ToolResult, _err
+from .. import graphquery
+
+# staleness: graph.json mtime vs last commit time (seconds of slack)
+_STALE_SLACK_S = 5.0
+
+
+def _check_staleness(graph_dir: Path, workdir: Path) -> str:
+    """Return '' when fresh (or undeterminable), else a human marker."""
+    try:
+        import os
+
+        graph_files = [p for p in Path(graph_dir).rglob("*.json")]
+        if not graph_files:
+            return "[stale: no graph json found]"
+        graph_mtime = max(os.path.getmtime(p) for p in graph_files)
+        r = subprocess.run(
+            ["git", "-C", str(workdir), "log", "-1", "--format=%ct"],
+            capture_output=True, text=True, timeout=10,
+        )
+        commit_ts = float(r.stdout.strip())
+    except Exception:
+        return ""  # cannot determine -> do not claim staleness
+    if graph_mtime < commit_ts - _STALE_SLACK_S:
+        return ("[stale: graph is older than HEAD; refresh with "
+                "`graphify . --update` before trusting structural answers]")
+    return ""
+
+
+def _fmt_node(n: dict) -> str:
+    nid = n.get("id", "?")
+    src = n.get("src", n.get("loc", ""))
+    label = n.get("label", n.get("name", ""))
+    return f"{nid}" + (f" [{label}]" if label and label != nid else "") + (
+        f" ({src})" if src else "")
+
+
+def _edges_text(edges: list, max_results: int) -> str:
+    if not edges:
+        return "(no edges recorded)"
+    out = []
+    for e in edges[:max_results]:
+        out.append(f"- {e.get('source','?')} -> {e.get('target','?')}"
+                   + (f" [{e.get('relation', e.get('type', ''))}]"
+                      if e.get("relation") or e.get("type") else ""))
+    return "\n".join(out)
+
+
+def run(args: dict, ctx) -> "object":
+    try:
+        from .base import ToolResult
+
+        symbol = str(args.get("symbol", "")).strip()
+        if not symbol:
+            return ToolResult(output="error: graph_query needs 'symbol'", ok=False)
+        from ..sandbox import validate_root
+
+        workdir = validate_root(ctx, ".")
+        gdir = graphquery.find_graph_dir(workdir)
+        if gdir is None:
+            return ToolResult(
+                output="error: no graphify-out/ graph in this workspace "
+                       "(build one with `graphify .`); refusing to guess "
+                       "structure without it",
+                ok=False,
+            )
+        stale = _check_staleness(gdir, workdir)
+        graph = graphquery.load_graph(gdir)
+        res = graphquery.graph_query(graph, symbol,
+                                     max_results=int(args.get("max_results", 20) or 20))
+        lines = []
+        if stale:
+            lines.append(stale)
+        if not res["matches"]:
+            lines.append(f"(no node matches '{symbol}')")
+        else:
+            lines.append(f"matches for '{symbol}':")
+            for nid, n in list(res["matches"].items())[:10]:
+                lines.append("  " + _fmt_node(n))
+            edges_txt = _edges_text(res["edges"], int(args.get("max_results", 20) or 20))
+            lines.append("edges:")
+            lines.append(edges_txt)
+        return ToolResult(output="\n".join(lines), meta={"stale": bool(stale)})
+    except Exception as e:
+        return _err(e)
+
+
+def graph_path_lookup(workdir, a: str, b: str, *, max_depth: int = 4) -> dict:
+    """Shortest relation path a -> b over graph edges (BFS). Staleness-aware."""
+    gdir = graphquery.find_graph_dir(workdir)
+    if gdir is None:
+        return {"ok": False, "error": "no graphify-out/ graph in this workspace",
+                "stale": ""}
+    stale = _check_staleness(gdir, Path(workdir))
+    graph = graphquery.load_graph(gdir)
+    nodes = graph["nodes"]
+    edges = graph["edges"]
+
+    def resolve(sym: str):
+        res = graphquery.graph_query(graph, sym, max_results=1)
+        if res["matches"]:
+            return next(iter(res["matches"]))
+        return None
+
+    sa, sb = resolve(a), resolve(b)
+    if sa is None or sb is None:
+        missing = [name for name, val in ((a, sa), (b, sb)) if val is None]
+        return {"ok": False,
+                "error": "unresolved endpoint(s): " + ", ".join(repr(m) for m in missing),
+                "stale": stale}
+    # BFS over adjacency
+    from collections import deque
+
+    adj: dict = {}
+    for e in edges:
+        adj.setdefault(e.get("source"), []).append(e.get("target"))
+    prev = {sa: None}
+    q = [sa]
+    depth = {sa: 0}
+    while q:
+        cur = q.pop(0)
+        if depth[cur] >= max_depth:
+            continue
+        for nxt in adj.get(cur, []):
+            if nxt not in prev:
+                prev[nxt] = cur
+                depth[nxt] = depth[cur] + 1
+                q.append(nxt)
+                if nxt == sb:
+                    q = []
+                    break
+    if sb not in prev:
+        return {"ok": False, "error": f"no path {a!r} -> {b!r} within {max_depth} hops",
+                "stale": stale}
+    path = []
+    n = sb
+    while n is not None:
+        path.append(n)
+        n = prev[n]
+    path.reverse()
+    return {"ok": True, "path": path, "stale": stale}
+
+
+def run_path(args: dict, ctx) -> "object":
+    try:
+        from .base import ToolResult
+
+        a = str(args.get("from", args.get("a", ""))).strip()
+        b = str(args.get("to", args.get("b", ""))).strip()
+        if not a or not b:
+            return ToolResult(output="error: graph_path needs 'from' and 'to'",
+                              ok=False)
+        from ..sandbox import validate_root
+
+        workdir = validate_root(ctx, ".")
+        res = graph_path_lookup(workdir, a, b,
+                                max_depth=int(args.get("max_depth", 4) or 4))
+        lines = []
+        if res.get("stale"):
+            lines.append(res["stale"])
+        if not res["ok"]:
+            lines.append(f"error: {res['error']}")
+            return ToolResult(output="\n".join(lines), ok=False)
+        lines.append("path: " + " -> ".join(res["path"]))
+        return ToolResult(output="\n".join(lines), meta={"stale": bool(res.get("stale"))})
+    except Exception as e:
+        return _err(e)
+
+
+def _explain_local(workdir, name: str) -> dict:
+    gdir = graphquery.find_graph_dir(workdir)
+    if gdir is None:
+        return {"ok": False, "error": "no graphify-out/ graph in this workspace",
+                "text": ""}
+    stale = _check_staleness(gdir, Path(workdir))
+    graph = graphquery.load_graph(gdir)
+    res = graphquery.graph_query(graph, name, max_results=20)
+    lines = []
+    if stale:
+        lines.append(stale)
+    if not res["matches"]:
+        lines.append(f"(no node matches '{name}')")
+    else:
+        for nid, n in list(res["matches"].items())[:5]:
+            lines.append(_fmt_node(n))
+            if n.get("summary"):
+                lines.append("  " + str(n["summary"])[:400])
+            elif n.get("doc"):
+                lines.append("  " + str(n["doc"])[:400])
+        edges_txt = _edges_text(res["edges"], 20)
+        lines.append("edges:")
+        lines.append(edges_txt)
+    return {"ok": bool(res["matches"]), "text": "\n".join(lines),
+            "stale": stale}
+
+
+def run_explain(args: dict, ctx) -> "object":
+    try:
+        from .base import ToolResult
+
+        name = str(args.get("name", args.get("symbol", ""))).strip()
+        if not name:
+            return ToolResult(output="error: graph_explain needs 'name'", ok=False)
+        from ..sandbox import validate_root
+
+        workdir = validate_root(ctx, ".")
+        res = _explain_local(workdir, name)
+        return ToolResult(output=res["text"] or res["error"], ok=res["ok"],
+                          meta={"stale": bool(res.get("stale"))})
+    except Exception as e:
+        return _err(e)
+
+
+# One module, three tool entry points: the registry maps each name to a shim
+# exposing the right `run` (dispatch calls `<entry>.run(args, ctx)`).
+class GraphQueryTool:
+    run = staticmethod(run)
+
+
+class GraphPathTool:
+    run = staticmethod(run_path)
+
+
+class GraphExplainTool:
+    run = staticmethod(run_explain)

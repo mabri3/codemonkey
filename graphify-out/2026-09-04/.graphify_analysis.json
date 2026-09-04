@@ -359,48 +359,6 @@
       "tests_test_r37_fixes_turn_init"
     ],
     "7": [
-      "argument",
-      "context",
-      "help",
-      "is_eager",
-      "option",
-      "src_codemonkey_cli",
-      "src_codemonkey_cli_callback",
-      "src_codemonkey_cli_config",
-      "src_codemonkey_cli_dispatch_exec_resume",
-      "src_codemonkey_cli_exec",
-      "src_codemonkey_cli_exec_resume",
-      "src_codemonkey_cli_exec_resume_alias",
-      "src_codemonkey_cli_exectypergroup",
-      "src_codemonkey_cli_exectypergroup_resolve_command",
-      "src_codemonkey_cli_main",
-      "src_codemonkey_cli_models",
-      "src_codemonkey_cli_py_command",
-      "src_codemonkey_cli_py_path",
-      "src_codemonkey_cli_rationale_1",
-      "src_codemonkey_cli_rationale_148",
-      "src_codemonkey_cli_rationale_178",
-      "src_codemonkey_cli_rationale_226",
-      "src_codemonkey_cli_rationale_383",
-      "src_codemonkey_cli_rationale_407",
-      "src_codemonkey_cli_rationale_458",
-      "src_codemonkey_cli_rationale_600",
-      "src_codemonkey_cli_rationale_666",
-      "src_codemonkey_cli_rationale_765",
-      "src_codemonkey_cli_rationale_807",
-      "src_codemonkey_cli_rationale_90",
-      "src_codemonkey_cli_rationale_937",
-      "src_codemonkey_cli_rationale_966",
-      "src_codemonkey_cli_rationale_997",
-      "src_codemonkey_cli_resume_dispatch",
-      "src_codemonkey_cli_review",
-      "src_codemonkey_cli_run_exec_or_exit",
-      "src_codemonkey_cli_sessions",
-      "src_codemonkey_cli_status",
-      "src_codemonkey_cli_undo",
-      "src_codemonkey_cli_version_callback"
-    ],
-    "8": [
       "providererror",
       "src_codemonkey_loop_looks_like_tools_rejection",
       "tests_test_protocol_test_looks_like_tools_rejection",
@@ -440,6 +398,45 @@
       "tests_test_retry_test_tools_500_raises_immediately_no_retry",
       "tests_test_retry_test_transport_error_exhausted_reports_attempts",
       "tests_test_retry_test_transport_error_is_retried_then_succeeds"
+    ],
+    "8": [
+      "argument",
+      "context",
+      "help",
+      "is_eager",
+      "option",
+      "src_codemonkey_cli",
+      "src_codemonkey_cli_callback",
+      "src_codemonkey_cli_config",
+      "src_codemonkey_cli_dispatch_exec_resume",
+      "src_codemonkey_cli_exec",
+      "src_codemonkey_cli_exec_resume",
+      "src_codemonkey_cli_exec_resume_alias",
+      "src_codemonkey_cli_main",
+      "src_codemonkey_cli_models",
+      "src_codemonkey_cli_py_command",
+      "src_codemonkey_cli_py_path",
+      "src_codemonkey_cli_rationale_1",
+      "src_codemonkey_cli_rationale_148",
+      "src_codemonkey_cli_rationale_178",
+      "src_codemonkey_cli_rationale_226",
+      "src_codemonkey_cli_rationale_383",
+      "src_codemonkey_cli_rationale_407",
+      "src_codemonkey_cli_rationale_600",
+      "src_codemonkey_cli_rationale_666",
+      "src_codemonkey_cli_rationale_765",
+      "src_codemonkey_cli_rationale_807",
+      "src_codemonkey_cli_rationale_90",
+      "src_codemonkey_cli_rationale_937",
+      "src_codemonkey_cli_rationale_966",
+      "src_codemonkey_cli_rationale_997",
+      "src_codemonkey_cli_resume_dispatch",
+      "src_codemonkey_cli_review",
+      "src_codemonkey_cli_run_exec_or_exit",
+      "src_codemonkey_cli_sessions",
+      "src_codemonkey_cli_status",
+      "src_codemonkey_cli_undo",
+      "src_codemonkey_cli_version_callback"
     ],
     "9": [
       "src_codemonkey_providers_init_build_provider",
@@ -589,6 +586,39 @@
       "tests_test_tools_test_write_file_denied_read_only"
     ],
     "13": [
+      "baseexception",
+      "src_codemonkey_journal",
+      "src_codemonkey_journal_args_key",
+      "src_codemonkey_journal_classify_error",
+      "src_codemonkey_journal_find_outcome",
+      "src_codemonkey_journal_journal_dir",
+      "src_codemonkey_journal_journal_path",
+      "src_codemonkey_journal_list_threads",
+      "src_codemonkey_journal_py_path",
+      "src_codemonkey_journal_rationale_1",
+      "src_codemonkey_journal_rationale_36",
+      "src_codemonkey_journal_rationale_52",
+      "src_codemonkey_journal_rationale_74",
+      "src_codemonkey_journal_rationale_99",
+      "src_codemonkey_journal_record",
+      "tests_test_idempotency_test_key_stability_and_distinction",
+      "tests_test_journal",
+      "tests_test_journal_cli_test_list_threads",
+      "tests_test_journal_jhome",
+      "tests_test_journal_py_fixture",
+      "tests_test_journal_rationale_1",
+      "tests_test_journal_rationale_55",
+      "tests_test_journal_test_args_never_stored_raw",
+      "tests_test_journal_test_error_classes",
+      "tests_test_journal_test_find_outcome_replay_source",
+      "tests_test_journal_test_intent_before_outcome_ordering",
+      "tests_test_journal_test_journal_survives_kill9",
+      "tests_test_journal_test_thread_isolation_and_list",
+      "tests_test_journal_wiring_rationale_117",
+      "tests_test_journal_wiring_test_run_scope_changes_the_idempotency_key",
+      "tests_test_journal_wiring_test_same_run_replay_still_hits"
+    ],
+    "14": [
       "tests_test_cycle6",
       "tests_test_cycle6_fp_fixture",
       "tests_test_cycle6_py_fixture",
@@ -621,7 +651,7 @@
       "tests_test_cycle6_test_validate_wrong_type",
       "tests_test_cycle6_tmp_sessions"
     ],
-    "14": [
+    "15": [
       "src_codemonkey_repomap",
       "src_codemonkey_repomap_cache_path",
       "src_codemonkey_repomap_format_map",
@@ -653,7 +683,7 @@
       "tests_test_repomap_relevance_test_relevance_overrides_recency",
       "tests_test_repomap_relevance_test_score_counts_path_and_symbols"
     ],
-    "15": [
+    "16": [
       "tests_test_prefix_stability",
       "tests_test_prefix_stability_badjsonthengood",
       "tests_test_prefix_stability_badjsonthengood_chat",
@@ -685,7 +715,7 @@
       "tests_test_prefix_stability_turn",
       "tests_test_prefix_stability_turn_init"
     ],
-    "16": [
+    "17": [
       "src_codemonkey_cli_eval",
       "src_codemonkey_cli_rationale_289",
       "src_codemonkey_matrix",
@@ -716,7 +746,7 @@
       "tests_test_matrix_turn_init",
       "tests_test_matrix_write_suite"
     ],
-    "17": [
+    "18": [
       "src_codemonkey_tools_delegate",
       "src_codemonkey_tools_delegate_py_toolresult",
       "src_codemonkey_tools_delegate_rationale_1",
@@ -747,7 +777,7 @@
       "tests_test_roles_test_role_framings_content",
       "tests_test_roles_test_unknown_role_rejected"
     ],
-    "18": [
+    "19": [
       "src_codemonkey_digest",
       "src_codemonkey_digest_build_digest",
       "src_codemonkey_digest_cli",
@@ -777,7 +807,7 @@
       "tests_test_watch_digest_test_render_multi_sections",
       "tests_test_watch_digest_whome"
     ],
-    "19": [
+    "20": [
       "src_codemonkey_sandbox",
       "src_codemonkey_sandbox_can",
       "src_codemonkey_sandbox_check",
@@ -807,7 +837,7 @@
       "tests_test_sandbox_ws",
       "tests_test_tools_test_sandbox_can_matrix"
     ],
-    "20": [
+    "21": [
       "chatturn",
       "providerbase",
       "src_codemonkey_loop_fallbackrecorded",
@@ -836,7 +866,7 @@
       "tests_test_verify_gate_writethendone_init",
       "toolcontext"
     ],
-    "21": [
+    "22": [
       "src_codemonkey_cli_cfg",
       "src_codemonkey_config",
       "src_codemonkey_config_configerror",
@@ -863,7 +893,7 @@
       "tests_test_config_test_user_config_then_project_overrides",
       "tests_test_retry_test_config_default_and_env_override"
     ],
-    "22": [
+    "23": [
       "src_codemonkey_redact",
       "src_codemonkey_redact_cli_py_command",
       "src_codemonkey_redact_cli_py_path",
@@ -890,7 +920,7 @@
       "tests_test_hardening_test_redaction_noop_when_clean",
       "tests_test_hardening_test_threat_model_exists"
     ],
-    "23": [
+    "24": [
       "src_codemonkey_status_mod",
       "src_codemonkey_status_mod_collect",
       "src_codemonkey_status_mod_collect_latest_sessions",
@@ -917,7 +947,7 @@
       "tests_test_watch_digest_test_collect_latest_sessions_newest_first",
       "tests_test_watch_digest_test_render_frame_pure"
     ],
-    "24": [
+    "25": [
       "src_codemonkey_strategies_compaction_rationale_91",
       "src_codemonkey_strategies_compaction_slidingwindowcompaction",
       "src_codemonkey_strategies_compaction_slidingwindowcompaction_init",
@@ -943,7 +973,7 @@
       "tests_test_strategies_test_sliding_window_below_keep_is_noop_copy",
       "tests_test_strategies_test_sliding_window_drops_old_keeps_last_n"
     ],
-    "25": [
+    "26": [
       "tests_test_exec",
       "tests_test_exec_failprovider",
       "tests_test_exec_fakeprovider",
@@ -969,7 +999,7 @@
       "tests_test_exec_test_output_schema_flag_is_usage_error_until_cycle6",
       "tests_test_exec_test_run_error_exits_1"
     ],
-    "26": [
+    "27": [
       "src_codemonkey_approvals_decide",
       "src_codemonkey_approvals_rationale_58",
       "tests_test_approvals",
@@ -993,31 +1023,6 @@
       "tests_test_approvals_test_untrusted_gates_shell_and_writes",
       "tests_test_approvals_turn",
       "tests_test_approvals_turn_init"
-    ],
-    "27": [
-      "src_codemonkey_journal_class_summary",
-      "src_codemonkey_journal_cli",
-      "src_codemonkey_journal_cli_journal_list",
-      "src_codemonkey_journal_cli_journal_show",
-      "src_codemonkey_journal_cli_journal_tail",
-      "src_codemonkey_journal_cli_py_command",
-      "src_codemonkey_journal_cli_rationale_1",
-      "src_codemonkey_journal_cli_rationale_16",
-      "src_codemonkey_journal_cli_rationale_26",
-      "src_codemonkey_journal_cli_rationale_34",
-      "src_codemonkey_journal_rationale_134",
-      "src_codemonkey_journal_read_thread",
-      "tests_test_journal",
-      "tests_test_journal_cli_test_class_summary_counts",
-      "tests_test_journal_jhome",
-      "tests_test_journal_py_fixture",
-      "tests_test_journal_rationale_1",
-      "tests_test_journal_rationale_55",
-      "tests_test_journal_rationale_89",
-      "tests_test_journal_test_class_summary",
-      "tests_test_journal_test_intent_before_outcome_ordering",
-      "tests_test_journal_test_journal_survives_kill9",
-      "tests_test_journal_test_loop_writes_journal_records"
     ],
     "28": [
       "src_codemonkey_checkpoints",
@@ -1138,28 +1143,6 @@
       "tests_test_budget_test_yaml_block_render"
     ],
     "33": [
-      "src_codemonkey_journal",
-      "src_codemonkey_journal_args_key",
-      "src_codemonkey_journal_find_outcome",
-      "src_codemonkey_journal_journal_dir",
-      "src_codemonkey_journal_journal_path",
-      "src_codemonkey_journal_list_threads",
-      "src_codemonkey_journal_py_path",
-      "src_codemonkey_journal_rationale_1",
-      "src_codemonkey_journal_rationale_36",
-      "src_codemonkey_journal_rationale_74",
-      "src_codemonkey_journal_rationale_99",
-      "src_codemonkey_journal_record",
-      "tests_test_idempotency_test_key_stability_and_distinction",
-      "tests_test_journal_cli_test_list_threads",
-      "tests_test_journal_test_args_never_stored_raw",
-      "tests_test_journal_test_find_outcome_replay_source",
-      "tests_test_journal_test_thread_isolation_and_list",
-      "tests_test_journal_wiring_rationale_117",
-      "tests_test_journal_wiring_test_run_scope_changes_the_idempotency_key",
-      "tests_test_journal_wiring_test_same_run_replay_still_hits"
-    ],
-    "34": [
       "src_codemonkey_claims",
       "src_codemonkey_claims_annotate",
       "src_codemonkey_claims_check_claims",
@@ -1180,7 +1163,7 @@
       "tests_test_verify_claims_test_file_claim_missing_unverified",
       "tests_test_verify_claims_test_reply_without_claims_noop"
     ],
-    "35": [
+    "34": [
       "src_codemonkey_instructions",
       "src_codemonkey_instructions_build_project_context_block",
       "src_codemonkey_instructions_find_instructions_file",
@@ -1201,7 +1184,7 @@
       "tests_test_instructions_test_small_file_not_truncated",
       "tests_test_instructions_test_walk_stops_at_git_root"
     ],
-    "36": [
+    "35": [
       "src_codemonkey_retry",
       "src_codemonkey_retry_annotate",
       "src_codemonkey_retry_attempts_for",
@@ -1222,7 +1205,7 @@
       "tests_test_retry_test_parse_retry_after",
       "tests_test_retry_test_sleep_delay_full_jitter_bounds"
     ],
-    "37": [
+    "36": [
       "src_codemonkey_strategies_init_rationale_34",
       "src_codemonkey_strategies_init_select_strategy",
       "tests_test_strategies",
@@ -1243,7 +1226,7 @@
       "tests_test_strategies_test_sqlite_store_roundtrip",
       "tests_test_strategies_test_valid_sets"
     ],
-    "38": [
+    "37": [
       "src_codemonkey_graphquery",
       "src_codemonkey_graphquery_find_graph_dir",
       "src_codemonkey_graphquery_graph_query",
@@ -1263,7 +1246,7 @@
       "tests_test_graphquery_test_no_match_empty",
       "tests_test_graphquery_test_pinned_symbol_lookup"
     ],
-    "39": [
+    "38": [
       "src_codemonkey_truthpass",
       "src_codemonkey_truthpass_audit_report",
       "src_codemonkey_truthpass_claimed_test_count",
@@ -1283,7 +1266,7 @@
       "tests_test_truthpass_test_real_repo_audit_green",
       "tests_test_truthpass_test_test_file_claims_verified"
     ],
-    "40": [
+    "39": [
       "tests_test_repomap_inject",
       "tests_test_repomap_inject_ctx",
       "tests_test_repomap_inject_git_repo",
@@ -1303,7 +1286,7 @@
       "tests_test_repomap_inject_turn",
       "tests_test_repomap_inject_turn_init"
     ],
-    "41": [
+    "40": [
       "path",
       "src_codemonkey_tools_base_save",
       "src_codemonkey_tools_write_file",
@@ -1322,7 +1305,7 @@
       "tests_test_delegate_test_result_capped",
       "tests_test_delegate_test_task_too_long"
     ],
-    "42": [
+    "41": [
       "src_codemonkey_compile_rules",
       "src_codemonkey_compile_rules_compile_corrections",
       "src_codemonkey_compile_rules_merge_rules",
@@ -1341,7 +1324,7 @@
       "tests_test_compile_rules_test_over_threshold_compile",
       "tests_test_compile_rules_test_under_threshold_skipped"
     ],
-    "43": [
+    "42": [
       "src_codemonkey_strategies_compaction",
       "src_codemonkey_strategies_compaction_estimate_tokens",
       "src_codemonkey_strategies_compaction_rationale_1",
@@ -1360,7 +1343,7 @@
       "tests_test_strategies_test_summarizing_noop_when_under_trigger",
       "tests_test_strategies_test_summarizing_triggers_and_summarizes_with_provider"
     ],
-    "44": [
+    "43": [
       "tests_test_checkpoints",
       "tests_test_checkpoints_ctx_of",
       "tests_test_checkpoints_rationale_1",
@@ -1379,7 +1362,7 @@
       "tests_test_checkpoints_test_undo_in_another_workspace_refuses",
       "tests_test_checkpoints_test_undo_restores_every_file_of_a_batch"
     ],
-    "45": [
+    "44": [
       "src_codemonkey_grounding",
       "src_codemonkey_grounding_locate",
       "src_codemonkey_grounding_pre_apply_validate",
@@ -1396,6 +1379,24 @@
       "tests_test_grounding_test_python_syntax_caught",
       "tests_test_grounding_test_python_valid_passes",
       "tests_test_grounding_test_symbol_index_defines"
+    ],
+    "45": [
+      "src_codemonkey_journal_class_summary",
+      "src_codemonkey_journal_cli",
+      "src_codemonkey_journal_cli_journal_list",
+      "src_codemonkey_journal_cli_journal_show",
+      "src_codemonkey_journal_cli_journal_tail",
+      "src_codemonkey_journal_cli_py_command",
+      "src_codemonkey_journal_cli_rationale_1",
+      "src_codemonkey_journal_cli_rationale_16",
+      "src_codemonkey_journal_cli_rationale_26",
+      "src_codemonkey_journal_cli_rationale_34",
+      "src_codemonkey_journal_rationale_134",
+      "src_codemonkey_journal_read_thread",
+      "tests_test_journal_cli_test_class_summary_counts",
+      "tests_test_journal_rationale_89",
+      "tests_test_journal_test_class_summary",
+      "tests_test_journal_test_loop_writes_journal_records"
     ],
     "46": [
       "src_codemonkey_permissions",
@@ -2144,22 +2145,21 @@
       "tests_test_knobs_test_exec_passes_knobs_to_run_turns"
     ],
     "98": [
-      "baseexception",
-      "src_codemonkey_journal_classify_error",
-      "src_codemonkey_journal_rationale_52",
-      "tests_test_journal_test_error_classes"
-    ],
-    "99": [
       "src_codemonkey_providers_openai_native_openai_tool_calls",
       "src_codemonkey_providers_openai_rationale_30",
       "tests_test_protocol_test_native_openai_tool_call_bad_json_preserved",
       "tests_test_protocol_test_native_openai_tool_call_extraction"
     ],
-    "100": [
+    "99": [
       "src_codemonkey_tools_init_names",
       "tests_test_tools_rationale_269",
       "tests_test_tools_test_registry_has_all_thirteen",
       "tests_test_tools_test_search_python_fallback_glob_not_regex"
+    ],
+    "100": [
+      "src_codemonkey_cli_exectypergroup",
+      "src_codemonkey_cli_exectypergroup_resolve_command",
+      "src_codemonkey_cli_rationale_458"
     ],
     "101": [
       "tests_test_tools_py_fixture",
@@ -2217,45 +2217,45 @@
     "4": 0.045454545454545456,
     "5": 0.07505285412262157,
     "6": 0.06533776301218161,
-    "7": 0.1,
-    "8": 0.10256410256410256,
+    "7": 0.10256410256410256,
+    "8": 0.11261261261261261,
     "9": 0.0945945945945946,
     "10": 0.12063492063492064,
     "11": 0.09848484848484848,
     "12": 0.14962121212121213,
-    "13": 0.06881720430107527,
-    "14": 0.12413793103448276,
-    "15": 0.10574712643678161,
-    "16": 0.13793103448275862,
-    "17": 0.0960591133004926,
-    "18": 0.12698412698412698,
-    "19": 0.11904761904761904,
-    "20": 0.15384615384615385,
-    "21": 0.13333333333333333,
-    "22": 0.11333333333333333,
-    "23": 0.12,
-    "24": 0.16304347826086957,
-    "25": 0.16666666666666666,
-    "26": 0.1422924901185771,
-    "27": 0.12648221343873517,
+    "13": 0.1032258064516129,
+    "14": 0.06881720430107527,
+    "15": 0.12413793103448276,
+    "16": 0.10574712643678161,
+    "17": 0.13793103448275862,
+    "18": 0.0960591133004926,
+    "19": 0.12698412698412698,
+    "20": 0.11904761904761904,
+    "21": 0.15384615384615385,
+    "22": 0.13333333333333333,
+    "23": 0.11333333333333333,
+    "24": 0.12,
+    "25": 0.16304347826086957,
+    "26": 0.16666666666666666,
+    "27": 0.1422924901185771,
     "28": 0.1471861471861472,
     "29": 0.14285714285714285,
     "30": 0.13852813852813853,
     "31": 0.12554112554112554,
     "32": 0.18421052631578946,
-    "33": 0.1631578947368421,
-    "34": 0.16374269005847952,
-    "35": 0.18128654970760233,
-    "36": 0.14035087719298245,
-    "37": 0.12280701754385964,
-    "38": 0.16993464052287582,
-    "39": 0.1830065359477124,
-    "40": 0.13071895424836602,
-    "41": 0.14705882352941177,
-    "42": 0.16911764705882354,
-    "43": 0.14705882352941177,
-    "44": 0.19852941176470587,
-    "45": 0.175,
+    "33": 0.16374269005847952,
+    "34": 0.18128654970760233,
+    "35": 0.14035087719298245,
+    "36": 0.12280701754385964,
+    "37": 0.16993464052287582,
+    "38": 0.1830065359477124,
+    "39": 0.13071895424836602,
+    "40": 0.14705882352941177,
+    "41": 0.16911764705882354,
+    "42": 0.14705882352941177,
+    "43": 0.19852941176470587,
+    "44": 0.175,
+    "45": 0.18333333333333332,
     "46": 0.2,
     "47": 0.175,
     "48": 0.175,
@@ -2309,8 +2309,8 @@
     "96": 0.25,
     "97": 0.2857142857142857,
     "98": 0.5,
-    "99": 0.5,
-    "100": 0.3333333333333333,
+    "99": 0.3333333333333333,
+    "100": 0.6666666666666666,
     "101": 0.6666666666666666,
     "102": 1.0,
     "103": 1.0,
