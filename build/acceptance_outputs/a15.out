@@ -1,8 +1,235 @@
-........................................................................ [ 15%]
-........................................................................ [ 31%]
-........................................................................ [ 46%]
-........................................................................ [ 62%]
-........................................................................ [ 78%]
-........................................................................ [ 93%]
-............................                                             [100%]
-460 passed in 78.82s (0:01:18)
+......................................F...........................F..... [ 15%]
+..................F.............................................F....... [ 30%]
+F....................................................................... [ 45%]
+........................................................................ [ 60%]
+........................................................................ [ 76%]
+........................................................................ [ 91%]
+.........................................                                [100%]
+=================================== FAILURES ===================================
+______________________ test_exec_cost_summary_shows_cache ______________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10eef0690>
+
+    @requires_home
+    def test_exec_cost_summary_shows_cache(monkeypatch):
+        """--cost-summary surfaces a cache line when the server reports timings."""
+        import subprocess
+    
+        repo = "/Users/bharris/Programs/CodeMonkey"
+        monkeypatch.chdir(repo)
+        r = subprocess.run(
+            ["uv", "run", "codemonkey", "exec", "--ephemeral", "--cost-summary",
+             "Reply with exactly: cache-probe"],
+            capture_output=True, text=True, timeout=420, cwd=repo,
+        )
+>       assert r.returncode == 0, r.stdout + r.stderr
+E       AssertionError: error: HTTP 400 from http://192.168.50.176:8080/v1/chat/completions: {"error":{"message":"No model loaded. Call POST /inference/load first. Or enable Model auto-switch (Settings > API) to load a requested model automatically.","type":"invalid_request_error","param":null,"code":null}}
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['uv', 'run', 'codemonkey', 'exec', '--ephemeral', '--cost-summary', 'Reply with exactly: cache-...Settings > API) to load a requested model automatically.","type":"invalid_request_error","param":null,"code":null}}\n').returncode
+
+tests/test_cache_telemetry.py:110: AssertionError
+_________________________ test_exec_cost_summary_flag __________________________
+
+tmp_path = PosixPath('/private/var/folders/xb/kzc31shn1pz2s_5l2fy6d7rh0000gn/T/pytest-of-bharris/pytest-3880/test_exec_cost_summary_flag0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10ef3ad90>
+
+    @requires_home
+    def test_exec_cost_summary_flag(tmp_path, monkeypatch):
+        """--cost-summary end-to-end: exec prints summary + ledger written."""
+        import codemonkey.loop as loop_mod
+        import subprocess
+    
+        repo = "/Users/bharris/Programs/CodeMonkey"
+        monkeypatch.chdir(repo)
+        monkeypatch.setenv("CODEMONKEY_COST_LEDGER", str(tmp_path / "cost.json"))
+    
+        r = subprocess.run(
+            ["uv", "run", "codemonkey", "exec", "--ephemeral", "--cost-summary",
+             "Reply with exactly: cost-ok"],
+            capture_output=True, text=True, timeout=300, cwd=repo,
+        )
+>       assert r.returncode == 0, r.stdout + r.stderr
+E       AssertionError: error: HTTP 400 from http://192.168.50.176:8080/v1/chat/completions: {"error":{"message":"No model loaded. Call POST /inference/load first. Or enable Model auto-switch (Settings > API) to load a requested model automatically.","type":"invalid_request_error","param":null,"code":null}}
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['uv', 'run', 'codemonkey', 'exec', '--ephemeral', '--cost-summary', 'Reply with exactly: cost-o...Settings > API) to load a requested model automatically.","type":"invalid_request_error","param":null,"code":null}}\n').returncode
+
+tests/test_cost.py:85: AssertionError
+____________________ test_child_executes_and_returns_result ____________________
+
+ctx = ToolContext(workdir=PosixPath('/private/var/folders/xb/kzc31shn1pz2s_5l2fy6d7rh0000gn/T/pytest-of-bharris/pytest-3880/test_child_executes_and_return0'), sandbox='workspace-write', add_dirs=[], timeout=10, extra={})
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10f34f510>
+
+    def test_child_executes_and_returns_result(ctx, monkeypatch):
+        monkeypatch.delenv("CODEMONKEY_DELEGATE_DEPTH", raising=False)
+        monkeypatch.setenv("CODEMONKEY_FORCE_LIVE", "1")
+        # skip when home is down (same conftest policy) — handled by pytest skip
+        import httpx
+    
+        try:
+            httpx.post("http://192.168.50.176:8080/v1/chat/completions",
+                       json={"model": "unsloth/Qwen3.8-27B-GGUF",
+                             "messages": [{"role": "user", "content": "ping"}],
+                             "max_tokens": 8}, timeout=15)
+            alive = True
+        except Exception:
+            alive = False
+        if not alive:
+            pytest.skip("home llama.cpp unreachable")
+        import subprocess as sp2
+    
+        sp2.run(["git", "init", "-q"], cwd=ctx.workdir)  # child needs a git repo
+        res = run({"task": "Reply with exactly: delegate-ok"}, ctx)
+>       assert res.ok, res.output
+E       AssertionError: error: delegate exited 1: error: HTTP 400 from http://192.168.50.176:8080/v1/chat/completions: {"error":{"message":"No model loaded. Call POST /inference/load first. Or enable Model auto-switch (Settings > API) to load a requested model automatically.","type":"invalid_request_error","param":null,"code":null}}
+E       assert False
+E        +  where False = ToolResult(output='error: delegate exited 1: error: HTTP 400 from http://192.168.50.176:8080/v1/chat/completions: {"er...,"type":"invalid_request_error","param":null,"code":null}}', ok=False, meta={'delegated': True, 'role': 'implementer'}).ok
+
+tests/test_delegate.py:55: AssertionError
+________________________ test_cli_check_regression_flow ________________________
+
+tmp_path = PosixPath('/private/var/folders/xb/kzc31shn1pz2s_5l2fy6d7rh0000gn/T/pytest-of-bharris/pytest-3880/test_cli_check_regression_flow0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10f56bb90>
+
+    @requires_home
+    def test_cli_check_regression_flow(tmp_path, monkeypatch):
+        """Live CLI: green run -> write baseline -> broken suite -> --check exit 1."""
+        repo = Path("/Users/bharris/Programs/CodeMonkey")
+        monkeypatch.chdir(repo)
+    
+        suite_path = tmp_path / "cli-suite.yaml"
+        suite_path.write_text(yaml.safe_dump({
+            "name": "cli-flow",
+            "tasks": [{"id": "ping", "prompt": "Reply with exactly: ping",
+                       "expect_stdout_contains": ["ping"], "expect_exit": 0}],
+        }))
+        baseline = tmp_path / "baseline.json"
+        out = tmp_path / "eval"
+    
+        r1 = _run_eval_cli([str(suite_path), "--check", "--baseline", str(baseline),
+                            "--out", str(out), "--write-baseline"], cwd=repo)
+>       assert r1.returncode == 0, r1.stdout + r1.stderr
+E       AssertionError: {"type": "thread.started", "thread_id": "516fd2da4d78"}
+E         {"type": "turn.started", "thread_id": "516fd2da4d78"}
+E         {"type": "error", "message": "HTTP 400 from http://192.168.50.176:8080/v1/chat/completions: {\"error\":{\"message\":\"No model loaded. Call POST /inference/load first. Or enable Model auto-switch (Settings > API) to load a requested model automatically.\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":null}}"}
+E         ╭───────────────────── Traceback (most recent call last) ──────────────────────╮
+E         │ /Users/bharris/Programs/CodeMonkey/src/codemonkey/cli.py:309 in eval         │
+E         │                                                                              │
+E         │   306 │   from .eval import run_suite as _run_suite                          │
+E         │   307 │   from .eval import write_baseline as _write_baseline                │
+E         │   308 │                                                                      │
+E         │ ❱ 309 │   results = _run_suite(suite, out_dir=out_dir)                       │
+E         │   310 │   if route_stats_flag:                                               │
+E         │   311 │   │   from .routing import route_stats as _rs                        │
+E         │   312                                                                        │
+E         │                                                                              │
+E         │ /Users/bharris/Programs/CodeMonkey/src/codemonkey/eval.py:139 in run_suite   │
+E         │                                                                              │
+E         │   136 │   │   def collect(ev, _events=events):                               │
+E         │   137 │   │   │   events.append(ev)                                          │
+E         │   138 │   │                                                                  │
+E         │ ❱ 139 │   │   code = exec_fn(                                                │
+E         │   140 │   │   │   task["prompt"],                                            │
+E         │   141 │   │   │   json_mode=True,                                            │
+E         │   142 │   │   │   event_sink=events,                                         │
+E         │                                                                              │
+E         │ /Users/bharris/Programs/CodeMonkey/src/codemonkey/exec.py:518 in run_exec    │
+E         │                                                                              │
+E         │   515 │   │   if _fall_name != p_name:                                       │
+E         │   516 │   │   │   pass  # fallback provider built lazily only if the primary │
+E         │       fails                                                                  │
+E         │   517 │   try:                                                               │
+E         │ ❱ 518 │   │   turn = _attempt(provider)                                      │
+E         │   519 │   except Exception as _exc:                                          │
+E         │   520 │   │   _err_text = str(_exc).lower()                                  │
+E         │   521 │   │   _transport = ("transport" in _err_text or "timeout" in         │
+E         │       _err_text                                                              │
+E         │                                                                              │
+E         │ /Users/bharris/Programs/CodeMonkey/src/codemonkey/exec.py:444 in _attempt    │
+E         │                                                                              │
+E         │   441 │   │   )                                                              │
+E         │   442 │                                                                      │
+E         │   443 │   def _attempt(prov):                                                │
+E         │ ❱ 444 │   │   return run_turns(                                              │
+E         │   445 │   │   │   prov,                                                      │
+E         │   446 │   │   │   full_prompt,                                               │
+E         │   447 │   │   │   ctx,                                                       │
+E         │                                                                              │
+E         │ /Users/bharris/Programs/CodeMonkey/src/codemonkey/loop.py:169 in run_turns   │
+E         │                                                                              │
+E         │   166 │   │   │   │   │   cache_prompt=prompt_cache,                         │
+E         │   167 │   │   │   │   )                                                      │
+E         │   168 │   │   │   elif native_first:                                         │
+E         │ ❱ 169 │   │   │   │   turn = provider.chat(                                  │
+E         │   170 │   │   │   │   │   messages,                                          │
+E         │   171 │   │   │   │   │   system=system,                                     │
+E         │   172 │   │   │   │   │   stream=stream,                                     │
+E         │                                                                              │
+E         │ /Users/bharris/Programs/CodeMonkey/src/codemonkey/providers/openai.py:260 in │
+E         │ chat                                                                         │
+E         │                                                                              │
+E         │   257 │   │   # streaming                                                    │
+E         │   258 │   │   turn = ChatTurn()                                              │
+E         │   259 │   │   tc_acc: dict = {}                                              │
+E         │ ❱ 260 │   │   for event in self._request_stream("/chat/completions", body):  │
+E         │   261 │   │   │   choice = (event.get("choices") or [{}])[0]                 │
+E         │   262 │   │   │   delta = choice.get("delta") or {}                          │
+E         │   263 │   │   │   piece = delta.get("content")                               │
+E         │                                                                              │
+E         │ /Users/bharris/Programs/CodeMonkey/src/codemonkey/providers/openai.py:166 in │
+E         │ _request_stream                                                              │
+E         │                                                                              │
+E         │   163 │   │   │   │   │   │   │   status=resp.status_code, text=text,        │
+E         │       headers=getattr(resp, "headers", None),                                │
+E         │   164 │   │   │   │   │   │   ):                                             │
+E         │   165 │   │   │   │   │   │   │   continue                                   │
+E         │ ❱ 166 │   │   │   │   │   │   raise retry.annotate(last, attempt)            │
+E         │   167 │   │   │   │   │   started = True                                     │
+E         │   168 │   │   │   │   │   events: list[dict] = []                            │
+E         │   169 │   │   │   │   │   for line in resp.iter_lines():                     │
+E         ╰──────────────────────────────────────────────────────────────────────────────╯
+E         ProviderError: HTTP 400 from http://192.168.50.176:8080/v1/chat/completions: 
+E         {"error":{"message":"No model loaded. Call POST /inference/load first. Or enable
+E         Model auto-switch (Settings > API) to load a requested model 
+E         automatically.","type":"invalid_request_error","param":null,"code":null}}
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['uv', 'run', 'codemonkey', 'eval', '/private/var/folders/xb/kzc31shn1pz2s_5l2fy6d7rh0000gn/T/py...ttings > API) to load a requested model \nautomatically.","type":"invalid_request_error","param":null,"code":null}}\n').returncode
+
+tests/test_golden.py:87: AssertionError
+________ test_temp_unblock_provider_removed_when_home_serves_inference _________
+
+    def test_temp_unblock_provider_removed_when_home_serves_inference():
+        temp_present = "unblock" in cfg_mod.DEFAULTS["providers"]
+        if not _home_reachable():
+            # loop7: home server flaps (verified twice on 2026-09-02). When it is
+            # unreachable at the network level, the hygiene decision is UNDECIDABLE
+            # — skip rather than fail on an environment condition. The hygiene
+            # action (temp removal) was already taken and verified in loop4-final.
+            import pytest
+    
+            pytest.skip("home llama.cpp unreachable (network) — hygiene state undecided")
+        if _home_server_inference_alive():
+            assert not temp_present, (
+                "HYGIENE: home llama.cpp serves inference again - remove the "
+                "temporary `unblock` provider from DEFAULTS.providers (marked "
+                "TEMPORARY in config.py) and any CODEMONKEY_UNBLOCK_KEY usage."
+            )
+        else:
+>           assert temp_present, (
+                "home llama.cpp inference is still wedged; the temporary `unblock` "
+                "provider must stay so live probes can run (removing it early "
+                "breaks all live cycles)."
+            )
+E           AssertionError: home llama.cpp inference is still wedged; the temporary `unblock` provider must stay so live probes can run (removing it early breaks all live cycles).
+E           assert False
+
+tests/test_hygiene_6f4.py:99: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_cache_telemetry.py::test_exec_cost_summary_shows_cache - As...
+FAILED tests/test_cost.py::test_exec_cost_summary_flag - AssertionError: erro...
+FAILED tests/test_delegate.py::test_child_executes_and_returns_result - Asser...
+FAILED tests/test_golden.py::test_cli_check_regression_flow - AssertionError:...
+FAILED tests/test_hygiene_6f4.py::test_temp_unblock_provider_removed_when_home_serves_inference
+5 failed, 468 passed in 15.67s

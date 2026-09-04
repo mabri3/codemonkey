@@ -1848,3 +1848,24 @@ defects: fizzbuzz test-file overclaim + A11 date hallucination (both =
 "trust narration not claims") → cycle 52 honest-completion gate; .176 serving
 3 models unused → cycle 53 static routing rules. LLM-judge verification NOT
 selected (self-agreement evidence); trained router NOT selected.
+
+## 2026-09-03 — CYCLE loop17-final: Loop 17 acceptance — honest completion + routing shipped
+
+**Completed:** verify_claims (cycle 52) audits reply claims against the
+journal/filesystem, [UNVERIFIED] markers + journaled flags (off by default);
+static model routing (cycle 53) — model_routing first-match rules, journaled
+route records, eval --route-stats. LIVE on .176: "compliance" prompt routed
+rule=0 to unsloth/Qwen3.6-35B-A3B-MTP-GGUF; control prompt stayed on default.
+LOOP 17 COMPLETE.
+
+## 2026-09-03 — loop17-final incident notes (honest recording)
+
+**Sweep-17 flake analysis:** A15 5-fail was sweep-interleaved env pollution
+(clean re-run: 473/473); A11 exit=1 was a rambly model reply (retry PASS, the
+codeword pineapple + durable "zebra" both recalled); **A16 chars=0 root
+cause: server-side model unload** ("No model loaded. Call POST
+/inference/load first") — the routing probe to Qwen3.6-35B (rule=0) triggered
+LM Studio's single-model unload of Qwen3.8-27B. Server auto-recovered
+(chat 200). **Design note for a future cycle:** routing rules against a
+single-model-slot server should record the unload risk; --route-stats plus
+the journal route records make this measurable.

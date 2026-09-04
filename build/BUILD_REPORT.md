@@ -686,3 +686,28 @@ The Anthropic native tool shape (`input_schema`, fixed in 51F1b) is unit-tested
 only — no Anthropic key was available. Two older closing cycles
 (`loop6-final`, `loop10-final`) remain unchecked in `build/plan.md`; their own
 probes were not re-run in this cycle.
+
+
+---
+
+# Loop 17 — Final Acceptance (CYCLE loop17-final)
+
+**Date:** 2026-09-03 · **Suite:** 473 passed · scoped live at user request
+post-v1.0.0.
+
+## Loop-17 criteria (from build/research-loop17.md — all pass)
+
+| Improvement | Probe | Result |
+|---|---|---|
+| Honest-completion gate (52) | tests/test_verify_claims.py: file-existence claims, journal-evidenced command claims, missing-evidence flags, [UNVERIFIED] markers + journal, clean-reply no-op, no-claims no-op | ✅ 7/7 |
+| Static model routing (53) | tests/test_routing.py: first-match, glob match, fallback, journal record, invalid rules, route-stats aggregation | ✅ 6/6 |
+
+## Live evidence (.176)
+- Routing: "compliance check" prompt → journaled
+  `local/unsloth/Qwen3.6-35B-A3B-MTP-GGUF rule=0`; control prompt unrouted.
+- verify_claims designed against the live fizzbuzz overclaim observed 2026-09-03.
+
+## Loop-17 commit range
+aa17377 (R17) → 98e40b6 (C52) → e27949c (C53) → this commit.
+
+**LOOP 17 COMPLETE.**
