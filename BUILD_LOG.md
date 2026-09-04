@@ -2364,3 +2364,27 @@ FULFILLED.
   tempdir copy is the upgrade path). Matrix arms do not best-of (comparable
   single runs only) — same scope line as early-stop.
 - **Next step:** CYCLE 80 — `codemonkey branch` sub-command.
+
+## 2026-09-04 — CYCLE 80 (loop38): `codemonkey branch` sub-command
+
+- **Files changed:** `src/codemonkey/branches.py` (name validation keeping
+  worktrees inside `.branches/`; `is_git_repo`; `branch_remove` also drops
+  the `branch/<name>` ref; `branch_diff` direction fixed to
+  `HEAD...branch/<name>` — the shipped direction diffed the base against
+  HEAD and always printed empty), `src/codemonkey/branches_cli.py` (new:
+  `branch create <name> [--base]` / `list` / `diff` / `remove`, exit 2
+  outside a repo + for unknown names, exit 1 on git failure),
+  `src/codemonkey/cli.py` (registers `branch`), `.gitignore`
+  (`.branches/`), `tests/test_branch_cli.py` (new, 7 tests).
+- **F7 row cleared for `branches`:** reachable from the `branch` entry point.
+- **Tests run:** `uv run pytest -q tests/test_branch_cli.py` → **7
+  passed**; `uv run pytest -q` → **635 passed**, 0 failed.
+- **Probe results (literal, R-I):** scratch repo create → exit 0,
+  `.branches/demo` exists and on `git worktree list`; `diff` → exit 0;
+  `list` names it; `remove` → exit 0 and gone from worktree list;
+  create outside a git repo → exit 2 with repo error (transcript
+  `build/probes/cycle80-cli.out`); committed branch change shows in
+  `branch diff --stat`.
+- **Known issues:** none. Worktree-internal `.git` files are git's own
+  bookkeeping, covered by the `.branches/` ignore.
+- **Next step:** CYCLE 81 — the capability register.

@@ -13,6 +13,9 @@ __pycache__/
 # Runtime state (user config dir lives at ~/.codemonkey/, not here)
 .codemonkey/
 
+# loop38 cycle 80: branch worktrees live here, never committed
+.branches/
+
 # OS
 .DS_Store
 build/.tick.lock

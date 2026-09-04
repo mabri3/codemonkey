@@ -414,6 +414,12 @@ def eval(
 
 journal_app = typer.Typer()
 try:
+    from .branches_cli import app as _branch_app
+
+    app.add_typer(_branch_app, name="branch", help="Worktree branches in .branches/.")
+except ImportError:  # pragma: no cover
+    pass
+try:
     from .journal_cli import app as _journal_app
 
     app.add_typer(_journal_app, name="journal", help="Execution-journal forensics.")

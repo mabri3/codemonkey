@@ -1810,7 +1810,9 @@ shipped until its entry point is exercised") live in
   checkpoint-group only); usage probe: `--best-of 2` with no verify command →
   exit 2; `uv run pytest -q tests/test_bestofn_exec.py` → exit 0 (≥6 tests);
   full suite green.
-- [ ] CYCLE 80 — `loop38:` `codemonkey branch` sub-command:
+- [x] CYCLE 80 — `loop38:` `codemonkey branch` sub-command:
+  DONE 2026-09-04: create/list/diff/remove live on scratch repo, exit-2
+  outside git + unknown names; suite 635/635
   `branch create <name> [--base HEAD]` / `branch list` / `branch diff <name>`
   / `branch remove <name>` over git worktrees in `.branches/` (branches.py
   wired; .branches gitignored) | est: 30m |

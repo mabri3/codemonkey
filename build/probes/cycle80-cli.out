@@ -1,0 +1,13 @@
+$ codemonkey branch create demo
+branch demo at /tmp/cm-branch-demo/.branches/demo
+$ codemonkey branch diff demo
+diff-exit=0
+$ codemonkey branch list
+demo
+$ codemonkey branch remove demo
+removed branch demo
+$ git worktree list | grep -c branches
+0
+$ codemonkey branch create demo   # outside a git repo
+error: '/tmp/...' is not inside a git repository; branch worktrees need one
+exit=2
