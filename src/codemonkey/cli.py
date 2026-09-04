@@ -392,6 +392,13 @@ def eval(
         typer.echo(f"  [{mark}] {t['id']}")
         if not t["ok"]:
             typer.echo(f"         {json.dumps(t.get('detail', {}))}")
+        rub = t.get("rubric")
+        if rub is not None:
+            steps = " ".join(
+                f"{s['id']}:{'ok' if s['ok'] else 'FAIL'}"
+                for s in rub.get("steps", []))
+            typer.echo(f"         rubric: {'passed' if rub.get('passed') else 'FAILED'} "
+                       f"score={rub.get('score')} {steps}")
     if write_baseline:
         _write_baseline(results, baseline)
         typer.echo(f"baseline written: {baseline}")

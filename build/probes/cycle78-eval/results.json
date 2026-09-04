@@ -1,0 +1,105 @@
+{
+  "suite": "rubric",
+  "tasks": [
+    {
+      "id": "clean",
+      "ok": true,
+      "checks": {
+        "stdout": true,
+        "exit": true,
+        "trajectory": true
+      },
+      "detail": {},
+      "tokens": 9148,
+      "wall_seconds": 9.94,
+      "rubric": {
+        "steps": [
+          {
+            "id": "step1",
+            "kind": "contains",
+            "ok": true
+          }
+        ],
+        "passed": true,
+        "score": 1.0
+      },
+      "stdout": "hello world",
+      "window_depth": 4537,
+      "journal_thread": "df8ed985f569",
+      "journal_classes": {},
+      "route_key": "/"
+    },
+    {
+      "id": "rubfail",
+      "ok": false,
+      "checks": {
+        "stdout": true,
+        "exit": true,
+        "trajectory": true
+      },
+      "detail": {},
+      "tokens": 9262,
+      "wall_seconds": 12.89,
+      "rubric": {
+        "steps": [
+          {
+            "id": "step1",
+            "kind": "contains",
+            "ok": true
+          },
+          {
+            "id": "step2",
+            "kind": "contains",
+            "ok": false
+          }
+        ],
+        "passed": false,
+        "score": 0.5
+      },
+      "stdout": "hello world",
+      "window_depth": 4537,
+      "journal_thread": "ff9b92ceda32",
+      "journal_classes": {},
+      "route_key": "/"
+    },
+    {
+      "id": "rubric-only",
+      "ok": true,
+      "checks": {
+        "stdout": true,
+        "exit": true,
+        "trajectory": true
+      },
+      "detail": {},
+      "tokens": 9232,
+      "wall_seconds": 12.09,
+      "rubric": {
+        "steps": [
+          {
+            "id": "step1",
+            "kind": "regex",
+            "ok": true
+          },
+          {
+            "id": "step2",
+            "kind": "absent",
+            "ok": true
+          }
+        ],
+        "passed": true,
+        "score": 1.0
+      },
+      "stdout": "hello world",
+      "window_depth": 4537,
+      "journal_thread": "492ddeca3b7c",
+      "journal_classes": {},
+      "route_key": "/"
+    }
+  ],
+  "started": 1788551117.871115,
+  "stopped_early": false,
+  "pass_rate": 0.667,
+  "total_tokens": 27642,
+  "wall_seconds": 34.92,
+  "finished": 1788551152.793847
+}

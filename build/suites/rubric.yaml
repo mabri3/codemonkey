@@ -1,0 +1,24 @@
+name: rubric
+tasks:
+  - id: clean
+    prompt: "Reply with exactly: hello world and nothing else."
+    expect_stdout_contains: ["hello"]
+    expect_exit: 0
+    ephemeral: true
+    rubric:
+      - "contains: hello"
+  - id: rubfail
+    prompt: "Reply with exactly: hello world and nothing else."
+    expect_stdout_contains: ["hello"]
+    expect_exit: 0
+    ephemeral: true
+    rubric:
+      - "contains: hello"
+      - "contains: goodbye"
+  - id: rubric-only
+    prompt: "Reply with exactly: hello world and nothing else."
+    expect_exit: 0
+    ephemeral: true
+    rubric:
+      - "regex: ^hello"
+      - "absent: banana"

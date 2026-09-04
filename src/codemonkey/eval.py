@@ -86,7 +86,21 @@ def _score_task(task: dict, *, exit_code: int, stdout: str,
             detail["trajectory"] = {"want": want_tools, "got": got}
 
     ok = all(checks.values())
-    return {
+
+    # loop38 cycle 78: rubric steps compose into task scoring. The rubric
+    # grades the same stdout text; a failing rubric fails the task even when
+    # every other check passes (rubric-only tasks — no stdout contract — are
+    # allowed: an empty checks dict is all-true, the rubric still decides).
+    rubric_result = None
+    if task.get("rubric"):
+        from .rubrics import rubric_from_yaml_steps, score_rubric
+
+        rubric_result = score_rubric(
+            stdout, rubric_from_yaml_steps(task.get("rubric") or []))
+        if not rubric_result["passed"]:
+            ok = False
+
+    result = {
         "id": task["id"],
         "ok": ok,
         "checks": checks,
@@ -94,6 +108,9 @@ def _score_task(task: dict, *, exit_code: int, stdout: str,
         "tokens": _tokens_from_events(events),
         "wall_seconds": round(wall, 2),
     }
+    if rubric_result is not None:
+        result["rubric"] = rubric_result
+    return result
 
 
 def _tokens_from_events(events: list) -> int:

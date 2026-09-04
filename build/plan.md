@@ -1783,7 +1783,8 @@ shipped until its entry point is exercised") live in
   --delta 0.2` → exit 0, output prints a `hoeffding-gate` certificate line and
   stops before task 6 (transcript `build/probes/cycle77-*`; BLOCKED+reason if
   the endpoint is down).
-- [ ] CYCLE 78 — `loop38:` eval rubrics: suite tasks may carry
+- [x] CYCLE 78 — `loop38:` eval rubrics: suite tasks may carry
+  DONE 2026-09-04, LIVE: stdout-pass + rubric-fail → ok=false
   `rubric: ["contains: x", "absent: y", "regex: ..."]` steps; rubric scores
   compose into task scoring (`rubric: {steps, passed, score}` in results, task
   ok=false when the rubric fails); rubric-only tasks allowed (no stdout

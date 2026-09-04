@@ -1,0 +1,11 @@
+$ uv run codemonkey eval build/suites/rubric.yaml --out build/probes/cycle78-eval
+suite: rubric  pass_rate: 0.667  tokens: 27642  wall: 34.92s
+  [PASS] clean
+         rubric: passed score=1.0 step1:ok
+  [FAIL] rubfail
+         {}
+         rubric: FAILED score=0.5 step1:ok step2:FAIL
+  [PASS] rubric-only
+         rubric: passed score=1.0 step1:ok step2:ok
+no regressions
+(rubfail: stdout contract passed — empty {} detail — but the rubric verdict drove ok=false)

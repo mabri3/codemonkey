@@ -2301,3 +2301,31 @@ FULFILLED.
   never consulted); matrix arms (`--strategy-matrix`) do not early-stop
   (per-arm comparability) — documented scope, not a gap.
 - **Next step:** CYCLE 78 — eval rubrics.
+
+## 2026-09-04 — CYCLE 78 (loop38): eval rubrics wired into task scoring
+
+- **Files changed:** `src/codemonkey/eval.py` (`_score_task` grades
+  `task["rubric"]` YAML steps via `rubrics.rubric_from_yaml_steps` +
+  `score_rubric` against the same stdout text; `result["rubric"] =
+  {steps, passed, score}`; failing rubric forces `ok=false`, including
+  rubric-only tasks with no stdout contract), `src/codemonkey/cli.py` (`eval`
+  prints per-task `rubric: passed|FAILED score=X step:ok|FAIL` lines),
+  `tests/test_eval_rubrics.py` (new, 5 tests), `build/suites/rubric.yaml`
+  (new: clean / rubfail / rubric-only tasks).
+- **F7 row cleared for `rubrics`:** imported by `eval.py` → decided by a real
+  run; `score_rubric`/`rubric_from_yaml_steps` reachable from the eval entry
+  point at last.
+- **Tests run:** `uv run pytest -q tests/test_eval_rubrics.py
+  tests/test_eval.py tests/test_rubrics.py` → **19 passed**;
+  `uv run pytest -q` → **621 passed**, 0 failed.
+- **Probe results (literal, LIVE on home server):** `uv run codemonkey eval
+  build/suites/rubric.yaml` → exit 0, `pass_rate: 0.667`; `rubfail` shows
+  `{}` (empty stdout-failure detail = stdout contract passed) with
+  `rubric: FAILED score=0.5 step1:ok step2:FAIL` driving the FAIL; `clean`
+  and `rubric-only` PASS with rubric detail (transcript
+  `build/probes/cycle78-eval.out`, results
+  `build/probes/cycle78-eval/results.json`).
+- **Known issues:** none. Rubric grades the final stdout text only (not tool
+  trajectories) — matches the charter; trajectory rubrics would be a new
+  research item.
+- **Next step:** CYCLE 79 — `exec --best-of N`.
