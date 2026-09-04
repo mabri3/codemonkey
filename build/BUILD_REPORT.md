@@ -878,3 +878,30 @@ ping-ponging.
 | verify_command suggestion (63) | tests/test_verifyhint.py: pytest-usage detection, silent-when-configured, no-pytest no-op, deterministic | ✅ 4/4 |
 
 **LOOP 26 COMPLETE.**
+
+
+---
+
+# Loop 27 — Final Acceptance: v1.1.0
+
+**Date:** 2026-09-03 · **Suite:** 524 passed · **Tag:** v1.1.0
+
+## What's in 1.1.0 (loops 17-26)
+
+| Loop | Feature |
+|---|---|
+| 17 | honest-completion gate + static model routing (--route-stats) |
+| 18 | unload-fallback rerouting + model-affinity batching |
+| 19 | codemonkey budget (VRAM→tokens) |
+| 20 | tool-arg validation gate |
+| 21 | codemonkey digest |
+| 22 | exec --dry-run |
+| 23 | env quarantine + sweep offline guard |
+| 24 | delegate role_presets |
+| 25 | watch frames + digest --last |
+| 26 | verify-gate suggestion |
+
+## Loop-27 commit range
+1825ee7 (loop26-final) → R27 → 64 → this commit → v1.1.0 tag.
+
+**LOOP 27 COMPLETE — the 27-loop arc is done.**

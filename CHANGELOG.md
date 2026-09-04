@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.1.0 (2026-09-03)
+
+Loops 17-26: honest-completion gate (`--verify-claims`), static model routing
+(`model_routing` + `eval --route-stats`), unload-fallback rerouting for
+single-slot servers, model-affinity task batching, `codemonkey budget`
+VRAM→tokens calculator, tool-arg validation gate, `codemonkey digest`,
+`exec --dry-run`, env quarantine for tests + sweep offline guard, delegate
+`role_presets`, watch frames + `digest --last`, verify-gate suggestion.
+
 ## 1.0.0 (2026-09-03)
 
 Final v1.0 closing the 16-loop arc: delegation ROI (roles + adversarial review

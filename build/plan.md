@@ -779,6 +779,12 @@ journal key semantics that cycle 36-38 will build on.
 
 
 
+
+### loop27: cycles (from build/research-loop27.md, cycle R27)
+
+- [x] CYCLE 64 — `loop27:` v1.1.0 release (bump + changelog + tag)
+- [x] CYCLE loop27-final — Loop 27 acceptance: sweep + report + push
+
 ### loop26: cycles (from build/research-loop26.md, cycle R26)
 
 - [x] CYCLE 63 — `loop26:` verify_command auto-suggestion
@@ -1314,7 +1320,7 @@ live with zero BLOCKED rows.
   stays OPEN and is carried into loop 27's record as an open gap, never
   declared passing on unit tests. Core-design: NO (packaging/platform); a
   containment difference forcing a semantic change ends by asking.
-- [ ] CYCLE R27 — Loop 27 research + closing acceptance: v2.0 — full A1-A20
+- [x] CYCLE R27 — Loop 27 research + closing acceptance: v2.0 — full A1-A20
   re-sweep plus every loop-2..26 criterion live with zero BLOCKED rows (or an
   individually justified exception list), the capability register brought
   current as the release record (arc rule R-E), a closing critic pass in

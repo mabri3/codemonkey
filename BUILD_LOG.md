@@ -1942,3 +1942,7 @@ digest_recent/render_multi (newest-first, sectioned). LOOP 25 COMPLETE.
 
 **Completed:** verifyhint.py + exec notice when pytest ran unverified.
 Gate stays operator-enabled (governance precedent). LOOP 26 COMPLETE.
+
+## 2026-09-03 — CYCLE loop27-final: v1.1.0 — ALL 27 LOOPS COMPLETE
+
+Tag v1.1.0 pushed. 524 tests green. The build-through-27 order is fulfilled.
