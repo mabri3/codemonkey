@@ -156,7 +156,8 @@ Post-v3.0.0 critic fix pass (DONE 2026-09-04): cycles `R37F1`-`R37F6` in
 exit-2 contract break, an adaptive-memory budget overrun, a missing import and
 a stale knowledge graph. Suite 579 -> 587.
 
-Utility arc loops 38-45 (PROPOSED 2026-09-04, NOT AUTHORIZED): eight research
+Utility arc loops 38-45 (PROPOSED 2026-09-04; **AUTHORIZED by the user on
+2026-09-04** — "Review AGENTS.md then build loop 38 - 45"): eight research
 cycles `R38`-`R45` appended unchecked after R37F6 in `build/plan.md`. Charters:
 `build/loops-38-45-proposal.md`. The arc's premise is critic finding F7 —
 SEVEN of the ten loop-28..36 capability modules are imported by no source file
@@ -164,8 +165,17 @@ and cannot affect a real run — so R38 wires or deletes them before any new
 capability is built. Rules R-A…R-G carry over; R-H (a "certificate" is
 time-uniform or is renamed) and R-I (a capability is not shipped until its
 ENTRY POINT is exercised — `pytest` alone may not satisfy a verify probe) are
-added. R41, R43 and R44 touch core design and END BY ASKING. Unauthorized
-until the user says otherwise.
+added. R41, R43 and R44 touch core design and END BY ASKING. R38 research is
+DONE (2026-09-04): `build/research-loop38.md` committed; `loop38:` build
+cycles 74-81 + `loop38-final` appended — build order: 74 graph tools ·
+75 context strategy · 76 adaptive memory · 77 R-H rename + eval early-stop ·
+78 eval rubrics · 79 exec --best-of (default OFF) · 80 branch sub-command ·
+81 capability register · loop38-final acceptance sweep. Note for later arcs:
+some live network probes require user consent in this environment — when a
+curl to the endpoint is declined, record the LIVE row BLOCKED with that reason
+and run every CLI-level probe (the probe grammar still forbids pytest-only
+satisfaction: in-process CliRunner + fake provider + real `run_exec` counts as
+an entry-point probe).
 
 ## Ticks (every 5 min)
 

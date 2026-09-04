@@ -2054,3 +2054,36 @@ FULFILLED.
   touch approved core design and end by asking even then.
 - **Next step:** user decision on Gate 2 (v3.0.0 acceptance, now with F7/F8 on
   the record) and on whether to authorize the 38–45 arc.
+
+## 2026-09-04 — CYCLE R38: loop-38 research + reachability plan (loop 38 of the authorized 38-45 arc)
+
+- **Files changed:** `build/research-loop38.md` (new — the loop-38 research
+  file; deliberately cites in-repo evidence, not literature), `build/plan.md`
+  (CYCLE R38 marked done with status; `loop38:` build cycles 74-81 +
+  `loop38-final` appended unchecked, every probe R-I entry-point shaped),
+  `SPRINT.md` (arc mirror: authorization recorded, build order fixed),
+  `build/probes/r38_state.sh` (the F7 re-verification script).
+- **Research method:** re-verified critic F7 at HEAD — `for m in graphquery
+  certify branches bestofn rubrics adaptivemem learnedctx; do grep -rl ... done`
+  → all seven NO-IMPORTER; `tools.SPECS` has no `graph_*` tool; no
+  `--best-of` flag; no `branch` sub-command;
+  `build/CAPABILITY_REGISTER.md` absent (F8). Mapped every existing wiring
+  point (exec.py system-prompt assembly, strategies registry, tool registry,
+  cli sub-commands, eval harness) before proposing cycles.
+- **Selected (8 cycles):** 74 graph tools + staleness + `graph` sub-command ·
+  75 `context` strategy domain (static default / learned) · 76 `adaptive`
+  memory strategy · 77 R-H rename (`hoeffding_gate`) + eval early-stop ·
+  78 eval rubrics · 79 `exec --best-of N` (default OFF per R-F) · 80
+  `branch` sub-command · 81 capability register (+ R-A deletion verdicts) ·
+  loop38-final sweep.
+- **Tests run:** none this cycle (research/ledger only — no source change).
+  Plan/probe state checked instead: `grep -c '^### loop38' build/plan.md` → 1;
+  `grep -c '^- \[ \] CYCLE' build/plan.md` → 9 (74-81 + loop38-final).
+- **Probe results (literal):** research file exists (9.7KB); F7 table
+  re-verified (7 × NO-IMPORTER); SPECS listing unchanged (13 tools, no graph).
+- **Known issues:** live-endpoint probes may hit the consent wall in this
+  environment — recorded in SPRINT.md arc note: LIVE rows then BLOCK with
+  reason, CLI-level probes still run; in-process CliRunner + fake provider +
+  real `run_exec` counts as an R-I entry-point probe.
+- **Next step:** CYCLE 74 (graph tools into the registry + staleness +
+  `codemonkey graph`).

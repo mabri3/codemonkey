@@ -1599,11 +1599,19 @@ shipped until its entry point is exercised") live in
 `build/loops-38-45-proposal.md`. Rules R-A…R-G carry over from the 17-27 and
 28-37 arcs. These cycles stay unchecked until the user authorizes the arc.
 
-- [ ] CYCLE R38 — Loop 38 research + reachability: the seven loop-28..36 modules
+- [x] CYCLE R38 — Loop 38 research + reachability: the seven loop-28..36 modules
   that no source file imports (`graphquery`, `certify`, `branches`, `bestofn`,
   `rubrics`, `adaptivemem`, `learnedctx`) are wired to a real entry point or
   deleted; `build/CAPABILITY_REGISTER.md` reconstructed as the release record
   | est: 40m |
+  status: DONE 2026-09-04. AUTH for the arc = user instruction "Review AGENTS.md
+  then build loop 38 - 45" (2026-09-04, this run). Research committed as
+  `build/research-loop38.md` — deliberately cites IN-REPO evidence (critic F7/F8
+  re-verified at HEAD: 7 modules NO-IMPORTER; `tools.SPECS` has no graph tool;
+  register missing) instead of literature, and says so. `loop38:` build cycles
+  74-81 + `loop38-final` (82) appended below with R-I entry-point probes; R-H
+  discharged in cycle 77 BEFORE `certify` is rewired; `--best-of` ships
+  default-OFF per R-F (adoption returns to the user).
   verify: `build/research-loop38.md` committed in the standard shape (this one
   cites in-repo evidence — `build/critic-r37.md` F7/F8 — rather than
   literature, and says so); `build/plan.md` contains the `loop38:` cycles
@@ -1716,3 +1724,107 @@ shipped until its entry point is exercised") live in
   evidence packs); report committed. ENTRY CONDITION: loops 38-44 closed
   (shipped or explicitly rejected in writing), no open critic finding above
   LOW. Core-design: NO.
+
+### loop38: cycles (selected from build/research-loop38.md, cycle R38)
+
+- [ ] CYCLE 74 — `loop38:` graph tools in the registry: `graph_query` /
+  `graph_path` / `graph_explain` tool modules + SPECS/PARAMS entries +
+  read-only sandbox classification; staleness check in-band (`[stale: graph
+  older than HEAD]`, never silent); `codemonkey graph <symbol>` print
+  sub-command | est: 40m |
+  verify (R-I): `uv run codemonkey graph run_turns` → exit 0, prints the node
+  + ≥1 edge from THIS repo's graphify-out; `uv run python -c "from codemonkey
+  import tools; assert 'graph_query' in tools.SPECS"` → exit 0; LIVE probe:
+  `uv run codemonkey exec --ephemeral --approval never --json "Use the
+  graph_query tool to look up run_turns, then name one file that imports it."`
+  → exit 0 and the `--json` tool trace contains `graph_query` (transcript to
+  `build/probes/cycle74-*`; BLOCKED+reason if the endpoint is down — the CLI
+  and registry probes still run); `uv run pytest -q tests/test_graph_tools.py`
+  → exit 0 (≥5 tests: registry/SPECS presence, read-only allowance, stale-graph
+  marker, missing-graph honesty, path lookups).
+- [ ] CYCLE 75 — `loop38:` strategy domain `context`: `static` (default —
+  byte-identical to today's block assembly) | `learned` (learnedctx.assemble
+  over project-context / instructions / memory / repo-map fragments under a
+  token budget); config `strategies.context` + env
+  `CODEMONKEY_STRATEGY_CONTEXT`; wired in exec.py beside the existing
+  repo_map/instructions assembly | est: 30m |
+  verify (R-I): with a RECORDING provider through the real `run_turns` via
+  `run_exec`, `CODEMONKEY_STRATEGY_CONTEXT=learned` + tiny budget selects the
+  task-overlapping fragment and drops the wide one — the system prompt
+  differs observably vs `static`; `uv run codemonkey config` shows
+  `context: learned` effective (A19 surface); unknown name → exit 2 listing
+  valid names; `uv run pytest -q tests/test_context_strategy.py` → exit 0
+  (≥5 tests); full suite green.
+- [ ] CYCLE 76 — `loop38:` memory strategy `adaptive`: registered in the
+  memory domain (default stays `file`); token-budgeted recency-decay
+  selection over the memory file via adaptivemem; config/env selectable |
+  est: 30m |
+  verify (R-I): with a recording provider through the real `run_turns`,
+  `CODEMONKEY_STRATEGY_MEMORY=adaptive` + small budget injects only the
+  selected lines (system prompt observable); `uv run codemonkey config` shows
+  `memory: adaptive`; `uv run pytest -q tests/test_memory_adaptive.py` →
+  exit 0 (≥4 tests: round-trip, budget honored, non-selected lines absent,
+  unknown name exit 2); full suite green.
+- [ ] CYCLE 77 — `loop38:` R-H FIRST, then eval early-stop: `certify`'s
+  fixed-n Hoeffding bound RENAMED to what it is (`hoeffding_gate`, verdicts
+  carry `kind: "hoeffding-gate"`; `sequential_verdict` deprecated alias kept
+  one release with a warning), then `eval --early-stop --delta 0.05` prints
+  the named gate verdict and stops the suite when it settles; loop-30-era
+  numbers re-labeled as measured under the fixed-n gate (superseded note in
+  the register) | est: 40m |
+  verify (R-H + R-I): `uv run pytest -q tests/test_certify.py` → exit 0
+  (renamed API; old name warns but still works); LIVE probe: a 6-task trivial
+  suite `uv run codemonkey eval build/suites/trivial.yaml --early-stop
+  --delta 0.2` → exit 0, output prints a `hoeffding-gate` certificate line and
+  stops before task 6 (transcript `build/probes/cycle77-*`; BLOCKED+reason if
+  the endpoint is down).
+- [ ] CYCLE 78 — `loop38:` eval rubrics: suite tasks may carry
+  `rubric: ["contains: x", "absent: y", "regex: ..."]` steps; rubric scores
+  compose into task scoring (`rubric: {steps, passed, score}` in results, task
+  ok=false when the rubric fails); rubric-only tasks allowed (no stdout
+  contract) | est: 30m |
+  verify (R-I): golden-suite run where a task's stdout check passes but its
+  rubric fails → `results.json` shows the rubric verdict driving ok=false;
+  `uv run codemonkey eval build/suites/rubric.yaml` → exit 0 with per-task
+  rubric detail in the output and results.json (transcript
+  `build/probes/cycle78-*`); `uv run pytest -q tests/test_eval_rubrics.py` →
+  exit 0 (≥4 tests).
+- [ ] CYCLE 79 — `loop38:` `exec --best-of N` (default OFF, N=1) behind a
+  verify command (config `verify_command` or `--verify-command`; exit 2 when
+  N>1 without one); N full attempts, zero-residue workspace reset between
+  candidates (full-tree snapshot incl. new files), first verifier-pass wins,
+  honest failure keeps the last evidence; `bestofn.*` events | est: 40m |
+  verify (R-I): scripted real-exec run (fake provider, attempt 1 wrong /
+  attempt 2 right, verify command checks the file) → run ends exit 0, final
+  tree carries the verified content, `bestofn.attempt` events count 2,
+  `bestofn.completed{ok,index}` present; byte-identity probe: files created
+  by attempt 1 are ABSENT after the reset (full-tree reset, not
+  checkpoint-group only); usage probe: `--best-of 2` with no verify command →
+  exit 2; `uv run pytest -q tests/test_bestofn_exec.py` → exit 0 (≥6 tests);
+  full suite green.
+- [ ] CYCLE 80 — `loop38:` `codemonkey branch` sub-command:
+  `branch create <name> [--base HEAD]` / `branch list` / `branch diff <name>`
+  / `branch remove <name>` over git worktrees in `.branches/` (branches.py
+  wired; .branches gitignored) | est: 30m |
+  verify (R-I): on a scratch git repo, `uv run codemonkey branch create demo`
+  → exit 0, `.branches/demo` exists, `git worktree list` names it;
+  `branch diff demo` → exit 0; `branch remove demo` → exit 0 and gone;
+  `branch create demo` outside a git repo → exit 2 with a clear error;
+  `uv run pytest -q tests/test_branch_cli.py` → exit 0 (≥5 tests).
+- [ ] CYCLE 81 — `loop38:` the register: reconstruct
+  `build/CAPABILITY_REGISTER.md` — one row per module in `src/codemonkey/`
+  reading PROVEN-LIVE (entry probe named) / UNIT-ONLY (reason) / DEAD;
+  R-A armed: any module that cannot earn an entry probe is DELETED in this
+  cycle and its row records the deletion verdict; the deletion decision is
+  mechanical (entry point exercised or not) | est: 40m |
+  verify: `build/CAPABILITY_REGISTER.md` exists with a row for every module
+  (count matches `ls src/codemonkey/*.py | wc -l`); no row reads UNVALIDATED;
+  each PROVEN-LIVE row names its entry probe; deletion verdicts recorded with
+  their evidence; full suite green; graphify committed with the cycle.
+- [ ] CYCLE loop38-final — Loop 38 acceptance: full A1–A20 re-sweep (live
+  where the endpoint allows, BLOCKED+reason per row otherwise) + the loop-38
+  entry-point probes; BUILD_REPORT loop-38 section; Gate 6 report to the user
+  (including: whether `--best-of` adoption should be default beyond OFF per
+  R-F, and the loop-39..45 continuation) | est: 40m |
+  verify: `bash build/acceptance_sweep.sh` → all exit 0 (BLOCKED rows carry
+  reasons); `uv run pytest -q` → exit 0; report committed.
