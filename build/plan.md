@@ -772,6 +772,18 @@ journal key semantics that cycle 36-38 will build on.
 
 
 
+
+### loop19: cycles (selected from build/research-loop19.md, cycle R19)
+
+- [ ] CYCLE 56 — `loop19:` codemonkey budget — VRAM→tokens calculator
+  (per-token KV bytes = 2×layers×kv_heads×head_dim×bytes), safe context_limit
+  + 40% observation split, copiable YAML block, honest metadata-missing error
+  with override flags | est: 30m |
+  verify: `uv run pytest tests/test_budget.py -q` → exit 0 (≥6 tests);
+  `uv run pytest -q` → exit 0.
+- [ ] CYCLE loop19-final — Loop 19 acceptance: sweep + report + push |
+  est: 30m | verify: sweep green; suite green; report; pushed.
+
 ### loop18: cycles (selected from build/research-loop18.md, cycle R18)
 
 - [x] CYCLE 54 — `loop18:` unload-fallback rerouting: 400 "No model loaded"
@@ -1140,7 +1152,7 @@ live with zero BLOCKED rows.
   operate in — otherwise R18 records BLOCKED and appends no cycles (a
   synthetic repo is not a foreign repo). Core-design: NO for the log; PARTIAL
   if a friction's only fix changes tool semantics — that fix ends by asking.
-- [ ] CYCLE R19 — Loop 19 research: mid-turn resume and crash truth (D1,
+- [x] CYCLE R19 — Loop 19 research: mid-turn resume and crash truth (D1,
   deferred in loop 7, chartered and missed in loop 12) — exactly-once replay
   of the in-flight intent off the journal, a crash-point taxonomy (before the
   call / after call before journal write / after journal write before effect /

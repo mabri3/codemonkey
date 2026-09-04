@@ -1883,3 +1883,10 @@ inference.load variants), exec retries once against the default route on the
 single-slot unload error, journals model_unload_fallback, turn.route_meta
 tagged. 55 — affinity.py batch_by_model(); eval resolves route keys, runs
 same-model tasks contiguously, restores suite order for stable baselines.
+
+## 2026-09-03 — CYCLE R19: Loop 19 research — VRAM→tokens budget calculator selected
+
+**Completed:** `build/research-loop19.md` — codemonkey budget (56): per-token
+KV math + safe context_limit/observation split. BaKlaVa per-layer allocation
+adopted as design note (client shows per-component priority; allocator is
+server-side). NVMe offload NOT selected (server-side).
