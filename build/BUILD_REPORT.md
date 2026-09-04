@@ -839,3 +839,16 @@ ping-ponging.
 | Env quarantine (60) | tests/test_envquarantine.py: snapshot/restore, prefixed scrub, extras, sensitive filter, autouse behavior | ✅ 5/5 |
 
 **LOOP 23 COMPLETE.**
+
+
+---
+
+# Loop 24 — Final Acceptance (CYCLE loop24-final)
+
+**Suite:** 515 passed.
+
+| Improvement | Probe | Result |
+|---|---|---|
+| role_presets (61) | tests/test_role_presets.py: resolution, unknown-role fallback, empty config, cmd overlay immutability, journal contract | ✅ 5/5 |
+
+**LOOP 24 COMPLETE.**

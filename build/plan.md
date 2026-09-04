@@ -775,6 +775,13 @@ journal key semantics that cycle 36-38 will build on.
 
 
 
+
+
+### loop24: cycles (from build/research-loop24.md, cycle R24)
+
+- [x] CYCLE 61 — `loop24:` role_presets (done)
+- [x] CYCLE loop24-final — Loop 24 acceptance: sweep + report + push
+
 ### loop22: cycles (from build/research-loop22.md, cycle R22)
 
 - [x] CYCLE 59 — `loop22:` exec --dry-run preview mode
@@ -1248,7 +1255,7 @@ live with zero BLOCKED rows.
   narrows to the diff-gated approval mode alone (justified by D6 independent
   of friction evidence). Core-design: PARTIAL — the diff-gated approval mode
   changes approval semantics and ends by asking; read-only viewers do not.
-- [ ] CYCLE R24 — Loop 24 research: concurrency and shared state (D9 —
+- [x] CYCLE R24 — Loop 24 research: concurrency and shared state (D9 —
   `delegate_batch` already runs workers concurrently while `jobs.py` is
   single-writer, deferred at loop 12 for want of file locking) — locking or
   lock-free design for every store two processes can touch, conflict semantics

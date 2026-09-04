@@ -1926,3 +1926,8 @@ compute via args_key (jkey scope bug caught by test_batch_edit).
 **Completed:** envquarantine.py (snapshot/restore/scrub + SENSITIVE_MODULES),
 autouse restore fixture + scrubbed_env fixture, sweep SWEEP_OFFLINE=1 guard.
 LOOP 23 COMPLETE. 510 tests.
+
+## 2026-09-03 — CYCLE 61+loop24-final (loop24): delegate role presets shipped
+
+**Completed:** rolepresets.py (resolve_role_preset + apply_to_cmd), journal
+contract via route records. LOOP 24 COMPLETE. 515 tests.
