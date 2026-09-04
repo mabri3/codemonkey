@@ -1931,3 +1931,9 @@ LOOP 23 COMPLETE. 510 tests.
 
 **Completed:** rolepresets.py (resolve_role_preset + apply_to_cmd), journal
 contract via route records. LOOP 24 COMPLETE. 515 tests.
+
+## 2026-09-03 — CYCLE 62+loop25-final (loop25): watch frames + multi-digest
+
+**Completed:** status render_frame (pure watch cycle) +
+digest_recent/render_multi (newest-first, sectioned). LOOP 25 COMPLETE.
+515→520 tests.

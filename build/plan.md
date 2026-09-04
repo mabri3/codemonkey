@@ -777,6 +777,12 @@ journal key semantics that cycle 36-38 will build on.
 
 
 
+
+### loop25: cycles (from build/research-loop25.md, cycle R25)
+
+- [x] CYCLE 62 — `loop25:` status --watch frames + digest --last
+- [x] CYCLE loop25-final — Loop 25 acceptance
+
 ### loop24: cycles (from build/research-loop24.md, cycle R24)
 
 - [x] CYCLE 61 — `loop24:` role_presets (done)
@@ -1271,7 +1277,7 @@ live with zero BLOCKED rows.
   and defers concurrent crash semantics explicitly. Core-design: YES (shared
   mutable state across processes; the standing R8/R11 concurrent-model-turns
   flag may be RAISED here, never assumed) — R24 ENDS BY ASKING.
-- [ ] CYCLE R25 — Loop 25 research: long-thread economy (D12 — journals,
+- [x] CYCLE R25 — Loop 25 research: long-thread economy (D12 — journals,
   spills, checkpoints and session stores grow unbounded; GC was an R12 seed
   never taken; no job here has outlived a single run by days) — measured
   growth per store under a long job BEFORE any policy is designed, retention

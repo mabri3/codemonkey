@@ -852,3 +852,16 @@ ping-ponging.
 | role_presets (61) | tests/test_role_presets.py: resolution, unknown-role fallback, empty config, cmd overlay immutability, journal contract | ✅ 5/5 |
 
 **LOOP 24 COMPLETE.**
+
+
+---
+
+# Loop 25 — Final Acceptance (CYCLE loop25-final)
+
+**Suite:** 520 passed.
+
+| Improvement | Probe | Result |
+|---|---|---|
+| Watch frames + digest --last (62) | tests/test_watch_digest.py: pure frame, newest-first digest, empty tolerance, multi-sections, latest-sessions order | ✅ 5/5 |
+
+**LOOP 25 COMPLETE.**
