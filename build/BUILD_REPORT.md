@@ -749,3 +749,28 @@ post-v1.0.0, from first-week live defects on .176.
 aa17377 (R17) → 98e40b6 (C52) → e27949c (C53) → this commit (loop17-final).
 
 **LOOP 17 COMPLETE.**
+
+
+---
+
+# Loop 18 — Final Acceptance (CYCLE loop18-final)
+
+**Date:** 2026-09-03 · **Suite:** 481 passed.
+
+## Loop-18 criteria (from build/research-loop18.md — all pass)
+
+| Improvement | Probe | Result |
+|---|---|---|
+| Unload-fallback rerouting (54) | tests/test_unload_fallback.py: unload-sentence classification (400 class detected; auth/500/transport NOT), fallback route shape, live retried-once exec flow (2 run_turns calls, no failure) | ✅ 3/3 |
+| Model-affinity batching (55) | tests/test_batch_by_model.py: grouping, first-appearance group order, stable within group, empty/single, mixed route shapes; eval restores SUITE order (tests/test_eval.py 10/10 green) | ✅ 5/5 |
+
+## Live incident closure
+The loop-17 A16 root cause ("No model loaded" after a routing probe unloaded
+the slot) is now handled client-side: detect → journal model_unload_fallback
+→ retry once on the default route. Eval batches by model to prevent
+ping-ponging.
+
+## Loop-18 commit range
+6c6b257 (R18) → 9ca9553 (C54) → a0e8921 (C55) → this commit.
+
+**LOOP 18 COMPLETE.**

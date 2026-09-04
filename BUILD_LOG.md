@@ -1875,3 +1875,11 @@ the journal route records make this measurable.
 **Completed:** `build/research-loop18.md` — client-side unload detection +
 one-shot default-model fallback (54), model-affinity batching to minimize
 slot swaps (55). Server-side routers/llama-swap documented not adopted.
+
+## 2026-09-03 — CYCLE 54/55 (loop18): unload-fallback + affinity batching
+
+**Completed:** 54 — unload.py classifier (No model loaded / not loaded /
+inference.load variants), exec retries once against the default route on the
+single-slot unload error, journals model_unload_fallback, turn.route_meta
+tagged. 55 — affinity.py batch_by_model(); eval resolves route keys, runs
+same-model tasks contiguously, restores suite order for stable baselines.
