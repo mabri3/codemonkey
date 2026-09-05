@@ -2741,3 +2741,24 @@ false `max_turns` error → exit 0 at turn 5, clean.
   points are re-verified against the tree when its cycles are built, and a
   dead citation is a BLOCKING finding — needs adopting alongside R-J/R-K
   before R46–R50 cycles are built.
+
+## 2026-09-05 — CYCLE 96 (loop41, R41-C5): partial-application counter + baseline
+
+**Completed:** `src/codemonkey/partial.py` — post-hoc classifier over journal
+thread records (PARTIAL requires an edit failure AFTER the first landing,
+91F1 ordering; report names which key failed after which landed key;
+verifier half explicitly unclaimed — no verify records exist in the
+journal). Population = runs ATTEMPTING >= 2 distinct edits (a landed-gate
+would drop the very failure mode counted — caught by the suite's own
+discriminator test during construction). Empty population → rate None, not
+0.0. `tests/test_partial_counter.py` 9/9 (every label's discriminator incl.
+91F1/91F3 cases: failure-before-landing, failure-nothing-landed, replay
+dedup, attempted-population, None-rate).
+**Baseline over 56 journal threads (13,966 records): 11 threads with edits,
+ALL single-edit, 0 multi-edit attempts → rate None (denominator zero).**
+The failure mode has never occurred in recorded history because no recorded
+run ever attempted a second edit. The counter stands ready for C97+ runs.
+Full suite 703/5.
+- **Known issues:** none.
+- **Next step:** C97 plan object + atomic apply (ASK 1+2 recorded at C96:
+  OFF/opt-in per R-F, `undo` untouched, rollback under a new verb).

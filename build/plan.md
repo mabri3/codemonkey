@@ -2151,9 +2151,24 @@ loop 45's v4.0 acceptance. This section is a plan, not a queue.
 
 ### loop41: cycles (selected from build/research-loop41.md, cycle R41)
 
-- [ ] CYCLE 96 — `loop41:` partial-application counter: instrument multi-file
+- [x] CYCLE 96 — `loop41:` partial-application counter: instrument multi-file
   runs (hunks-planned vs hunks-landed vs verifier outcome) and report the
   baseline count | est: 30m |
+  R41 ASK DECIDED 2026-09-05, recorded verbatim at the authorizing cycles:
+  (1) "Plan object + atomic apply/rollback (C1+C3) — APPROVED, sequenced:
+  C96's baseline lands first, the capability ships OFF/opt-in per R-F, and
+  the acceptance probe is the mid-plan-failure scenario (kill mid-plan, the
+  tree must be whole, and the report must name what the plan was)." →
+  authorizes C97/C98. (2) "C6 undo semantics — REJECTED as proposed. `undo`
+  keeps file semantics. Plan rollback lives under a new verb. Redefining a
+  shipped command for every existing script is the same call I made on C94,
+  and you rejected it as a default yourselves." → C97/C98 MUST NOT change
+  `undo`; rollback ships under a new verb. (3) "C4 worktree-boundary plans —
+  APPROVED opt-in only, conditional on the number: loop41-final reports the
+  C96 partial-application rate and the per-plan cost of the second tree +
+  second verify run, and if the rate doesn't justify the spend, C4 gets an
+  R-A deletion cycle rather than a default." → authorizes loop41-final's
+  C4 measurement, opt-in only.
   verify (R-I): scripted runs produce the count; `uv run pytest -q
   tests/test_changeplan.py` → exit 0 (≥4 tests); full suite green.
 - [ ] CYCLE 97 — `loop41:` plan object + atomic apply/rollback on the 14F1
