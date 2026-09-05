@@ -2810,3 +2810,20 @@ verified live (`rollback --list` + named rollback). Tests
 `test_changeplan.py` 7/7. Full suite 725/5.
 - **Known issues:** none.
 - **Next step:** C98 graph-grounded impact analysis (both counts reported).
+
+## 2026-09-05 — CYCLE 97F1 (HIGH): mixed-tree honesty
+
+**Fixed:** `note_shell(plan, cmd)` classifies the raw in-memory command via
+96F1's `shell_mutation`/`shell_targets` (raw never persisted — plan.json
+verified free of command text); only pattern-matching calls listed with
+pattern + targets. `plan_report` carries `shell_uncovered_paths` +
+`shell_mutating_calls`. The gave-up closing itself now names them
+("rolled back N files; M shell-mediated change(s) to <paths> are OUTSIDE
+the rollback and remain in the tree") — computed before rollback from the
+pre-rollback report. `rollback` CLI names the paths too.
+**Verify (R-I):** mixed scripted run (write lands + heredoc lands → gave_up)
+→ edit reverted, shell file remains, report + closing name `s.txt`;
+non-mutating-shell control (echo) raises no warning and lists nothing
+(the 91F1 discriminator). 10/10 changeplan tests. Full suite 728/5.
+- **Known issues:** none.
+- **Next step:** C98 graph-grounded impact analysis.

@@ -607,11 +607,13 @@ def run_turns(
                         )
                 except OSError:
                     pass
-            # loop41 cycle 97: shell ran inside a plan scope — counted as
-            # uncovered, never rolled back (the plan report says so).
+            # loop41 cycle 97: shell ran inside a plan scope — 97F1 passes
+            # the RAW command so the plan knows whether atomicity is
+            # compromised (classification in-memory only, never stored raw).
             if name == "shell" and plan is not None:
                 try:
-                    _plm.note_shell(plan)
+                    _plm.note_shell(
+                        plan, str((call.get("args") or {}).get("command", "")))
                 except Exception:
                     pass
             # loop40 cycle 93: feed successful file writes to the repro gate
@@ -990,6 +992,23 @@ def run_turns(
             # carry the pair that justifies the claim so it is checkable.
             _gave["advised_pair"] = list(recovery_tracker.advisory_pair or ())
             _gave["matched_pair"] = list(_post_advisory_pair or ())
+            # 97F1: the closing is composed BEFORE rollback runs — compute the
+            # mixed-tree sentence here so the operator-readable text names
+            # the uncovered paths by name, not just the JSON.
+            _plan_shell_note = ""
+            if plan is not None:
+                try:
+                    _rep0 = _plm.plan_report(plan)
+                    _paths0 = _rep0.get("shell_uncovered_paths", [])
+                    if _paths0:
+                        _plan_shell_note = (
+                            f" Rolled back {len(plan.files)} tracked "
+                            f"file(s); {_rep0.get('shell_mutating_calls', 0)} "
+                            f"shell-mediated change(s) to "
+                            f"{', '.join(_paths0)} are OUTSIDE the rollback "
+                            f"and remain in the tree.")
+                except Exception:
+                    _plan_shell_note = ""
             _closing = (
                 f"GAVE UP (recovery policy enforced stop): the policy advisory "
                 f"issued at turn {recovery_tracker.advisory_turn} about "
@@ -999,7 +1018,8 @@ def run_turns(
                 f"{recovery_tracker.first_stuck_turn}. "
                 f"Checkpoint to resume from: {_cp2 or '(none)'} "
                 f"(journal thread {journal_thread or '(ephemeral)'}). "
-                f"Not a model error — the run stopped itself by policy.")
+                f"Not a model error — the run stopped itself by policy."
+                f"{_plan_shell_note}")
             if on_event:
                 on_event({"type": "failure_report.gave_up", "report": _gave})
             if journal_thread:

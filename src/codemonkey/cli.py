@@ -373,8 +373,14 @@ def rollback(
     for rel in result["missing"]:
         typer.echo(f"  MISSING {rel}")
     if result["shell_calls_uncovered"]:
-        typer.echo(f"  note: {result['shell_calls_uncovered']} shell call(s) "
-                   "ran inside the plan and are NOT covered by rollback")
+        paths = result.get("shell_uncovered_paths", [])
+        if paths:
+            typer.echo(f"  OUTSIDE the rollback and remaining in the tree: "
+                       f"{', '.join(paths)}")
+        else:
+            typer.echo(f"  note: {result['shell_calls_uncovered']} shell call(s) "
+                       "ran inside the plan (none matched a mutation pattern) "
+                       "and are NOT covered by rollback")
 
 
 @app.command()

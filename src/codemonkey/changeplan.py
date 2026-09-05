@@ -52,7 +52,11 @@ class ChangePlan:
     started: float
     group_dir: Path
     files: dict = field(default_factory=dict)  # rel -> {"existed": bool}
-    shell_calls: int = 0  # mutations outside _save: counted, not covered
+    shell_calls: int = 0  # every shell invocation in scope: counted
+    shell_mutating: list = field(default_factory=list)  # 97F1: pattern +
+    # redirect targets of shell calls that MATCHED a mutation pattern —
+    # these paths sit OUTSIDE the rollback guarantee. Non-matching shell
+    # is counted in shell_calls but never listed here.
 
 
 def begin_plan(workdir: Path) -> ChangePlan:
@@ -94,6 +98,7 @@ def _persist(plan: ChangePlan) -> None:
         "plan_id": plan.plan_id, "workdir": plan.workdir,
         "started": plan.started, "files": plan.files,
         "shell_calls": plan.shell_calls,
+        "shell_mutating": plan.shell_mutating,
     }, indent=1))
 
 
@@ -111,14 +116,34 @@ def note_write(plan: ChangePlan, workdir: Path, rel: str,
     _persist(plan)
 
 
-def note_shell(plan: ChangePlan) -> None:
-    """A shell call ran inside the plan scope: counted, not covered."""
+def note_shell(plan: ChangePlan, cmd: str = "") -> None:
+    """A shell call ran inside the plan scope (97F1: with its command).
+
+    Classification runs on the RAW in-memory command (never stored — the
+    journal holds the redacted copy). Only pattern-matching calls are
+    listed with pattern name + redirect targets; the raw text itself is
+    NOT persisted here.
+    """
     plan.shell_calls += 1
+    if cmd:
+        try:
+            from .partial import shell_mutation, shell_targets
+
+            mut, pname = shell_mutation(cmd)
+            if mut:
+                plan.shell_mutating.append({
+                    "pattern": pname,
+                    "targets": shell_targets(cmd),
+                })
+        except Exception:
+            pass
     _persist(plan)
 
 
 def plan_report(plan: ChangePlan) -> dict:
     """The report names what the plan was: id, workspace, files, coverage."""
+    uncovered = sorted({t for m in plan.shell_mutating for t in m["targets"]
+                        if t})
     return {
         "plan_id": plan.plan_id,
         "workdir": plan.workdir,
@@ -127,6 +152,8 @@ def plan_report(plan: ChangePlan) -> dict:
         "n_existed": sum(1 for f in plan.files.values() if f["existed"]),
         "n_created": sum(1 for f in plan.files.values() if not f["existed"]),
         "shell_calls_during_plan": plan.shell_calls,
+        "shell_mutating_calls": len(plan.shell_mutating),
+        "shell_uncovered_paths": uncovered,
         "shell_covered": False,
     }
 
@@ -161,7 +188,8 @@ def rollback_plan(plan: ChangePlan, workdir: Path) -> dict:
             # absent already → nothing to do, not even worth naming
     return {"plan_id": plan.plan_id, "restored": sorted(restored),
             "removed": sorted(removed), "missing": sorted(missing),
-            "shell_calls_uncovered": plan.shell_calls}
+            "shell_calls_uncovered": plan.shell_calls,
+            "shell_uncovered_paths": plan_report(plan)["shell_uncovered_paths"]}
 
 
 def load_plan(plan_id: str) -> ChangePlan:
@@ -171,7 +199,8 @@ def load_plan(plan_id: str) -> ChangePlan:
     plan = ChangePlan(plan_id=doc["plan_id"], workdir=doc["workdir"],
                       started=doc["started"], group_dir=group,
                       files=doc["files"],
-                      shell_calls=doc.get("shell_calls", 0))
+                      shell_calls=doc.get("shell_calls", 0),
+                      shell_mutating=doc.get("shell_mutating", []))
     return plan
 
 

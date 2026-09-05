@@ -217,3 +217,90 @@ def test_persisted_plan_reloads_for_crash_recovery(home):
     loaded = pl_mod.load_plan(pid)
     assert loaded.files == {"f.txt": {"existed": True}}
     assert any(p["plan_id"] == pid for p in pl_mod.list_plans())
+
+
+# ---------------- 97F1: mixed-tree honesty ----------------
+
+class _MixedProv:
+    """write_file lands, shell heredoc lands, then the same failing call
+    until the policy gives up."""
+    protocol = "prompt"
+
+    def __init__(self):
+        self.n = 0
+
+    def chat(self, messages, system=None, **kw):
+        self.n += 1
+        if self.n == 1:
+            return _tool("write_file", {"path": "a.txt", "content": "aaa"})
+        if self.n == 2:
+            return _tool("shell", {"command": "printf 'sh' > s.txt"})
+        return _tool("shell", {"command": "exit 1"})
+
+    def close(self):
+        pass
+
+
+class _CleanShellProv:
+    """write_file lands, NON-mutating shell only, then stuck."""
+    protocol = "prompt"
+
+    def __init__(self):
+        self.n = 0
+
+    def chat(self, messages, system=None, **kw):
+        self.n += 1
+        if self.n == 1:
+            return _tool("write_file", {"path": "a.txt", "content": "aaa"})
+        if self.n == 2:
+            return _tool("shell", {"command": "echo hello"})
+        return _tool("shell", {"command": "exit 1"})
+
+    def close(self):
+        pass
+
+
+def test_mixed_tree_names_shell_path_in_report_and_closing(home):
+    workdir, turn, events = _run(home, "ws-mixed", _MixedProv())
+    assert getattr(turn, "gave_up", None), "run must declare failure"
+    assert not (workdir / "a.txt").exists(), "tracked edit reverted"
+    assert (workdir / "s.txt").read_text() == "sh", "shell file remains"
+    rb = turn.gave_up["plan_rollback"]
+    assert rb["shell_uncovered_paths"] == ["s.txt"]
+    assert rb["shell_mutating_calls"] == 1
+    closing = turn.gave_up["closing"]
+    assert "s.txt" in closing and "OUTSIDE" in closing, closing
+    rolled = next(e for e in events if e["type"] == "plan.rolled_back")
+    assert rolled["report"]["shell_uncovered_paths"] == ["s.txt"]
+
+
+def test_non_mutating_shell_raises_no_warning(home):
+    # 91F1 lesson as discriminator: grep/ls/echo must NOT arm the warning.
+    workdir, turn, events = _run(home, "ws-clean", _CleanShellProv())
+    assert getattr(turn, "gave_up", None)
+    rb = turn.gave_up["plan_rollback"]
+    assert rb["shell_mutating_calls"] == 0
+    assert rb["shell_uncovered_paths"] == []
+    assert "OUTSIDE" not in turn.gave_up["closing"]
+    assert (workdir / "a.txt").exists() is False
+
+
+def test_note_shell_lists_only_mutating(home):
+    plan = pl_mod.begin_plan(home)
+    try:
+        pl_mod.note_shell(plan, "printf x > s.txt")
+        pl_mod.note_shell(plan, "ls -la")
+        pl_mod.note_shell(plan, "")
+        assert plan.shell_calls == 3
+        assert len(plan.shell_mutating) == 1
+        assert plan.shell_mutating[0]["pattern"] == "redirect"
+        assert plan.shell_mutating[0]["targets"] == ["s.txt"]
+        rep = pl_mod.plan_report(plan)
+        assert rep["shell_uncovered_paths"] == ["s.txt"]
+        assert rep["shell_mutating_calls"] == 1
+        import json
+        raw = (plan.group_dir / "plan.json").read_text()
+        assert "printf" not in raw, "raw command text must not persist"
+    finally:
+        if pl_mod.current_plan() is plan:
+            pl_mod.end_plan()

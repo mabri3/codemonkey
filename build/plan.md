@@ -2188,6 +2188,16 @@ loop 45's v4.0 acceptance. This section is a plan, not a queue.
   C4 measurement, opt-in only.
   verify (R-I): scripted runs produce the count; `uv run pytest -q
   tests/test_changeplan.py` → exit 0 (≥4 tests); full suite green.
+- [x] CYCLE 97F1 — critic 97F1 (HIGH): mixed-tree honesty. note_shell
+  takes the command; shell_mutation/shell_targets record whether plan
+  atomicity is compromised and which paths sit outside the guarantee;
+  plan_report carries those paths; the gave-up closing itself names them
+  ("rolled back N files; M shell-mediated changes to <paths> are OUTSIDE
+  the rollback and remain in the tree") | est: 30m |
+  verify (R-I): scripted run (write_file lands + shell heredoc lands, then
+  gave_up) → edit reverted, shell file remains, report + closing name the
+  shell path; non-mutating-shell control raises no warning;
+  `uv run pytest -q tests/test_changeplan.py` → exit 0; full suite green.
 - [x] CYCLE 97 — `loop41:` plan object + atomic apply/rollback on the 14F1
   group; induced mid-plan failure leaves the tree byte-identical
   (`git status` clean, `git diff` empty) | est: 40m |
