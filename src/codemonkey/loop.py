@@ -74,6 +74,7 @@ def run_turns(
     prompt_cache: bool = True,
     journal_thread: str = "",
     journal_run: str = "",
+    redact_needles: list | None = None,
     perm_rules: list | None = None,
     dry_run: bool = False,
     recovery_budget: int = 8,
@@ -374,6 +375,19 @@ def run_turns(
         def _run_one(idx: int, call: dict):
             """Execute one parsed call. Returns (idx, name, ok, output, meta)."""
             name = call.get("name", "")
+            # 96F1: shell commands are journaled pre-redacted (caller-side
+            # redact via config needles; record() never sees raw text).
+            # None needles = unknown provenance → store nothing.
+            def _shell_kw() -> dict:
+                if name != "shell" or redact_needles is None:
+                    return {}
+                try:
+                    from .redact import redact_text as _rt
+
+                    raw = str((call.get("args") or {}).get("command", ""))
+                    return {"cmd": _rt(raw, redact_needles)[0][:500]}
+                except Exception:
+                    return {}
             # R37F1: the journal key is needed by the permission-rule audit
             # record BELOW as well as by the dispatch bookkeeping further
             # down. It used to be assigned only after the approval gate, so
@@ -534,7 +548,8 @@ def run_turns(
                         return (idx, name, hit.get("status") == "ok",
                                 hit.get("output", ""),
                                 {"replayed": True, "_jkey": jkey})
-                    _jr(journal_thread, "intent", tool=name, key=jkey)
+                    _jr(journal_thread, "intent", tool=name, key=jkey,
+                        **_shell_kw())
                 except OSError:
                     jkey = ""
             t0 = time.monotonic()
@@ -547,7 +562,8 @@ def run_turns(
 
                         _jr(journal_thread, "outcome", tool=name, key=jkey,
                             status="error", error_class=_ce(exc),
-                            duration_ms=int((time.monotonic() - t0) * 1000))
+                            duration_ms=int((time.monotonic() - t0) * 1000),
+                            **_shell_kw())
                     except OSError:
                         pass
                 return (idx, name, False, f"error: {exc}",
@@ -561,6 +577,7 @@ def run_turns(
                         error_class=("tool-error" if not result.ok else ""),
                         duration_ms=int((time.monotonic() - t0) * 1000),
                         output=result.output,
+                        **_shell_kw(),
                         )
                 except OSError:
                     pass

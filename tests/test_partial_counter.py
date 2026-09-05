@@ -87,7 +87,9 @@ def test_summarize_rate_is_partial_over_multi_edit():
         "t4": classify_thread([]),
     }
     s = summarize(classified)
-    assert s == {"threads": 4, "with_edits": 3, "multi_edit": 2,
-                 "partial": 1, "partial_threads": ["t2"], "rate": 0.5,
-                 "labels": {"t1": "CLEAN", "t2": "PARTIAL",
-                            "t3": "SINGLE", "t4": "NO_EDITS"}}
+    assert s["threads"] == 4 and s["with_edits"] == 3
+    assert s["multi_edit"] == 2 and s["partial"] == 1
+    assert s["partial_threads"] == ["t2"] and s["rate"] == 0.5
+    assert s["dark_shell"] == 0 and "unobservable" in s["scope"]
+    assert s["labels"] == {"t1": "CLEAN", "t2": "PARTIAL",
+                           "t3": "SINGLE", "t4": "NO_EDITS"}

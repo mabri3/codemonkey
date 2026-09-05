@@ -2151,6 +2151,23 @@ loop 45's v4.0 acceptance. This section is a plan, not a queue.
 
 ### loop41: cycles (selected from build/research-loop41.md, cycle R41)
 
+- [x] CYCLE 96F1 — critic 96F1 (HIGH): shell mutation path observable.
+  `journal.record()` gains an optional redacted `cmd` field; loop records the
+  shell command (truncated, via `redact_text` with config needles) on shell
+  intent+outcome; `partial.py` classifies shell-mediated mutations by pattern
+  and `summarize` states its scope in its own output; re-baseline over a
+  population that includes shell-mediated edits | est: 40m |
+  verify (R-I): scripted multi-edit run through `run_turns` (fake provider:
+  shell heredoc write lands, later edit fails) → journal re-read classifies
+  PARTIAL; secret-bearing command stored only redacted;
+  `uv run pytest -q tests/test_partial_counter.py tests/test_shell_observable.py`
+  → exit 0; full suite green.
+- [x] CYCLE 96F2 — critic 96F2 (MEDIUM): path parsing in `partial.py` —
+  extract paths from edit outputs ("wrote N bytes to P", "replaced/all
+  outcome lines") and shell redirect targets where present, so distinct
+  edits are exact instead of arg-hash-proxied | est: 30m |
+  verify: 16/18 historical edit outcomes resolve to real paths; same-file
+  double-edit collapses to one key in a probe; tests green; full suite green.
 - [x] CYCLE 96 — `loop41:` partial-application counter: instrument multi-file
   runs (hunks-planned vs hunks-landed vs verifier outcome) and report the
   baseline count | est: 30m |

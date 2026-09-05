@@ -70,8 +70,13 @@ def classify_error(exc: BaseException | None) -> str:
 
 def record(thread_id: str, record_type: str, *, tool: str, key: str,
            status: str = "", error_class: str = "", duration_ms: int = 0,
-           output: str = "") -> dict:
-    """Append one journal record. Best-effort: never raises into the loop."""
+           output: str = "", cmd: str = "") -> dict:
+    """Append one journal record. Best-effort: never raises into the loop.
+
+    `cmd` (96F1) carries a shell command ALREADY redacted by the caller via
+    `redact.redact_text` — record() never sees the raw command. Capped at
+    500 chars; empty means "not a shell call" (or "needles unknown").
+    """
     rec = {
         "ts": time.time(),
         "type": record_type,
@@ -87,6 +92,8 @@ def record(thread_id: str, record_type: str, *, tool: str, key: str,
         rec["duration_ms"] = duration_ms
     if output:
         rec["output"] = output[:2000]  # replay payload cap (cycle 32)
+    if cmd:
+        rec["cmd"] = cmd[:500]  # 96F1: pre-redacted shell text, hard cap
     try:
         with journal_path(thread_id).open("a") as f:
             f.write(json.dumps(rec) + "\n")

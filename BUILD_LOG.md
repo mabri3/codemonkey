@@ -2762,3 +2762,27 @@ Full suite 703/5.
 - **Known issues:** none.
 - **Next step:** C97 plan object + atomic apply (ASK 1+2 recorded at C96:
   OFF/opt-in per R-F, `undo` untouched, rollback under a new verb).
+
+## 2026-09-05 — CYCLES 96F1+96F2: shell observable, paths exact, re-baselined
+
+**96F1 (HIGH) FIXED:** `journal.record()` gains optional `cmd` (pre-redacted
+only — record() never sees raw text, 500 cap); loop journals shell commands
+on intent+outcome via config needles (`redact_needles`, None = store
+nothing); exec.py wires `needles_from_config(cfg)`. `partial.py` classifies
+shell mutations over a conservative named pattern list (redirect/tee/sed
+-i/git apply/patch/mv-cp-rm/dd/git-checkout-restore-clean) and `summarize`
+states its scope in its own output incl. the dark count.
+**96F2 (MEDIUM) FIXED:** `edit_paths`/`shell_targets` — 18/18 historical edit
+outcomes resolve to real paths (incl. atomic multi-file + error forms);
+same-file double-edit collapses to one key; unparseable falls back to hash.
+**Re-baseline (56 threads): 0 multi-edit, rate None, dark_shell 4576.**
+History's shell is permanently dark — presence AND absence of the failure
+mode are both unestablished from history. Tests: `test_shell_observable.py`
+15/15 (patterns + non-mutation controls, dark-never-classified, redaction
+at rest incl. secret-needle probe, None-needles stores nothing, 500-cap) +
+`test_partial_counter.py` 9/9; end-to-end R-I probe (scripted run_turns:
+shell heredoc lands → edit fails → journal re-read PARTIAL) green. Full
+suite 718/5.
+- **Known issues:** none.
+- **Next step:** C97 per R41 ASK 1+2 (plan object OFF/opt-in, new rollback
+  verb, `undo` untouched) — sequencing answer below.

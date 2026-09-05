@@ -511,6 +511,11 @@ def run_exec(
         )
 
     def _attempt(prov, _jrun=None):
+        from .redact import needles_from_config as _nfc
+
+        # 96F1: shell commands journaled pre-redacted with config needles
+        # ([] = known-clean still stores; None never would).
+        _needles = _nfc(cfg)
         return run_turns(
             prov,
             full_prompt,
@@ -539,6 +544,7 @@ def run_exec(
             # so a resumed thread cannot replay an earlier run's write.
             journal_thread=thread_id,
             journal_run=(_jrun or run_id),
+            redact_needles=_needles,
             perm_rules=list(((cfg.get("permissions") or {}).get("rules")) or []),
             dry_run=dry_run,
             recovery_budget=int(cfg.get("recovery_budget", 8) or 0),
