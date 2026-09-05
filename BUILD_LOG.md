@@ -2579,3 +2579,23 @@ tokens, run completes). Full suite 654/5.
 - **Known issues:** none. C91/C92 remain AWAITING-ASK.
 - **Next step:** the R39 ask batch (C91/C92 termination + rollback policy,
   C94-flip default-on) — user decision required before any worker starts them.
+
+## 2026-09-04 — CYCLE 91 (loop39): ENFORCE the stop — evidence-capped
+
+**Completed:** loop.py evidence gate (advisory_turn recorded on consult;
+post-advisory failure → `failure_report.gave_up` with advisory/failed/first-stuck
+turns + checkpoint + journal thread; honest assistant closing; `last_turn.gave_up`;
+break). exec.py: exit **3**, stdout carries the closing, `failure_report.gave_up`
+translated to JSONL. spec.md §Safety records exit 3 (user-required).
+**Tests:** `tests/test_enforced_stop.py` 3/3 (stop with evidence; recovery-after-
+advisory negative control; tracker default) + `tests/test_stuck.py` R-I updated
+to the C91 world + `tests/test_recovery.py` backstop test. Full suite 658/5.
+- **Known issues:** none.
+- **Next step:** CYCLE 92 scoped suggest-only per ASK decision (no code).
+
+## 2026-09-04 — CYCLE 92 (loop39): suggest-only — DONE with no code change
+
+Per the ASK decision ("do not build the auto-restore path"), no auto-restore
+was built. The suggest path is already real: every C90/C91 report names the
+checkpoint group and every budget advisory prints "Checkpoint to resume from".
+Verified by the existing R-I traces (checkpoint_id field present). C92 DONE.

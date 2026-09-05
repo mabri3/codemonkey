@@ -100,6 +100,12 @@ surfaced as `plan` items), `web_fetch` (bounded GET, config-enabled).
   **soft-denied** (notice to stderr naming the tool + how to allow, run
   continues, exit 0 — agy semantics) unless `approval: never` (auto-approve)
   or `--dangerously-bypass-approvals-and-sandbox`.
+- Gave-up exit code (C91, ASK DECIDED 2026-09-04): when the recovery policy
+  has issued a documented alternative and a later tool outcome also failed,
+  the run stops itself and exec exits **3** (distinct from error 1 and usage
+  2). Stdout carries the honest closing (advisory turn, failed turn, first
+  stuck turn, checkpoint to resume from). The stop is evidence-capped, never
+  turn-count-capped: no advisory tried + failed ⇒ no stop.
 
 ## Sessions
 

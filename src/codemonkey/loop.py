@@ -560,6 +560,10 @@ def run_turns(
         outcomes.sort(key=lambda o: o[0])  # deterministic call order
         edit_retry_hint = None
         stuck_signal = None
+        # loop39 cycle 91: evidence for the stop — a failed outcome on a turn
+        # AFTER a policy advisory was issued (the alternative was tried and
+        # also failed). Reset per turn; the stop check reads it below.
+        _post_advisory_failed = False
         for idx, name, ok, result_output, meta in outcomes:
             # loop39 cycle 89: feed every outcome to the stuck detector
             # BEFORE the observation budget splices `result_output`; the
@@ -575,6 +579,20 @@ def run_turns(
             # loop39 cycle 90: first error signal starts the recovery budget
             if not ok and recovery_tracker.first_error_turn is None:
                 recovery_tracker.note_error(_turn_no)
+            # loop39 cycle 90: freshest failed outcome feeds the budget
+            # backstop's taxonomy (alternating failures never re-fire stuck)
+            if not ok:
+                try:
+                    _cls = stuck_mod.classify_outcome(name, ok, result_output, meta)
+                except Exception:
+                    _cls = "unknown"
+                recovery_tracker.last_error = {
+                    "tool": name, "error_class": _cls,
+                    "output": str(result_output or "")[:500]}
+            # loop39 cycle 91: post-advisory failure is the stop evidence
+            if (not ok and recovery_tracker.advisory_turn is not None
+                    and _turn_no > recovery_tracker.advisory_turn):
+                _post_advisory_failed = True
             # 35F1: `_jkey` is the journal key carried back from _run_one (it
             # is a LOCAL there — the old code read an unbound `jkey` in this
             # scope and the surrounding `except Exception` swallowed the
@@ -724,6 +742,11 @@ def run_turns(
                 "content": (f"RECOVERY POLICY [{_policy['taxonomy']} → "
                             f"{_policy['action']}]: {_policy['hint']}"),
             })
+            # loop39 cycle 91 (ASK DECIDED 2026-09-04: stop only after the
+            # policy's documented alternative was tried and also failed).
+            # Record the advisory turn: the evidence gate for the stop.
+            if recovery_tracker.advisory_turn is None:
+                recovery_tracker.advisory_turn = _turn_no
             if on_event:
                 on_event({"type": "failure_report.consulted",
                           "report": _report, "policy": _policy["action"]})
@@ -759,6 +782,51 @@ def run_turns(
                         "This is ADVISORY ONLY — the run continues; report honestly "
                         "if you cannot make progress."),
                 })
+        # ---- budget backstop (loop39, cycle 90): alternating failures never
+        # re-fire the stuck detector, but they still burn budget. One verdict
+        # per run (guarded by the same flag the stuck-path verdict sets), with
+        # taxonomy consulted off the freshest failed outcome. Advisory only.
+        if (recovery_tracker.first_error_turn is not None
+                and recovery_tracker.exhausted(_turn_no)
+                and not recovery_tracker.verdict_emitted):
+            recovery_tracker.verdict_emitted = True
+            _le = recovery_tracker.last_error or {}
+            _bpolicy = recovery_mod.consult(
+                str(_le.get("tool", "")), str(_le.get("error_class", "")),
+                str(_le.get("output", "")))
+            _bsaved = recovery_tracker.saved_vs_max_turns(
+                max_turns, _turn_no, turn_tokens, turns_seen)
+            try:
+                from .checkpoints import list_checkpoints as _lc3
+
+                _cps3 = _lc3(workdir=ctx.workdir)
+                _cp3 = str(_cps3[0]["dir"].name) if _cps3 else ""
+            except Exception:
+                _cp3 = ""
+            _breport = recovery_mod.failure_report(
+                failure_class="budget-exhausted",
+                taxonomy=_bpolicy["taxonomy"],
+                first_stuck_turn=recovery_tracker.first_stuck_turn,
+                attempts=(stuck_det.fired if stuck_det is not None else 0),
+                checkpoint_id=_cp3,
+                journal_thread=journal_thread)
+            if on_event:
+                on_event({"type": "failure_report.budget_exhausted",
+                          "report": _breport,
+                          "would_save_turns": _bsaved["turns"],
+                          "would_save_tokens": _bsaved["tokens"]})
+            messages.append({
+                "role": "user",
+                "content": (
+                    f"RECOVERY BUDGET EXHAUSTED (no stuck pattern — steady "
+                    f"failure burn): {recovery_tracker.post_error_turns(_turn_no)} "
+                    f"turns since the first error (budget {recovery_tracker.budget}). "
+                    f"Stopping now would have saved ~{_bsaved['turns']} turns and "
+                    f"~{_bsaved['tokens']} tokens vs burning to max_turns ({max_turns}). "
+                    f"Checkpoint to resume from: {_cp3 or '(none)'}. "
+                    "This is ADVISORY ONLY — the run continues; report honestly "
+                    "if you cannot make progress."),
+            })
 
         # ---- verify gate (loop4, cycle 19) ------------------------------
         # After any turn whose MUTATING tool calls succeeded, run the
@@ -804,6 +872,55 @@ def run_turns(
                     on_event({"type": "notice",
                               "message": "verify gate: failed — corrective turn granted"})
                 continue
+        # ---- evidence-capped stop (loop39, cycle 91 — ASK DECIDED 2026-09-04)
+        # Stop ONLY if a policy advisory was issued on an earlier turn AND a
+        # post-advisory tool outcome failed: the documented alternative was
+        # tried and also failed. Otherwise the run continues untouched.
+        if (_post_advisory_failed
+                and recovery_tracker.advisory_turn is not None
+                and _turn_no > recovery_tracker.advisory_turn):
+            try:
+                from .checkpoints import list_checkpoints as _lc2
+
+                _cps2 = _lc2(workdir=ctx.workdir)
+                _cp2 = str(_cps2[0]["dir"].name) if _cps2 else ""
+            except Exception:
+                _cp2 = ""
+            _gave = recovery_mod.failure_report(
+                failure_class="gave-up",
+                taxonomy="recovery-failure",
+                first_stuck_turn=recovery_tracker.first_stuck_turn,
+                attempts=(stuck_det.fired if stuck_det is not None else 1),
+                checkpoint_id=_cp2,
+                journal_thread=journal_thread)
+            _gave["advisory_turn"] = recovery_tracker.advisory_turn
+            _gave["failed_turn"] = _turn_no
+            _closing = (
+                f"GAVE UP (recovery policy enforced stop): the policy advisory "
+                f"issued at turn {recovery_tracker.advisory_turn} was tried and "
+                f"also failed at turn {_turn_no}. First stuck at turn "
+                f"{recovery_tracker.first_stuck_turn}. "
+                f"Checkpoint to resume from: {_cp2 or '(none)'} "
+                f"(journal thread {journal_thread or '(ephemeral)'}). "
+                f"Not a model error — the run stopped itself by policy.")
+            if on_event:
+                on_event({"type": "failure_report.gave_up", "report": _gave})
+            if journal_thread:
+                try:
+                    from .journal import record as _jrg
+
+                    _jrg(journal_thread, "outcome",
+                         tool="(run)",
+                         key=f"gave-up:{journal_run}:{_turn_no}",
+                         status="gave-up", error_class="recovery-failure",
+                         output=_closing[:2000])
+                except OSError:
+                    pass
+            messages.append({"role": "assistant", "content": _closing})
+            last_turn = turn
+            last_turn.gave_up = {**_gave, "closing": _closing}
+            last_turn.all_messages = messages
+            break
         last_turn = turn
 
     # max_turns bail

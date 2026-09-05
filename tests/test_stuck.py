@@ -145,8 +145,14 @@ def test_failing_run_shows_stuck_event_and_still_completes(tmp_path, monkeypatch
         skip_git_repo_check=True, ephemeral=True, stream_deltas=False,
         stdin_cm="", sandbox="workspace-write", approval="never",
         event_sink=events, max_turns=6)
-    # report-only: the run COMPLETES (no enforced stop — that is C91)
-    assert code in (0, 1)
+    # C91 (ASK DECIDED 2026-09-04) supersedes the C89 report-only shape for
+    # this scenario: advisory at turn 3 + failure at turn 4 → enforced stop.
+    assert code == 3, f"C91 stop must fire here, got {code}"
+    gave = [e for e in events if e.get("type") == "failure_report.gave_up"
+            and "thread_id" in e]
+    assert len(gave) == 1
+    assert gave[0]["report"]["advisory_turn"] == 3
+    assert gave[0]["report"]["failed_turn"] == 4
     types = [e.get("type") for e in events]
     stuck = [e for e in events if e.get("type") == "stuck"]
     assert stuck, f"no stuck event in trace types={types}"
@@ -157,11 +163,10 @@ def test_failing_run_shows_stuck_event_and_still_completes(tmp_path, monkeypatch
     assert s0["error_class"] == "tool-error"
     assert s0["streak"] == 3
     assert "turn.completed" in types or "error" in types  # run kept going
-    # the run used its full turn budget (no early exit). The loop emits one
-    # turn.started per turn; run_exec prepends its own thread-turn pair, and
-    # cost.py counts turns off this same stream (12 = 1 exec pre-turn + 6
-    # loop turns... visible as doubled markers in this trace wiring).
-    assert types.count("turn.started") == 2 * 6  # 6 loop turns, no early exit
+    # C91 stops the run at turn 4 (was: full 6-turn budget under C89
+    # report-only). turn.started markers: 1 exec pre-turn + 4 loop turns,
+    # doubled in this trace wiring.
+    assert types.count("turn.started") == 2 * 4  # 4 loop turns, early stop
 
 
 def test_stuck_disabled_by_env_burns_turns_silently(tmp_path, monkeypatch):

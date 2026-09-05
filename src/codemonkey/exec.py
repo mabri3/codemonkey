@@ -338,6 +338,11 @@ def run_exec(
                   "policy": ev.get("policy", ""),
                   "would_save_turns": ev.get("would_save_turns", 0),
                   "would_save_tokens": ev.get("would_save_tokens", 0)})
+        elif etype == "failure_report.gave_up":
+            # loop39 cycle 91: the enforced stop rides the trace with its
+            # evidence (advisory turn + failed turn).
+            emit({"type": etype, "thread_id": thread_id,
+                  "report": ev.get("report") or {}})
         elif etype == "error":
             emit({"type": "error", "message": ev.get("message", "")})
         elif etype == "persist.drop":
@@ -705,6 +710,10 @@ def run_exec(
         except OSError:
             pass
     final_text = normalized if (schema_ok and normalized is not None) else (turn.content or "")
+    if getattr(turn, "gave_up", None):
+        # loop39 cycle 91: the honest closing replaces model text on stdout —
+        # the run stopped itself, so the trace's closing is the report.
+        final_text = turn.gave_up.get("closing", final_text)
     if turn.reasoning:
         emit(
             {
@@ -837,4 +846,9 @@ def run_exec(
         # best-of ran and no candidate passed the verifier: the tree keeps
         # the last attempt's evidence and the exit code says so.
         return 1
+    if getattr(turn, "gave_up", None):
+        # loop39 cycle 91 (ASK DECIDED 2026-09-04): the run stopped itself by
+        # recovery policy — exit 3 (gave-up), distinct from error (1).
+        # Spec §Safety records the code. Stdout carries the honest closing.
+        return 3
     return 0 if schema_ok else 1

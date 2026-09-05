@@ -117,18 +117,71 @@ def test_failing_run_reports_first_stuck_and_would_have_saved(tmp_path, monkeypa
         skip_git_repo_check=True, ephemeral=True, stream_deltas=False,
         stdin_cm="", sandbox="workspace-write", approval="never",
         event_sink=events, max_turns=12)
-    # report-only: the run COMPLETES (enforced stop is C91, AWAITING-ASK)
-    assert code in (0, 1)
+    # C91 (ASK DECIDED 2026-09-04) supersedes the C90 burn-to-max_turns shape:
+    # the evidence-capped stop fires at turn 4, so the run ends with exit 3
+    # BEFORE budget exhaustion — the verdict below asserts the stop, and the
+    # budget math is covered by unit tests + the alternating-failure path.
+    assert code == 3, f"expected gave-up exit 3, got {code}"
     consulted = [e for e in events if e.get("type") == "failure_report.consulted"]
     assert consulted, "no policy consult in trace"
     rep = consulted[0]["report"]
     assert rep["first_stuck_turn"] == 3  # streak ×3 fires on turn 3
     assert rep["journal_thread"]  # resume handle present
-    exhausted = [e for e in events if e.get("type") == "failure_report.budget_exhausted"]
-    assert exhausted, "no budget verdict in trace"
-    last = exhausted[-1]
-    # first error turn 1 + budget 8 → exhausted at turn 9 of 12:
-    # would-have-saved 3 turns AND a token estimate (R-F: both, off the wire)
-    assert last["would_save_turns"] == 3
+    gave = [e for e in events if e.get("type") == "failure_report.gave_up"
+            and "thread_id" in e]
+    assert len(gave) == 1
+    assert gave[0]["report"]["advisory_turn"] == 3
+    assert gave[0]["report"]["failed_turn"] == 4
+
+
+class AlternatingProv:
+    """Alternates two different failing tools — the stuck detector never
+    fires (no ×3 pair), no advisory is ever issued, so C91 cannot stop;
+    the budget backstop is the only verdict."""
+
+    protocol = "openai"
+
+    def __init__(self):
+        self.n = 0
+
+    def chat(self, messages, system=None, **kw):
+        self.n += 1
+        if self.n % 2:
+            return Turn('TOOL_CALL: {"name": "shell", "arguments": '
+                        '{"command": "exit 1"}}\n')
+        return Turn('TOOL_CALL: {"name": "read_file", "arguments": '
+                    '{"path": "no-such-file-xyz.txt"}}\n')
+
+    def close(self):
+        pass
+
+
+def test_alternating_failures_get_budget_verdict_but_no_stop(tmp_path, monkeypatch):
+    import codemonkey.exec as exec_mod
+
+    monkeypatch.setenv("HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("CODEMONKEY_TOOL_PROTOCOL", "prompt")
+    prov = AlternatingProv()
+    orig = exec_mod._provider_from_config
+    monkeypatch.setattr(exec_mod, "_provider_from_config",
+                        lambda cfg, pn, m: (orig(cfg, pn, m)[0], prov))
+    events: list = []
+    code = exec_mod.run_exec(
+        "Do work with alternating tools", cwd=tmp_path,
+        skip_git_repo_check=True, ephemeral=True, stream_deltas=False,
+        stdin_cm="", sandbox="workspace-write", approval="never",
+        event_sink=events, max_turns=12)
+    # no advisory was ever issued → C91 evidence gate never completes → no stop
+    assert code in (0, 1), f"must not stop without advisory evidence, got {code}"
+    assert not [e for e in events if e.get("type") == "failure_report.gave_up"]
+    assert not [e for e in events if e.get("type") == "stuck"]
+    # but the budget backstop fired exactly once with turns AND tokens (R-F)
+    exhausted = [e for e in events
+                 if e.get("type") == "failure_report.budget_exhausted"
+                 and "thread_id" in e]
+    assert len(exhausted) == 1
+    last = exhausted[0]
+    assert last["would_save_turns"] == 3  # exhausted at turn 9 of 12
     assert last["would_save_tokens"] > 0
-    assert last["report"]["first_stuck_turn"] == 3
+    assert last["report"]["failure_class"] == "budget-exhausted"
+    assert last["report"]["taxonomy"]  # consulted off the freshest failure

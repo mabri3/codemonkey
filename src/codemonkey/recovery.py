@@ -100,6 +100,8 @@ class RecoveryTracker:
         self.first_error_turn: int | None = None
         self.first_stuck_turn: int | None = None
         self.verdict_emitted = False  # budget verdict fires once per run
+        self.advisory_turn: int | None = None  # turn a policy hint was issued
+        self.last_error: dict = {}  # most recent failed outcome, for backstop taxonomy
 
     def note_error(self, turn_no: int) -> None:
         if self.first_error_turn is None:

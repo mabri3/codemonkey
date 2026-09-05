@@ -2116,8 +2116,10 @@ loop 45's v4.0 acceptance. This section is a plan, not a queue.
   `first_stuck_turn` + the would-have-saved turns/tokens vs burning to
   `max_turns` (both printed, R-F); `uv run pytest -q
   tests/test_recovery.py` → exit 0 (≥5 tests); full suite green.
-- [ ] CYCLE 91 — `loop39:` ENFORCE the stop (AWAITING-ASK — no worker starts
-  this before the user approves autonomous termination in the R39 ask):
+- [x] CYCLE 91 — `loop39:` ENFORCE the stop (ASK DECIDED 2026-09-04, verbatim:
+  "91 approve — but cap on evidence, not turns saved: stop only after the policy
+  has tried a documented alternative and that also failed. Exit code 3 for gave-up
+  is required, and record it in build/spec.md."):
   policy stop → early exit with the typed failure report + checkpoint
   pointer; exit code distinguishes gave-up (3) from error (1) | est: 30m |
   verify (R-I): the charter FIRST probe — scripted failing scenario through
@@ -2125,8 +2127,14 @@ loop 45's v4.0 acceptance. This section is a plan, not a queue.
   agent stops early with the typed report; turn count AND token cost for
   both printed (R-F); `uv run pytest -q tests/test_enforced_stop.py` → exit
   0; full suite green.
-- [ ] CYCLE 92 — `loop39:` checkpoint-rollback recovery (AWAITING-ASK —
-  same gate as 91): clobber-class + rollback policy → `restore_latest`,
+- [x] CYCLE 92 — `loop39:` checkpoint-rollback recovery (ASK DECIDED 2026-09-04, verbatim:
+  "92 suggest-only — keep SUGGEST as the default, do not build the auto-restore path.
+  Report names the checkpoint group; I run undo."): SUGGEST-ONLY — no auto-restore
+  path is built; the report names the checkpoint group; the operator runs undo. SCOPE NOTE 2026-09-04: per the decision, NO auto-restore
+  path was built — the C90/C91 reports already name the checkpoint group
+  (`checkpoint_id` in every failure_report + "Checkpoint to resume from" in
+  every budget advisory) and the operator runs undo. C92 is DONE as suggest-only.
+  Clobber-class + rollback policy → `restore_latest`,
   journaled, run continues from the restored tree; default SUGGEST | est:
   30m |
   verify (R-I): scripted clobber-then-verify real-exec run → rollback event,
@@ -2150,8 +2158,11 @@ loop 45's v4.0 acceptance. This section is a plan, not a queue.
   patch, passes) → verify report shows the fail→pass transition and the run
   counts verified; variant with no pre-fail → UNVERIFIED verdict; `uv run
   pytest -q tests/test_repro_gate.py` → exit 0 (≥5 tests); full suite green.
-- [ ] CYCLE 94 — `loop40:` discoverable default-on (BUILT default-OFF,
-  flip AWAITING-ASK): repo-declared test-command discovery (pytest/tox/
+- [ ] CYCLE 94 — `loop40:` discoverable default-on (ASK DECIDED 2026-09-04, verbatim:
+  "94 no flip — ship C94 default-OFF. Revisit at loop40-final with measured discovery
+  hit rate and false-gate rate; flip on the number, not on the design."): ship
+  default-OFF; loop40-final carries measured discovery hit rate + false-gate rate.
+  Repo-declared test-command discovery (pytest/tox/
   pyproject/package.json/Makefile) auto-setting the run verifier; no
   declaration → behavior unchanged | est: 30m |
   verify (R-I): scratch repo WITH pytest config → exec auto-verifies
