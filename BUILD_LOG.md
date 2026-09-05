@@ -2942,3 +2942,22 @@ Full suite 741/5.
 - **Known issues:** none.
 - **Next step:** C101 subprocess contract (writing needs no ask; publishing
   does — loop43-final held on answers).
+
+## 2026-09-05 — CYCLES 101+102 (loop43): contract specified + conformance runs
+
+**C101 DONE:** `build/contract.md` v1 — exit taxonomy (0/1/2/3, §Safety
+exit 3), event envelope `v: 1` (`events.SCHEMA_V`, stamped at the single
+exec funnel covering all 40+ loop emission sites), core type set with
+compat rule (additive minor; consumer MUST reject unknown v),
+output-schema/resume/redaction guarantees. Tests 5/5 (all sink events
+versioned; gave-up pair shape pinned per 91F4; usage raises).
+**C102 DONE (bounded):** `build/conformance.py` — independent-process
+driver over the RELEASED BINARY, docs-only knowledge: 7 offline probes
+green (version/help/exit 0-1-2/rollback paths), envelope validator with
+deliberate-break FAIL control, live end-to-end PASS-or-BLOCKED (BLOCKED
+while .176 down). Tests 7/7.
+**loop43-final HELD** on R43 ASK 1+2+3 — recorded at the cycle, dated.
+Nothing published as binding; no MCP surface. Full suite 753/5.
+- **Known issues:** none.
+- **Next step:** loop44/45 cannot start (R44 needs ask answers; R45 needs
+  loops 38–44 closed). Traversal ends at the ask boundary — status below.

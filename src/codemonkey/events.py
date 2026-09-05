@@ -22,6 +22,17 @@ def new_thread_id() -> str:
     return uuid.uuid4().hex[:12]
 
 
+# loop43 cycle 101: versioned event envelope. Every event crossing the exec
+# boundary carries v=SCHEMA_V. Additive minor versions add fields; breaking
+# changes bump major. stamp() setdefaults — never clobbers an explicit v.
+SCHEMA_V = 1
+
+
+def stamp(event: dict) -> dict:
+    event.setdefault("v", SCHEMA_V)
+    return event
+
+
 def emit(event: dict, *, json_mode: bool, stream=None) -> None:
     """Write one event: JSONL line on stdout in json mode, human line to
     stderr otherwise. Never errors — event emission must not crash a run."""

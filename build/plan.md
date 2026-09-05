@@ -2233,16 +2233,20 @@ loop 45's v4.0 acceptance. This section is a plan, not a queue.
 
 ### loop43: cycles (selected from build/research-loop43.md, cycle R43)
 
-- [ ] CYCLE 101 — `loop43:` subprocess contract specified: exit-code
+- [x] CYCLE 101 — `loop43:` subprocess contract specified: exit-code
   taxonomy, versioned JSONL schema (`v` field + compat rule),
   `--output-schema` guarantees, resumability | est: 30m |
   verify (R-I): contract doc committed; `uv run pytest -q
   tests/test_contract.py` → exit 0 (≥4 tests); full suite green.
-- [ ] CYCLE 102 — `loop43:` conformance suite: independent process drives
+- [x] CYCLE 102 — `loop43:` conformance suite: independent process drives
   codemonkey on documentation alone, green on the released binary; a
   deliberate schema change FAILS it | est: 40m |
   verify (R-I): charter probe as written; tests green; full suite green.
-- [ ] CYCLE loop43-final — Loop 43 acceptance + R43 ASK (publish contract,
+- [ ] CYCLE loop43-final — Loop 43 acceptance
+  HELD 2026-09-05: R43 ASK 1 (publish contract as constraint) + ASK 2
+  (MCP server vs deferred client) + ASK 3 (trust boundary) unanswered —
+  the contract is specified and conformance runs, but nothing is published
+  as binding and no MCP surface is built; loop43-final ticks on answers, not on more code. + R43 ASK (publish contract,
   MCP server vs deferred client, trust boundary); report committed. ENTRY:
   R38 closed (fulfilled).
 

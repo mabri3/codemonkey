@@ -255,6 +255,9 @@ def run_exec(
     _emit_base = emit_fn or (lambda ev: events.emit(ev, json_mode=json_mode))
 
     def emit(ev: dict) -> None:
+        from .events import stamp as _stamp
+
+        _stamp(ev)  # loop43 cycle 101: versioned envelope at the funnel
         if event_sink is not None:
             event_sink.append(ev)
         _emit_base(ev)
@@ -271,6 +274,9 @@ def run_exec(
     _external_events = event_sink if event_sink is not None else None
 
     def on_event(ev: dict) -> None:
+        from .events import stamp as _stamp2
+
+        _stamp2(ev)  # loop43 cycle 101: loop events versioned at the boundary
         if _external_events is not None:
             _external_events.append(ev)
         etype = ev.get("type", "")
