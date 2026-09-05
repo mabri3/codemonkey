@@ -2203,7 +2203,7 @@ loop 45's v4.0 acceptance. This section is a plan, not a queue.
   (`git status` clean, `git diff` empty) | est: 40m |
   verify (R-I): charter probe as written through `codemonkey exec`;
   `uv run pytest -q tests/test_changeplan.py` → exit 0; full suite green.
-- [ ] CYCLE 98 — `loop41:` graph-grounded impact analysis: signature-change
+- [x] CYCLE 98 — `loop41:` graph-grounded impact analysis: signature-change
   task where the graph plan touches callers a `search`-driven plan misses,
   both counts reported | est: 30m |
   verify (R-I): both counts in the BUILD_LOG entry; tests green; full suite

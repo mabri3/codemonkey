@@ -2827,3 +2827,21 @@ non-mutating-shell control (echo) raises no warning and lists nothing
 (the 91F1 discriminator). 10/10 changeplan tests. Full suite 728/5.
 - **Known issues:** none.
 - **Next step:** C98 graph-grounded impact analysis.
+
+## 2026-09-05 — CYCLE 98 (loop41): graph-grounded impact + R-L correction
+
+**Completed:** `src/codemonkey/impact.py` — `graph_importers` (binding
+info: imports_from vs imports), `graph_callers` (same-file, edge evidence),
+`search_files` via the REAL search tool, `compare` reporting both counts.
+**Measured on a real extract + real search** (direct + aliased + dynamic +
+noise fixture): graph importers {direct, alias, dynamic} with correct
+binding (alias imports_from, dynamic imports); search finds all three PLUS
+noise.py (comment + substring); **graph_only 0, search_only {noise.py}**.
+**R-L correction:** R41-C2's "callers search misses" premise fails on
+measurement — calls edges are same-file-only (1,119/1,119 resolvable;
+fixture: 0 calls edges). C2 downgraded to importers-with-binding; correction
+appended to research-loop41.md (dated); `test_graph_only_empty_pinned`
+reopens C2 if the extractor ever emits cross-file calls. Tests
+`test_impact.py` 4/4. Full suite follows.
+- **Known issues:** none.
+- **Next step:** loop41-final (acceptance + the C4 number question).

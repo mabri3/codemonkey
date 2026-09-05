@@ -102,3 +102,19 @@ per-plan in the probes.
    with plan-rollback under a new verb?
 3. Authorize C4 worktree-boundary plans (second tree + second verify run
    per risky plan, cost reported)?
+
+## R-L correction (2026-09-05, CYCLE C98 — re-verified at build time)
+
+C2's premise ("the graph knows [callers]; `search` guesses") does not hold
+for freshly extracted graphs on this extractor (graphify, measured live):
+`calls` edges resolve SAME-FILE calls only — all 1,119 resolvable `calls`
+edges in this repo are same-file, zero cross-file; a 4-file fixture
+(direct + aliased + dynamic dispatch callers) extracts ZERO `calls` edges.
+What the graph does provide cross-file: `imports` / `imports_from` with
+binding info (name bound vs module-level). C2 is therefore DOWNGRADED:
+graph-grounded impact = importers-with-binding + exact same-file call
+sites, compared against grep (which keeps file-level recall but adds
+comment/substring noise). The `test_graph_only_empty_pinned` test in
+`tests/test_impact.py` reopens this the day the extractor emits
+cross-file calls. The SELECTED ranking is unchanged (C2 still builds);
+only the claimed mechanism narrowed to what was measured.
