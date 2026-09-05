@@ -322,6 +322,62 @@ def undo(
 
 
 @app.command()
+def rollback(
+    plan_id: Annotated[
+        str,
+        typer.Argument(help="Change-plan id to roll back (see rollback --list)."),
+    ] = "",
+    list_only: Annotated[
+        bool,
+        typer.Option("--list", help="List persisted change plans without rolling back."),
+    ] = False,
+) -> None:
+    """Rollback a change plan whole (loop41): restore pre-plan bytes, delete
+    plan-created files. `undo` keeps file semantics; this is the plan verb."""
+    from . import changeplan as pl_mod
+
+    if list_only:
+        plans = pl_mod.list_plans()
+        if not plans:
+            typer.echo("(no change plans)")
+            return
+        import datetime
+        for p in plans[:10]:
+            ts = datetime.datetime.fromtimestamp(p["started"]).strftime("%m-%d %H:%M:%S")
+            typer.echo(f"{p['plan_id']}  {ts}  {p['files']} file(s)  "
+                       f"shell:{p['shell_calls']}  {p['workdir']}")
+        return
+    if not plan_id:
+        typer.secho("error: PLAN_ID required (or --list)", err=True, fg=typer.colors.RED)
+        raise typer.Exit(2) from None
+    try:
+        plan = pl_mod.load_plan(plan_id)
+    except (OSError, KeyError, ValueError) as exc:
+        typer.secho(f"error: unknown plan {plan_id}: {exc}", err=True, fg=typer.colors.RED)
+        raise typer.Exit(1) from None
+    try:
+        result = pl_mod.rollback_plan(plan, Path.cwd())
+    except ValueError as exc:
+        typer.secho(f"error: {exc}", err=True, fg=typer.colors.RED)
+        raise typer.Exit(1) from None
+    except OSError as exc:
+        typer.secho(f"error: rollback failed: {exc}", err=True, fg=typer.colors.RED)
+        raise typer.Exit(1) from None
+    rep = pl_mod.plan_report(plan)
+    typer.echo(f"rolled back plan {plan.plan_id} "
+               f"({rep['n_existed']} restored, {rep['n_created']} created):")
+    for rel in result["restored"]:
+        typer.echo(f"  restored {rel}")
+    for rel in result["removed"]:
+        typer.echo(f"  removed {rel}")
+    for rel in result["missing"]:
+        typer.echo(f"  MISSING {rel}")
+    if result["shell_calls_uncovered"]:
+        typer.echo(f"  note: {result['shell_calls_uncovered']} shell call(s) "
+                   "ran inside the plan and are NOT covered by rollback")
+
+
+@app.command()
 def eval(
     suite: Annotated[
         Path,
@@ -709,6 +765,10 @@ def exec(
         Optional[str],
         typer.Option("--verify-command", help="Machine verifier for --best-of N>1 (or config verify_command)."),
     ] = None,
+    atomic_plan: Annotated[
+        bool,
+        typer.Option("--atomic-plan", help="Opt-in atomic change plan (loop41): the run's edits land whole or roll back whole on declared failure. Off by default."),
+    ] = False,
     ignore_user_config: Annotated[
         bool,
         typer.Option("--ignore-user-config", help="Skip ~/.codemonkey/config.yaml."),
@@ -762,6 +822,7 @@ def exec(
             dry_run=dry_run,
             best_of=best_of,
             verify_command=verify_command,
+            atomic_plan=atomic_plan,
         )
     except ExecUsageError as exc:
         typer.secho(f"error: {exc}", err=True, fg=typer.colors.RED)

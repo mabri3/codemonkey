@@ -2786,3 +2786,27 @@ suite 718/5.
 - **Known issues:** none.
 - **Next step:** C97 per R41 ASK 1+2 (plan object OFF/opt-in, new rollback
   verb, `undo` untouched) — sequencing answer below.
+
+## 2026-09-05 — CYCLE 97 (loop41, R41 ASK 1+2): plan object + atomic rollback
+
+**Completed:** `src/codemonkey/changeplan.py` — plan object (id, workdir,
+per-path prior bytes/existed, shell count) persisted as plan.json;
+first-write-wins `note_write` hooked into `_save` (fail-soft, call-group
+snapshots untouched); `rollback_plan` restores priors + DELETES
+plan-created files (the gap restore_latest cannot close) and refuses
+workdir mismatch (14F2 lesson). `run_turns(atomic_plan=...)` opens the plan
+at start; auto-rollback ONLY on gave_up (report carries `plan_rollback`
+naming the plan); success/max_turns close WITHOUT rollback (resume expects
+files). Shell inside a plan counted as uncovered in the report, never
+rolled back. `--atomic-plan` (default OFF) threaded exec→CLI; new
+`rollback` verb (`--list`, PLAN_ID) — `git diff` is purely additive
+(+121/-0 across cli/exec/loop/base): `undo` untouched per ASK 2.
+**Verify (R-I charter probe):** scripted run (2 created + 1 modified, then
+stuck→gave_up) → created removed, modified restored, `git status` clean,
+`git diff` empty, `plan.rolled_back` names the plan. Controls: success
+lands whole; max_turns keeps files; shell counted-not-covered; unit
+(first-write-wins, mismatch refusal, crash-reload) green. CLI round-trip
+verified live (`rollback --list` + named rollback). Tests
+`test_changeplan.py` 7/7. Full suite 725/5.
+- **Known issues:** none.
+- **Next step:** C98 graph-grounded impact analysis (both counts reported).

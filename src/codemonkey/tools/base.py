@@ -50,6 +50,18 @@ def _save(path, data, ctx) -> str:
                              rp.read_bytes())
     except Exception:
         pass
+    # loop41 cycle 97: an active change plan records the pre-plan state
+    # (prior bytes, or created-here) first-write-wins. Same fail-soft rule.
+    try:
+        from .. import changeplan as pl_mod
+
+        pl = pl_mod.current_plan()
+        if pl is not None:
+            wd = Path(ctx.workdir).resolve()
+            pl_mod.note_write(pl, wd, str(rp.relative_to(wd)),
+                              rp.read_bytes() if rp.is_file() else None)
+    except Exception:
+        pass
     rp.parent.mkdir(parents=True, exist_ok=True)
     if isinstance(data, str):
         data = data.encode("utf-8")

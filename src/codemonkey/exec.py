@@ -151,6 +151,7 @@ def run_exec(
     dry_run: bool = False,
     best_of: int = 1,
     verify_command: Optional[str] = None,
+    atomic_plan: bool = False,
 ) -> int:
     """Run one non-interactive exec turn-group. Returns the exit code."""
     from .config import ConfigError, load_config
@@ -545,6 +546,7 @@ def run_exec(
             journal_thread=thread_id,
             journal_run=(_jrun or run_id),
             redact_needles=_needles,
+            atomic_plan=atomic_plan,
             perm_rules=list(((cfg.get("permissions") or {}).get("rules")) or []),
             dry_run=dry_run,
             recovery_budget=int(cfg.get("recovery_budget", 8) or 0),

@@ -2188,7 +2188,7 @@ loop 45's v4.0 acceptance. This section is a plan, not a queue.
   C4 measurement, opt-in only.
   verify (R-I): scripted runs produce the count; `uv run pytest -q
   tests/test_changeplan.py` → exit 0 (≥4 tests); full suite green.
-- [ ] CYCLE 97 — `loop41:` plan object + atomic apply/rollback on the 14F1
+- [x] CYCLE 97 — `loop41:` plan object + atomic apply/rollback on the 14F1
   group; induced mid-plan failure leaves the tree byte-identical
   (`git status` clean, `git diff` empty) | est: 40m |
   verify (R-I): charter probe as written through `codemonkey exec`;

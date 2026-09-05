@@ -75,6 +75,7 @@ def run_turns(
     journal_thread: str = "",
     journal_run: str = "",
     redact_needles: list | None = None,
+    atomic_plan: bool = False,
     perm_rules: list | None = None,
     dry_run: bool = False,
     recovery_budget: int = 8,
@@ -121,6 +122,30 @@ def run_turns(
 
     if verify_command and repro_mod.enabled():
         repro_tracker = repro_mod.ReproTracker()
+
+    # loop41 cycle 97: opt-in atomic change plan (R41 ASK 1). The plan opens
+    # here, closes at every return below. Automatic rollback fires ONLY on
+    # the gave_up declared-failure path; max_turns exhaustion ends the plan
+    # WITHOUT rollback (the operator may resume; resume expects files).
+    from . import changeplan as _plm
+
+    plan = _plm.begin_plan(ctx.workdir) if atomic_plan else None
+    if plan is not None and on_event:
+        on_event({"type": "plan.started",
+                  "report": _plm.plan_report(plan)})
+
+    def _close_plan(rolled_back: dict | None) -> None:
+        # Pop only OUR plan: a nested run_turns owns whatever is on top.
+        if _plm.current_plan() is not plan:
+            return
+        _p = _plm.end_plan()
+        if _p is None or on_event is None:
+            return
+        rep = _plm.plan_report(_p)
+        if rolled_back is not None:
+            rep["rollback"] = rolled_back
+        on_event({"type": ("plan.rolled_back" if rolled_back is not None
+                            else "plan.completed"), "report": rep})
 
     def _emit_repro(turn_obj) -> None:
         if repro_tracker is None:
@@ -363,6 +388,7 @@ def run_turns(
                         })
             last_turn.all_messages = messages
             _emit_repro(last_turn)
+            _close_plan(None)  # loop41: landed whole, no rollback
             return last_turn
 
         messages.append({"role": "assistant", "content": turn.content or ""})
@@ -580,6 +606,13 @@ def run_turns(
                         **_shell_kw(),
                         )
                 except OSError:
+                    pass
+            # loop41 cycle 97: shell ran inside a plan scope — counted as
+            # uncovered, never rolled back (the plan report says so).
+            if name == "shell" and plan is not None:
+                try:
+                    _plm.note_shell(plan)
+                except Exception:
                     pass
             # loop40 cycle 93: feed successful file writes to the repro gate
             # (test writes open a cycle; post-fail non-test writes are patches)
@@ -982,8 +1015,20 @@ def run_turns(
                     pass
             messages.append({"role": "assistant", "content": _closing})
             last_turn = turn
+            # loop41 cycle 97: the run declared failure inside an atomic plan
+            # → roll back whole. The report names the plan (R41 ASK 1 terms).
+            _rb_dict: dict | None = None
+            if plan is not None and plan.files:
+                try:
+                    _rb = _plm.rollback_plan(plan, ctx.workdir)
+                    _rb_dict = {**_plm.plan_report(plan), "rollback": _rb}
+                except Exception as _rbe:
+                    _rb_dict = {"plan_id": plan.plan_id,
+                                "error": str(_rbe)[:200]}
+                _gave["plan_rollback"] = _rb_dict
             last_turn.gave_up = {**_gave, "closing": _closing}
             last_turn.all_messages = messages
+            _close_plan(_rb_dict)
             break
         last_turn = turn
 
@@ -996,6 +1041,7 @@ def run_turns(
                   "message": f"max_turns ({max_turns}) reached without a final answer"})
     last_turn.all_messages = messages
     _emit_repro(last_turn)
+    _close_plan(None)  # loop41: max_turns ends the plan WITHOUT rollback
     return last_turn
 
 
