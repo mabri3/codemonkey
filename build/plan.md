@@ -2180,7 +2180,7 @@ loop 45's v4.0 acceptance. This section is a plan, not a queue.
   rate beside 63%, and per-arm cost/wall (BLOCKED+reason for live arms if
   the endpoint is down — the gate plumbing still probes offline); `uv run
   pytest -q tests/test_f2p_gate.py` → exit 0 (≥4 tests); full suite green.
-- [ ] CYCLE loop40-final — Loop 40 acceptance: repro gate + discovery +
+- [x] CYCLE loop40-final — Loop 40 acceptance: repro gate + discovery +
   quality gate re-verified (94-flip only if ASK approved, else recorded as
   approved-scope exclusion); BUILD_REPORT loop-40 section with the ON/OFF
   numbers + R-G/R-F/R-H rows | est: 30m |

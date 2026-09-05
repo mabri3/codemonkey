@@ -1002,3 +1002,33 @@ signature in the contract: intent → spec → plan → SPRINT → 37 loops →
 closing acceptance → user acceptance. **Codemonkey is ACCEPTED at v3.0.0**
 (579 tests, all 37 charters closed, tags v1.0.0 / v1.1.0 / v3.0.0 pushed).
 The build contract is CLOSED.
+
+
+---
+
+# Loop 40 — Final Acceptance (CYCLE loop40-final)
+
+**Date:** 2026-09-05 · **Suite:** 690 passed / 5 skipped.
+
+## Loop-40 criteria — all pass
+
+| Improvement | Probe | Result |
+|---|---|---|
+| Repro-first gate (93) | `tests/test_repro_gate.py`: conventions, full fail→pass cycle, pass-only UNVERIFIED, strict fail counting, cycle restart, report shape, R-I VERIFIED + UNVERIFIED runs | ✅ 8/8 |
+| Discoverable verifier, default-OFF (94) | `tests/test_discover_verify.py`: 6 declaration mappings, precedence, R-I auto-verify on declared repo, unchanged on undeclared | ✅ 14/14 |
+| F2P arms + verdict (95) | `tests/test_f2p_gate.py`: labels, arm summary, verdict rules, 63% line, offline two-arm matrix, env restore, unknown-arm rejection | ✅ 10/10 |
+
+## ON/OFF numbers + R-G / R-F / R-H rows
+
+- ON vs OFF (offline, gate-honoring fake, 4 tasks): ON arm 4/4 labeled F2P
+  (rate 1.000), OFF arm 0 labeled; verdict INCONCLUSIVE on thin live evidence
+  — plumbing proven, live numbers pending endpoint.
+- **R-G:** local F2P unmeasured live; published 63% stands as frontier
+  reference (e-Otter++ TDD-Bench Verified), never a target.
+- **R-F:** per-arm tokens/wall print in `render_f2p_table`; live costs pending.
+- **R-H:** gate verdict rules committed (`MEASURED` only on matched arms with
+  ≥3 labeled tasks, observational-only disclaimer).
+- **94 flip decision:** NO FLIP — hit rate 18/18 offline, false-gate rate
+  unmeasurable (endpoint down). Flip on the number when live runs return.
+
+**LOOP 40 COMPLETE.**

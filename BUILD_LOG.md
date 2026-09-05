@@ -2659,3 +2659,20 @@ env restore, unknown-arm rejection). Full suite 690/5.
 - **Known issues:** none.
 - **Next step:** CYCLE loop40-final — Loop 40 acceptance + the 94 flip decision
   on measured discovery hit rate / false-gate rate.
+
+## 2026-09-05 — CYCLE loop40-final: Loop 40 acceptance + the 94 flip decision
+
+**Re-verified:** C93 repro gate (8/8), C94 discovery (14/14), C95 F2P arms
+(10/10); full suite 690/5.
+
+**Discovery measurement (the 94 flip decision, decided on numbers):**
+- Hit rate (offline fixture matrix, 18 cases incl. adversarial no-declaration
+  + precedence pairs): **18/18** — mapping correct, nothing invented, nothing
+  missed.
+- False-gate rate (discovered verifier failing runs that would otherwise
+  pass): **UNMEASURABLE — endpoint .176 connection-refused** (live arms
+  BLOCKED, same outage as C95). Per the ASK decision ("flip on the number,
+  not on the design") the flip stays **NO**: half the required numbers exist.
+  Revisit when live runs are possible; the notice hook already records
+  verifier provenance per run for that measurement.
+**LOOP 40 COMPLETE.**
