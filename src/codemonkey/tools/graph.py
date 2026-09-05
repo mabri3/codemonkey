@@ -137,10 +137,28 @@ def graph_path_lookup(workdir, a: str, b: str, *, max_depth: int = 4) -> dict:
     edges = graph["edges"]
 
     def resolve(sym: str):
-        res = graphquery.graph_query(graph, sym, max_results=1)
-        if res["matches"]:
-            return next(iter(res["matches"]))
-        return None
+        """98F2: prefer an EXACT id/name match over a substring one.
+
+        `graph_query`'s `max_results` caps edges, not matches, so
+        `next(iter(matches))` returned whichever substring hit came first in
+        node order — for `run_turns` that is
+        `tests_test_knobs_test_exec_passes_knobs_to_run_turns`, so a
+        one-hop path (`run_turns -> estimate_tokens`) reported "no path".
+        """
+        res = graphquery.graph_query(graph, sym)
+        matches = res["matches"]
+        if not matches:
+            return None
+        low = sym.lower()
+        for nid, node in matches.items():
+            name = str(node.get("name") or node.get("label") or "")
+            if name.endswith("()"):
+                name = name[:-2]
+            if nid.lower() == low or name.lower() == low:
+                return nid
+        # no exact hit: shortest id wins over an arbitrary one (the least
+        # decorated node bearing the name), still deterministic.
+        return min(matches, key=lambda n: (len(n), n))
 
     sa, sb = resolve(a), resolve(b)
     if sa is None or sb is None:

@@ -2360,3 +2360,37 @@ Review of the C91 enforced stop at HEAD `2de107c` with the suite green
 in-repo attachment points are re-verified against the tree at the moment its
 cycles are built; a citation naming a module that no longer exists is a
 BLOCKING finding for that cycle, not a footnote.
+
+### 98F: graph loader review gate (critic: the C98 measurement was an artifact)
+
+- [x] CYCLE 98F1 — `loop41:` `graphquery.load_graph` read only `data["edges"]`
+  while `graphify-out/graph.json` stores relationships under `"links"`, so
+  every edge any consumer saw came from per-file AST cache fragments —
+  same-file by construction. `rglob` also swept `cache/ast/` and the dated
+  backup snapshots, serving 36 nodes from modules cycle 81 deleted. Fixed:
+  both keys read, scope narrowed to the graph dir's own `*.json`. R41-C2
+  REOPENED; the C98 R-L "correction" withdrawn in `research-loop41.md` and
+  `impact.py` | est: 40m |
+  verify (R-I): loader returns exactly graph.json's 2328 nodes / 4339 edges;
+  `calls` 1598 with **892 cross-file** (was 1270/0); zero deleted-module
+  nodes; live `compare()` on `journal.record` → `graph_only = 12`;
+  `test_loader_reads_links_not_only_edges` +
+  `test_loader_ignores_backups_and_cache` +
+  `test_cross_file_callers_are_observable` (replacing the pinned artifact
+  `test_graph_only_empty_pinned`); `uv run codemonkey graph run_turns` prints
+  cross-file `calls` edges; full suite green.
+- [x] CYCLE 98F2 — `loop41:` `graph_path_lookup.resolve` took
+  `next(iter(matches))`, but `graph_query`'s `max_results` caps EDGES, not
+  matches — so an arbitrary substring hit won (`run_turns` resolved to
+  `tests_test_knobs_test_exec_passes_knobs_to_run_turns`) and a one-hop path
+  reported `no_path`. Exact id/name match now wins, with a deterministic
+  shortest-id fallback | est: 15m |
+  verify: `uv run codemonkey graph run_turns --to estimate_tokens` →
+  `path: src_codemonkey_loop_run_turns -> src_codemonkey_strategies_compaction_estimate_tokens`,
+  exit 0 (was "no path within 6 hops"); regression test pins the
+  first-substring-hit case; full suite green.
+
+**Rule proposed (the missing half of R-L):** a measurement that contradicts a
+design premise is re-derived from primary data before the premise is
+downgraded. A pin can only detect that evidence CHANGED — it cannot detect
+that the evidence was WRONG when written.

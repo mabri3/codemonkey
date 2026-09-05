@@ -103,18 +103,66 @@ per-plan in the probes.
 3. Authorize C4 worktree-boundary plans (second tree + second verify run
    per risky plan, cost reported)?
 
-## R-L correction (2026-09-05, CYCLE C98 — re-verified at build time)
+## R-L correction (2026-09-05, CYCLE C98) — ⚠️ WITHDRAWN, see below
 
-C2's premise ("the graph knows [callers]; `search` guesses") does not hold
-for freshly extracted graphs on this extractor (graphify, measured live):
-`calls` edges resolve SAME-FILE calls only — all 1,119 resolvable `calls`
-edges in this repo are same-file, zero cross-file; a 4-file fixture
-(direct + aliased + dynamic dispatch callers) extracts ZERO `calls` edges.
-What the graph does provide cross-file: `imports` / `imports_from` with
-binding info (name bound vs module-level). C2 is therefore DOWNGRADED:
-graph-grounded impact = importers-with-binding + exact same-file call
-sites, compared against grep (which keeps file-level recall but adds
-comment/substring noise). The `test_graph_only_empty_pinned` test in
-`tests/test_impact.py` reopens this the day the extractor emits
-cross-file calls. The SELECTED ranking is unchanged (C2 still builds);
-only the claimed mechanism narrowed to what was measured.
+> C2's premise ("the graph knows [callers]; `search` guesses") does not hold
+> for freshly extracted graphs on this extractor (graphify, measured live):
+> `calls` edges resolve SAME-FILE calls only — all 1,119 resolvable `calls`
+> edges in this repo are same-file, zero cross-file; a 4-file fixture
+> (direct + aliased + dynamic dispatch callers) extracts ZERO `calls` edges.
+> What the graph does provide cross-file: `imports` / `imports_from` with
+> binding info (name bound vs module-level). C2 is therefore DOWNGRADED:
+> graph-grounded impact = importers-with-binding + exact same-file call
+> sites, compared against grep (which keeps file-level recall but adds
+> comment/substring noise). The `test_graph_only_empty_pinned` test in
+> `tests/test_impact.py` reopens this the day the extractor emits
+> cross-file calls. The SELECTED ranking is unchanged (C2 still builds);
+> only the claimed mechanism narrowed to what was measured.
+
+## 98F1 withdrawal (2026-09-05) — C2 REOPENED, the correction was wrong
+
+The correction above is **withdrawn in full**. Its measurement was an
+artifact of our own tooling, not a property of the extractor.
+
+`graphquery.load_graph` merged files with `edges.extend(data.get("edges"))`
+over `rglob("*.json")`. Two defects, both silent:
+
+1. **Wrong key.** `graphify-out/graph.json` stores relationships under
+   `"links"`. Only the per-file AST cache fragments carry `"edges"`. So
+   100% of the edges every consumer ever saw came from single-file
+   extractions — **same-file by construction**. "Zero cross-file calls" was
+   a restatement of the bug.
+2. **Wrong scope.** `rglob` swept `cache/ast/` and the dated backup
+   snapshots, so the merged graph served 36 nodes from `rolepresets.py` and
+   the other modules cycle 81 deleted as though they were live.
+
+Measured after the fix, same repo, same day:
+
+| | before (bug) | after (98F1) |
+|---|---|---|
+| nodes / edges | 4789 / 8444 | 2328 / 4339 |
+| `calls` edges | 1270 | 1598 |
+| same-file / **cross-file** | 1119 / **0** | 692 / **892** |
+| deleted-module nodes served | 36 | 0 |
+
+Cross-file edges are AST-`EXTRACTED`, e.g.
+`src/codemonkey/exec.py:427 -> load_instructions() @ instructions.py`.
+Live `compare()` on `journal.record` now reports **graph_only = 12** —
+twelve caller files the graph finds and `search` misses — against
+search_only = 18 (comment/substring noise). That is C2's original premise,
+confirmed, on the measurement that was supposed to refute it.
+
+**C2 is REOPENED at full scope:** graph-grounded impact = importers with
+binding info **plus cross-file caller edges**, not importers alone.
+
+**The lesson, recorded because it cost a cycle.** `test_graph_only_empty_pinned`
+was written to reopen this question "the day the extractor learns cross-file
+calls". It could only detect that the evidence CHANGED; it could not detect
+that the evidence was WRONG when written, and it asserted a remembered
+number rather than the graph file's own content. R-L makes citations
+verifiable against the tree; this is its missing half — **a measurement that
+contradicts a design premise is re-derived from primary data before the
+premise is downgraded.** Three consumers (`graph_query` / `graph_path` /
+`graph_explain`), the `codemonkey graph` CLI and `impact.py` had been
+answering from per-file caches and stale snapshots since loop 28 without
+anyone noticing, because they did return *something*.

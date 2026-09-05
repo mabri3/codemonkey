@@ -1,11 +1,17 @@
 """Change-impact analysis: graph-grounded vs search-driven (loop 41, C98).
 
-R-L correction, measured 2026-09-05 (see research-loop41.md correction):
-the loop-28 graph's AST extractor resolves module structure (contains /
-imports / imports_from) and SAME-FILE calls only — all 1,119 resolvable
-`calls` edges in this repo are same-file, zero cross-file. So this module
-does NOT claim cross-file caller coverage from `calls` edges. What the
-graph actually contributes over grep:
+R-L correction, measured 2026-09-05 — **WITHDRAWN 2026-09-05 by 98F1.**
+That correction read: "all 1,119 resolvable `calls` edges in this repo are
+same-file, zero cross-file", and R41-C2 was downgraded on it. It was false.
+`graphquery.load_graph` read only `data["edges"]` while the graph file
+stores relationships under `"links"`, so every edge this module saw came
+from per-file AST cache fragments — same-file by construction. With the
+loader fixed, this repo's graph holds **1,598 `calls` edges, 892 of them
+cross-file** (AST-EXTRACTED, e.g. `exec.py:427 -> load_instructions() @
+instructions.py`). R41-C2 is REOPENED: the graph does know callers, and
+`graph_callers` reports them.
+
+What the graph contributes over grep:
 
 1. Importers with binding info: `imports_from` (a NAME is bound here —
    `from m import target [as t]`, the file must change with a signature
@@ -15,10 +21,13 @@ graph actually contributes over grep:
 2. Precision: zero noise — comments, docstrings and substring coincidences
    (`retarget`) never appear as importers.
 
-`graph_callers` is kept for same-file call sites (exact edge evidence) and
-for the day the extractor emits cross-file calls — its test pins the
-current empty-cross-file result so that day reopens the question instead
-of passing silently.
+3. Callers by edge evidence, same-file and cross-file, with the call site's
+   line — not a name match.
+
+98F1 lesson, recorded because it cost a cycle: the original pin asserted a
+remembered number ("graph_only is empty"). A pin can only tell you the
+evidence CHANGED; it cannot tell you the evidence was wrong when written.
+The replacement tests assert against the graph file's own content.
 """
 
 from __future__ import annotations
@@ -45,9 +54,9 @@ def _node_name(node: dict) -> str:
 
 
 def graph_callers(workdir: Path, symbol: str) -> dict:
-    """Same-file call sites of `symbol` (edge evidence). Returns
-    {file: [line, ...]}. Cross-file callers: not emitted by the extractor
-    (measured 2026-09-05) — absent here means unobservable, not nonexistent.
+    """Call sites of `symbol` by edge evidence — same-file AND cross-file
+    (98F1: the cross-file half was hidden by the loader, not absent from
+    the extractor). Returns {file: [line, ...]}.
     """
     graph = _load(workdir)
     nodes = graph["nodes"]

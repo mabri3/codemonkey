@@ -2845,3 +2845,57 @@ reopens C2 if the extractor ever emits cross-file calls. Tests
 `test_impact.py` 4/4. Full suite follows.
 - **Known issues:** none.
 - **Next step:** loop41-final (acceptance + the C4 number question).
+
+## 2026-09-05 — CYCLES 98F1–98F2: the graph loader was the measurement
+
+**Completed:** C98's headline finding — "all 1,119 resolvable `calls` edges in
+this repo are same-file, zero cross-file", on which R41-C2 was downgraded —
+was an artifact of our own tooling. This is the **fifth** evidence-over-claim
+instance in this arc and the first where the corrupted evidence came from the
+repo's own code rather than a stale citation.
+
+- **98F1 (HIGH)** — `graphquery.load_graph` merged with
+  `edges.extend(data.get("edges"))` over `rglob("*.json")`. Two silent
+  defects. **Wrong key:** `graphify-out/graph.json` stores relationships under
+  `"links"`; only the per-file AST cache fragments carry `"edges"`, so 100% of
+  the edges every consumer ever saw came from single-file extractions —
+  same-file *by construction*. **Wrong scope:** `rglob` swept `cache/ast/` and
+  the dated backup snapshots, so the merged graph served 36 nodes from
+  `rolepresets.py` and the other modules cycle 81 deleted as though live —
+  precisely what R-L forbids of a research file, happening inside the tool
+  CLAUDE.md tells every agent to query first.
+
+  | | before | after |
+  |---|---|---|
+  | nodes / edges | 4789 / 8444 | 2328 / 4339 |
+  | `calls` edges | 1270 | 1598 |
+  | same-file / cross-file | 1119 / **0** | 692 / **892** |
+  | deleted-module nodes served | 36 | 0 |
+
+  Live `compare()` on `journal.record` now reports **graph_only = 12** —
+  twelve caller files the graph finds and `search` misses — against
+  search_only = 18 (comment/substring noise). That is R41-C2's original
+  premise, confirmed by the measurement that was supposed to refute it.
+  C2 is REOPENED at full scope; the correction is withdrawn in
+  `research-loop41.md` and `impact.py`, both dated.
+
+- **98F2 (MEDIUM)** — `graph_path_lookup.resolve` took
+  `next(iter(matches))`, but `graph_query`'s `max_results` caps edges, not
+  matches. An arbitrary substring hit won: `run_turns` resolved to
+  `tests_test_knobs_test_exec_passes_knobs_to_run_turns`, so the one-hop path
+  `run_turns -> estimate_tokens` reported "no path within 6 hops" while
+  `graph run_turns` printed that very edge. Exact id/name match now wins.
+
+**Verified:** `uv run pytest -q` → 735 passed, 5 skipped (was 732/5).
+`uv run codemonkey graph run_turns` prints cross-file `calls` edges;
+`--to estimate_tokens` → `path: src_codemonkey_loop_run_turns ->
+src_codemonkey_strategies_compaction_estimate_tokens`, exit 0. A18 green.
+
+- **Known issues:** `test_graph_only_empty_pinned` was deleted, not repaired.
+  It pinned a remembered number and could only detect that evidence CHANGED,
+  never that it was WRONG when written. Replaced by three tests asserting
+  against the graph file's own content.
+- **Next step:** loop41-final still owes the C4 worktree cost number and the
+  R-G verdict on whether partial application is a real failure mode. C2's
+  reopening means C98's comparison should be re-stated at full scope before
+  that acceptance.
