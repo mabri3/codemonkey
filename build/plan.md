@@ -1664,7 +1664,7 @@ shipped until its entry point is exercised") live in
   cost/wall-clock per R-F, certified under R-H. ENTRY CONDITION: R38 closed
   (certificates and best-of-N reachable). Core-design: PARTIAL — default-on
   verification changes what "finished" means and ends by asking.
-- [ ] CYCLE R41 — Loop 41 research: repository-scale change that lands or rolls
+- [x] CYCLE R41 — Loop 41 research: repository-scale change that lands or rolls
   back whole — the change plan as an explicit object, change-impact analysis
   over the loop-28 graph, atomic apply/rollback on the 14F1 checkpoint group,
   worktrees as the isolation boundary | est: 30m |
@@ -1678,7 +1678,7 @@ shipped until its entry point is exercised") live in
   `search`-driven plan misses, both counts reported. ENTRY CONDITION: R38 and
   R39 closed. Core-design: YES — this changes how edits are applied and what
   `undo` means. R41 ENDS BY ASKING.
-- [ ] CYCLE R42 — Loop 42 research: the small-model compiler — long-horizon
+- [x] CYCLE R42 — Loop 42 research: the small-model compiler — long-horizon
   tasks compiled into short, individually verifiable segments with explicit
   hand-off state (`jobs`), per-segment tool-surface restriction, and constrained
   decoding where the endpoint supports it | est: 30m |
@@ -1692,7 +1692,7 @@ shipped until its entry point is exercised") live in
   CONDITION: R40 closed — without a machine success signal this loop cannot be
   measured. Core-design: PARTIAL — per-segment tool restriction changes the
   advertised tool surface mid-run and ends by asking.
-- [ ] CYCLE R43 — Loop 43 research: the caller contract — the subprocess
+- [x] CYCLE R43 — Loop 43 research: the caller contract — the subprocess
   contract specified (exit-code taxonomy, versioned JSONL event schema,
   `--output-schema` guarantees, resumability), then the loop-10 MCP deferral
   decided one way or the other (server vs client — pick one, with reasons),
@@ -1706,7 +1706,7 @@ shipped until its entry point is exercised") live in
   schema change shown to FAIL it. ENTRY CONDITION: R38 closed. Core-design:
   YES — a published contract constrains every future loop and an MCP surface is
   a new trust boundary. R43 ENDS BY ASKING.
-- [ ] CYCLE R44 — Loop 44 research: trustworthy autonomy budgets — declared
+- [x] CYCLE R44 — Loop 44 research: trustworthy autonomy budgets — declared
   token/wall-clock/turn/cost/blast-radius budgets enforced by the runtime,
   approval batching against finite human oversight capacity, and halting that
   reports and resumes rather than degrading | est: 30m |
@@ -1718,7 +1718,7 @@ shipped until its entry point is exercised") live in
   can never raise a budget. ENTRY CONDITION: R41 closed — blast radius needs a
   change plan to bound. Core-design: YES — this defines what unattended
   operation is. R44 ENDS BY ASKING.
-- [ ] CYCLE R45 — Loop 45 research + closing acceptance: v4.0 — the evidence
+- [x] CYCLE R45 — Loop 45 research + closing acceptance: v4.0 — the evidence
   pack (claims linked to their supporting journal/command/diff/test evidence,
   redacted, hash-chained, verifiable by another process) and the closing sweep
   | est: 40m |
@@ -2147,6 +2147,93 @@ loop 45's v4.0 acceptance. This section is a plan, not a queue.
   est: 30m |
   verify: loop39 entry probes green; `uv run pytest -q` → exit 0; report
   committed.
+
+
+### loop41: cycles (selected from build/research-loop41.md, cycle R41)
+
+- [ ] CYCLE 96 — `loop41:` partial-application counter: instrument multi-file
+  runs (hunks-planned vs hunks-landed vs verifier outcome) and report the
+  baseline count | est: 30m |
+  verify (R-I): scripted runs produce the count; `uv run pytest -q
+  tests/test_changeplan.py` → exit 0 (≥4 tests); full suite green.
+- [ ] CYCLE 97 — `loop41:` plan object + atomic apply/rollback on the 14F1
+  group; induced mid-plan failure leaves the tree byte-identical
+  (`git status` clean, `git diff` empty) | est: 40m |
+  verify (R-I): charter probe as written through `codemonkey exec`;
+  `uv run pytest -q tests/test_changeplan.py` → exit 0; full suite green.
+- [ ] CYCLE 98 — `loop41:` graph-grounded impact analysis: signature-change
+  task where the graph plan touches callers a `search`-driven plan misses,
+  both counts reported | est: 30m |
+  verify (R-I): both counts in the BUILD_LOG entry; tests green; full suite
+  green.
+- [ ] CYCLE loop41-final — Loop 41 acceptance + R41 ASK (plan-object/undo
+  semantics, worktree boundary); report committed. ENTRY: R38+R39 closed
+  (fulfilled).
+
+### loop42: cycles (selected from build/research-loop42.md, cycle R42)
+
+- [ ] CYCLE 99 — `loop42:` capability ladder + malformed-call metric: local
+  single-call → multi-call → multi-turn ladder next to BFCL (R-G); eval
+  counts malformed calls per task | est: 30m |
+  verify (R-I): ladder numbers + malformed-call rate in BUILD_LOG;
+  `uv run pytest -q tests/test_segment.py` → exit 0 (≥4 tests); full suite
+  green.
+- [ ] CYCLE 100 — `loop42:` segmentation ON vs OFF: golden suite pass rate
+  AND malformed-call rate, tokens/wall per R-F, certified per R-H |
+  est: 40m |
+  verify (R-I): ON/OFF numbers committed; tests green; full suite green.
+- [ ] CYCLE loop42-final — Loop 42 acceptance + R42 ASK (per-segment tool
+  restriction, ceiling term); report committed. ENTRY: R40 closed
+  (fulfilled).
+
+### loop43: cycles (selected from build/research-loop43.md, cycle R43)
+
+- [ ] CYCLE 101 — `loop43:` subprocess contract specified: exit-code
+  taxonomy, versioned JSONL schema (`v` field + compat rule),
+  `--output-schema` guarantees, resumability | est: 30m |
+  verify (R-I): contract doc committed; `uv run pytest -q
+  tests/test_contract.py` → exit 0 (≥4 tests); full suite green.
+- [ ] CYCLE 102 — `loop43:` conformance suite: independent process drives
+  codemonkey on documentation alone, green on the released binary; a
+  deliberate schema change FAILS it | est: 40m |
+  verify (R-I): charter probe as written; tests green; full suite green.
+- [ ] CYCLE loop43-final — Loop 43 acceptance + R43 ASK (publish contract,
+  MCP server vs deferred client, trust boundary); report committed. ENTRY:
+  R38 closed (fulfilled).
+
+### loop44: cycles (selected from build/research-loop44.md, cycle R44)
+
+- [ ] CYCLE 103 — `loop44:` declared budget + runtime enforcement: breach
+  halts with a distinct exit, resumable job file, checkpointed workspace;
+  self-authored rules can never raise a budget (rejection recorded) |
+  est: 40m |
+  verify (R-I): charter probe as written; `uv run pytest -q
+  tests/test_budgets.py` → exit 0 (≥5 tests); full suite green.
+- [ ] CYCLE 104 — `loop44:` approval batching + blast-radius limits (post
+  R41): ranked batches replace per-call interrupts; files-touched caps off
+  the change plan | est: 30m |
+  verify (R-I): batch behavior + halt-at-limit probes green; tests green;
+  full suite green.
+- [ ] CYCLE loop44-final — Loop 44 acceptance + R44 ASK (enforcement exit,
+  batching, rule invariant); report committed. ENTRY: R41 closed
+  (starts only after loop41-final).
+
+### loop45: cycles (selected from build/research-loop45.md, cycle R45)
+
+- [ ] CYCLE 105 — `loop45:` evidence pack + hash-chained journal: claims
+  linked to journal/command/diff/test evidence, redacted; broken chain
+  fails verification | est: 40m |
+  verify (R-I): pack from a real run; `uv run pytest -q
+  tests/test_evidence.py` → exit 0 (≥5 tests); full suite green.
+- [ ] CYCLE 106 — `loop45:` endpoint-off verification + register completion:
+  pack verifies with the model endpoint switched off; every register row
+  PROVEN-LIVE / UNIT-ONLY-with-reason / DEAD | est: 30m |
+  verify (R-I): endpoint-off verification log committed; tests green; full
+  suite green.
+- [ ] CYCLE loop45-final — v4.0 closing acceptance: sweep zero BLOCKED,
+  suite green, version matches tag, THREAT_MODEL refreshed, report
+  committed, tag v4.0, Gate 5 handoff. ENTRY: loops 38–44 closed,
+  no critic finding above LOW.
 
 ### loop40: cycles (selected from build/research-loop40.md, cycle R40)
 

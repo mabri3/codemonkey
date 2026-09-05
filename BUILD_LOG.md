@@ -2676,3 +2676,20 @@ env restore, unknown-arm rejection). Full suite 690/5.
   Revisit when live runs are possible; the notice hook already records
   verifier provenance per run for that measurement.
 **LOOP 40 COMPLETE.**
+
+## 2026-09-05 — CYCLES R41–R45: loops 41–45 research (web-backed, standard shape)
+
+**Completed:** `build/research-loop41.md` (atomic change plans; ARISE /
+ProMax / arch-aware generation; C6 undo-semantics rejected-as-default, in
+the ask) · `research-loop42.md` (small-model compiler; BFCL ladder +
+ceiling warning up front; fine-tune C6 rejected as out-of-premise) ·
+`research-loop43.md` (caller contract; MCP SERVER-over-client recommendation
+with trust-boundary reasons) · `research-loop44.md` (autonomy budgets;
+entry PENDING R41 close) · `research-loop45.md` (evidence pack + v4.0
+acceptance; entry PENDING loops 38–44). Each ends by asking (R45 by
+acceptance terms). plan.md carries unchecked `loop41:`–`loop45:` cycles
+(C96–C106 + finals); R44/R45 entry conditions recorded PENDING.
+- **Known issues:** none (research only, no code).
+- **Next step:** R41 ASK answers unblock C96 (counter work needs no ask,
+  but C97+ apply-semantics do); loop41-final needs
+  the R41 ask answered.
