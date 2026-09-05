@@ -2624,3 +2624,19 @@ R-I pre-fixed UNVERIFIED variant). Full suite 666/5.
 - **Known issues:** none.
 - **Next step:** CYCLE 94 — discoverable default-on, shipped default-OFF per
   ASK decision (no flip; loop40-final measures hit/false-gate rates).
+
+## 2026-09-05 — CYCLE 94 (loop40): discoverable default-on, shipped default-OFF
+
+**Completed (ASK DECIDED 2026-09-04: no flip):** `src/codemonkey/discover.py` —
+`discover_verify_command` (pytest.ini/tox.ini/setup.cfg-pytest/pyproject-pytest/
+package.json-test/Makefile-test → command + source file; nothing declared →
+(None, "")) + `resolve_verifier` (explicit param > config > discovered > none).
+exec.py threads one resolution through the normal path AND best-of (also fixing
+the latent bug where the explicit `verify_command` param never reached the
+normal path), and emits a discovery notice naming the source file (measurement
+hook for loop40-final hit rate). No declaration → behavior unchanged.
+**Tests:** `tests/test_discover_verify.py` 14/14 (11 mapping/precedence unit +
+R-I declared-repo auto-verifies with `pytest -q` on the trace /
+undeclared-repo unchanged). Full suite 680/5.
+- **Known issues:** none. Default-ON flip waits for loop40-final numbers.
+- **Next step:** CYCLE 95 — F2P quality gate + measurement.

@@ -2158,7 +2158,7 @@ loop 45's v4.0 acceptance. This section is a plan, not a queue.
   patch, passes) → verify report shows the fail→pass transition and the run
   counts verified; variant with no pre-fail → UNVERIFIED verdict; `uv run
   pytest -q tests/test_repro_gate.py` → exit 0 (≥5 tests); full suite green.
-- [ ] CYCLE 94 — `loop40:` discoverable default-on (ASK DECIDED 2026-09-04, verbatim:
+- [x] CYCLE 94 — `loop40:` discoverable default-on (ASK DECIDED 2026-09-04, verbatim:
   "94 no flip — ship C94 default-OFF. Revisit at loop40-final with measured discovery
   hit rate and false-gate rate; flip on the number, not on the design."): ship
   default-OFF; loop40-final carries measured discovery hit rate + false-gate rate.

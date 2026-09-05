@@ -472,6 +472,16 @@ def run_exec(
     # -- session history (resume / new) ----------------------------------
     from . import sessions as sessions_mod
 
+    # loop40 cycle 94 (ASK DECIDED 2026-09-04: ship default-OFF — discovery
+    # only fills the verifier when the operator configured nothing; the
+    # default-ON flip waits for loop40-final numbers). Precedence: explicit
+    # param > config > discovered > none. This also fixes the latent bug
+    # where the explicit verify_command param never reached the normal path.
+    from .discover import resolve_verifier as _resolve_verifier
+
+    _eff_verify_loop, _eff_verify_origin = _resolve_verifier(
+        verify_command, cfg.get("verify_command"), workdir)
+
     # loop2 cycle 15: registry-selected compaction strategy for auto-compaction
     from .strategies import select_strategy as _sel_strat
     from .strategies.compaction import get_compactor as _get_compactor
@@ -516,7 +526,7 @@ def run_exec(
             approval=eff_approval,
             context_limit=int(cfg.get("context_limit", 32000) or 0) or None,
             compaction=compaction,
-            verify_command=(str(cfg.get("verify_command") or "").strip() or None),
+            verify_command=_eff_verify_loop,
             max_verify_retries=int(cfg.get("max_verify_retries", 1) or 0),
             memory_enabled=memory_enabled,
             max_edit_retries=int(cfg.get("max_edit_retries", 1) or 0),
@@ -588,7 +598,13 @@ def run_exec(
         raise ExecUsageError("--best-of must be an integer >= 1") from None
     if _eff_best_of < 1:
         raise ExecUsageError("--best-of must be an integer >= 1")
-    _eff_verify = (verify_command or cfg.get("verify_command") or "").strip()
+    _eff_verify = _eff_verify_loop or ""
+    if _eff_verify_origin.startswith("discovered:") and on_event is not None:
+        # measurement hook for loop40-final (hit rate): the trace records
+        # WHERE each verifier came from.
+        on_event({"type": "notice",
+                  "message": f"verify: discovered `{_eff_verify}` from "
+                             f"{_eff_verify_origin.split(':', 1)[1]}"})
     if _eff_best_of > 1 and not _eff_verify:
         raise ExecUsageError(
             "--best-of N>1 requires a verify command: pass --verify-command "
