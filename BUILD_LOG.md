@@ -2599,3 +2599,12 @@ Per the ASK decision ("do not build the auto-restore path"), no auto-restore
 was built. The suggest path is already real: every C90/C91 report names the
 checkpoint group and every budget advisory prints "Checkpoint to resume from".
 Verified by the existing R-I traces (checkpoint_id field present). C92 DONE.
+
+## 2026-09-04 — CYCLE loop39-final: Loop 39 acceptance
+
+**Re-verified:** failclass taxonomy (C88), stuck detector (C89), policy table +
+budget + typed report (C90), evidence-capped enforced stop exit 3 (C91),
+C92 suggest-only (no auto-restore per ASK). Loop39 file set: 36/36 green;
+full suite 658/5. ASK scope honored: 91 evidence-capped as decided, 92 no-code,
+spec §Safety carries exit 3, decisions verbatim in plan at C91/C92/C94.
+**LOOP 39 COMPLETE.**

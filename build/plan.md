@@ -2140,7 +2140,7 @@ loop 45's v4.0 acceptance. This section is a plan, not a queue.
   verify (R-I): scripted clobber-then-verify real-exec run → rollback event,
   final tree carries pre-clobber content, verifier passes; `uv run pytest -q
   tests/test_rollback_recovery.py` → exit 0 (≥4 tests); full suite green.
-- [ ] CYCLE loop39-final — Loop 39 acceptance: policy table + budget + report
+- [x] CYCLE loop39-final — Loop 39 acceptance: policy table + budget + report
   re-verified (91/92 only if ASK approved, else recorded as approved-scope
   exclusions with the ask transcript pointer); BUILD_REPORT loop-39 section;
   Gate report (including the measured pre/post turn+token deltas per R-F) |
