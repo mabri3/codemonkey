@@ -2899,3 +2899,24 @@ src_codemonkey_strategies_compaction_estimate_tokens`, exit 0. A18 green.
   R-G verdict on whether partial application is a real failure mode. C2's
   reopening means C98's comparison should be re-stated at full scope before
   that acceptance.
+
+## 2026-09-05 — CYCLE loop41-final: Loop 41 acceptance + C4 number + R-G verdict
+
+**Acceptance:** C96 counter (rate None, scope-in-output) · C97 plan object +
+atomic rollback, OFF/opt-in, `undo` untouched (+121/-0) · 97F1 mixed-tree
+honesty (closing names uncovered paths) · C98 impact compare · 98F1-98F2
+(sibling: `links` loader fix — C98's same-file finding was a loader
+artifact; corrected: cross-file calls 892 AST-EXTRACTED, graph_only=12 on
+journal.record; R41-C2 REOPENED at full scope). Suite 735/5.
+**C4 number (R41 ASK 3):** partial-application rate None (unknown — 11
+single-edit runs, 4,576 dark shell outcomes); per-plan worktree cost basis
+measured live: `git worktree add` 0.2s, 20MB second tree, second verify run
+up to ~22s (full suite; targeted verifies less). Rate unknown + nonzero
+per-plan spend → **C4 stays APPROVED-BUT-UNBUILT**: no deletion cycle
+(R-A fires on measured-absent, not unknown), no default. The counter
+accumulates observable data for a future number.
+**R-G verdict (explicit, not silent):** partial application is
+UNDEMONSTRATED in this repo's history — C97/C98 ship as opt-in insurance
+and proven mechanism, not as remedy for a measured problem. The question
+stays open until the cmd-capturing journal observes real multi-edit runs.
+**LOOP 41 COMPLETE (R41 CLOSED).**

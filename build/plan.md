@@ -2208,7 +2208,7 @@ loop 45's v4.0 acceptance. This section is a plan, not a queue.
   both counts reported | est: 30m |
   verify (R-I): both counts in the BUILD_LOG entry; tests green; full suite
   green.
-- [ ] CYCLE loop41-final — Loop 41 acceptance + R41 ASK (plan-object/undo
+- [x] CYCLE loop41-final — Loop 41 acceptance + R41 ASK (plan-object/undo
   semantics, worktree boundary); report committed. ENTRY: R38+R39 closed
   (fulfilled).
 

@@ -1032,3 +1032,26 @@ The build contract is CLOSED.
   unmeasurable (endpoint down). Flip on the number when live runs return.
 
 **LOOP 40 COMPLETE.**
+
+
+---
+
+# Loop 41 — Final Acceptance (CYCLE loop41-final)
+
+**Date:** 2026-09-05 · **Suite:** 735 passed / 5 skipped.
+
+| Cycle | Claim | Evidence |
+|---|---|---|
+| C96 | counter + baseline | `partial.py`, rate None, scope-in-output; 9 tests |
+| C97 | plan object + atomic rollback, opt-in | charter probe git-clean; `undo` untouched; 7 tests |
+| 97F1 | mixed-tree honesty | closing + CLI name uncovered paths; control; +3 tests |
+| C98 | impact compare, both counts | live extract: graph_only 0(noise excluded), search_only {noise} |
+| 98F1 | loader artifact corrected | `links` read; cross-file calls 892; graph_only=12; C2 REOPENED |
+| 98F2 | path-lookup first-match fix | sibling; tests green |
+
+- **R-G:** local partial-application rate None (unknown); no published
+  counterpart exists for this failure mode — nothing to stand next to.
+- **R-F:** worktree plan ≈ 0.2s + 20MB + second verify (≤22s full suite).
+- **R-H:** mechanism probes (induced failures), never field-rate claims.
+- **C4:** approved-but-unbuilt pending a measured rate.
+- **LOOP 41 COMPLETE.**
