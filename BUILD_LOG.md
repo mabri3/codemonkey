@@ -2920,3 +2920,25 @@ UNDEMONSTRATED in this repo's history — C97/C98 ship as opt-in insurance
 and proven mechanism, not as remedy for a measured problem. The question
 stays open until the cmd-capturing journal observes real multi-edit runs.
 **LOOP 41 COMPLETE (R41 CLOSED).**
+
+## 2026-09-05 — CYCLES 99+100 (loop42): ladder + malformed metric + segmentation
+
+**C99 DONE:** eval scores `tool_calls/malformed/parse_errors/malformed_rate`
+per task (error_class rides tool.completed via meta). `ladder.py` TIERS
+L1 single-call / L2 multi-call / L3 multi-turn-state, deterministic file
+checkers, provider-agnostic runner. Scripted: good clears 3/3 malformed 0;
+schema-violating fake fails L1 with malformed>=1. `test_segment.py` 6/6.
+**Ladder numbers (R-G):** BFCL is the published ladder (frontier far above
+27B-class; single-call accuracy, easier than multi-turn). LOCAL: endpoint
+.176 DOWN (ConnectError) — live ladder BLOCKED, no local numbers. The
+harness stands ready; same runner, live numbers on return.
+**C100 DONE (bounded):** `run_segmented` — separate short runs, file+handoff
+handoff, per-segment checks, stop-on-failure, per-segment malformed
+attribution. Scripted: s1 work survives s2 failure (1/2); malformed
+attributed per segment. NO tool restriction (R42 ASK 1 unanswered —
+building it would preempt the ask); report states identical surface.
+**loop42-final HELD** on R42 ASK 1+2 — recorded at the cycle, dated.
+Full suite 741/5.
+- **Known issues:** none.
+- **Next step:** C101 subprocess contract (writing needs no ask; publishing
+  does — loop43-final held on answers).

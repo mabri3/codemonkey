@@ -205,6 +205,22 @@ def run_suite(suite_path: Path, *, exec_fn=None,
             from .f2p import label_task as _f2p_label
 
             scored["f2p"] = _f2p_label(events)
+        # loop42 cycle 99: malformed-call metric — tool.completed events
+        # already carry error_class via meta. schema_mismatch = unusable
+        # call (model's fault); parse = prompt-protocol failure. Both count
+        # as malformed; broken out so the loop sees WHICH failure mode.
+        _tc = _mal = _par = 0
+        for ev in events:
+            if isinstance(ev, dict) and ev.get("type") == "tool.completed":
+                _tc += 1
+                if ev.get("error_class") == "schema_mismatch":
+                    _mal += 1
+                elif ev.get("error_class") == "parse":
+                    _par += 1
+        scored["tool_calls"] = _tc
+        scored["malformed"] = _mal
+        scored["parse_errors"] = _par
+        scored["malformed_rate"] = (_mal + _par) / _tc if _tc else 0.0
         # loop7 cycle 33: journal-derived failure-class stats for the run
         try:
             from .journal import class_summary as _cs, read_thread as _rt

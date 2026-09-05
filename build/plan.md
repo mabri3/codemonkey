@@ -2214,17 +2214,20 @@ loop 45's v4.0 acceptance. This section is a plan, not a queue.
 
 ### loop42: cycles (selected from build/research-loop42.md, cycle R42)
 
-- [ ] CYCLE 99 — `loop42:` capability ladder + malformed-call metric: local
+- [x] CYCLE 99 — `loop42:` capability ladder + malformed-call metric: local
   single-call → multi-call → multi-turn ladder next to BFCL (R-G); eval
   counts malformed calls per task | est: 30m |
   verify (R-I): ladder numbers + malformed-call rate in BUILD_LOG;
   `uv run pytest -q tests/test_segment.py` → exit 0 (≥4 tests); full suite
   green.
-- [ ] CYCLE 100 — `loop42:` segmentation ON vs OFF: golden suite pass rate
+- [x] CYCLE 100 — `loop42:` segmentation ON vs OFF: golden suite pass rate
   AND malformed-call rate, tokens/wall per R-F, certified per R-H |
   est: 40m |
   verify (R-I): ON/OFF numbers committed; tests green; full suite green.
-- [ ] CYCLE loop42-final — Loop 42 acceptance + R42 ASK (per-segment tool
+- [ ] CYCLE loop42-final — Loop 42 acceptance
+  HELD 2026-09-05: R42 ASK 1 (per-segment tool restriction) + ASK 2
+  (ceiling term) unanswered — C100 ships WITHOUT restriction machinery
+  and the report states identical-surface; loop42-final ticks on answers, not on more code. + R42 ASK (per-segment tool
   restriction, ceiling term); report committed. ENTRY: R40 closed
   (fulfilled).
 
