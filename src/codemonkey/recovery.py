@@ -101,6 +101,11 @@ class RecoveryTracker:
         self.first_stuck_turn: int | None = None
         self.verdict_emitted = False  # budget verdict fires once per run
         self.advisory_turn: int | None = None  # turn a policy hint was issued
+        # 91F1: the (tool, error_class) the advisory was ISSUED ABOUT. The
+        # enforced stop (cycle 91) requires THIS pair to recur — an unrelated
+        # failure after the advisory is ordinary work, not evidence that the
+        # documented alternative was tried and also failed.
+        self.advisory_pair: tuple[str, str] | None = None
         self.last_error: dict = {}  # most recent failed outcome, for backstop taxonomy
 
     def note_error(self, turn_no: int) -> None:
@@ -110,6 +115,18 @@ class RecoveryTracker:
     def note_stuck(self, turn_no: int) -> None:
         if self.first_stuck_turn is None:
             self.first_stuck_turn = int(turn_no)
+
+    def note_advisory(self, turn_no: int, tool: str, error_class: str) -> None:
+        """91F1: record WHEN the first advisory fired and WHAT it was about."""
+        if self.advisory_turn is None:
+            self.advisory_turn = int(turn_no)
+            self.advisory_pair = (str(tool), str(error_class))
+
+    def is_advised_failure(self, tool: str, error_class: str) -> bool:
+        """91F1: does this failed outcome repeat the advised-against pair?"""
+        if self.advisory_pair is None:
+            return False
+        return self.advisory_pair == (str(tool), str(error_class))
 
     def post_error_turns(self, turn_no: int) -> int:
         if self.first_error_turn is None:

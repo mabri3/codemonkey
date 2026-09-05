@@ -26,9 +26,20 @@ adversary with write access to the chain file.
 
 ## In-repo evidence (this repo, not literature)
 
-- `claims` + `truthpass` already extract agent claims; `journal` already
-  records runs; `redact` already scrubs secrets; `cost` already ledgers
-  spend. The pack is composition + chaining, not new extraction machinery.
+- `claims` (`check_claims` / `annotate`, agent claims vs journal records)
+  already extracts agent claims; `journal` already records runs; `redact`
+  already scrubs secrets; `cost` already ledgers spend. For the *agent-claim*
+  half the pack is composition + chaining, not new extraction machinery.
+  **91F4 correction (2026-09-04):** this bullet originally read
+  "`claims` + `truthpass` already extract agent claims". Two errors.
+  (a) `truthpass.py` no longer exists — cycle 81 (`5ea507f`) deleted it under
+  R-A the same day this file was written. (b) It never did agent-claim
+  extraction: it verified *build-ledger* claims (an acceptance row naming
+  `tests/x.py` → the file exists and holds ≥ the claimed test count). So the
+  **ledger-verification** half of an evidence pack is NOT composition — it is
+  machinery this arc deleted, and loop 45 must either rebuild it or scope the
+  pack to agent claims only. That choice is now a cycle-level decision, not
+  an assumption.
 - The journal is append-only by convention, not by construction — no hash
   chain, no tamper evidence.
 - `build/CAPABILITY_REGISTER.md` exists; loop-38..44 rows need

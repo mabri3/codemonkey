@@ -590,6 +590,7 @@ def run_turns(
         # AFTER a policy advisory was issued (the alternative was tried and
         # also failed). Reset per turn; the stop check reads it below.
         _post_advisory_failed = False
+        _post_advisory_pair: tuple[str, str] | None = None  # 91F1: the matched pair
         for idx, name, ok, result_output, meta in outcomes:
             # loop39 cycle 89: feed every outcome to the stuck detector
             # BEFORE the observation budget splices `result_output`; the
@@ -615,10 +616,17 @@ def run_turns(
                 recovery_tracker.last_error = {
                     "tool": name, "error_class": _cls,
                     "output": str(result_output or "")[:500]}
-            # loop39 cycle 91: post-advisory failure is the stop evidence
-            if (not ok and recovery_tracker.advisory_turn is not None
-                    and _turn_no > recovery_tracker.advisory_turn):
-                _post_advisory_failed = True
+                # loop39 cycle 91 + 91F1: the stop evidence is the ADVISED-
+                # AGAINST pair recurring after the advisory — not any failure.
+                # An agent that obeys the advisory, switches approach and
+                # incurs an unrelated miss (a path that isn't there, an empty
+                # grep) has NOT shown the documented alternative failed, and
+                # stopping it would make build/spec.md's closing text a lie.
+                if (recovery_tracker.advisory_turn is not None
+                        and _turn_no > recovery_tracker.advisory_turn
+                        and recovery_tracker.is_advised_failure(name, _cls)):
+                    _post_advisory_failed = True
+                    _post_advisory_pair = (name, _cls)
             # 35F1: `_jkey` is the journal key carried back from _run_one (it
             # is a LOCAL there — the old code read an unbound `jkey` in this
             # scope and the surrounding `except Exception` swallowed the
@@ -771,8 +779,9 @@ def run_turns(
             # loop39 cycle 91 (ASK DECIDED 2026-09-04: stop only after the
             # policy's documented alternative was tried and also failed).
             # Record the advisory turn: the evidence gate for the stop.
-            if recovery_tracker.advisory_turn is None:
-                recovery_tracker.advisory_turn = _turn_no
+            # 91F1: record the pair too — the stop gate matches against it.
+            recovery_tracker.note_advisory(
+                _turn_no, stuck_signal["tool"], stuck_signal["error_class"])
             if on_event:
                 on_event({"type": "failure_report.consulted",
                           "report": _report, "policy": _policy["action"]})
@@ -927,10 +936,16 @@ def run_turns(
                 journal_thread=journal_thread)
             _gave["advisory_turn"] = recovery_tracker.advisory_turn
             _gave["failed_turn"] = _turn_no
+            # 91F1: the closing claims the alternative was tried and failed —
+            # carry the pair that justifies the claim so it is checkable.
+            _gave["advised_pair"] = list(recovery_tracker.advisory_pair or ())
+            _gave["matched_pair"] = list(_post_advisory_pair or ())
             _closing = (
                 f"GAVE UP (recovery policy enforced stop): the policy advisory "
-                f"issued at turn {recovery_tracker.advisory_turn} was tried and "
-                f"also failed at turn {_turn_no}. First stuck at turn "
+                f"issued at turn {recovery_tracker.advisory_turn} about "
+                f"{'/'.join(recovery_tracker.advisory_pair or ('?', '?'))} was "
+                f"tried and the same failure recurred at turn {_turn_no}. "
+                f"First stuck at turn "
                 f"{recovery_tracker.first_stuck_turn}. "
                 f"Checkpoint to resume from: {_cp2 or '(none)'} "
                 f"(journal thread {journal_thread or '(ephemeral)'}). "
@@ -955,8 +970,11 @@ def run_turns(
             break
         last_turn = turn
 
-    # max_turns bail
-    if on_event:
+    # max_turns bail. 91F2: the cycle-91 enforced stop is the only `break` in
+    # this loop (normal completion returns above), so without this guard every
+    # policy stop also emitted "max_turns reached" — an error that did not
+    # happen, contradicting the gave-up report on the same trace.
+    if on_event and not getattr(last_turn, "gave_up", None):
         on_event({"type": "error",
                   "message": f"max_turns ({max_turns}) reached without a final answer"})
     last_turn.all_messages = messages

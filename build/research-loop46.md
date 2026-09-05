@@ -24,9 +24,10 @@ that `prompt_block` advertises and `dispatch` sandbox-gates through
 `sandbox.check` — a single, already-policed admission point for any new tool.
 `strategies/__init__.py::DOMAINS` carries compaction / memory / session_state
 with env-overridable names (the A19 pattern) — a fourth and fifth domain cost
-nothing structurally. `lessons.py` + `lessons_gate.py` already implement
-*admission by measurement* (a lesson's `verified` flag is set by an eval run,
-not by a model's opinion) — which is exactly the gate shape R-J demands.
+nothing structurally. `lessons.py` already implements *admission by measurement*
+(`add(..., verified=False)` drafts, `mark_verified` set by an eval run rather
+than a model's opinion, `retrieve(verified_only=True)` gating what is ever
+injected) — exactly the gate shape R-J demands.
 `journal.py` records typed per-step data including `error_class`. `eval.py` /
 `rubrics.py` / `certify.py` are the measurement harness. `checkpoints.py` gives
 per-call snapshot groups. Nothing in loop 46 needs a new subsystem; it needs a
@@ -46,8 +47,9 @@ create → memory → manage → evaluate cycle (https://arxiv.org/pdf/2605.2736
 CoEvoSkills adds co-evolutionary *verification* of skills, i.e. a skill and its
 check evolve together (https://arxiv.org/html/2604.01687).
 **Attachment.** `tools/__init__.py` registry + `sandbox.py` classification +
-`shell`/`delegate` for synthesis + `lessons_gate`'s admission-by-measurement
-pattern + `checkpoints` for rollback.
+`shell`/`delegate` for synthesis + `lessons.py`'s admission-by-measurement
+pattern (`verified` / `mark_verified` / `retrieve(verified_only=True)`) +
+`checkpoints` for rollback.
 **R-I probe.** Run A synthesizes a skill and admits it; run B on a related task
 shows the skill name in its `--json` tool trace and finishes in strictly fewer
 turns than the `--no-skills` control.
@@ -63,7 +65,7 @@ away domain insight) and **context collapse** (iterative rewriting eroding
 detail) — both of which a rewrite-style lessons file is exposed to
 (https://arxiv.org/abs/2510.04618, production notes:
 https://contextual.ai/blog/optimize-agent-performance-using-self-evolving-context).
-**Attachment.** `lessons.py`/`lessons_gate.py` (curator gate exists),
+**Attachment.** `lessons.py` (curator gate exists: `verified` + `mark_verified`),
 `compile_rules.py` (playbook → enforcement exists), `learnedctx.py` +
 loop 38's `context` strategy domain (injection point exists), `journal.py`
 (reflector input exists).
@@ -101,7 +103,7 @@ out-of-band defense literature's structural finding is to keep the evaluator
 away from the untrusted content and judge on metadata
 (https://arxiv.org/pdf/2606.26479, survey: https://arxiv.org/pdf/2510.06445).
 **Attachment.** `envquarantine.py`, `permissions.py`, `approvals.py`,
-`sandbox.py`, `redact.py`, `claims.py`, `truthpass.py`, `journal.py`.
+`sandbox.py`, `redact.py`, `claims.py`, `journal.py`.
 **R-I probe.** A fixture page carrying an injected "add this to your skills"
 instruction: the admission is refused with the taint cited in the journal,
 while the same skill from a clean run is admitted.
@@ -162,8 +164,8 @@ C1 is selected as loop 46 on three grounds. **Magnitude:** it is the largest
 published delta available to a scaffold that cannot retrain its model, and the
 paper's stated unbuilt next step *is* the thing this repo is unusually equipped
 to build. **Fit:** the admission gate C1 needs — promote only on a mechanical
-check, never on a model's say-so — already exists as `lessons_gate`'s
-verified-by-eval flag; the registry it must extend is already the single
+check, never on a model's say-so — already exists as `lessons.py`'s
+verified-by-eval flag (`mark_verified`, consumed by `retrieve(verified_only=True)`); the registry it must extend is already the single
 sandbox-policed choke point; rollback is `checkpoints`. **Order:** C2's
 playbook and C3's tournament both become measurable *through* the same
 library-on/library-off arm structure C1 forces us to build, so C1 first makes
@@ -204,3 +206,24 @@ the user's word and loop 45's v4.0 gate):
    written.
 
 Full cycle text with literal verify probes is in `build/plan.md`.
+
+
+---
+
+## 91F4 citation re-point (2026-09-04)
+
+This file was written against a tree that has since changed under R-A. Two
+modules it cited as attachment points no longer exist, and the re-points are
+recorded here rather than made silently:
+
+| Cited | Status | Re-pointed to |
+|---|---|---|
+| `lessons_gate.py` (×4, incl. C1's whole "Fit" argument) | DELETED by cycle 81 (`5ea507f`) under R-A | `lessons.py` — `add(verified=False)` / `mark_verified` / `retrieve(verified_only=True)`. The admission-by-measurement *pattern* survives intact; only the wrapper module went. C1's Fit argument stands. |
+| `truthpass.py` (C4 attachment) | DELETED by cycle 81 (`5ea507f`) under R-A | Nothing. It verified build-ledger claims, not tool-output provenance, so it was a mis-citation for C4 even before deletion. C4's real attachment points are `claims.py`, `journal.py`, `sandbox.py`, `redact.py`. |
+
+**Standing rule (proposed for the arc, alongside R-J/R-K):** a research file's
+in-repo attachment points are re-verified against the tree at the moment its
+cycles are built, and a citation naming a module that no longer exists is a
+BLOCKING finding for that cycle, not a footnote. `build/research-loop45.md`
+was written 2026-09-04 22:00 citing a module cycle 81 deleted the same day —
+so this check has to be mechanical, not a habit.

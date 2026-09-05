@@ -2693,3 +2693,51 @@ acceptance terms). plan.md carries unchecked `loop41:`–`loop45:` cycles
 - **Next step:** R41 ASK answers unblock C96 (counter work needs no ask,
   but C97+ apply-semantics do); loop41-final needs
   the R41 ask answered.
+
+## 2026-09-04 — CYCLES 91F1–91F4: C91 enforced-stop review gate
+
+**Completed:** a review pass over the cycle-91 enforced stop
+(`build/critic-c91-review.md`, HEAD `2de107c`, suite green 690/5) found four
+issues the tests structurally could not see, all now fixed.
+
+- **91F1 (HIGH)** — the evidence cap did not discriminate. `loop.py` armed the
+  stop on ANY failed outcome after the advisory turn, never matching it
+  against the `(tool, error_class)` the advisory was issued about. Reproduced:
+  an agent stuck on `write_file` ×3 that then OBEYS the advisory, switches to
+  `read_file` and misses one path — the most routine failure in exploration —
+  was terminated at turn 4 of 12 with a closing asserting "the policy advisory
+  … was tried and also failed". It had not been. Fixed with
+  `RecoveryTracker.note_advisory` / `is_advised_failure`; the report now
+  carries `advised_pair` + `matched_pair` so the closing is checkable, and
+  `build/spec.md` states the tightened contract.
+- **91F2 (MEDIUM)** — the cycle-91 `break` is the only break in `run_turns`
+  (normal completion returns), so it fell through the unconditional bail and
+  every policy stop also emitted `error: max_turns (N) reached without a final
+  answer`, contradicting the gave-up report on the same trace.
+- **91F3 (MEDIUM)** — both C91 fixtures repeat one failing call forever, so
+  the discriminating case never occurred; the negative control makes no tool
+  calls after the advisory. Four tests added; the three regressions were
+  proved failing against unfixed HEAD source in a detached worktree before
+  being accepted as regressions.
+- **91F4 (MEDIUM)** — citation rot is ongoing, not historical:
+  `research-loop45.md`, written 2026-09-04 22:00, cited `truthpass` under "In-repo
+  evidence" to argue loop 45 needs no new extraction machinery. Cycle 81
+  deleted `truthpass.py` the same day — and it verified *build-ledger* claims,
+  not agent claims, so it was a mis-citation regardless. `research-loop46.md`
+  carried five dead references (`lessons_gate` ×4, `truthpass` ×1). Both
+  re-pointed with dated correction blocks rather than silent edits.
+
+**Verified:** `uv run pytest -q` → 694 passed, 5 skipped (was 690/5).
+`uv run codemonkey --help` lists exec/review/sessions/config/models (A18).
+Before/after on the same scenario: exit 3 at turn 4 with a false closing and a
+false `max_turns` error → exit 0 at turn 5, clean.
+
+- **Known issues:** no live `exec --json` probe — the endpoint has been down
+  across this arc (`10123d1` records connection-refused ×2). The scenarios run
+  the real `run_exec` path in-process with a scripted provider; that exercises
+  the loop, sandbox and exit-code contract but is NOT a live probe, and is
+  recorded as such rather than claimed as one.
+- **Next step:** the proposed standing rule — a research file's attachment
+  points are re-verified against the tree when its cycles are built, and a
+  dead citation is a BLOCKING finding — needs adopting alongside R-J/R-K
+  before R46–R50 cycles are built.

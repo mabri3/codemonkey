@@ -2273,3 +2273,48 @@ loop 45's v4.0 acceptance. This section is a plan, not a queue.
   numbers + R-G/R-F/R-H rows | est: 30m |
   verify: loop40 entry probes green; `uv run pytest -q` → exit 0; report
   committed.
+
+### 91F: review-gate fix pass (critic `build/critic-c91-review.md`)
+
+Review of the C91 enforced stop at HEAD `2de107c` with the suite green
+(690/5). These are correctness gaps the tests structurally could not see.
+
+- [x] CYCLE 91F1 — `loop39:` the evidence cap must discriminate: arm the
+  enforced stop only when the ADVISED-AGAINST `(tool, error_class)` pair
+  recurs, not on any post-advisory failure. `RecoveryTracker.note_advisory`
+  records the pair; `is_advised_failure` gates; the report carries
+  `advised_pair` + `matched_pair` so the closing text is checkable; spec
+  tightened | est: 30m |
+  verify (R-I): provider stuck on `write_file` ×3 (advisory at turn 3) that
+  then OBEYS — switches to `read_file`, takes one missing-path miss, then
+  answers → exit 0, no `failure_report.gave_up`, run reaches turn 5; the
+  same-pair-repeats scenario → still exit 3 with
+  `advised_pair == matched_pair == ["write_file", "tool-error"]`;
+  `uv run pytest -q tests/test_enforced_stop.py` → exit 0.
+- [x] CYCLE 91F2 — `loop39:` a policy stop is not turn exhaustion. The
+  cycle-91 `break` is the only break in `run_turns` (normal completion
+  returns), so it fell through the unconditional `max_turns` bail and every
+  policy stop also emitted `error: max_turns (N) reached without a final
+  answer` | est: 10m |
+  verify: the 91F1 stop scenario emits no `error` event matching `max_turns`;
+  a run that genuinely exhausts turns still emits it.
+- [x] CYCLE 91F3 — `loop39:` the missing test arm. Both C91 fixtures repeat
+  one failing call forever, so the discriminating case never occurred; the
+  negative control makes no tool calls after the advisory | est: 20m |
+  verify: 4 new tests in `tests/test_enforced_stop.py`; the three regression
+  tests FAIL against unfixed HEAD source (proved in a detached worktree with
+  `PYTHONPATH` pointed at HEAD `2de107c`) and pass on the fix; suite green.
+- [x] CYCLE 91F4 — `loop39:` research citation re-point + standing rule.
+  `research-loop45.md` cited `truthpass` (deleted by cycle 81 the same day it
+  was written, and a mis-citation even before that: it verified build-ledger
+  claims, not agent claims); `research-loop46.md` cited `lessons_gate` ×4 and
+  `truthpass` ×1 | est: 20m |
+  verify: `grep -c "lessons_gate\|truthpass"` in both files returns only
+  hits inside the recorded correction notes; both files carry a dated
+  re-point block naming what moved and why; the proposed standing rule is
+  written into `research-loop46.md`.
+
+**Standing rule proposed (arc-level, alongside R-J/R-K):** a research file's
+in-repo attachment points are re-verified against the tree at the moment its
+cycles are built; a citation naming a module that no longer exists is a
+BLOCKING finding for that cycle, not a footnote.
