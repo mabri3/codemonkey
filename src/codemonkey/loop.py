@@ -113,11 +113,12 @@ def run_turns(
 
     # loop40 cycle 93: repro-first gate — active only when a verify command
     # is configured (otherwise runs are untouched). Tracks write-test →
-    # expect-fail → patch → expect-pass across the run.
+    # expect-fail → patch → expect-pass across the run. Cycle 95: the
+    # CODEMONKEY_REPRO_GATE kill switch selects the repro-off arm.
     repro_tracker = None
-    if verify_command:
-        from . import repro as repro_mod
+    from . import repro as repro_mod
 
+    if verify_command and repro_mod.enabled():
         repro_tracker = repro_mod.ReproTracker()
 
     def _emit_repro(turn_obj) -> None:

@@ -351,6 +351,10 @@ def eval(
         bool,
         typer.Option("--delegation-matrix", help="Bake off delegation off vs on (implementer role)."),
     ] = False,
+    arms: Annotated[
+        str,
+        typer.Option("--arms", help="F2P quality bake-off arms, e.g. repro-on,repro-off (loop40)."),
+    ] = "",
     route_stats_flag: Annotated[
         bool,
         typer.Option("--route-stats", help="Print per-route pass_rate/token aggregates from the last results."),
@@ -371,6 +375,14 @@ def eval(
         results = run_delegation_matrix(suite, out_dir=out_dir)
         typer.echo(json.dumps(results["arms"], indent=2))
         typer.echo(f"matrix written: {Path(out_dir) / 'delegation_matrix.json'}")
+        return
+    if arms:
+        from .matrix import render_f2p_table, run_f2p_matrix
+
+        labels = [a.strip() for a in arms.split(",") if a.strip()]
+        results = run_f2p_matrix(suite, arms=labels, out_dir=out_dir)
+        typer.echo(render_f2p_table(results))
+        typer.echo(f"matrix written: {Path(out_dir) / 'f2p_matrix.json'}")
         return
     if strategy_matrix:
         from .matrix import render_table, run_matrix

@@ -2640,3 +2640,22 @@ R-I declared-repo auto-verifies with `pytest -q` on the trace /
 undeclared-repo unchanged). Full suite 680/5.
 - **Known issues:** none. Default-ON flip waits for loop40-final numbers.
 - **Next step:** CYCLE 95 — F2P quality gate + measurement.
+
+## 2026-09-05 — CYCLE 95 (loop40): F2P quality gate + measurement
+
+**Completed:** `src/codemonkey/f2p.py` — task labels from the C93 trace
+(F2P / UNPROVEN / N/A), per-arm aggregates (pass rate, F2P counts/rate,
+tokens/wall), gate verdict (MEASURED vs INCONCLUSIVE with stated rules, never
+causal), comparison line printing local F2P next to published 63% as frontier
+reference, never target (R-G). `repro.enabled()` kill switch
+(CODEMONKEY_REPRO_GATE, default on) honored by the loop. eval.py attaches the
+last `repro.verdict` + `f2p` label to every scored task. matrix.py
+`run_f2p_matrix` (repro-on/repro-off arms, env restored after) +
+`render_f2p_table` + `f2p_matrix.json`. CLI: `codemonkey eval <suite> --arms
+repro-on,repro-off`.
+**Tests:** `tests/test_f2p_gate.py` 10/10 (labels, arm summary, verdict rules,
+comparison line, two-arm matrix with gate-honoring fake, json+table shape,
+env restore, unknown-arm rejection). Full suite 690/5.
+- **Known issues:** none.
+- **Next step:** CYCLE loop40-final — Loop 40 acceptance + the 94 flip decision
+  on measured discovery hit rate / false-gate rate.

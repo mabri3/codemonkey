@@ -194,6 +194,17 @@ def run_suite(suite_path: Path, *, exec_fn=None,
                              events=events, wall=wall)
         scored["stdout"] = stdout_text[:2000]
         scored["window_depth"] = _window_depth_from_events(events)
+        # loop40 cycle 95: F2P labeling — last repro.verdict on the trace
+        # (None when the gate was off / no verifier configured).
+        scored["repro"] = None
+        scored["f2p"] = "N/A"
+        for ev in events:
+            if isinstance(ev, dict) and ev.get("type") == "repro.verdict":
+                scored["repro"] = ev.get("report")
+        if scored["repro"] is not None:
+            from .f2p import label_task as _f2p_label
+
+            scored["f2p"] = _f2p_label(events)
         # loop7 cycle 33: journal-derived failure-class stats for the run
         try:
             from .journal import class_summary as _cs, read_thread as _rt

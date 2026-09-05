@@ -11,6 +11,8 @@ never instantiated and behavior is unchanged. Pure state machine, no I/O.
 
 from __future__ import annotations
 
+import os
+
 
 def is_test_path(path: str) -> bool:
     """Test file by convention: test_*.py / *_test.py, or under tests/."""
@@ -19,6 +21,12 @@ def is_test_path(path: str) -> bool:
     if base.startswith("test_") or base.endswith("_test.py"):
         return True
     return any(p in ("tests", "test") for p in parts[:-1])
+
+
+def enabled() -> bool:
+    """Kill switch: CODEMONKEY_REPRO_GATE=0 disables tracking (the
+    loop40-final repro-off arm). Default ON when a verify command exists."""
+    return os.environ.get("CODEMONKEY_REPRO_GATE", "1") != "0"
 
 
 class ReproTracker:

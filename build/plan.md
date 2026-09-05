@@ -2170,7 +2170,7 @@ loop 45's v4.0 acceptance. This section is a plan, not a queue.
   verifier attached; `uv run pytest -q tests/test_discover_verify.py` →
   exit 0 (≥4 tests); full suite green. The default-ON flip waits for the
   R40 ask.
-- [ ] CYCLE 95 — `loop40:` F2P quality gate + measurement: generated tests
+- [x] CYCLE 95 — `loop40:` F2P quality gate + measurement: generated tests
   labeled by observed transition (fail→pass counts, pass-only = UNPROVEN);
   golden-suite ON-vs-OFF arms reporting pass rate, LOCAL fail-to-pass rate
   next to published 63% (R-G), cost/wall per arm (R-F), gate verdict (R-H) |
