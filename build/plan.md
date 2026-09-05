@@ -2150,7 +2150,7 @@ loop 45's v4.0 acceptance. This section is a plan, not a queue.
 
 ### loop40: cycles (selected from build/research-loop40.md, cycle R40)
 
-- [ ] CYCLE 93 — `loop40:` repro-first gate: `repro.py` state machine
+- [x] CYCLE 93 — `loop40:` repro-first gate: `repro.py` state machine
   (write-test → run-expect-FAIL → allow-patch → run-expect-PASS) around the
   run's test command; a patch with no observed pre-fail does not count as
   verified | est: 40m |

@@ -111,6 +111,23 @@ def run_turns(
     turn_tokens = 0
     turns_seen = 0
 
+    # loop40 cycle 93: repro-first gate — active only when a verify command
+    # is configured (otherwise runs are untouched). Tracks write-test →
+    # expect-fail → patch → expect-pass across the run.
+    repro_tracker = None
+    if verify_command:
+        from . import repro as repro_mod
+
+        repro_tracker = repro_mod.ReproTracker()
+
+    def _emit_repro(turn_obj) -> None:
+        if repro_tracker is None:
+            return
+        rep = repro_tracker.report()
+        turn_obj.repro = rep
+        if on_event:
+            on_event({"type": "repro.verdict", "report": rep})
+
     mode = tool_protocol if tool_protocol in ("native", "prompt") else "auto"
     edit_retries_left = max(0, int(max_edit_retries))
     obs_spent = 0
@@ -343,6 +360,7 @@ def run_turns(
                                      )},
                         })
             last_turn.all_messages = messages
+            _emit_repro(last_turn)
             return last_turn
 
         messages.append({"role": "assistant", "content": turn.content or ""})
@@ -544,6 +562,13 @@ def run_turns(
                         output=result.output,
                         )
                 except OSError:
+                    pass
+            # loop40 cycle 93: feed successful file writes to the repro gate
+            # (test writes open a cycle; post-fail non-test writes are patches)
+            if result.ok and repro_tracker is not None and name in ("write_file", "edit_file"):
+                try:
+                    repro_tracker.note_write(str((call.get("args") or {}).get("path", "")))
+                except Exception:
                     pass
             return (idx, name, result.ok, result.output, {"_jkey": jkey})
 
@@ -860,6 +885,12 @@ def run_turns(
                 on_event({"type": "verify.completed",
                           "ok": v_ok, "exit_code": v_code})
             obs_spent += len(v_text)
+            # loop40 cycle 93: feed every verify outcome to the repro gate
+            if repro_tracker is not None:
+                try:
+                    repro_tracker.note_verify(v_ok)
+                except Exception:
+                    pass
             if not v_ok:
                 verify_retries_left -= 1
                 messages.append({
@@ -928,6 +959,7 @@ def run_turns(
         on_event({"type": "error",
                   "message": f"max_turns ({max_turns}) reached without a final answer"})
     last_turn.all_messages = messages
+    _emit_repro(last_turn)
     return last_turn
 
 

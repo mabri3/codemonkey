@@ -2608,3 +2608,19 @@ C92 suggest-only (no auto-restore per ASK). Loop39 file set: 36/36 green;
 full suite 658/5. ASK scope honored: 91 evidence-capped as decided, 92 no-code,
 spec §Safety carries exit 3, decisions verbatim in plan at C91/C92/C94.
 **LOOP 39 COMPLETE.**
+
+## 2026-09-04 — CYCLE 93 (loop40): repro-first gate
+
+**Completed:** `src/codemonkey/repro.py` — ReproTracker state machine
+(write-test → expect-FAIL → allow-patch → expect-PASS; strict: fail counts
+only post-test, pass counts only post-patch; fresh test restarts the cycle)
++ `is_test_path` conventions. Loop wiring (active only with verify_command):
+write feed on successful file writes, verify feed on every gate outcome,
+`repro.verdict` event at run exits + `turn.repro`. exec translates the event
+to JSONL. A patch with no observed pre-fail is UNVERIFIED.
+**Tests:** `tests/test_repro_gate.py` 8/8 (conventions, full cycle, pass-only,
+fail-without-test, cycle restart, report shape, R-I VERIFIED fix run,
+R-I pre-fixed UNVERIFIED variant). Full suite 666/5.
+- **Known issues:** none.
+- **Next step:** CYCLE 94 — discoverable default-on, shipped default-OFF per
+  ASK decision (no flip; loop40-final measures hit/false-gate rates).

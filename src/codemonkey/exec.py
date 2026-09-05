@@ -343,6 +343,10 @@ def run_exec(
             # evidence (advisory turn + failed turn).
             emit({"type": etype, "thread_id": thread_id,
                   "report": ev.get("report") or {}})
+        elif etype == "repro.verdict":
+            # loop40 cycle 93: the repro-first verdict rides the trace.
+            emit({"type": etype, "thread_id": thread_id,
+                  "report": ev.get("report") or {}})
         elif etype == "error":
             emit({"type": "error", "message": ev.get("message", "")})
         elif etype == "persist.drop":
