@@ -102,3 +102,15 @@ covered, path overstated.
 **Verify probe (F2):** entry reworded to the path taken, OR a
 CLI-addressable scripted-provider probe added; either way the entry must
 name a runnable path.
+
+## Method rule (proposed, NOT adopted here — goes through the tool prompt
+with the R-L items)
+
+An in-process break run against a detached worktree is INVALID under an
+editable install, because the venv resolves `import codemonkey` to MAIN
+src: the break never takes effect and green means nothing. Evidence: first
+E2 (10 passed on broken classifier), voided E5. Every break run in this
+repo from here needs `PYTHONPATH=<worktree>/src` PLUS an asserted import
+origin (`codemonkey.__file__`) before assertions run — the assertion is
+load-bearing, not ceremony, and must not be dropped because a run
+"obviously" picked up the worktree.

@@ -79,8 +79,11 @@ class ReproTracker:
 
     def report(self) -> dict:
         v = self.verdict()
+        # 102F5: no "type" key — the envelope event already carries
+        # type=repro.verdict, and a nested type-without-v invites walkers
+        # to mistake the payload for an event (contract §2: reports are
+        # payloads, not events).
         return {
-            "type": "repro.verdict",
             "verdict": v,
             "test_written": self.test_written,
             "fail_observed": self.fail_observed,

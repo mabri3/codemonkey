@@ -32,7 +32,6 @@ announced here. A consumer MUST ignore unknown fields and MUST reject
 conformance suite pins this with a deliberate schema break.
 
 Core `type`s (stable set; new types are additive):
-
 - `thread.started` {thread_id} · `turn.started` {} · `turn.completed`
   {usage{total_tokens, prompt_tokens, completion_tokens}}
 - `tool.started` {name, args} · `tool.completed` {name, ok, output,
@@ -48,6 +47,11 @@ Core `type`s (stable set; new types are additive):
 - `failure_report.gave_up` {report} / `failure_report.consulted` /
   `failure_report.budget_exhausted`
 - `error` {message} · `notice` {message}
+
+Payload rule (102F5): `report` objects nested inside events are PAYLOADS,
+not events — they carry no `type` and no `v`. A consumer walking for
+objects with `type` must only match envelope level; conformance probes
+this on a real trace (no bare `type` inside any `report`).
 
 ## 3. Output and resume guarantees
 

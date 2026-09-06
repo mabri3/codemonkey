@@ -129,3 +129,85 @@ def test_unknown_arm_rejected(tmp_path):
     with pytest.raises(ValueError, match="unknown f2p arm"):
         run_f2p_matrix(_suite(tmp_path), arms=["repro-on", "bogus"],
                        exec_fn=_fake_exec_factory())
+
+
+# ---------------- 102F5: real-trace wiring ----------------
+
+class _F2PTurn:
+    def __init__(self, content):
+        self.content = content
+        self.reasoning = ""
+        self.usage = {"total_tokens": 10}
+        self.tool_calls = []
+
+
+def _f2p_tool(name, args):
+    import json
+    return _F2PTurn("TOOL_CALL: " + json.dumps({"name": name, "arguments": args}) + "\n")
+
+
+class _FixProv:
+    """Write test (verify fails) → patch (verify passes) → final."""
+    protocol = "prompt"
+
+    def __init__(self):
+        self.n = 0
+
+    def chat(self, messages, system=None, **kw):
+        self.n += 1
+        if self.n == 1:
+            return _f2p_tool("write_file", {"path": "tests/test_cm95.py",
+                                            "content": "x"})
+        if self.n == 2:
+            return _f2p_tool("write_file", {"path": "fixed.marker",
+                                            "content": "fixed"})
+        return _F2PTurn("fixed and verified")
+
+    def close(self):
+        pass
+
+
+def _real_trace(tmp_path, precreate_marker=False):
+    from codemonkey.loop import run_turns
+    from codemonkey.sandbox import ToolContext
+
+    if precreate_marker:
+        (tmp_path / "fixed.marker").write_text("already fixed")
+    events: list = []
+    ctx = ToolContext(workdir=tmp_path, sandbox="workspace-write", timeout=30)
+    turn = run_turns(_FixProv(), "fix it", ctx, tool_protocol="prompt",
+                     max_turns=8,
+                     verify_command=f'test -f "{tmp_path}/fixed.marker"',
+                     max_verify_retries=3,
+                     on_event=events.append)
+    return turn, events
+
+
+def test_label_from_real_verified_trace(tmp_path):
+    """102F5: the verdict comes from run_turns, never from a literal."""
+    turn, events = _real_trace(tmp_path)
+    verdicts = [e for e in events if e.get("type") == "repro.verdict"]
+    assert verdicts, "loop must emit a real verdict"
+    assert getattr(turn, "repro", {}).get("verdict") == "VERIFIED"
+    assert label_task(events) == "F2P"
+    assert verdicts[-1]["report"]["verdict"] == "VERIFIED"
+
+
+def test_label_from_real_unverified_trace(tmp_path):
+    turn, events = _real_trace(tmp_path, precreate_marker=True)
+    verdicts = [e for e in events if e.get("type") == "repro.verdict"]
+    assert verdicts, "loop must emit a real verdict"
+    assert label_task(events) == "UNPROVEN"
+
+
+def test_no_bare_type_inside_reports_on_real_trace(tmp_path):
+    """102F5 nesting probe: reports are payloads, not events — no nested
+    report dict carrying type may ride a real trace. (Top-level `v` is the
+    exec funnel's job, asserted by the conformance envelope probe — a
+    run_turns trace is inside the boundary, unstamped by design.)"""
+    _, events = _real_trace(tmp_path)
+    assert events, "trace must be non-empty"
+    for e in events:
+        rep = e.get("report")
+        if isinstance(rep, dict):
+            assert "type" not in rep, rep

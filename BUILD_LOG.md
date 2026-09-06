@@ -3021,3 +3021,18 @@ folded in (C102 historical; C103/C104 must name code breaks when built).
 Report: `build/critic-102f4-review.md`.
 - **Known issues:** none (audit makes no code changes).
 - **Next step:** 102F4-F1/F2 when authorized — fixes were out of scope.
+
+## 2026-09-05 — CYCLE 102F5: F1 real-trace f2p + nesting fix
+
+**Built:** `test_label_from_real_verified_trace` /
+`test_label_from_real_unverified_trace` (verdicts from run_turns, never
+literals) + `test_no_bare_type_inside_reports_on_real_trace` (walker).
+Dropped redundant `report["type"]` (zero readers in src/); contract §2
+payload rule; `test_report_shape` updated.
+**Break run** (detached worktree, PYTHONPATH, origin asserted to worktree
+src): `_emit_repro` neutered → `AssertionError: loop must emit a real
+verdict / assert []`, **2 failed / 11 passed (was 13 passed)**. The 10
+literal tests stay green by design (pure-function units, not wiring).
+F1 CLOSED. Full suite follows.
+- **Known issues:** none.
+- **Next step:** 102F6 (F2 C97 probe path — prefer CLI-addressable).

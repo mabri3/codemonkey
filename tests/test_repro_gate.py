@@ -65,7 +65,8 @@ def test_new_test_restarts_cycle():
 
 def test_report_shape():
     rep = ReproTracker().report()
-    assert rep == {"type": "repro.verdict", "verdict": "UNVERIFIED",
+    # 102F5: no "type" — the envelope carries it; payloads aren't events.
+    assert rep == {"verdict": "UNVERIFIED",
                    "test_written": False, "fail_observed": False,
                    "patched": False, "pass_observed": False,
                    "reason": "no reproduction test was written",
