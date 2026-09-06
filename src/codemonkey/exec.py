@@ -361,6 +361,16 @@ def run_exec(
             # loop40 cycle 93: the repro-first verdict rides the trace.
             emit({"type": etype, "thread_id": thread_id,
                   "report": ev.get("report") or {}})
+        elif etype == "verify.started":
+            # 102F7: plain omission — the verifier is the machine success
+            # signal (R40) and §2 always listed these; a stream watcher
+            # could never see verification happen. Same pass-through shape.
+            emit({"type": etype, "thread_id": thread_id,
+                  "command": ev.get("command", "")})
+        elif etype == "verify.completed":
+            emit({"type": etype, "thread_id": thread_id,
+                  "ok": ev.get("ok", False),
+                  "exit_code": ev.get("exit_code", 1)})
         elif etype == "error":
             emit({"type": "error", "message": ev.get("message", "")})
         elif etype == "persist.drop":

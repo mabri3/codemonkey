@@ -31,22 +31,30 @@ announced here. A consumer MUST ignore unknown fields and MUST reject
 (`ValueError`) an event whose `v` it does not understand — the C102
 conformance suite pins this with a deliberate schema break.
 
-Core `type`s (stable set; new types are additive):
-- `thread.started` {thread_id} · `turn.started` {} · `turn.completed`
-  {usage{total_tokens, prompt_tokens, completion_tokens}}
-- `tool.started` {name, args} · `tool.completed` {name, ok, output,
-  error_class?} — `error_class` ∈ journal taxonomy (`schema_mismatch`,
-  `parse`, `tool-error`, `timeout`, `transport`, …); present only on
-  failure.
-- `item.started`/`item.completed` {item{id, type, tool, …},
-  thread_id} — derived presentation stream for renderers.
-- `verify.started` {command} · `verify.completed` {ok, exit_code}
-- `plan.started`/`plan.completed`/`plan.rolled_back` {report} (only with
-  `--atomic-plan`)
-- `repro.verdict` {report{verdict}} (only with a verifier configured)
-- `failure_report.gave_up` {report} / `failure_report.consulted` /
-  `failure_report.budget_exhausted`
-- `error` {message} · `notice` {message}
+Core `type`s (stable set; new types are additive). Wire versus internal
+(102F7 decision, written not defaulted):
+
+- ON THE WIRE (every binary `--json` run can produce these; the coverage
+  probe in `build/conformance.py` FAILS if any is unproducible):
+  `thread.started` {thread_id} · `turn.started` {} · `turn.completed`
+  {usage{total_tokens, prompt_tokens, completion_tokens}} ·
+  `item.started`/`item.completed` {item{id, type, tool, …}, thread_id} ·
+  `verify.started` {command} · `verify.completed` {ok, exit_code} (runs
+  with a verifier configured) ·
+  `plan.started`/`plan.completed`/`plan.rolled_back` {report} (only with
+  `--atomic-plan`) · `repro.verdict` {report{verdict}} (only with a
+  verifier configured) · `failure_report.gave_up` /
+  `failure_report.consulted` / `failure_report.budget_exhausted` {report} ·
+  `stuck` {tool, error_class, streak} (report-only detector; on the wire
+  since loop 39, documented here in 102F7) · `error` {message} ·
+  `notice` {message}.
+- INTERNAL, deliberately not on the wire: `tool.started` {name, args} and
+  `tool.completed` {name, ok, output, error_class?} are the loop's raw
+  per-call feed; `item.*` is their public projection (the renderer reads
+  `$ command` / `[edit] path` off items, 51F5). Forwarding both would put
+  every call on the stream twice. Consumers MUST read `item.*`, never
+  `tool.*`; a future change that emits raw `tool.*` on stdout breaks this
+  contract.
 
 Payload rule (102F5): `report` objects nested inside events are PAYLOADS,
 not events — they carry no `type` and no `v`. A consumer walking for
@@ -78,9 +86,16 @@ funnel, and every one of them is checked against §2. An empty stream on a
 non-usage exit FAILS (§3); exit 2 with no events is BLOCKED-with-reason
 (no provider on that machine).
 
-**Live** (endpoint required): the SUCCESS-path event set — `tool.*` and a
-`turn.completed` carrying usage. Only this reports BLOCKED when the
-endpoint is down.
+**Live** (endpoint required): the SUCCESS-path event set — `item.*` (the
+public projection; raw `tool.*` is internal by §2) and a `turn.completed`
+carrying usage. Only this reports BLOCKED when the endpoint is down.
+
+**Coverage** (102F7): `type_coverage` in `build/conformance.py` enumerates
+§2's ON-THE-WIRE list against streams the binary produced across five
+offline stub-driven runs (verify pass-with-retry, atomic gave-up,
+successful atomic run, max-turns, alternating-failure burn) and FAILS on
+any documented type no run produces — plus FAILS if raw `tool.*` ever
+appears on the wire. Enumerate, don't sample.
 
 A deliberate envelope break (delete `events.stamp`'s `setdefault`) FAILS
 the suite. 102F1 corrected the C102 claim: as shipped, the break-control

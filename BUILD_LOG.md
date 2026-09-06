@@ -3050,3 +3050,22 @@ failure_report.*). F2 CLOSED by making the claim true, not by rewording.
 Suite 761/5.
 - **Known issues:** none.
 - **Next step:** held items unchanged (loop42/43-finals, 44–50, asks, R-L).
+
+## 2026-09-05 — CYCLE 102F7: contract §2 coverage gate (enumerate, don't sample)
+
+**Decided + written (not defaulted):** `tool.started/completed` INTERNAL —
+loop raw feed, `item.*` the public projection (forwarding both doubles
+every call); `verify.started/completed` forwarded (plain omission — the R40
+signal was stream-invisible); `stuck` documented (was on-wire-undocumented).
+Doc and code agree both directions; doc-needle test pins the sets.
+**Control:** `type_coverage` (5 stub-driven binary runs: verify
+pass-with-retry, atomic gave-up, atomic-ok, max-turns, budget burn) FAILS
+on any wire type no stream yields + any raw tool.* leaked. It found
+`plan.completed` unproducible on its FIRST run (gave-up yields rolled_back
+only) → atomic-ok run added; 18/18 covered, 0 leaked.
+**Break run** (worktree, PYTHONPATH, asserted origin, compile-gated
+surgery): plan.* branch deleted → RED with the exact missing sets per run;
+restored → green. First attempt voided (bad surgery → import SyntaxError;
+caught, redone, recorded). Suite follows.
+- **Known issues:** none.
+- **Next step:** held items unchanged (loop42/43-finals, 44–50, asks, R-L).

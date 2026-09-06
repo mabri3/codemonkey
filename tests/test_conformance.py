@@ -131,6 +131,27 @@ def test_binary_addressable_docs_only():
     assert proc.returncode == 0 and "exec" in proc.stdout
 
 
+def test_type_coverage_enumerates_contract(tmp_path):
+    """102F7: every §2 ON-THE-WIRE type appears on a binary-produced
+    stream; raw tool.* never does. Four stub-driven runs, union compared."""
+    cov = _drv.type_coverage(tmp_path)
+    assert cov["ok"] and cov["covered"] == len(_drv.WIRE_TYPES), cov
+
+
+def test_wire_and_internal_sets_documented():
+    """Both directions of §2/code agreement, pinned mechanically: every
+    wire type is documented ON-THE-WIRE, every internal type in the
+    internal carve-out."""
+    from pathlib import Path as _P
+
+    doc = (_P(__file__).parent.parent / "build" / "contract.md").read_text()
+    for t in sorted(_drv.WIRE_TYPES):
+        assert f"`{t}`" in doc, t
+    for t in sorted(_drv.INTERNAL_TYPES):
+        assert f"`{t}`" in doc, t
+    assert "INTERNAL, deliberately not on the wire" in doc
+
+
 def test_run_binary_closes_stdin(monkeypatch):
     """102F2: `exec` with no prompt reads stdin. The driver inherited the
     parent's, so with an open-but-idle stdin (CI, a background runner) the

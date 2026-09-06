@@ -2278,6 +2278,13 @@ loop 45's v4.0 acceptance. This section is a plan, not a queue.
   worktree src): _emit_repro neutered → "AssertionError: loop must emit
   a real verdict / assert []", 2 failed / 11 passed (was 13 passed; the 10
   literal-unit tests stay green by design — pure-function units).
+- [x] CYCLE 102F7 — contract §2 coverage gate. DONE: per-type decision (tool.* INTERNAL w/ item.* public carve-out; verify.* forwarded — was plain omission; stuck documented); type_coverage over 5 stub-driven binary runs FAILS on documented-but-unproducible + raw tool.* on wire. First run found plan.completed unproducible → added atomic-ok run (all 18 wire types now covered). BREAK RUN (worktree, PYTHONPATH, origin asserted, surgery compile-gated): plan.* branch deleted → ConformanceFailure listing plan.started/rolled_back (gaveup) + plan.completed (atomicok); restored → green. (First break attempt VOID: indent-dropping surgery broke exec.py syntax — binary died on import; caught by unexpected signature, redone.) Per-type decision
+  (tool.* internal w/ item.* public — doc carve-out; verify.* forwarded;
+  stuck documented) so doc and code agree; conformance type-coverage probe
+  over binary-produced streams FAILS on documented-but-unproducible types |
+  est: 40m |
+  verify (R-I): break run (worktree, PYTHONPATH + asserted origin): plan.*
+  forwarding deleted → coverage probe RED; restored → green; full suite green.
 - [x] CYCLE 102F6 — F2 (LOW): C97 probe CLI-addressable. DONE (binary path,
   not reword): `build/stub_provider.py` (scripted OpenAI-compatible turns
   over real HTTP, JSON+SSE, zero product changes) + `tests/test_changeplan_cli.py`
