@@ -350,6 +350,13 @@ def run_exec(
             # evidence (advisory turn + failed turn).
             emit({"type": etype, "thread_id": thread_id,
                   "report": ev.get("report") or {}})
+        elif etype in ("plan.started", "plan.completed", "plan.rolled_back"):
+            # loop41 cycle 97 / 102F6: contract §2 lists the plan lifecycle
+            # as core stream types (atomic-plan runs only) — forward the
+            # report so the stream names what the plan was. Found because
+            # the CLI-addressable charter probe asserted it on the wire.
+            emit({"type": etype, "thread_id": thread_id,
+                  "report": ev.get("report") or {}})
         elif etype == "repro.verdict":
             # loop40 cycle 93: the repro-first verdict rides the trace.
             emit({"type": etype, "thread_id": thread_id,

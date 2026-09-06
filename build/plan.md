@@ -2271,7 +2271,14 @@ loop 45's v4.0 acceptance. This section is a plan, not a queue.
   verify (R-I): `stdin=os.pipe()` → HUNG, killed at 15.0s; `DEVNULL` → exit 2
   in 0.1s; `test_run_binary_closes_stdin` pins the kwarg; conformance run
   prints a BLOCKED reason naming the refused connection.
-- [x] CYCLE 102F5 — F1 (HIGH): f2p on a real trace. Verdicts from run_turns (FixProv-style write→fail→patch→pass), label on the trace; report["type"] dropped (zero readers) + walker probe + contract §2 payload rule. BREAK RUN (worktree, PYTHONPATH, origin asserted → worktree src): _emit_repro neutered → "AssertionError: loop must emit a real verdict / assert []", 2 failed / 11 passed (was 13 passed; the 10 literal-unit tests stay green by design — pure-function units). repro.verdict
+- [x] CYCLE 102F5 — F1 (HIGH): f2p on a real trace.
+- [x] CYCLE 102F6 — F2 (LOW): C97 probe CLI-addressable. DONE: build/stub_provider.py (scripted OpenAI-compatible turns, JSON+SSE) + tests/test_changeplan_cli.py — binary exit 3, tree byte-identical, plan.rolled_back naming the plan on a versioned stream. Probe found contract §2 gap (plan.* never forwarded to stdout) — fixed in exec.py. C97 entry path claim now TRUE. Prefer binary path
+  over reword: stub-provider
+  scripted turns over real HTTP, zero product changes; pass plan.* lifecycle
+  to the --json stream (contract §2 already promised it — probe found it
+  missing) | est: 40m |
+  verify (R-I): `uv run pytest -q tests/test_changeplan_cli.py` → exit 0;
+  full suite green. Verdicts from run_turns (FixProv-style write→fail→patch→pass), label on the trace; report["type"] dropped (zero readers) + walker probe + contract §2 payload rule. BREAK RUN (worktree, PYTHONPATH, origin asserted → worktree src): _emit_repro neutered → "AssertionError: loop must emit a real verdict / assert []", 2 failed / 11 passed (was 13 passed; the 10 literal-unit tests stay green by design — pure-function units). repro.verdict
   events obtained from an actual run_turns call (repro_tracker configured),
   never literals; drop redundant report["type"] (zero readers; nested
   type-without-v inside the envelope); walker probe (every top-level type

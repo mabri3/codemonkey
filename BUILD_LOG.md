@@ -3036,3 +3036,17 @@ literal tests stay green by design (pure-function units, not wiring).
 F1 CLOSED. Full suite follows.
 - **Known issues:** none.
 - **Next step:** 102F6 (F2 C97 probe path — prefer CLI-addressable).
+
+## 2026-09-05 — CYCLE 102F6: F2 CLI-addressable charter probe (not reword)
+
+**Built:** `build/stub_provider.py` (stdlib HTTP, scripted turns, JSON+SSE,
+/v1/models) + `tests/test_changeplan_cli.py`: the C97 charter probe through
+the RELEASED BINARY (stub localhost + CODEMONKEY_BASE_URL override, no
+product changes, no endpoint) — exit 3, a/b removed, c restored, git clean,
+`plan.rolled_back` with plan_id + files on the versioned envelope stream.
+**Probe found real gap:** contract §2 listed plan.* as core stream types
+but on_event never forwarded them — added the pass-through (precedent:
+failure_report.*). F2 CLOSED by making the claim true, not by rewording.
+Suite 761/5.
+- **Known issues:** none.
+- **Next step:** held items unchanged (loop42/43-finals, 44–50, asks, R-L).
