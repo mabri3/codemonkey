@@ -60,7 +60,57 @@ def test_deliberate_schema_break_fails_stream():
 
 def test_offline_probes_green_on_binary(tmp_path):
     results = offline_probes(tmp_path)
-    assert len(results) == 7 and all(r["ok"] for r in results)
+    assert len(results) == 8 and all(r["ok"] for r in results)
+
+
+def test_envelope_probe_reads_a_real_stream_from_the_binary(tmp_path):
+    """102F1 regression: the envelope gate must be applied to events the
+    BINARY emitted. The shipped C102 suite asserted only on dicts written
+    by hand, so a binary with `events.stamp` deleted stayed 7/7 green —
+    the deliberate-break control could not detect the deliberate break.
+
+    No endpoint is needed: an unreachable one still drives thread.started /
+    turn.started / error through the exec funnel, and contract §2 binds
+    every event crossing it.
+    """
+    out = _drv.envelope_probe(tmp_path)
+    assert out["status"] == "PASS", out.get("reason")
+    assert out["events"] >= 2, out
+
+
+def test_envelope_probe_fails_a_binary_that_drops_v(tmp_path, monkeypatch):
+    """The control, exercised: a binary whose stream lacks `v` FAILS."""
+
+    class _Proc:
+        returncode = 1
+        stdout = ('{"type": "thread.started", "thread_id": "t"}\n'
+                  '{"type": "error", "message": "x"}\n')
+        stderr = ""
+
+    monkeypatch.setattr(_drv, "run_binary", lambda *a, **k: _Proc())
+    with pytest.raises(ConformanceFailure, match="missing v"):
+        _drv.envelope_probe(tmp_path)
+
+
+def test_envelope_probe_rejects_an_empty_stream(tmp_path, monkeypatch):
+    """Contract §3: --json stdout carries the stream. Silence is a failure,
+    not a pass — except exit 2, which is 'no provider here' (BLOCKED)."""
+
+    class _Proc:
+        returncode = 1
+        stdout = "   \n"
+        stderr = "boom"
+
+    monkeypatch.setattr(_drv, "run_binary", lambda *a, **k: _Proc())
+    with pytest.raises(ConformanceFailure, match="empty event stream"):
+        _drv.envelope_probe(tmp_path)
+
+    class _Usage(_Proc):
+        returncode = 2
+
+    monkeypatch.setattr(_drv, "run_binary", lambda *a, **k: _Usage())
+    out = _drv.envelope_probe(tmp_path)
+    assert out["status"] == "BLOCKED" and out["reason"]
 
 
 def test_live_exec_blocked_or_versioned(tmp_path):
@@ -79,3 +129,27 @@ def test_binary_addressable_docs_only():
     # only the doc-derived driver. The probe below uses --help text alone.
     proc = run_binary("--help")
     assert proc.returncode == 0 and "exec" in proc.stdout
+
+
+def test_run_binary_closes_stdin(monkeypatch):
+    """102F2: `exec` with no prompt reads stdin. The driver inherited the
+    parent's, so with an open-but-idle stdin (CI, a background runner) the
+    exec-no-prompt probe blocked to the 120s timeout instead of observing
+    exit 2 — the suite's verdict depended on its caller, not the binary.
+    Reproduced with os.pipe() as stdin: HUNG at 15s; DEVNULL: exit 2 in 0.1s.
+    """
+    seen = {}
+
+    def _fake_run(cmd, **kw):
+        seen.update(kw)
+
+        class _P:
+            returncode = 0
+            stdout = ""
+            stderr = ""
+
+        return _P()
+
+    monkeypatch.setattr(_drv.subprocess, "run", _fake_run)
+    _drv.run_binary("--version")
+    assert seen.get("stdin") is subprocess.DEVNULL

@@ -93,48 +93,8 @@ def emit(event: dict, *, json_mode: bool, stream=None) -> None:
         pass
 
 
-def item_start_sink(
-    thread_id: str, *, json_mode: bool, stream=None
-):
-    """Return an on_event callback that maps loop.run_turns events to items.
-
-    run_turns emits: turn.started, tool.started{name}, tool.completed{name,ok},
-    turn.completed{usage}, notice{message}, error{message}.
-    Items are synthesized per tool call: read-ish tools don't echo fully here —
-    exec.py keeps its own dispatch wrapper for exact item payloads, so this
-    sink only translates turn-level + error + notice events.
-    """
-    state = {"open": {}}
-
-    def sink(ev: dict) -> None:
-        etype = ev.get("type", "")
-        if etype == "turn.started":
-            emit({"type": "turn.started"}, json_mode=json_mode, stream=stream)
-        elif etype == "turn.completed":
-            emit(
-                {"type": "turn.completed", "usage": ev.get("usage") or {}},
-                json_mode=json_mode,
-                stream=stream,
-            )
-        elif etype == "notice":
-            emit(
-                {"type": "notice", "message": ev.get("message", "")},
-                json_mode=json_mode,
-                stream=stream,
-            )
-        elif etype == "stuck":
-            emit(
-                {"type": "stuck", "tool": ev.get("tool", ""),
-                 "error_class": ev.get("error_class", ""),
-                 "streak": ev.get("streak", 0)},
-                json_mode=json_mode,
-                stream=stream,
-            )
-        elif etype == "error":
-            emit(
-                {"type": "error", "message": ev.get("message", "")},
-                json_mode=json_mode,
-                stream=stream,
-            )
-
-    return sink
+# 102F3 (R-A, measure-or-delete): `item_start_sink` lived here from loop 12
+# to loop 43 with zero callers in src/, tests/ or docs — and it emitted via
+# `events.emit` directly, bypassing both exec funnels, so wiring it up would
+# have put UNSTAMPED events on stdout in --json mode and broken contract §2
+# silently. exec.py's own dispatch wrapper builds the item stream. Deleted.

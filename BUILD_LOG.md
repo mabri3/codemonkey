@@ -2943,6 +2943,49 @@ Full suite 741/5.
 - **Next step:** C101 subprocess contract (writing needs no ask; publishing
   does — loop43-final held on answers).
 
+## 2026-09-05 — CYCLES 102F1-102F3 (loop43): the conformance suite's break-control never touched the binary
+
+**102F1 DONE (BLOCKING):** C102's charter is "a deliberate schema change
+FAILS the suite." It did not. Every envelope assertion was made against
+dicts and strings written by hand inside `tests/test_conformance.py`; none
+of the seven offline probes (`--version`, `--help`, five exit-code checks)
+emits a single event. Deleting `events.stamp`'s `setdefault` in a detached
+worktree produced a binary emitting `v`-less `thread.started` /
+`turn.started` / `error` — and the suite was **7 passed**. The in-process
+`tests/test_contract.py` did catch it (3 failed), but those are exactly the
+tests whose insufficiency is why C102 exists under R-I.
+Root cause of the omission: the envelope was filed as endpoint-gated and
+folded into the BLOCKED live probe. It is not. An unreachable endpoint
+still drives three events through the exec funnel, versioned, offline.
+Added `envelope_probe` (contract §2 applied to a stream the BINARY
+produced); narrowed `live_probe` to the success-path types (`tool.*`,
+`turn.completed` usage) that genuinely need an endpoint; rewrote
+`contract.md` §4, which had claimed offline coverage of "envelope version."
+**102F2 DONE:** the suite's verdict depended on its CALLER. `run_binary`
+inherited the parent's stdin and `exec` with no prompt reads stdin, so
+under an open-but-idle stdin the `exec-no-prompt` probe blocked to the 120s
+timeout rather than observing exit 2 — found by running the driver as a
+background task, where it died on `subprocess.TimeoutExpired`.
+`stdin=subprocess.DEVNULL`. The BLOCKED reason was also built from stderr,
+which §3 guarantees is empty in `--json` mode: it read `"exit 1: "` and now
+reads the `error` event the run emitted.
+**102F3 DONE (R-A):** `events.item_start_sink` — zero callers in `src/`,
+`tests/` or docs since loop 12, and it called `events.emit` directly,
+bypassing both exec funnels; wiring it up would have put unstamped events
+on stdout and broken §2 silently. Deleted, 45 lines.
+
+**Verify (R-I, entry point):** `uv run python build/conformance.py` → 8
+offline PASS including `PASS envelope (exit 1)`, live BLOCKED with a reason
+naming the refused connection. Break re-applied to the same worktree with
+the new driver: **2 failed**, `ConformanceFailure: event missing v:
+'thread.started'` (was 7 passed). `stdin=os.pipe()` → HUNG, killed at
+15.0s; `DEVNULL` → exit 2 in 0.1s. Suite 757/5, A18 green.
+- **Known issues:** the live success-path probe stays BLOCKED while the
+  .176 endpoint refuses connections — now a narrow, honest BLOCKED rather
+  than one that swallowed the envelope check.
+- **Next step:** unchanged — loop43-final still HELD on R43 ASK 1-3. This
+  is a defect fix inside C102, not progress against the asks.
+
 ## 2026-09-05 — CYCLES 101+102 (loop43): contract specified + conformance runs
 
 **C101 DONE:** `build/contract.md` v1 — exit taxonomy (0/1/2/3, §Safety

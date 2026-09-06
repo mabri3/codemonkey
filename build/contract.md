@@ -65,7 +65,21 @@ Core `type`s (stable set; new types are additive):
 ## 4. Conformance (C102)
 
 `build/conformance.py` drives the RELEASED BINARY using only this document
-(no repo knowledge): offline probes (exit codes, envelope version,
-help/version surface) must pass anywhere; live probes (end-to-end exec)
-pass where an endpoint is reachable and report BLOCKED otherwise. A
-deliberate envelope break (drop `v`) FAILS the suite — shown in C102.
+(no repo knowledge).
+
+**Offline** (no endpoint, runs anywhere): the seven §1 exit-code probes,
+plus `envelope_probe` — `exec --json` against an unreachable endpoint,
+which still drives `thread.started` / `turn.started` / `error` through the
+funnel, and every one of them is checked against §2. An empty stream on a
+non-usage exit FAILS (§3); exit 2 with no events is BLOCKED-with-reason
+(no provider on that machine).
+
+**Live** (endpoint required): the SUCCESS-path event set — `tool.*` and a
+`turn.completed` carrying usage. Only this reports BLOCKED when the
+endpoint is down.
+
+A deliberate envelope break (delete `events.stamp`'s `setdefault`) FAILS
+the suite. 102F1 corrected the C102 claim: as shipped, the break-control
+asserted on dicts and strings written by hand inside the suite, so a binary
+emitting `v`-less events stayed 7/7 green. Re-verified against a worktree
+with the break applied: `event missing v: 'thread.started'`, 2 failed.

@@ -2242,6 +2242,44 @@ loop 45's v4.0 acceptance. This section is a plan, not a queue.
   codemonkey on documentation alone, green on the released binary; a
   deliberate schema change FAILS it | est: 40m |
   verify (R-I): charter probe as written; tests green; full suite green.
+- [x] CYCLE 102F1 — `loop43:` **the break-control could not detect the
+  break.** C102's charter is "a deliberate schema change FAILS the suite",
+  but every envelope assertion was made against dicts and strings written
+  by hand in `tests/test_conformance.py`; not one of the seven offline
+  probes emitted an event. Proof: `events.stamp` deleted in a detached
+  worktree → the binary emitted `v`-less `thread.started`/`turn.started`/
+  `error` and the suite was **7 passed**. Root cause of the omission: the
+  envelope was filed as endpoint-gated, but it is observable OFFLINE — an
+  unreachable endpoint still drives three events through the funnel. Added
+  `envelope_probe` (real stream from the binary, §2 applied to it); narrowed
+  `live_probe` to the success-path types it actually needs an endpoint for;
+  `contract.md` §4 rewritten | est: 35m |
+  verify (R-I): `uv run python build/conformance.py` → 8 offline PASS
+  including `PASS envelope (exit 1)`; same worktree break re-run → `2 failed`
+  with `ConformanceFailure: event missing v: 'thread.started'` (was 7 passed);
+  `test_envelope_probe_reads_a_real_stream_from_the_binary` +
+  `test_envelope_probe_fails_a_binary_that_drops_v` +
+  `test_envelope_probe_rejects_an_empty_stream`; full suite green.
+- [x] CYCLE 102F2 — `loop43:` the suite's verdict depended on its CALLER.
+  `run_binary` inherited the parent's stdin, and `exec` with no prompt READS
+  stdin — so under an open-but-idle stdin the `exec-no-prompt` probe blocked
+  to the 120s timeout instead of observing exit 2. Found by running the
+  driver as a background task, where it died on `subprocess.TimeoutExpired`.
+  `stdin=subprocess.DEVNULL`. Also: the BLOCKED reason was built from stderr,
+  which §3 guarantees is EMPTY in `--json` mode — it read `"exit 1: "`; it
+  now reads the `error` event the run emitted | est: 15m |
+  verify (R-I): `stdin=os.pipe()` → HUNG, killed at 15.0s; `DEVNULL` → exit 2
+  in 0.1s; `test_run_binary_closes_stdin` pins the kwarg; conformance run
+  prints a BLOCKED reason naming the refused connection.
+- [x] CYCLE 102F3 — `loop43:` R-A on `events.item_start_sink` — zero callers
+  in `src/`, `tests/` or docs since loop 12, and it called `events.emit`
+  directly, bypassing both exec funnels: wiring it up would have put
+  UNSTAMPED events on stdout and broken contract §2 silently. Deleted (45
+  lines) | est: 5m |
+  verify: `grep -rn item_start_sink` → no hits outside the deletion note;
+  `dir(codemonkey.events)` → `SCHEMA_V, emit, new_thread_id, stamp`;
+  full suite green.
+
 - [ ] CYCLE loop43-final — Loop 43 acceptance
   HELD 2026-09-05: R43 ASK 1 (publish contract as constraint) + ASK 2
   (MCP server vs deferred client) + ASK 3 (trust boundary) unanswered —
