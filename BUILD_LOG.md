@@ -3004,3 +3004,20 @@ Nothing published as binding; no MCP surface. Full suite 753/5.
 - **Known issues:** none.
 - **Next step:** loop44/45 cannot start (R44 needs ask answers; R45 needs
   loops 38–44 closed). Traversal ends at the ask boundary — status below.
+
+## 2026-09-05 — CYCLE 102F4: control audit (report only, no fixes)
+
+**Audited** every negative control / charter probe / deliberate break in
+tests+build via code-breaks in detached worktree (PYTHONPATH-forced;
+first E2 voided by editable-install shadowing — reported).
+**Confirmed real:** 102F1 envelope (E1 2F), 97F1 mixed-tree (E2 2F/8P,
+control passes), 96F1 ordering (E3 1F/8P), 98F1 loader incl. real-graphify
+tests (E5 5F/2P). Inspection-clean: poison-provider, source-grep,
+contract pair-shape (real run_exec).
+**Findings → F-cycles (unchecked):** 102F4-F1 (HIGH) f2p wiring gap —
+emit-break leaves test_f2p_gate green while test_repro_gate goes red;
+102F4-F2 (LOW) C97 probe overclaims binary path. Self-referential probes
+folded in (C102 historical; C103/C104 must name code breaks when built).
+Report: `build/critic-102f4-review.md`.
+- **Known issues:** none (audit makes no code changes).
+- **Next step:** 102F4-F1/F2 when authorized — fixes were out of scope.

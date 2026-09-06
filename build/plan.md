@@ -2271,6 +2271,27 @@ loop 45's v4.0 acceptance. This section is a plan, not a queue.
   verify (R-I): `stdin=os.pipe()` → HUNG, killed at 15.0s; `DEVNULL` → exit 2
   in 0.1s; `test_run_binary_closes_stdin` pins the kwarg; conformance run
   prints a BLOCKED reason naming the refused connection.
+- [x] CYCLE 102F4 — `loop43:` control audit (no fixes in-cycle). Every
+  negative control / charter probe / deliberate break in tests+build checked
+  against the 102F1 question by applying breaks in a detached worktree.
+  Report: `build/critic-102f4-review.md`. Method correction: worktree breaks
+  are invisible under the editable install — all runs use
+  PYTHONPATH=<worktree>/src (first E2 voided by this). Findings: F1 (HIGH)
+  f2p label/matrix never see a real loop trace (emit-break: f2p green, repro
+  red); F2 (LOW) C97 probe overclaims binary path. Confirmed real, no
+  finding: 102F1 envelope, 97F1 mixed-tree, 96F1 ordering, 98F1 loader.
+  Self-referential probes folded in (C102 historical; C103/C104 preemptive;
+  C97 LOW). | est: 60m |
+  verify: break-run table in the report (E1 2F, E2 2F/8P, E3 1F/8P, E5 5F/2P,
+  E7 4F/25P with f2p green); full suite green.
+- [ ] CYCLE 102F4-F1 — F1 (HIGH): real-trace f2p test — scripted run_turns
+  with verify_command (fake: write-test → fail → patch → pass), REAL event
+  trace into label_task + eval f2p scoring → F2P; worktree neutering of
+  _emit_repro MUST turn it red | est: 30m |
+  verify: new test green on HEAD, red on neutered emit; full suite green.
+- [ ] CYCLE 102F4-F2 — F2 (LOW): C97 entry reworded to the path taken
+  (run_turns in-process) or CLI-addressable probe added | est: 10m |
+  verify: entry names a runnable path; full suite green.
 - [x] CYCLE 102F3 — `loop43:` R-A on `events.item_start_sink` — zero callers
   in `src/`, `tests/` or docs since loop 12, and it called `events.emit`
   directly, bypassing both exec funnels: wiring it up would have put
