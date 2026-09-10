@@ -4,6 +4,23 @@ What the sandbox and governance layers DO promise, and what they explicitly
 do NOT. Read this before running codemonkey unattended on a machine that
 matters.
 
+## Trust boundary — decided, not open (R43 ASK 3, 2026-09-10)
+
+The boundary is **the subprocess + sandbox line**, and no new boundary is
+authorized. Recorded explicitly so it is not re-asked:
+
+- Everything inside a `codemonkey exec` process is trusted; everything a tool
+  reaches (filesystem writes, shell, network) is gated by `sandbox.py`'s policy
+  and the approval policy, and nothing else is.
+- The caller is trusted — the caller contract constrains what this binary
+  promises its caller, not what the caller may ask for.
+- **Model output is untrusted INPUT, not a principal.** It is gated by the same
+  sandbox as any other tool argument. Loop 49's provenance work therefore
+  HARDENS this boundary; it does not create a new one.
+- **Explicitly not authorized:** a daemon, a socket, a server, a credential
+  broker, or a second execution context. `contract.md` §5 carries the same
+  statement; §6 records the MCP *no server* decision on the same grounds.
+
 ## Promised
 
 1. **Working-directory write containment** — file tools resolve and reject

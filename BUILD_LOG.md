@@ -3183,3 +3183,41 @@ them justifies waiving a row at v4.0.
 - **Next step:** loop43-final (publish §1+§2 binding, §3 advisory; MCP deferred
   by decision; trust boundary recorded).
 
+## 2026-09-10 — CYCLE loop43-final: Loop 43 acceptance (contract published, live probe retired)
+
+- **Files changed:** `build/contract.md` (§1/§2 binding, §3 advisory, §5 trust
+  boundary, §6 MCP decision, code 4), `THREAT_MODEL.md` (trust boundary),
+  `build/conformance_with_stub.py` (new), `tests/test_conformance_live_stub.py`
+  (new, 2 tests), `tests/test_contract.py` (published-state pin),
+  `build/BUILD_REPORT.md` (Loop 43 section).
+- **ASK 1 — PUBLISHED AS BINDING, §1 AND §2 ONLY.** §3 is re-headed
+  **ADVISORY (UNTIL IT HAS A COVERAGE PROBE)** and carries its closing
+  condition (one conformance probe per clause, against the binary). The ASK's
+  citation of 102F8 resolves to nothing; recorded at the citation (102F9).
+- **ASK 2 — NO SERVER.** MCP recorded as a *decision with its reason*: a server
+  is a second, wider entry point — the boundary §5 declines to authorize — with
+  no demonstrated consumer.
+- **ASK 3 — trust boundary** recorded in `contract.md` §5 **and**
+  `THREAT_MODEL.md`, including what is explicitly not authorized.
+- **Exit code 4 documented before its implementation** (R44 ASK 1), with the
+  conformance probe landing in CYCLE 103.
+- **The live probe, retired with a run.** `uv run python build/conformance_with_stub.py`
+  → **10/10 PASS**, `PASS live-exec (4 events, envelope v1)`,
+  `conformance: offline green; live PASS`, exit 0. The probe is endpoint-gated
+  (it asserts OUR loop's output), so §2's success-path types are now covered on
+  any machine, not only one with a box. Pinned by a test, so a regression in
+  the live probe turns the suite red.
+- **A real failure this cycle caused, and what it taught.** `test_contract.py`
+  pinned the pre-decision wording `"NOT decided here"` and went red the moment
+  the contract was published — **781 passed / 1 failed**. The pin was replaced
+  with one on the PUBLISHED state (binding §1/§2, advisory §3, code 4
+  documented), which now fails in both directions: silently widening the
+  binding claim, or silently narrowing it.
+- **Tests run:** `uv run pytest -q` → **781 passed, 5 skipped**.
+- **Exception list (2 rows, named):** (1) a real model *choosing* a tool —
+  closes with the live probe on real inference; (2) §3's five clauses — each
+  closes by acquiring a conformance probe.
+- **Known issues:** none new; graph doc half still key-blocked.
+- **Next step:** C103 (loop 44 budget enforcement, exit code 4, already
+  documented) — C104 is declined scope per R44 ASK 2.
+

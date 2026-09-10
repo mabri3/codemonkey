@@ -2405,7 +2405,7 @@ appended by its own research cycle, with loops 42-45 closed in parallel.
   `dir(codemonkey.events)` → `SCHEMA_V, emit, new_thread_id, stamp`;
   full suite green.
 
-- [ ] CYCLE loop43-final — Loop 43 acceptance
+- [x] CYCLE loop43-final — Loop 43 acceptance
   **R43 ASK DECIDED 2026-09-10 (verbatim):**
   **ASK 1 —** "PUBLISH AS BINDING, §1 AND §2 ONLY. Exit codes, the envelope,
   and the wire/internal type sets have break-verified controls (102F1,
@@ -2433,6 +2433,20 @@ appended by its own research cycle, with loops 42-45 closed in parallel.
   **the subprocess + sandbox line IS the trust boundary; stated in
   THREAT_MODEL.md and contract.md so it is not re-asked.**
   ENTRY: R38 closed (fulfilled).
+  **DONE 2026-09-10.** `contract.md` status → **PUBLISHED AS BINDING, §1 AND
+  §2 ONLY**, with the reason written into the document (`§3 has NO coverage
+  probe`), §3 re-headed **ADVISORY (UNTIL IT HAS A COVERAGE PROBE)** with its
+  closing condition spelled out; §5 records the trust boundary; §6 records the
+  MCP *no server* decision with its reason. Exit code **4** documented in §1
+  **before** its implementation, per R44 ASK 1. The live conformance probe —
+  the suite's only BLOCKED row without an endpoint — is **retired with a run**:
+  `uv run python build/conformance_with_stub.py` → all 10 probes PASS,
+  `PASS live-exec (4 events, envelope v1)`, `conformance: offline green; live
+  PASS`, exit 0; pinned by `tests/test_conformance_live_stub.py`.
+  `tests/test_contract.py` pinned the old "NOT decided here" wording and **went
+  red on this cycle's own change** — replaced with a pin on the PUBLISHED state
+  (binding §1/§2, advisory §3, code 4 documented) so the claim cannot be
+  silently widened *or* narrowed. Suite **781 passed, 5 skipped**.
 
 ### loop44: cycles (selected from build/research-loop44.md, cycle R44)
 

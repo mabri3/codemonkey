@@ -1115,3 +1115,74 @@ not an exception list):**
 **LOOP 42 COMPLETE** — C99 and C100 built and scripted-green; ASK 1 recorded as
 an R-A scope exclusion; ASK 2 accepted and exercised; three rows named on the
 model-gated exception list.
+
+
+---
+
+# Loop 43 — Final Acceptance (CYCLE loop43-final)
+
+**Date:** 2026-09-10 · **Suite:** 781 passed / 5 skipped.
+
+| Cycle | Claim | Evidence |
+|---|---|---|
+| C101 | caller contract v1 written | `build/contract.md` — exit codes, versioned envelope, output/resume |
+| C102 | conformance suite, independent process, docs-only | `build/conformance.py`; 10 probes |
+| 102F1 | the break-control could not detect the break | `event missing v: 'thread.started'`, 2 failed (was 7 passed); `envelope_probe` added |
+| 102F2 | the suite's verdict depended on its CALLER | `stdin=DEVNULL`; `test_run_binary_closes_stdin` |
+| 102F3 | R-A: `events.item_start_sink` deleted (45 lines) | zero callers; would have emitted UNSTAMPED events |
+| 102F5 | f2p verdicts from a real loop trace | `AssertionError: loop must emit a real verdict`, 2 failed / 11 passed |
+| 102F6 | C97 probe CLI-addressable | binary exit 3, tree byte-identical, `plan.*` gap found and fixed |
+| 102F7 | contract §2 type list proven producible | `type_coverage`, 5 stub runs, RED naming the missing `plan.*` types |
+| 102F9 | ledger truth + gate corrections | superseded cycles ticked; v4.0 clause restored; 102F8 citation recorded as resolving to nothing |
+| 102F10 | BLOCKED rows split instead of conflated | 9/9 green with runs behind them; 4 named residuals |
+
+**R43 ASK 1 — PUBLISH AS BINDING, §1 AND §2 ONLY.** Verbatim: *"Exit codes,
+the envelope, and the wire/internal type sets have break-verified controls
+(102F1, 102F7, 102F8). §3 — resume, redaction, output-schema — has NO coverage
+probe. Binding the whole document would claim coverage we do not have, the
+exact defect this arc has hit eight times. §3 stays advisory and marked as
+such until it has a probe."* → **`contract.md` §1 and §2 are BINDING; §3
+carries an explicit ADVISORY-UNTIL-PROBED marker at its own heading with its
+closing condition written out** (one conformance probe per clause, against the
+binary). The ASK's citation of **102F8 resolves to nothing** — no ledger entry,
+no commit, no report; the controls that exist are 102F1 (envelope), 102F7
+(type coverage) and 102F5 (real-trace emit break). Recorded at the citation
+rather than silently mapped (102F9).
+
+**R43 ASK 2 — NO SERVER.** Verbatim: *"Hold at deferred client, recorded as a
+decision, not a deferral-by-default."* → `contract.md` §6 records the decision
+**with its reason** (a server is a second, wider entry point — the new trust
+boundary §5 declines to authorize — with no demonstrated consumer). No MCP
+surface is claimed to exist.
+
+**R43 ASK 3 — trust boundary.** Verbatim: *"no new trust boundary authorized.
+The boundary stays the subprocess + sandbox line. Record it explicitly so it is
+not re-asked."* → recorded in **both** `contract.md` §5 and `THREAT_MODEL.md`,
+including the four things explicitly NOT authorized (daemon, socket, server,
+credential broker, second execution context).
+
+**The live probe, retired with a run.** `conformance.py`'s `live_probe` was the
+suite's only BLOCKED row with no endpoint — leaving §2's success-path types
+(`item.*`, `turn.completed` usage) unverified on any machine without a box.
+It is ENDPOINT-GATED (it asserts OUR loop's output), so it is now exercised
+offline against the scripted endpoint. **Observed, literal:**
+`PASS live-exec (4 events, envelope v1)`, `conformance: offline green; live
+PASS`, exit 0 — all 10 probes PASS. Pinned by
+`tests/test_conformance_live_stub.py` so §2's success-path coverage is a
+control, not a promise.
+
+**Exception list (loop 43, named per row):**
+
+1. **A real model *choosing* a tool** — the scripted endpoint drives the call;
+   it cannot show that a 27B picks one from a natural instruction. Closes by:
+   endpoint up, `build/conformance.py` with no stub (live probe on real
+   inference).
+2. **§3's five clauses** (text-mode stdout purity, `--output-last-message`
+   contents, schema-violation exit 1, resume continuation, journaled-command
+   pre-redaction) — advisory by decision, not by omission; each closes by
+   acquiring a conformance probe against the binary.
+
+**LOOP 43 COMPLETE** — the contract is published binding where it is
+controlled and marked advisory where it is not; conformance is green on the
+released binary with zero BLOCKED; the MCP and trust-boundary questions are
+answered and recorded so they are not re-asked.

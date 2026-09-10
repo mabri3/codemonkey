@@ -96,6 +96,36 @@ def test_contract_doc_exists():
 
     doc = Path(__file__).parent.parent / "build" / "contract.md"
     text = doc.read_text()
-    for needle in ["| 0 |", "| 1 |", "| 2 |", "| 3 |", "`v: 1`",
-                   "R43", "NOT decided here"]:
+    for needle in ["| 0 |", "| 1 |", "| 2 |", "| 3 |", "`v: 1`", "R43"]:
         assert needle in text, needle
+
+
+def test_contract_publication_state_is_pinned():
+    """R43 ASK 1 (2026-09-10): §1 + §2 are BINDING because they have
+    break-verified controls; §3 is ADVISORY until it has a probe.
+
+    This used to pin "NOT decided here". Pinning the PUBLISHED state instead
+    keeps the binding claim honest in both directions: a later edit cannot
+    silently widen it (binding §3 with no probe is the defect this arc keeps
+    finding), and it cannot silently narrow it either.
+    """
+    from pathlib import Path
+
+    text = (Path(__file__).parent.parent / "build" / "contract.md").read_text()
+    assert "## 1. Exit codes — **BINDING**" in text
+    assert "## 2. Event envelope (JSONL, `--json` or `event_sink`) — **BINDING**" in text
+    assert "## 3. Output and resume guarantees — **ADVISORY" in text
+    assert "Closing condition" in text, "§3 must carry its closing condition"
+    assert "NOT decided here" not in text
+
+
+def test_exit_code_4_documented_before_its_implementation():
+    """R44 ASK 1: "contract.md gets code 4 BEFORE the implementation cycle."
+    The doc row is the specification; CYCLE 103 implements it and adds the
+    conformance probe."""
+    from pathlib import Path
+
+    text = (Path(__file__).parent.parent / "build" / "contract.md").read_text()
+    assert "| 4 |" in text
+    assert "budget breach" in text
+    assert "documented here FIRST" in text
