@@ -25,9 +25,9 @@
     "semantic_hash": "e43635cf16aa0617a4f2dd279e8281f6"
   },
   "src/codemonkey/config.py": {
-    "mtime": 1788536736.4575582,
-    "ast_hash": "4c7dc95bf1a05ba9539d572ba5931b74",
-    "semantic_hash": "4c7dc95bf1a05ba9539d572ba5931b74"
+    "mtime": 1789062680.2848628,
+    "ast_hash": "847269560869b7d563aba9c7a1b4d77a",
+    "semantic_hash": "847269560869b7d563aba9c7a1b4d77a"
   },
   "src/codemonkey/events.py": {
     "mtime": 1788670106.6931286,
@@ -35,9 +35,9 @@
     "semantic_hash": "fa6f7d17d46f7b64d7dc9e843e387490"
   },
   "src/codemonkey/exec.py": {
-    "mtime": 1788735869.9213967,
-    "ast_hash": "ab58029565c2bd3a632763866db15a94",
-    "semantic_hash": "ab58029565c2bd3a632763866db15a94"
+    "mtime": 1789062901.0926678,
+    "ast_hash": "6cbe7f1c7449728658316f7fe280416e",
+    "semantic_hash": "6cbe7f1c7449728658316f7fe280416e"
   },
   "src/codemonkey/instructions.py": {
     "mtime": 1788373203.899547,
@@ -45,9 +45,9 @@
     "semantic_hash": "dfbf3763c6db4d0823d5e630e8cfa48e"
   },
   "src/codemonkey/loop.py": {
-    "mtime": 1788623062.7719965,
-    "ast_hash": "1219db955075e6d5c6c4dc4b704a708e",
-    "semantic_hash": "1219db955075e6d5c6c4dc4b704a708e"
+    "mtime": 1789062779.51346,
+    "ast_hash": "3faa120b0291a367e0214045cc61bb0e",
+    "semantic_hash": "3faa120b0291a367e0214045cc61bb0e"
   },
   "src/codemonkey/native.py": {
     "mtime": 1788476351.082512,
@@ -975,9 +975,9 @@
     "semantic_hash": "ce87efaa2d25c1ea0b77b9d8734b75d4"
   },
   "tests/test_contract.py": {
-    "mtime": 1788642038.6370502,
-    "ast_hash": "4bdbeed71c5be148b8a84208845b2b38",
-    "semantic_hash": "4bdbeed71c5be148b8a84208845b2b38"
+    "mtime": 1789062420.2744043,
+    "ast_hash": "21a79322b04453cba3ccb5441e669a2f",
+    "semantic_hash": "21a79322b04453cba3ccb5441e669a2f"
   },
   "tests/test_segment.py": {
     "mtime": 1788641873.7472467,
@@ -993,5 +993,20 @@
     "mtime": 1789062105.639158,
     "ast_hash": "eace1fc9c5cabdcfd42880703578e785",
     "semantic_hash": "eace1fc9c5cabdcfd42880703578e785"
+  },
+  "src/codemonkey/budgets.py": {
+    "mtime": 1789062811.985122,
+    "ast_hash": "ac07b29b0293872a1dd55775013fa1b0",
+    "semantic_hash": "ac07b29b0293872a1dd55775013fa1b0"
+  },
+  "tests/test_budgets.py": {
+    "mtime": 1789062900.8871298,
+    "ast_hash": "3bcfefb5abe97a4a61b7052620535a65",
+    "semantic_hash": "3bcfefb5abe97a4a61b7052620535a65"
+  },
+  "tests/test_conformance_live_stub.py": {
+    "mtime": 1789062340.79194,
+    "ast_hash": "d010acf326f9ecd7e035ac0a7fc850f0",
+    "semantic_hash": "d010acf326f9ecd7e035ac0a7fc850f0"
   }
 }
