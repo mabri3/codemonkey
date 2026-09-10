@@ -3159,3 +3159,27 @@ them justifies waiving a row at v4.0.
   doc half is still key-blocked.
 - **Next step:** loop42-final (R42 ASK 1 declined / ASK 2 accepted, recorded).
 
+## 2026-09-10 — CYCLE loop42-final: Loop 42 acceptance (ASK 1 declined, ASK 2 accepted)
+
+- **Files changed:** `build/BUILD_REPORT.md` (Loop 42 section), `build/plan.md`
+  (final ticked, ASK answers verbatim at the cycle they authorize).
+- **ASK 1 — DECLINED (R-A scope exclusion).** No per-segment tool restriction is
+  built. C100 therefore ships with an **identical advertised tool surface** in
+  segmented and unsegmented runs, and the report says so explicitly instead of
+  leaving the equality implicit. Revisit when live tier numbers exist.
+- **ASK 2 — ACCEPTED.** The ceiling term is the loop's honest exit statement
+  (R-G): if the long-horizon tier stays out of reach, the loop says so.
+- **R-G/R-F/R-H.** Published reference is the BFCL ladder. **Local numbers:
+  unmeasured — `.176` DOWN (ConnectError, re-probed 2026-09-10).** The gap is
+  UNSTATED, not zero; no arm numbers, no cost claim, verdict
+  UNMEASURED-WITH-DATE — never 0, never green.
+- **Exception list (3 rows, named).** (1) L1/L2/L3 ladder numbers on the 27B;
+  (2) segmentation ON vs OFF pass-rate + malformed-rate arms; (3) the ceiling
+  term, evaluable only once (1) and (2) exist. Each row carries its closing
+  condition.
+- **Tests run:** none new; suite **777 passed, 5 skipped**.
+- **Known issues:** the ceiling question stays open (environmental, not
+  architectural, so no capability claim is made either way).
+- **Next step:** loop43-final (publish §1+§2 binding, §3 advisory; MCP deferred
+  by decision; trust boundary recorded).
+

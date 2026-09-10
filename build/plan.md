@@ -2235,7 +2235,7 @@ appended by its own research cycle, with loops 42-45 closed in parallel.
   AND malformed-call rate, tokens/wall per R-F, certified per R-H |
   est: 40m |
   verify (R-I): ON/OFF numbers committed; tests green; full suite green.
-- [ ] CYCLE loop42-final — Loop 42 acceptance
+- [x] CYCLE loop42-final — Loop 42 acceptance
   **R42 ASK DECIDED 2026-09-10 (verbatim):**
   **ASK 1 —** "R42 ASK 1 — DECLINED, scope. Per-segment tool restriction
   changes the advertised surface mid-run with no measurement behind it: the

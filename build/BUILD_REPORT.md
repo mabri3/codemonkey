@@ -1055,3 +1055,63 @@ The build contract is CLOSED.
 - **R-H:** mechanism probes (induced failures), never field-rate claims.
 - **C4:** approved-but-unbuilt pending a measured rate.
 - **LOOP 41 COMPLETE.**
+
+
+---
+
+# Loop 42 — Final Acceptance (CYCLE loop42-final)
+
+**Date:** 2026-09-10 · **Suite:** 777 passed / 5 skipped.
+
+| Cycle | Claim | Evidence |
+|---|---|---|
+| C99 | capability ladder + malformed-call metric | `ladder.py` TIERS L1/L2/L3, deterministic checkers, provider-agnostic runner; eval scores `tool_calls/malformed/parse_errors/malformed_rate` per task; scripted good clears 3/3 malformed 0, schema-violating fake fails L1 with malformed≥1; `test_segment.py` 6/6 |
+| C100 | segmentation ON vs OFF | `run_segmented`: separate short runs, file+handoff, per-segment checks, stop-on-failure, per-segment malformed attribution; scripted s1 work survives s2 failure (1/2) |
+
+**R42 ASK 1 — DECLINED (scope, R-A).** Verbatim: *"Per-segment tool
+restriction changes the advertised surface mid-run with no measurement behind
+it: the live ladder is BLOCKED, so we do not know an unrestricted surface costs
+anything. R-A. Record the exclusion verbatim; revisit when live tier numbers
+exist."* → **C100 ships WITHOUT restriction machinery. The advertised tool
+surface is IDENTICAL in segmented and unsegmented runs**, and that equality is
+stated here rather than left implicit. Revisit condition: live tier numbers
+exist.
+
+**R42 ASK 2 — ACCEPTED.** Verbatim: *"If segmentation buys points and the
+long-horizon tier stays out of reach on the 27B endpoint, the loop exits saying
+so. That is R-G; accepting it costs nothing."* → the ceiling term is this
+loop's honest exit statement, not a failure.
+
+- **R-G (local vs published vs gap):** published reference is the BFCL ladder
+  (frontier well above 27B-class; single-call easier than multi-turn).
+  **LOCAL: unmeasured — endpoint `.176` DOWN (ConnectError, re-probed
+  2026-09-10). No local ladder numbers, no local segmentation arms. The gap is
+  therefore UNSTATED, not zero.** The harness stands ready and runs on the same
+  runner the moment a model answers.
+- **R-F (cost):** per-arm tokens/wall print in the existing renderers; live
+  per-arm costs pending with the endpoint. No cost claim is made here.
+- **R-H (gate verdict):** the ladder and segmentation arms are
+  **MODEL-GATED** — they measure model capability, so no scripted endpoint can
+  stand in for them (contrast 102F10, where the rows were endpoint-gated and
+  9/9 were retired with runs behind them). Verdict for loop 42's live rows:
+  **UNMEASURED-WITH-DATE**, never 0 and never green.
+- **Ceiling term (ASK 2, exercised):** with the endpoint down the long-horizon
+  tier is out of reach for a reason that is environmental, not architectural,
+  so this loop does **not** claim the 27B hits a capability ceiling. It records
+  that the ceiling question stays open, and says so.
+
+**Exception list (loop 42, named per row — a blanket "endpoint down" waiver is
+not an exception list):**
+
+1. **L1 single-call / L2 multi-call / L3 multi-turn ladder numbers on the 27B**
+   — needs a real model's tool-calling behaviour. Closes by: endpoint up,
+   `codemonkey eval <suite> --ladder` (or the equivalent ladder run) with the
+   numbers committed.
+2. **Segmentation ON vs OFF pass-rate and malformed-rate arms** — needs a real
+   model, and the comparison is meaningless without one. Closes by: endpoint
+   up, both arms run over the same suite.
+3. **The ceiling term itself** — evaluable only once (1) and (2) exist.
+
+**LOOP 42 COMPLETE** — C99 and C100 built and scripted-green; ASK 1 recorded as
+an R-A scope exclusion; ASK 2 accepted and exercised; three rows named on the
+model-gated exception list.
