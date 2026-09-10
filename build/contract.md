@@ -57,8 +57,11 @@ Core `type`s (stable set; new types are additive). Wire versus internal
   `plan.started`/`plan.completed`/`plan.rolled_back` {report} (only with
   `--atomic-plan`) · `repro.verdict` {report{verdict}} (only with a
   verifier configured) · `failure_report.gave_up` /
-  `failure_report.consulted` / `failure_report.budget_exhausted` {report} ·
-  `stuck` {tool, error_class, streak} (report-only detector; on the wire
+ `failure_report.consulted` / `failure_report.budget_exhausted` {report} ·
+ `budget.exhausted` {field, limit, observed, turn, declared, meaning}
+ (runs with a declared budget — loop44 C103; the recovery report above is a
+ DIFFERENT event and neither substitutes for the other) ·
+ `stuck` {tool, error_class, streak} (report-only detector; on the wire
   since loop 39, documented here in 102F7) · `error` {message} ·
   `notice` {message}.
 - INTERNAL, deliberately not on the wire: `tool.started` {name, args} and
@@ -122,11 +125,13 @@ PASS`, exit 0. **Named residual (not waived as a class): a real model
 *choosing* a tool. Closes by: endpoint up, conformance run with no stub.**
 
 **Coverage** (102F7): `type_coverage` in `build/conformance.py` enumerates
-§2's ON-THE-WIRE list against streams the binary produced across five
+§2's ON-THE-WIRE list against streams the binary produced across six
 offline stub-driven runs (verify pass-with-retry, atomic gave-up,
-successful atomic run, max-turns, alternating-failure burn) and FAILS on
-any documented type no run produces — plus FAILS if raw `tool.*` ever
-appears on the wire. Enumerate, don't sample.
+successful atomic run, max-turns, alternating-failure burn, declared-budget
+halt) and FAILS on any documented type no run produces — plus FAILS if raw
+`tool.*` ever appears on the wire, and (C103) FAILS if the declared-budget
+run does not exit **4**, which is how §1's newest code is controlled.
+Enumerate, don't sample.
 
 A deliberate envelope break (delete `events.stamp`'s `setdefault`) FAILS
 the suite. 102F1 corrected the C102 claim: as shipped, the break-control

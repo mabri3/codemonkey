@@ -21,6 +21,7 @@ import subprocess
 import sys
 import time
 from pathlib import Path
+from typing import Optional
 
 REPO = Path(__file__).parent.parent
 KNOWN_VERSIONS = (1,)
@@ -190,9 +191,14 @@ WIRE_TYPES = frozenset({
     "repro.verdict",
     "failure_report.gave_up", "failure_report.consulted",
     "failure_report.budget_exhausted",
+    "budget.exhausted",
     "stuck", "error", "notice",
 })
 INTERNAL_TYPES = frozenset({"tool.started", "tool.completed"})
+
+# 102F10/103: the exit code each stub run produced — the §1 control for a code
+# that can only be observed on a run (4 = declared-budget breach).
+_LAST_EXIT: dict[str, int] = {}
 
 
 def _tool_call(name, args) -> str:
@@ -200,7 +206,7 @@ def _tool_call(name, args) -> str:
 
 
 def _stub_run(workdir: Path, name: str, turns: list, cli_args: list,
-              home: Path) -> list[dict]:
+              home: Path, env_extra: Optional[dict] = None) -> list[dict]:
     """One stub-driven binary run; returns its validated event stream."""
     import httpx
 
@@ -230,6 +236,7 @@ def _stub_run(workdir: Path, name: str, turns: list, cli_args: list,
                    CODEMONKEY_TOOL_PROTOCOL="prompt",
                    CODEMONKEY_API_KEY="dummy",
                    HOME=str(home))
+        env.update(env_extra or {})
         out = subprocess.run(
             ["uv", "run", "--project", str(REPO), "codemonkey", "exec",
              "--json", "--skip-git-repo-check", *cli_args],
@@ -239,6 +246,7 @@ def _stub_run(workdir: Path, name: str, turns: list, cli_args: list,
             raise ConformanceFailure(
                 f"[{name}] exit {out.returncode} with empty stream: "
                 f"{out.stderr[-300:]}")
+        _LAST_EXIT[name] = out.returncode
         return check_stream(out.stdout)
     finally:
         proc.terminate()
@@ -246,12 +254,13 @@ def _stub_run(workdir: Path, name: str, turns: list, cli_args: list,
 
 
 def type_coverage(workdir: Path) -> dict:
-    """Five stub-driven binary runs; union their wire types; compare.
+    """Six stub-driven binary runs; union their wire types; compare.
 
     A verify pass-with-retry (verify.*, notice, repro.verdict), an atomic
     gave-up (plan.started/rolled_back, failure_report.gave_up/consulted,
     stuck), a successful atomic run (plan.completed), a max-turns burn
-    (error), and an alternating-failure burn (budget_exhausted).
+    (error), an alternating-failure burn (failure_report.budget_exhausted),
+    and a declared-budget halt (budget.exhausted, loop44 C103).
     """
     home = workdir / "home"
     home.mkdir(exist_ok=True)
@@ -286,24 +295,37 @@ def type_coverage(workdir: Path) -> dict:
             ["--sandbox", "danger-full-access", "--max-turns", "2",
              "keep going"]),
         # D: rotating failures — never the same pair ×3 (no advisory, no
-        # gave_up), but the budget burns. Covers budget_exhausted.
+        # gave_up), but the RECOVERY budget burns. Covers
+        # failure_report.budget_exhausted (loop 39; distinct from the next).
         "budget": (
             [_tool_call("shell", {"command": "exit 1"}),
              _tool_call("write_file", {"content": "no-path"}),
              _tool_call("read_file", {"path": "no-such-file.txt"})],
             ["--sandbox", "danger-full-access", "--max-turns", "16",
-             "keep trying"]),
+             "keep trying"], None),
+        # F: a DECLARED budget (loop44 C103). One turn allowed, two taken →
+        # the run halts at its own declared boundary. Covers budget.exhausted
+        # and exit code 4. Without this run the type is documented-but-
+        # unproducible — the 102F7 question, asked again on purpose.
+        "budgetlimit": (
+            [_tool_call("write_file", {"path": "a.txt", "content": "a"}),
+             _tool_call("write_file", {"path": "b.txt", "content": "b"}),
+             "done"],
+            ["--sandbox", "danger-full-access", "write two files"],
+            {"CODEMONKEY_BUDGET_TURNS": "1"}),
     }
     union: set = set()
     per_run: dict = {}
-    for name, (turns, args) in runs.items():
+    for name, spec in runs.items():
+        turns, args = spec[0], spec[1]
+        env_extra = spec[2] if len(spec) > 2 else None
         # The stub repeats its LAST turn; multi-turn scripts are explicit
         # lists. Runs C/D need one entry per turn they must survive.
         if name == "maxturns":
             turns = turns * 3
         if name == "budget":
             turns = turns * 6
-        events = _stub_run(workdir / name, name, turns, args, home)
+        events = _stub_run(workdir / name, name, turns, args, home, env_extra)
         types = {e.get("type", "") for e in events}
         per_run[name] = sorted(types)
         union |= types
@@ -317,8 +339,16 @@ def type_coverage(workdir: Path) -> dict:
     if leaked:
         raise ConformanceFailure(
             f"[coverage] INTERNAL types on the wire: {leaked}")
+    # loop44 C103: contract §1's code 4 ("budget breach") is documented BEFORE
+    # its implementation; this is the control that makes the row a claim.
+    got = _LAST_EXIT.get("budgetlimit")
+    if got != 4:
+        raise ConformanceFailure(
+            f"[coverage] contract §1 code 4 (budget breach) not observed: the "
+            f"declared-budget run exited {got!r}, expected 4")
     return {"probe": "type-coverage", "ok": True,
             "runs": {k: len(v) for k, v in per_run.items()},
+            "exit_codes": dict(_LAST_EXIT),
             "covered": len(union & WIRE_TYPES)}
 
 

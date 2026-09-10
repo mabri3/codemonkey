@@ -3221,3 +3221,39 @@ them justifies waiving a row at v4.0.
 - **Next step:** C103 (loop 44 budget enforcement, exit code 4, already
   documented) — C104 is declined scope per R44 ASK 2.
 
+## 2026-09-10 — CYCLE 103 (loop44): declared budgets are LIMITS
+
+- **Files changed:** `src/codemonkey/budgets.py` (new), `src/codemonkey/loop.py`,
+  `src/codemonkey/exec.py`, `src/codemonkey/config.py`, `build/conformance.py`,
+  `build/contract.md`, `tests/test_budgets.py` (new, 17 tests).
+- **Before this cycle a "budget" in this repo was a REPORT** — `budget.py`
+  computes a context size, `cost.py` tallies spend afterwards, loop 39's
+  recovery tracker counts turns *after the first error*. None stopped a run.
+  Now a declared budget halts it.
+- **Enforcement.** `budgets.Declared` (turns / tokens / seconds / files; a
+  field left out is genuinely UNLIMITED, never zero) → `BudgetTracker` checks
+  turns and wall-clock *before* a turn is spent and tokens/files after the
+  turn that crossed them. Breach → `budget.exhausted` on the trace, the honest
+  closing on stdout, contract §1 **exit 4**, and a resumable **job file**.
+- **Probe results (literal).** `budget.exhausted` event observed; exit 4 at
+  the exec boundary; `jobs.list_jobs()` non-empty after the breach. The
+  boundary is a boundary: for a `turns=1` run that wanted two turns the
+  provider was called **once**.
+- **Two real defects, found by this cycle's own tests.** (a) The halt fell
+  through the max-turns bail and emitted *"max_turns (N) reached"* — the
+  **91F2 bug class reintroduced by a new `break`**; the bail now excludes a
+  budget breach the way it excludes `gave_up`. (b) `partial.shell_mutation`
+  returns `(bool, target)`, and a tuple is always truthy, so every shell call
+  would have consumed a file slot.
+- **R44 ASK 3 control, break-verified against the artifact:** the widening
+  refusal removed from `check_proposal` → `AssertionError: a rule raised the
+  budget` / `assert 40 == 4`, **1 failed / 15 passed** (was 16 passed);
+  import origin asserted; restored → 16 passed.
+- **§1 code 4 is controlled, not just documented.** Conformance gained a sixth
+  stub run (`budgetlimit`) and now FAILS if the declared-budget run does not
+  exit 4: `PASS type-coverage (18 §2 types across {..., 'budgetlimit': 6})`,
+  `conformance: offline green; live PASS`.
+- **Tests run:** `uv run pytest -q` → **797 passed, 5 skipped** (was 781/5).
+- **Known issues:** none; C104 is declined scope, recorded under R-A.
+- **Next step:** loop44-final, then C105/C106 and the v4.0 sweep.
+

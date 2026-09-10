@@ -2450,7 +2450,7 @@ appended by its own research cycle, with loops 42-45 closed in parallel.
 
 ### loop44: cycles (selected from build/research-loop44.md, cycle R44)
 
-- [ ] CYCLE 103 — `loop44:` declared budget + runtime enforcement: breach
+- [x] CYCLE 103 — `loop44:` declared budget + runtime enforcement: breach
   halts with a distinct exit, resumable job file, checkpointed workspace;
   self-authored rules can never raise a budget (rejection recorded) |
   est: 40m |
@@ -2469,6 +2469,29 @@ appended by its own research cycle, with loops 42-45 closed in parallel.
   gets its own break-verified control.**
   **ASK 4 —** "CONFIRMED. loop41-final is closed (2bf3476)." → ENTRY
   CONDITION MET.
+  **DONE 2026-09-10.** `src/codemonkey/budgets.py` (declared budget, tracker,
+  the widening-refusal invariant) + wiring: `loop.py` (halts at the boundary),
+  `exec.py` (contract §1 **exit 4**, the §2 `budget.exhausted` forwarding
+  branch, the honest closing on stdout, a resumable **job file**),
+  `config.py` (`budgets: {}` + `CODEMONKEY_BUDGET_*`).
+  **The boundary is a boundary:** the integration probe asserts the provider
+  was called **once** for a `turns=1` run that wanted two turns — the run
+  stops *at* the limit rather than reporting past it.
+  **Two real defects found by this cycle's own tests, both fixed:**
+  (a) the halt fell through the max-turns bail and emitted *"max_turns (N)
+  reached"* — the **91F2 bug class, reintroduced by a new `break`**; the bail
+  now excludes a budget breach the same way it excludes `gave_up`.
+  (b) `partial.shell_mutation` returns `(bool, target)`, not a bool — a tuple
+  is always truthy, so every shell call would have consumed a file slot.
+  **Control (R44 ASK 3), break-verified against the artifact:** the widening
+  refusal removed from `check_proposal` → `AssertionError: a rule raised the
+  budget` / `assert 40 == 4`, **1 failed / 15 passed** (was 16 passed),
+  import origin asserted (`.../src/codemonkey/budgets.py`); restored → green.
+  **§1 code 4 is now controlled, not just documented:** `build/conformance.py`
+  gained a sixth stub run (`budgetlimit`, `CODEMONKEY_BUDGET_TURNS=1`) and
+  enforces `budget.exhausted` + exit 4 in the coverage probe — observed
+  `PASS type-coverage (18 §2 types across {..., 'budgetlimit': 6})`.
+  Suite 781 → **797 passed, 5 skipped** (`tests/test_budgets.py`, 17 tests).
 - [ ] CYCLE 104 — `loop44:` approval batching + blast-radius limits — **R44
   ASK 2 DECLINED, scope (verbatim):** "NO to approval batching. Replacing
   per-call interrupts with ranked batches weakens a safety interlock and

@@ -24,6 +24,7 @@ import uuid
 from pathlib import Path
 from typing import Optional
 
+from . import budgets as budget_mod
 from . import events
 
 
@@ -350,6 +351,19 @@ def run_exec(
             # evidence (advisory turn + failed turn).
             emit({"type": etype, "thread_id": thread_id,
                   "report": ev.get("report") or {}})
+        elif etype == "budget.exhausted":
+            # loop44 cycle 103: the declared-budget halt. Contract §2 lists it
+            # as a wire type; without this branch it would be dropped silently,
+            # which is exactly the 102F6/102F7 defect (a documented type no
+            # stream could produce).
+            emit({"type": "budget.exhausted",
+                  "thread_id": thread_id,
+                  "field": ev.get("field", ""),
+                  "limit": ev.get("limit", 0),
+                  "observed": ev.get("observed", 0),
+                  "turn": ev.get("turn", 0),
+                  "declared": ev.get("declared") or {},
+                  "meaning": ev.get("meaning", "")})
         elif etype in ("plan.started", "plan.completed", "plan.rolled_back"):
             # loop41 cycle 97 / 102F6: contract §2 lists the plan lifecycle
             # as core stream types (atomic-plan runs only) — forward the
@@ -534,6 +548,10 @@ def run_exec(
             cwd=str(workdir),
         )
 
+    # loop44 cycle 103: the run's declared budget, resolved once. Unset in
+    # config → Declared() → no enforcement, byte-identical to pre-103 runs.
+    _declared_budget = budget_mod.Declared.from_config(cfg)
+
     def _attempt(prov, _jrun=None):
         from .redact import needles_from_config as _nfc
 
@@ -548,6 +566,9 @@ def run_exec(
             tool_protocol=tool_protocol,
             system_extra=system_extra,
             max_turns=eff_max_turns,
+            # loop44 cycle 103: the declared budget, enforced at the boundary
+            # (None when nothing is declared — identical to pre-103 behavior).
+            budget=(_declared_budget or None),
             stream=stream_deltas,
             on_event=on_event,
             on_token=on_token,
@@ -765,6 +786,11 @@ def run_exec(
         # loop39 cycle 91: the honest closing replaces model text on stdout —
         # the run stopped itself, so the trace's closing is the report.
         final_text = turn.gave_up.get("closing", final_text)
+    elif getattr(turn, "budget_breach", None):
+        # loop44 cycle 103: same rule for a declared-budget halt — stdout
+        # carries the closing that names the boundary, never a model's prose
+        # about having stopped.
+        final_text = getattr(turn, "budget_closing", None) or final_text
     if turn.reasoning:
         emit(
             {
@@ -902,4 +928,28 @@ def run_exec(
         # recovery policy — exit 3 (gave-up), distinct from error (1).
         # Spec §Safety records the code. Stdout carries the honest closing.
         return 3
+    if getattr(turn, "budget_breach", None):
+        # loop44 cycle 103: the run halted itself at a DECLARED boundary —
+        # exit 4 (contract §1), distinct from 3 (recovery policy gave up).
+        _breach = turn.budget_breach
+        sys.stderr.write(
+            f"[budget] {_breach.get('field')} limit {_breach.get('limit')} "
+            f"reached (observed {_breach.get('observed')} at turn "
+            f"{_breach.get('turn')})\n")
+        # Halting honestly means the run is RESUMABLE, not lost: the boundary
+        # it hit and the way back are recorded as a job file, and the workspace
+        # is already checkpointed per mutating write (THREAT_MODEL §Promised 5).
+        try:
+            from . import jobs as _jobs
+            _job = _jobs.create(
+                f"resume after budget breach: {_breach.get('field')} "
+                f"limit {_breach.get('limit')} reached at turn "
+                f"{_breach.get('turn')}",
+                ["inspect the run's trace and job record",
+                 "resume from the checkpoint, or re-run with a deliberately "
+                 "raised budget"])
+            sys.stderr.write(f"[budget] resumable job: {_job.get('job_id')}\n")
+        except Exception as _exc:                     # pragma: no cover
+            sys.stderr.write(f"[warn] no resume job written: {_exc}\n")
+        return 4
     return 0 if schema_ok else 1

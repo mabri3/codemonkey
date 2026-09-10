@@ -17,6 +17,7 @@ import time
 
 from typing import Callable, Optional
 
+from . import budgets as budget_mod
 from . import protocol as prompt_protocol
 from . import tools as tool_registry
 from .providers.base import ChatTurn, ProviderBase, ProviderError
@@ -57,6 +58,7 @@ def run_turns(
     tool_protocol: str = "auto",
     system_extra: str = "",
     max_turns: int = 30,
+    budget: Optional[budget_mod.Declared] = None,
     stream: bool = False,
     on_event: Optional[Callable[[dict], None]] = None,
     on_token: Optional[Callable[[str], None]] = None,
@@ -165,7 +167,29 @@ def run_turns(
     pre_run_len = len(messages)
     last_turn = ChatTurn()
 
+    # loop44 cycle 103: a declared budget is a LIMIT, not a report. None means
+    # no budget was declared and this run behaves exactly as it did before the
+    # cycle — the capability is opt-in.
+    _budget = budget_mod.BudgetTracker(budget) if budget is not None else None
+
+    def _budget_breach(b: budget_mod.Breach) -> None:
+        """Halt honestly: the run stopped ITSELF at the boundary."""
+        if on_event:
+            on_event(b.as_event())
+        try:
+            setattr(last_turn, "budget_breach", dict(b.as_event()))
+            setattr(last_turn, "budget_closing", b.closing())
+        except (AttributeError, TypeError):  # pragma: no cover - defensive
+            pass
+
     for _turn_no in range(1, max_turns + 1):
+        if _budget is not None:
+            # turns and wall-clock are knowable BEFORE the turn's cost is
+            # spent; that is the difference between a budget and a report.
+            _b = _budget.begin_turn()
+            if _b is not None:
+                _budget_breach(_b)
+                break
         if on_event:
             on_event({"type": "turn.started"})
 
@@ -281,6 +305,34 @@ def run_turns(
         except (TypeError, ValueError, AttributeError):
             pass
         turns_seen += 1
+
+        if _budget is not None:
+            _b = _budget.note_tokens(turn_tokens)
+            if _b is None:
+                # file accounting: distinct paths this turn intends to write.
+                # Shell-mediated writes count too (partial.shell_mutation) —
+                # an unknown target still consumes the budget, or the limit
+                # would be trivially evaded by doing the work in shell.
+                for _c in (calls or []):
+                    _name = (_c or {}).get("name")
+                    _args = (_c or {}).get("arguments") or (_c or {}).get("args") or {}
+                    if _name in ("write_file", "edit_file"):
+                        _b = _budget.note_path(str(_args.get("path") or ""))
+                    elif _name == "shell":
+                        from . import partial as _partial
+                        _cmd = str(_args.get("command") or "")
+                        # 96F1: shell_mutation returns (bool, target|None) —
+                        # a tuple is always truthy, so this MUST be unpacked
+                        # or every shell call would consume a file slot.
+                        _mut, _target = _partial.shell_mutation(_cmd)
+                        if _mut:
+                            _b = _budget.note_unknown_write(
+                                str(_target or _cmd)[:60])
+                    if _b is not None:
+                        break
+            if _b is not None:
+                _budget_breach(_b)
+                break
 
         # loop3 bridge: native call returned TEXT that still looks like prompt-
         # protocol output (some models wrap tool calls in text even when native
@@ -1056,7 +1108,12 @@ def run_turns(
     # this loop (normal completion returns above), so without this guard every
     # policy stop also emitted "max_turns reached" — an error that did not
     # happen, contradicting the gave-up report on the same trace.
-    if on_event and not getattr(last_turn, "gave_up", None):
+    # C103: the declared-budget halt is the SECOND self-stop, and it needs the
+    # same guard for the same reason — a budget halt that reports "max_turns
+    # reached" is a false claim about why the run ended. (Found by this
+    # cycle's own test: the halt emitted both events.)
+    if on_event and not getattr(last_turn, "gave_up", None) \
+            and not getattr(last_turn, "budget_breach", None):
         on_event({"type": "error",
                   "message": f"max_turns ({max_turns}) reached without a final answer"})
     last_turn.all_messages = messages

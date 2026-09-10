@@ -53,6 +53,11 @@ DEFAULTS: dict = {
     "repo_map_budget": 4000,
     "context_budget": 600,
     "max_retries": 3,
+    # loop44 cycle 103: declared runtime budgets. EMPTY means nothing is
+    # declared and nothing is enforced — a budget is opt-in and a field left
+    # out is genuinely unlimited, never zero. Keys: turns, tokens, seconds,
+    # files. Env: CODEMONKEY_BUDGET_<FIELD>.
+    "budgets": {},
     "permissions": {"rules": []},
     "fallback_provider": "",
     "prompt_cache": True,
@@ -80,6 +85,11 @@ ENV_MAP: dict[str, str] = {
     "CODEMONKEY_REPO_MAP": "repo_map",
     "CODEMONKEY_REPO_MAP_BUDGET": "repo_map_budget",
     "CODEMONKEY_MAX_RETRIES": "max_retries",
+    # loop44 cycle 103: declared runtime budgets (enforced by budgets.py)
+    "CODEMONKEY_BUDGET_TURNS": "budgets.turns",
+    "CODEMONKEY_BUDGET_TOKENS": "budgets.tokens",
+    "CODEMONKEY_BUDGET_SECONDS": "budgets.seconds",
+    "CODEMONKEY_BUDGET_FILES": "budgets.files",
     "CODEMONKEY_BASE_URL": "providers.local.base_url",
     "CODEMONKEY_STRATEGY_COMPACTION": "strategies.compaction",
     "CODEMONKEY_STRATEGY_MEMORY": "strategies.memory",
