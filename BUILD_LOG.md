@@ -3257,3 +3257,20 @@ them justifies waiving a row at v4.0.
 - **Known issues:** none; C104 is declined scope, recorded under R-A.
 - **Next step:** loop44-final, then C105/C106 and the v4.0 sweep.
 
+## 2026-09-10 — CYCLE loop44-final: Loop 44 acceptance
+
+- **Files changed:** `build/BUILD_REPORT.md` (Loop 44 section), `build/plan.md`.
+- **C103 accepted:** declared budgets halt the run at the boundary — exit 4,
+  `budget.exhausted` on the trace, resumable job file, 17 tests; the halt is a
+  boundary claim proven by the provider-call count, not by prose.
+- **C104 NOT BUILT** (R44 ASK 2 declined, verbatim in the plan at the cycle it
+  authorizes). The per-call interrupt stays; the exclusion carries its revisit
+  condition so it is a decision, not a deletion.
+- **R44 ASK 3's control exists** and was break-verified against the artifact.
+- **R-G/R-F/R-H:** no published counterpart for this mechanism; verdict
+  **MECHANISM PROVEN; FIELD EFFECT UNMEASURED** — no field rate is claimed.
+- **Exception list (2 rows, named):** budget-default calibration against real
+  runs; C104.
+- **Tests run:** none new; suite **797 passed, 5 skipped**.
+- **Next step:** C105 — evidence pack + hash-chained journal.
+

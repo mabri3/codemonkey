@@ -1186,3 +1186,66 @@ control, not a promise.
 controlled and marked advisory where it is not; conformance is green on the
 released binary with zero BLOCKED; the MCP and trust-boundary questions are
 answered and recorded so they are not re-asked.
+
+
+---
+
+# Loop 44 — Final Acceptance (CYCLE loop44-final)
+
+**Date:** 2026-09-10 · **Suite:** 797 passed / 5 skipped.
+
+| Cycle | Claim | Evidence |
+|---|---|---|
+| C103 | declared budgets are LIMITS | `budgets.py` + `loop.py`/`exec.py`/`config.py`; `budget.exhausted` on the wire; exit **4**; resumable job file; `tests/test_budgets.py` 17 tests |
+| C103 (control) | a self-authored rule can never raise a budget | break run against the artifact: refusal removed → `AssertionError: a rule raised the budget` / `assert 40 == 4`, 1 failed / 15 passed, restored green |
+| C103 (§1 control) | contract code 4 is observable | `build/conformance.py` `budgetlimit` run; the coverage probe FAILS if it does not exit 4 |
+| C104 | approval batching — **NOT BUILT** | R44 ASK 2 declined, recorded as an R-A approved-scope exclusion |
+
+**R44 ASK 1 — YES, with a NEW code 4.** Verbatim: *"YES to runtime budget
+enforcement, with a NEW code 4, not a reuse of 3. Contract §1 says new codes
+are documented there first: contract.md gets code 4 BEFORE the implementation
+cycle, and 102F7's coverage gate covers it."* → done in that order: §1 carried
+the row (loop43-final) before C103 existed, and the coverage gate now enforces
+the exit code rather than merely naming it.
+
+**R44 ASK 2 — NO.** Verbatim: *"NO to approval batching. Replacing per-call
+interrupts with ranked batches weakens a safety interlock and nothing measures
+interrupts as the bottleneck. Same answer as R42 ASK 1, same reason."* → C104
+is **not built**. The per-call interrupt stays. Recorded as an R-A exclusion
+with its revisit condition (a measurement showing interrupts are the
+bottleneck), not deleted from the plan.
+
+**R44 ASK 3 — CONFIRMED, and it has a control.** Verbatim: *"No self-authored
+rule may ever raise a budget. Rejections recorded, and the invariant gets a
+break-verified control like any other claim: break the refusal, watch it go
+red."* → `budgets.check_proposal` refuses a raise and refuses clearing a limit
+back to unlimited; refusals are RETURNED, not silently dropped. Break run
+performed against the artifact (see table).
+
+**R44 ASK 4 — CONFIRMED:** loop41-final closed (`2bf3476`); entry condition met.
+
+- **R-G (local vs published vs gap):** there is no published counterpart for
+  "does a declared runtime budget prevent a runaway run" — the mechanism is
+  novel here, so there is nothing to stand next to and **no field rate is
+  claimed**. What exists is mechanism evidence (probes), stated as such.
+- **R-F (cost):** enforcement adds no provider calls and no tokens; the
+  overhead is a counter comparison per turn plus one job-file write per
+  breach. Unmeasured in wall-clock on real runs (no endpoint).
+- **R-H (gate verdict):** the halt is a *boundary* claim, proven by the
+  provider-call count (one call for a two-turn run under `turns=1`), never by
+  prose. Verdict: **MECHANISM PROVEN; FIELD EFFECT UNMEASURED.**
+- **The honest limit of this loop:** "leave it running overnight and it will
+  stop" is now *implementable* and *enforced*, but whether these defaults are
+  the right ones for real work is unmeasured. That is a number nobody has.
+
+**Exception list (loop 44, named per row):**
+
+1. **Budget defaults calibrated against real runs** — needs live work to see
+   where runs actually stop. Closes by: endpoint up, N real runs, thresholds
+   chosen from the distribution rather than from taste.
+2. **C104 approval batching** — declined, not waived: it reopens only with a
+   measurement that interrupts are the bottleneck.
+
+**LOOP 44 COMPLETE** — budgets are enforced, the invariant is break-verified,
+code 4 is controlled end to end, and the declined half is recorded with its
+reason instead of quietly dropped.

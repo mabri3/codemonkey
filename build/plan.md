@@ -2502,9 +2502,15 @@ appended by its own research cycle, with loops 42-45 closed in parallel.
   Revisit condition: a measurement showing interrupts are the bottleneck.
   (Original scope, retained: ranked batches replace per-call interrupts;
   files-touched caps off the change plan.)
-- [ ] CYCLE loop44-final — Loop 44 acceptance + R44 ASK (all four recorded
+- [x] CYCLE loop44-final — Loop 44 acceptance + R44 ASK (all four recorded
   above, verbatim, at the cycles they authorize); report committed,
   including the C104 exclusion. ENTRY: R41 closed (fulfilled).
+  **DONE 2026-09-10.** `build/BUILD_REPORT.md` carries the loop-44 section:
+  C103 built (exit 4, `budget.exhausted`, resumable job file, 17 tests),
+  C104 **not built** (ASK 2 declined under R-A, revisit condition recorded),
+  the invariant break-verified, R-G/R-F/R-H rows stated with
+  **MECHANISM PROVEN / FIELD EFFECT UNMEASURED**, and a two-row exception
+  list (budget-default calibration; C104). Suite **797 passed, 5 skipped**.
 
 ### loop45: cycles (selected from build/research-loop45.md, cycle R45)
 
