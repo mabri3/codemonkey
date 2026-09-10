@@ -1724,7 +1724,13 @@ shipped until its entry point is exercised") live in
   | est: 40m |
   verify: `build/research-loop45.md` committed; `build/plan.md` contains the
   `loop45:` cycles (unchecked) ending in `loop45-final` whose own probe is:
-  `bash build/acceptance_sweep.sh` → all exit 0, zero BLOCKED; `uv run pytest
+  `bash build/acceptance_sweep.sh` → all exit 0, zero BLOCKED **or an
+  individually justified exception list** (GATE CORRECTION 2026-09-10: the
+  exception clause v2.0 and v3.0 shipped under is RESTORED here and at
+  :2364 — its removal in the v4.0 entries was drift with no decision
+  recorded; every waived row must be named individually with its reason and
+  what would close it, and a blanket "endpoint down" waiver is not an
+  exception list); `uv run pytest
   -q` → exit 0; `uv run codemonkey --version` matches the tag; every
   `build/CAPABILITY_REGISTER.md` row reads PROVEN-LIVE, UNIT-ONLY with a stated
   reason, or DEAD — no UNVALIDATED rows; every loop-38..44 row carries its
@@ -1957,9 +1963,14 @@ agent writes about itself is trusted until earned, and everything it writes is
 revocable) and **R-K** ("learned" is a measured word: forward transfer +
 retention, or say "changed"). R-A … R-I remain binding.
 
-**Ordering constraint — binding.** Loops 38-45 are open (loop 38's cycles 74-81
-are appended; 74 is in flight and red). No cycle in this arc may start before
-loop 45's v4.0 acceptance. This section is a plan, not a queue.
+**Ordering constraint — WAIVED 2026-09-10 (user).** Loops 46-50 are
+**AUTHORIZED**. The constraint ("nothing in this arc may be built before loop
+45's v4.0 acceptance") was self-authored and lived only in
+`build/loops-46-50-proposal.md` §D — it appears in neither AGENTS.md nor
+spec.md, so it was never binding on anything but this arc's own convenience.
+The waiver is recorded here AND at the constraint's original site
+(`loops-46-50-proposal.md` §D). Build order: loop 46 → 50, each loop's cycles
+appended by its own research cycle, with loops 42-45 closed in parallel.
 
 - [ ] CYCLE R46 — Loop 46 research: the skill library — a run that makes the
   next run cheaper. WRITTEN: `build/research-loop46.md` (8 candidates, web
@@ -2225,11 +2236,19 @@ loop 45's v4.0 acceptance. This section is a plan, not a queue.
   est: 40m |
   verify (R-I): ON/OFF numbers committed; tests green; full suite green.
 - [ ] CYCLE loop42-final — Loop 42 acceptance
-  HELD 2026-09-05: R42 ASK 1 (per-segment tool restriction) + ASK 2
-  (ceiling term) unanswered — C100 ships WITHOUT restriction machinery
-  and the report states identical-surface; loop42-final ticks on answers, not on more code. + R42 ASK (per-segment tool
-  restriction, ceiling term); report committed. ENTRY: R40 closed
-  (fulfilled).
+  **R42 ASK DECIDED 2026-09-10 (verbatim):**
+  **ASK 1 —** "R42 ASK 1 — DECLINED, scope. Per-segment tool restriction
+  changes the advertised surface mid-run with no measurement behind it: the
+  live ladder is BLOCKED, so we do not know an unrestricted surface costs
+  anything. R-A. Record the exclusion verbatim; revisit when live tier
+  numbers exist." → **C100 ships WITHOUT restriction machinery; recorded as
+  an approved-scope exclusion under R-A, and loop42-final ticks on that
+  exclusion.** Revisit condition: live tier numbers exist (endpoint up).
+  **ASK 2 —** "ACCEPTED. If segmentation buys points and the long-horizon
+  tier stays out of reach on the 27B endpoint, the loop exits saying so.
+  That is R-G; accepting it costs nothing." → **the ceiling term is accepted
+  as the loop's honest exit statement** (R-G), not as a failure.
+  ENTRY: R40 closed (fulfilled).
 
 ### loop43: cycles (selected from build/research-loop43.md, cycle R43)
 
@@ -2285,6 +2304,42 @@ loop 45's v4.0 acceptance. This section is a plan, not a queue.
   est: 40m |
   verify (R-I): break run (worktree, PYTHONPATH + asserted origin): plan.*
   forwarding deleted → coverage probe RED; restored → green; full suite green.
+- [x] CYCLE 102F9 — ledger truth + gate corrections (user-assigned
+  2026-09-10). (a) `102F4-F1`/`102F4-F2` still read `- [ ]` although they
+  shipped as **102F5**/**102F6** — ticked with supersession notes and their
+  HEADs, so no later reader builds them twice. (b) v4.0's acceptance entries
+  (`:1727`, `loop45-final`) had dropped the exception clause that v2.0 and
+  v3.0 shipped under ("zero BLOCKED **or an individually justified exception
+  list**"); restored at both sites, with the rule that every waived row is
+  named individually with its reason and what would close it — a blanket
+  "endpoint down" waiver is not an exception list. (c) The loops-46-50
+  ordering constraint is **WAIVED** at both sites (it was self-authored and
+  lived only in `loops-46-50-proposal.md` §D, appearing in neither AGENTS.md
+  nor spec.md); loops 46-50 are AUTHORIZED. (d) All outstanding ASK answers
+  recorded verbatim at the cycles they authorize (R42 1-2 on loop42-final;
+  R43 1-3 on loop43-final; R44 1-4 on C103/C104/loop44-final). (e) The R43
+  ASK's citation of "102F8" resolves to nothing — recorded, not mapped.
+  | est: 20m |
+  verify: `grep -c '^- \[ \] CYCLE 102F4-F'` in plan.md → 0; the exception
+  clause appears at both v4.0 gate sites; the waiver appears at both sites
+  of the ordering constraint; no ledger entry cites 102F8 as built.
+- [ ] CYCLE 102F10 — sweep classification BEFORE the v4.0 sweep (user's ASK
+  calls this "CYCLE 103"; renumbered because plan.md's `CYCLE 103` is the
+  loop44 budget cycle authorized in the same message — the mapping is
+  recorded so the instruction stays traceable). Split every BLOCKED row of
+  `build/acceptance_sweep.sh` into **ENDPOINT-GATED** (needs any HTTP server
+  speaking the API) and **MODEL-GATED** (needs a real model's behavior).
+  `build/stub_provider.py` retires the first class — that is how 102F6 and
+  102F7 ran end-to-end with the box off. Report both counts. **A row moves to
+  green ONLY with a run behind it**; a row reclassified without a
+  demonstration behind it is the defect this arc is about (R-I). The
+  MODEL-GATED remainder becomes the v4.0 exception list, named row by row
+  with its reason and its closing condition. | est: 60m |
+  verify (R-I): `SWEEP_ENDPOINT_STUB=1 bash build/acceptance_sweep.sh` runs
+  the endpoint-gated rows against the stub and each green row names its run;
+  `build/sweep-classification.md` carries the two counts, the per-row class,
+  and the exception list; the classification control breaks RED when a row is
+  moved to green without a run behind it; full suite green.
 - [x] CYCLE 102F6 — F2 (LOW): C97 probe CLI-addressable. DONE (binary path,
   not reword): `build/stub_provider.py` (scripted OpenAI-compatible turns
   over real HTTP, JSON+SSE, zero product changes) + `tests/test_changeplan_cli.py`
@@ -2307,14 +2362,21 @@ loop 45's v4.0 acceptance. This section is a plan, not a queue.
   C97 LOW). | est: 60m |
   verify: break-run table in the report (E1 2F, E2 2F/8P, E3 1F/8P, E5 5F/2P,
   E7 4F/25P with f2p green); full suite green.
-- [ ] CYCLE 102F4-F1 — F1 (HIGH): real-trace f2p test — scripted run_turns
+- [x] CYCLE 102F4-F1 — F1 (HIGH): real-trace f2p test — scripted run_turns
   with verify_command (fake: write-test → fail → patch → pass), REAL event
   trace into label_task + eval f2p scoring → F2P; worktree neutering of
   _emit_repro MUST turn it red | est: 30m |
   verify: new test green on HEAD, red on neutered emit; full suite green.
-- [ ] CYCLE 102F4-F2 — F2 (LOW): C97 entry reworded to the path taken
+  **SUPERSEDED (102F9, 2026-09-10):** built as **CYCLE 102F5** (HEAD
+  `ad726f1`), which carries the break run verbatim
+  (`AssertionError: loop must emit a real verdict`, 2 failed / 11 passed,
+  was 13 passed). Ticked here for ledger truth; do not build twice.
+- [x] CYCLE 102F4-F2 — F2 (LOW): C97 entry reworded to the path taken
   (run_turns in-process) or CLI-addressable probe added | est: 10m |
   verify: entry names a runnable path; full suite green.
+  **SUPERSEDED (102F9, 2026-09-10):** built as **CYCLE 102F6** (HEAD
+  `805db08`) — CLI-addressable, not reworded (`build/stub_provider.py` +
+  `tests/test_changeplan_cli.py`: binary exit 3, tree byte-identical).
 - [x] CYCLE 102F3 — `loop43:` R-A on `events.item_start_sink` — zero callers
   in `src/`, `tests/` or docs since loop 12, and it called `events.emit`
   directly, bypassing both exec funnels: wiring it up would have put
@@ -2325,12 +2387,33 @@ loop 45's v4.0 acceptance. This section is a plan, not a queue.
   full suite green.
 
 - [ ] CYCLE loop43-final — Loop 43 acceptance
-  HELD 2026-09-05: R43 ASK 1 (publish contract as constraint) + ASK 2
-  (MCP server vs deferred client) + ASK 3 (trust boundary) unanswered —
-  the contract is specified and conformance runs, but nothing is published
-  as binding and no MCP surface is built; loop43-final ticks on answers, not on more code. + R43 ASK (publish contract,
-  MCP server vs deferred client, trust boundary); report committed. ENTRY:
-  R38 closed (fulfilled).
+  **R43 ASK DECIDED 2026-09-10 (verbatim):**
+  **ASK 1 —** "PUBLISH AS BINDING, §1 AND §2 ONLY. Exit codes, the envelope,
+  and the wire/internal type sets have break-verified controls (102F1,
+  102F7, 102F8). §3 — resume, redaction, output-schema — has NO coverage
+  probe. Binding the whole document would claim coverage we do not have,
+  the exact defect this arc has hit eight times. §3 stays advisory and
+  marked as such until it has a probe." → **contract.md §1 + §2 are BINDING;
+  §3 is explicitly ADVISORY-UNTIL-PROBED and must say so in the document.**
+  **LEDGER NOTE (102F9, 2026-09-10): the citation "102F8" in this ASK
+  resolves to nothing.** Searched: `build/plan.md` (the line above is its
+  only occurrence in the repo), the working tree, and `git log --all` — no
+  entry, no commit, no report. The break-verified envelope/type controls that
+  DO exist are **102F1** (envelope: `2 failed` / "event missing v:
+  'thread.started'", was 7 passed), **102F7** (wire/internal type coverage:
+  RED listing `plan.started/plan.rolled_back/plan.completed`, restored green)
+  and **102F5** (real-trace emit break: `AssertionError: loop must emit a
+  real verdict`, 2 failed / 11 passed). Recorded rather than silently mapped:
+  a cited control that does not exist is the 102F7 defect class — a
+  documented artifact that no run can produce.
+  **ASK 2 —** "NO SERVER. Hold at deferred client, recorded as a decision,
+  not a deferral-by-default." → **no MCP server surface is built; the
+  deferral is recorded as a decision in contract.md + the report.**
+  **ASK 3 —** "no new trust boundary authorized. The boundary stays the
+  subprocess + sandbox line. Record it explicitly so it is not re-asked." →
+  **the subprocess + sandbox line IS the trust boundary; stated in
+  THREAT_MODEL.md and contract.md so it is not re-asked.**
+  ENTRY: R38 closed (fulfilled).
 
 ### loop44: cycles (selected from build/research-loop44.md, cycle R44)
 
@@ -2340,14 +2423,32 @@ loop 45's v4.0 acceptance. This section is a plan, not a queue.
   est: 40m |
   verify (R-I): charter probe as written; `uv run pytest -q
   tests/test_budgets.py` → exit 0 (≥5 tests); full suite green.
-- [ ] CYCLE 104 — `loop44:` approval batching + blast-radius limits (post
-  R41): ranked batches replace per-call interrupts; files-touched caps off
-  the change plan | est: 30m |
-  verify (R-I): batch behavior + halt-at-limit probes green; tests green;
-  full suite green.
-- [ ] CYCLE loop44-final — Loop 44 acceptance + R44 ASK (enforcement exit,
-  batching, rule invariant); report committed. ENTRY: R41 closed
-  (starts only after loop41-final).
+  **R44 ASK DECIDED 2026-09-10 (verbatim):**
+  **ASK 1 —** "YES to runtime budget enforcement, with a NEW code 4, not a
+  reuse of 3. Contract §1 says new codes are documented there first:
+  contract.md gets code 4 BEFORE the implementation cycle, and 102F7's
+  coverage gate covers it." → **exit code 4, documented in contract §1 in a
+  cycle that lands BEFORE the implementation; the type-coverage gate must
+  carry the new code.**
+  **ASK 3 —** "CONFIRMED. No self-authored rule may ever raise a budget.
+  Rejections recorded, and the invariant gets a break-verified control like
+  any other claim: break the refusal, watch it go red." → **the invariant
+  gets its own break-verified control.**
+  **ASK 4 —** "CONFIRMED. loop41-final is closed (2bf3476)." → ENTRY
+  CONDITION MET.
+- [ ] CYCLE 104 — `loop44:` approval batching + blast-radius limits — **R44
+  ASK 2 DECLINED, scope (verbatim):** "NO to approval batching. Replacing
+  per-call interrupts with ranked batches weakens a safety interlock and
+  nothing measures interrupts as the bottleneck. Same answer as R42 ASK 1,
+  same reason. R-A." → **NOT BUILT. Recorded as an approved-scope exclusion
+  under R-A: the per-call interrupt stays, and the reason is the same as R42
+  ASK 1 — no measurement behind it, and it relaxes a safety control.**
+  Revisit condition: a measurement showing interrupts are the bottleneck.
+  (Original scope, retained: ranked batches replace per-call interrupts;
+  files-touched caps off the change plan.)
+- [ ] CYCLE loop44-final — Loop 44 acceptance + R44 ASK (all four recorded
+  above, verbatim, at the cycles they authorize); report committed,
+  including the C104 exclusion. ENTRY: R41 closed (fulfilled).
 
 ### loop45: cycles (selected from build/research-loop45.md, cycle R45)
 
@@ -2361,8 +2462,10 @@ loop 45's v4.0 acceptance. This section is a plan, not a queue.
   PROVEN-LIVE / UNIT-ONLY-with-reason / DEAD | est: 30m |
   verify (R-I): endpoint-off verification log committed; tests green; full
   suite green.
-- [ ] CYCLE loop45-final — v4.0 closing acceptance: sweep zero BLOCKED,
-  suite green, version matches tag, THREAT_MODEL refreshed, report
+- [ ] CYCLE loop45-final — v4.0 closing acceptance: sweep zero BLOCKED **or
+  an individually justified exception list** (GATE CORRECTION 2026-09-10 —
+  clause restored, see :1727; each waived row named with reason + what would
+  close it), suite green, version matches tag, THREAT_MODEL refreshed, report
   committed, tag v4.0, Gate 5 handoff. ENTRY: loops 38–44 closed,
   no critic finding above LOW.
 

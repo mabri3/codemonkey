@@ -234,7 +234,14 @@ Loop 46's research cycle is `build/research-loop46.md`, written with this file;
 its selected cycles are appended to `build/plan.md` under
 `### loop46: cycles` and are marked NOT AUTHORIZED pending the user's word.
 
-**Ordering constraint.** Loops 38–45 are open. Loop 38's cycles 74–81 are
-appended and cycle 74 is in flight with a red suite (`build/critic-cycle74.md`,
-fix cycles 74F1–74F6). Nothing in this arc may be built before loop 45's v4.0
-acceptance, and the arc's first cycle is blocked on that gate by construction.
+**Ordering constraint — WAIVED 2026-09-10 (user).** The constraint below was
+self-authored and lived only in this file: it appears in neither AGENTS.md nor
+spec.md. Loops 46-50 are AUTHORIZED and may be built without waiting on loop
+45's v4.0 acceptance. The waiver is recorded at both sites (here and
+`build/plan.md`, §"Forward arc — loops 46-50"). Original text retained for the
+record:
+
+> ~~Ordering constraint.~~ Loops 38–45 are open. Loop 38's cycles 74–81 are
+> appended and cycle 74 is in flight with a red suite (`build/critic-cycle74.md`,
+> fix cycles 74F1–74F6). Nothing in this arc may be built before loop 45's v4.0
+> acceptance, and the arc's first cycle is blocked on that gate by construction.

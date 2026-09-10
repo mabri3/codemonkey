@@ -3069,3 +3069,46 @@ restored → green. First attempt voided (bad surgery → import SyntaxError;
 caught, redone, recorded). Suite follows.
 - **Known issues:** none.
 - **Next step:** held items unchanged (loop42/43-finals, 44–50, asks, R-L).
+
+## 2026-09-10 — CYCLE 102F9: ledger truth + gate corrections
+
+The user answered every outstanding ASK and issued two gate corrections. This
+cycle records them; no product code changed.
+
+- **Files changed:** `build/plan.md`, `build/loops-46-50-proposal.md`.
+- **Ledger truth.** `102F4-F1` and `102F4-F2` still read `- [ ]` although they
+  shipped as **102F5** (`ad726f1`) and **102F6** (`805db08`). Both ticked with
+  supersession notes naming their HEADs, so no later reader builds them twice.
+- **Gate correction 1 — the v4.0 exception clause is RESTORED.** v2.0 and v3.0
+  shipped under "zero BLOCKED **or an individually justified exception
+  list**"; the v4.0 entries (`:1727`, `loop45-final`) had dropped it with no
+  decision recorded anywhere. That was drift. Restored at both sites, with the
+  binding rule that every waived row is named individually with its reason and
+  what would close it — a blanket "endpoint down" waiver is not an exception
+  list.
+- **Gate correction 2 — the loops-46-50 ordering constraint is WAIVED.**
+  "Nothing in this arc may be built before loop 45's v4.0 acceptance" was
+  self-authored and lived only in `loops-46-50-proposal.md` §D: it appears in
+  neither AGENTS.md nor spec.md. **Loops 46-50 are AUTHORIZED.** The waiver is
+  recorded at both sites (the proposal §D and `plan.md`'s forward-arc header),
+  with the original text retained struck-through for the record.
+- **ASK answers recorded verbatim at the cycles they authorize:** R42 1-2 on
+  `loop42-final`; R43 1-3 on `loop43-final`; R44 1-4 on `C103`/`C104`/
+  `loop44-final`. Two are scope **declines** (R42 ASK 1 per-segment tool
+  restriction; R44 ASK 2 approval batching) and are recorded as R-A
+  approved-scope exclusions with their revisit conditions, not deleted.
+- **Finding — a citation that resolves to nothing.** R43 ASK 1 cites
+  break-verified controls "(102F1, 102F7, **102F8**)". `102F8` has no ledger
+  entry, no commit (`git log --all`) and no report; the only occurrence of the
+  string in the repo is the ASK text itself. Recorded at the citation rather
+  than silently mapped: the controls that exist are 102F1 (envelope), 102F7
+  (type coverage) and 102F5 (real-trace emit break). A cited control that does
+  not exist is the 102F7 defect class in a new place.
+- **Numbering decision.** The user's sweep-classification cycle is labeled
+  "CYCLE 103", but plan.md's `CYCLE 103` is the loop44 budget cycle authorized
+  in the same message. It is recorded as **CYCLE 102F10** with the mapping
+  noted in the entry, rather than renumbering shipped loop-44 scope.
+- **Tests run:** none (docs only); suite unchanged at **763 passed, 5 skipped**.
+- **Known issues:** the graph doc half is still key-blocked (unchanged).
+- **Next step:** CYCLE 102F10 — sweep classification before the v4.0 sweep.
+
