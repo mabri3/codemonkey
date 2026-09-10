@@ -160,6 +160,7 @@ remains the user's decision; the evidence record is
   <li class="done">CYCLE 91 (loop 39) &mdash; ENFORCE the stop (ASK DECIDED 2026-09-04, evidence-capped): advisory tried + later failure &rArr; run stops itself, exit <strong>3</strong> (spec §Safety), honest closing on stdout, <code>failure_report.gave_up</code> with advisory/failed turns. Covered by <code>tests/test_enforced_stop.py</code>.</li>
   <li class="done">CYCLE 99 (loop 42) &mdash; capability ladder (L1/L2/L3) + per-task malformed-call metric in eval; live ladder BLOCKED (endpoint down).</li>
   <li class="done">CYCLE 101 (loop 43) &mdash; caller contract v1: exit codes 0/1/2/3, versioned event envelope (v: 1), output/resume guarantees.</li>
+  <li class="done">CYCLE 102F10 &mdash; v4.0 sweep: the 9 BLOCKED rows are now classified and 9/9 are green with a run behind each against a scripted endpoint (5 need no model at all, 4 keep a named model-clause residual).</li>
   <li class="done">CYCLE 102F9 &mdash; ledger truth: superseded fix cycles ticked with their HEADs; v4.0 gate clause restored; loops 46-50 authorized.</li>
   <li class="done">CYCLE 102F7 &mdash; contract §2 coverage gate: every documented event type proven producible on binary streams (verify.* now forwarded); raw tool events declared internal.</li>
   <li class="done">CYCLE 102F6 &mdash; plan lifecycle events now ride the <code>--json</code> stream per contract §2; charter probe runs through the released binary via stub provider.</li>

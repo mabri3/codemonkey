@@ -2323,7 +2323,7 @@ appended by its own research cycle, with loops 42-45 closed in parallel.
   verify: `grep -c '^- \[ \] CYCLE 102F4-F'` in plan.md → 0; the exception
   clause appears at both v4.0 gate sites; the waiver appears at both sites
   of the ordering constraint; no ledger entry cites 102F8 as built.
-- [ ] CYCLE 102F10 — sweep classification BEFORE the v4.0 sweep (user's ASK
+- [x] CYCLE 102F10 — sweep classification BEFORE the v4.0 sweep (user's ASK
   calls this "CYCLE 103"; renumbered because plan.md's `CYCLE 103` is the
   loop44 budget cycle authorized in the same message — the mapping is
   recorded so the instruction stays traceable). Split every BLOCKED row of
@@ -2340,6 +2340,25 @@ appended by its own research cycle, with loops 42-45 closed in parallel.
   `build/sweep-classification.md` carries the two counts, the per-row class,
   and the exception list; the classification control breaks RED when a row is
   moved to green without a run behind it; full suite green.
+  **DONE 2026-09-10.** `build/sweep_endpoint_gated.py` runs all nine formerly-
+  BLOCKED rows end-to-end through the released binary against a fresh
+  `build/stub_provider.py` per row, with replies CONDITIONAL ON REQUEST
+  CONTENT (rule fires iff the request carried `banana` / the schema / `zebra` /
+  the diff text). Result: **9/9 green with a run behind each — 5 with no model
+  clause at all (A6, A7, A10, A11, A12; A7 proves stdin reached the wire, A10
+  proves schema injection, A11 proves history replay on resume, A16 proves diff
+  assembly), 4 keeping a NAMED residual (A4 live listing, A5 model compliance,
+  A9 tool SELECTION, A16 live prose)**. Exact counts printed by the sweep:
+  `classified 9 BLOCKED rows: 9 endpoint-gated -> 9 green with a run behind
+  them (5 with no model clause, 4 with a named residual)`. `SWEEP_ENDPOINT_STUB=1`
+  gives the sweep zero BLOCKED rows and prints the exception list per row; the
+  variable is OFF by default so the shipped sweep is unchanged. New control
+  `tests/test_sweep_classification.py` (14 tests) re-derives every green from
+  its evidence log — **it caught two real defects in this cycle's own work
+  (A11/A12 evidence logs written empty; the marker parser reading only the
+  first run of a multi-run row)**, and the break run (delete
+  `sweep-A7.log`, the artifact, not a stand-in) went **14 passed → 2 failed
+  naming A7 → 14 passed**. Suite 763 → **777 passed, 5 skipped**.
 - [x] CYCLE 102F6 — F2 (LOW): C97 probe CLI-addressable. DONE (binary path,
   not reword): `build/stub_provider.py` (scripted OpenAI-compatible turns
   over real HTTP, JSON+SSE, zero product changes) + `tests/test_changeplan_cli.py`

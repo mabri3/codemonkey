@@ -1,0 +1,128 @@
+{
+  "cycle": "102F10",
+  "generated": "2026-09-10T17:42:49Z",
+  "method": "build/sweep_endpoint_gated.py \u2014 each row run end-to-end through the released binary against build/stub_provider.py, replies conditional on request content",
+  "counts": {
+    "blocked_rows_classified": 9,
+    "endpoint_gated": 9,
+    "model_gated": 0,
+    "green_with_run_behind_it": 9,
+    "green_with_no_model_clause": 5,
+    "green_with_named_residual": 4,
+    "red": 0
+  },
+  "rows": [
+    {
+      "row": "A4",
+      "class": "ENDPOINT-GATED",
+      "status": "PASS",
+      "detail": "exit=0 listing='stub-model'",
+      "sweep_mirror": "codemonkey models --provider local",
+      "evidence": "build/acceptance_outputs/sweep-A4.log",
+      "residual_model_clause": "spec.md A4 says \"(live server call)\": a listing served by the configured box's own /v1/models. Closed by: endpoint up, re-run A4 with no stub.",
+      "green_is_full": false
+    },
+    {
+      "row": "A5",
+      "class": "ENDPOINT-GATED",
+      "status": "PASS",
+      "detail": "exit=0 out='pong' (rule fires only if the prompt reached the wire)",
+      "sweep_mirror": "Reply with exactly the word pong and nothing else.",
+      "evidence": "build/acceptance_outputs/sweep-A5.log",
+      "residual_model_clause": "a real model obeying a one-word instruction. The stub proves the prompt reached the endpoint and the reply was rendered; it cannot prove compliance. Closed by: endpoint up, live A5.",
+      "green_is_full": false
+    },
+    {
+      "row": "A6",
+      "class": "ENDPOINT-GATED",
+      "status": "PASS",
+      "detail": "exit=0 json-lines=4 unparseable=0 types=['item.completed', 'thread.started', 'turn.completed', 'turn.started']",
+      "sweep_mirror": "codemonkey exec --json",
+      "evidence": "build/acceptance_outputs/sweep-A6.log",
+      "residual_model_clause": null,
+      "green_is_full": true
+    },
+    {
+      "row": "A7",
+      "class": "ENDPOINT-GATED",
+      "status": "PASS",
+      "detail": "exit=0 out='banana' (rule fires only if stdin reached the wire)",
+      "sweep_mirror": "uv run codemonkey exec -",
+      "evidence": "build/acceptance_outputs/sweep-A7.log",
+      "residual_model_clause": null,
+      "green_is_full": true
+    },
+    {
+      "row": "A9",
+      "class": "ENDPOINT-GATED",
+      "status": "PASS",
+      "detail": "exit=0 stdout-has-sentinel=True stderr-has-command=True stderr-has-exit0=True",
+      "sweep_mirror": "echo codemonkey_tool_test",
+      "evidence": "build/acceptance_outputs/sweep-A9.log",
+      "residual_model_clause": "spec.md A9 says \"prompt protocol, live model\": that a real 27B *chooses* the shell tool from a natural instruction. The stub proves the whole tool loop executes \u2014 parse, sandbox, subprocess, output, feed-back \u2014 end to end through the released binary; it cannot prove tool SELECTION. Closed by: endpoint up, live A9.",
+      "green_is_full": false
+    },
+    {
+      "row": "A10",
+      "class": "ENDPOINT-GATED",
+      "status": "PASS",
+      "detail": "exit=0 payload={'project_name': 'codemonkey', 'programming_languages': ['Python']} (rule fires only if the schema reached the wire)",
+      "sweep_mirror": "--output-schema build/schema-repo.json",
+      "evidence": "build/acceptance_outputs/sweep-A10.log",
+      "residual_model_clause": null,
+      "green_is_full": true
+    },
+    {
+      "row": "A11",
+      "class": "ENDPOINT-GATED",
+      "status": "PASS",
+      "detail": "exit=0 thread=840e9b662ec5 out='zebra' (rule fires only if the HISTORY reached the wire)",
+      "sweep_mirror": "exec resume",
+      "evidence": "build/acceptance_outputs/sweep-A11.log",
+      "residual_model_clause": null,
+      "green_is_full": true
+    },
+    {
+      "row": "A12",
+      "class": "ENDPOINT-GATED",
+      "status": "PASS",
+      "detail": "exit=0 thread-in-listing=True",
+      "sweep_mirror": "codemonkey sessions",
+      "evidence": "build/acceptance_outputs/sweep-A12.log",
+      "residual_model_clause": null,
+      "green_is_full": true
+    },
+    {
+      "row": "A16",
+      "class": "ENDPOINT-GATED",
+      "status": "PASS",
+      "detail": "exit=0 chars=1110 (rule fires only if the DIFF content reached the wire)",
+      "sweep_mirror": "review --uncommitted",
+      "evidence": "build/acceptance_outputs/sweep-A16.log",
+      "residual_model_clause": "spec.md A16 says \"(live review run)\": review prose written by a real model. The stub proves the diff was assembled into the prompt and \u2265400 chars were rendered. Closed by: endpoint up, live A16.",
+      "green_is_full": false
+    }
+  ],
+  "exception_list": [
+    {
+      "row": "A4",
+      "waived_clause": "spec.md A4 says \"(live server call)\": a listing served by the configured box's own /v1/models. Closed by: endpoint up, re-run A4 with no stub.",
+      "evidence": "build/acceptance_outputs/sweep-A4.log"
+    },
+    {
+      "row": "A5",
+      "waived_clause": "a real model obeying a one-word instruction. The stub proves the prompt reached the endpoint and the reply was rendered; it cannot prove compliance. Closed by: endpoint up, live A5.",
+      "evidence": "build/acceptance_outputs/sweep-A5.log"
+    },
+    {
+      "row": "A9",
+      "waived_clause": "spec.md A9 says \"prompt protocol, live model\": that a real 27B *chooses* the shell tool from a natural instruction. The stub proves the whole tool loop executes \u2014 parse, sandbox, subprocess, output, feed-back \u2014 end to end through the released binary; it cannot prove tool SELECTION. Closed by: endpoint up, live A9.",
+      "evidence": "build/acceptance_outputs/sweep-A9.log"
+    },
+    {
+      "row": "A16",
+      "waived_clause": "spec.md A16 says \"(live review run)\": review prose written by a real model. The stub proves the diff was assembled into the prompt and \u2265400 chars were rendered. Closed by: endpoint up, live A16.",
+      "evidence": "build/acceptance_outputs/sweep-A16.log"
+    }
+  ]
+}

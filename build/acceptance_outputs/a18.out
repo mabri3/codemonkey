@@ -37,6 +37,10 @@
 │                model needed).                                                │
 │ undo           Undo: restore the most recent checkpoint (files snapshotted   │
 │                pre-mutation).                                                │
+│ rollback       Rollback a change plan whole (loop41): restore pre-plan       │
+│                bytes, delete                                                 │
+│                plan-created files. `undo` keeps file semantics; this is the  │
+│                plan verb.                                                    │
 │ eval           Run a golden evaluation suite against the real exec path.     │
 │ digest         Plain-text digest of one run (thread).                        │
 │ rules-compile  Journal failures → draft permission rules.                    │

@@ -81,11 +81,57 @@ except Exception:
 fi
 LIVE_BLOCKED="${LIVE_BLOCKED:-0}"
 
+# 102F10: one BLOCKED verdict for nine rows hid two different blockers. Rows
+# needing only an HTTP server that speaks the API are ENDPOINT-GATED and the
+# scripted endpoint in build/stub_provider.py retires them HERE, with the real
+# binary and the real assertions (that is how 102F6/102F7 ran with the box
+# off). Rows asserting something only a real model can establish keep a NAMED
+# residual. OFF by default: unset, this sweep behaves exactly as before.
+SWEEP_ENDPOINT_STUB="${SWEEP_ENDPOINT_STUB:-0}"
+STUB_RAN=0
+if [ "$LIVE_BLOCKED" = "1" ] && [ "$SWEEP_ENDPOINT_STUB" = "1" ]; then
+  note "--- 102F10: endpoint-gated rows via scripted endpoint (stub) ---"
+  if uv run python build/sweep_endpoint_gated.py 2>&1 | tee -a "$OUT/summary.txt"; then
+    STUB_RAN=1
+  else
+    note "102F10 driver reported a RED row — see the table above; those rows stay unproven"
+  fi
+fi
+
+# Read one row's verdict out of the driver's classification.
+stub_verdict() {
+  [ "$STUB_RAN" = "1" ] || return 0
+  python3 -c "
+import json
+d = json.load(open('build/sweep-classification.json'))
+for r in d['rows']:
+    if r['row'] == '$1':
+        print(r['status'] + '|' + (r['residual_model_clause'] or ''))
+        break
+" 2>/dev/null
+}
+
 # SWEEP-F1: one gate for every probe that needs a live endpoint. A blocked
 # probe is recorded as BLOCKED with its reason — never green, never silently
-# red for an environment condition.
+# red for an environment condition. 102F10: where the driver proved the row
+# against a scripted endpoint, the row is reported with its CLASS and the
+# evidence behind it, and any waived model clause is named per row.
 live_blocked() {
   if [ "$LIVE_BLOCKED" = "1" ]; then
+    V=$(stub_verdict "$1")
+    case "$V" in
+      PASS\|*)
+        RES="${V#PASS|}"
+        if [ -n "$RES" ]; then
+          note "$1 ENDPOINT-GATED PASS via stub ($OUT/sweep-$1.log); MODEL-GATED residual waived: $RES"
+        else
+          note "$1 ENDPOINT-GATED PASS via stub ($OUT/sweep-$1.log) — no model clause"
+        fi
+        return 0 ;;
+      FAIL*)
+        note "$1 ENDPOINT-GATED FAIL via stub ($OUT/sweep-$1.log) — the run behind it went red"
+        return 0 ;;
+    esac
     note "$1 BLOCKED (home llama.cpp wedged; no fallback provider configured)"
     return 0
   fi
@@ -258,3 +304,20 @@ uv run pytest tests/test_strategies.py -q >"$OUT/a20.out" 2>&1
 note "A20 exit=$?  $(tail -1 "$OUT/a20.out")"
 
 note "=== sweep complete ==="
+
+# 102F10: the v4.0 exception list, named per row. A blanket "endpoint down"
+# waiver is not an exception list.
+if [ "$STUB_RAN" = "1" ]; then
+  note "=== v4.0 exception list (MODEL-GATED clauses, one per row) ==="
+  python3 -c "
+import json
+d = json.load(open('build/sweep-classification.json'))
+c = d['counts']
+print(f\"classified {c['blocked_rows_classified']} BLOCKED rows: \"
+      f\"{c['endpoint_gated']} endpoint-gated -> {c['green_with_run_behind_it']} green with a run behind them (\"
+      f\"{c['green_with_no_model_clause']} with no model clause, \"
+      f\"{c['green_with_named_residual']} with a named residual)\")
+for e in d['exception_list']:
+    print(f\"  {e['row']}: {e['waived_clause']}\")
+" | tee -a "$OUT/summary.txt"
+fi

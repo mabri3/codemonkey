@@ -1,0 +1,18 @@
+# CYCLE 102F10 — evidence for row A16 (ENDPOINT-GATED, PASS)
+# binary: /Users/bharris/Programs/CodeMonkey/.venv/bin/codemonkey
+# assertion mirrors acceptance_sweep.sh: 'review --uncommitted'
+# verdict detail: exit=0 chars=1110 (rule fires only if the DIFF content reached the wire)
+
+# scripted endpoint http://127.0.0.1:50081/v1
+# script: {"model": "stub-model", "turns": ["NO-DIFF-IN-PROMPT"], "rules": [{"contains": "SWEEP102F10", "reply": "## Review verdict\n\nThe uncommitted change adds one scratch marker line to the repository README. There is no logic change, so there is no behavioural risk in the diff itself. The only observation is that the marker is a test artifact: if it were meant to ship, it would need a purpose in the documentation rather than a temporary sweep sentinel. No security-relevant surface is touched, no dependency moves, and no public interface changes shape. Recommendation: this diff is safe to discard; it exists to give the reviewer a non-empty diff to summarise.\n## Review verdict\n\nThe uncommitted change adds one scratch marker line to the repository README. There is no logic change, so there is no behavioural risk in the diff itself. The only observation is that the marker is a test artifact: if it were meant to ship, it would need a purpose in the documentation rather than a temporary sweep sentinel. No security-relevant surface is touched, no dependency moves, and no public interface changes shape. Recommendation: this diff is safe to discard; it exists to give the reviewer a non-empty diff to summarise.\n"}]}
+
+$ review --uncommitted
+[exit 0]
+--- stdout ---
+## Review verdict
+
+The uncommitted change adds one scratch marker line to the repository README. There is no logic change, so there is no behavioural risk in the diff itself. The only observation is that the marker is a test artifact: if it were meant to ship, it would need a purpose in the documentation rather than a temporary sweep sentinel. No security-relevant surface is touched, no dependency moves, and no public interface changes shape. Recommendation: this diff is safe to discard; it exists to give the reviewer a non-empty diff to summarise.
+## Review verdict
+
+The uncommitted change adds one scratch marker line to the repository README. There is no logic change, so there is no behavioural risk in the diff itself. The only observation is that the marker is a test artifact: if it were meant to ship, it would need a purpose in the documentation rather than a temporary sweep sentinel. No security-relevant surface is touched, no dependency moves, and no public interface changes shape. Recommendation: this diff is safe to discard; it exists to give the reviewer a non-empty diff to summarise.
+--- stderr --- (empty)

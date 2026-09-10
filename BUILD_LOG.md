@@ -3112,3 +3112,50 @@ cycle records them; no product code changed.
 - **Known issues:** the graph doc half is still key-blocked (unchanged).
 - **Next step:** CYCLE 102F10 — sweep classification before the v4.0 sweep.
 
+## 2026-09-10 — CYCLE 102F10: sweep classification (endpoint-gated vs model-gated)
+
+Nine rows (A4, A5, A6, A7, A9, A10, A11, A12, A16) reported one BLOCKED verdict
+when no endpoint answers. That verdict conflates two blockers, and only one of
+them justifies waiving a row at v4.0.
+
+- **Files changed:** `build/sweep_endpoint_gated.py` (new), `build/stub_provider.py`
+  (rules = conditional replies), `build/acceptance_sweep.sh` (stub branch +
+  named exception list), `tests/test_sweep_classification.py` (new, 14 tests),
+  `build/sweep-classification.{json,md}` + `build/acceptance_outputs/sweep-*.log`
+  (evidence, committed).
+- **The split.** A row is ENDPOINT-GATED when every clause of its criterion is
+  a property of OUR code observable through any server speaking the API; it is
+  MODEL-GATED when some clause asserts something only a real model can
+  establish. **9 rows classified: 9 endpoint-gated, 0 model-gated as whole
+  rows, 9 green with a run behind each.** Of those, **5 carry no model clause
+  at all** (A6 envelope, A7 stdin→wire, A10 schema injection, A11 history
+  replay on resume, A12 persistence listing) and **4 keep a named residual**:
+  A4 (a live `/v1/models` listing), A5 (a model obeying an instruction), A9 (a
+  model *choosing* a tool), A16 (a model writing review prose).
+- **The stub is an oracle, not a tape.** Every reply is conditional on request
+  content, so a green is evidence the binary actually sent the thing:
+  `banana` iff the request carried `banana`; the schema payload iff
+  `project_name` was in the prompt; `zebra` iff the HISTORY was replayed;
+  review prose iff the scratch diff reached the wire. A fixed tape would pass
+  even when the plumbing was broken.
+- **Probe results (literal).** `SWEEP_ENDPOINT_STUB=1 bash build/acceptance_sweep.sh`
+  → A1-A20 all report, **zero BLOCKED**, printing
+  `classified 9 BLOCKED rows: 9 endpoint-gated -> 9 green with a run behind
+  them (5 with no model clause, 4 with a named residual)`. A9's stub run shows
+  the real tool loop: `stdout-has-sentinel=True stderr-has-command=True
+  stderr-has-exit0=True`. Suite inside the sweep: **777 passed, 5 skipped**.
+- **The control, and what it caught.** `tests/test_sweep_classification.py`
+  re-derives every green from its evidence log rather than reading the
+  markdown claim. It failed twice during this cycle on REAL defects in this
+  cycle's own work: (1) A11/A12's evidence buffer was cleared after their runs,
+  so their logs would have been empty — greens citing no run; (2) the marker
+  parser read only the first run of a multi-run row. Both fixed, both recorded.
+  **Break run** (the artifact, not a stand-in): `mv sweep-A7.log` away →
+  **14 passed → 2 failed naming A7 → restored 14 passed**.
+- **Default is unchanged.** With `SWEEP_ENDPOINT_STUB` unset the sweep behaves
+  exactly as before; the stub branch only runs when the endpoint is down AND
+  the variable is set.
+- **Known issues:** the four residuals close only on a live endpoint; the graph
+  doc half is still key-blocked.
+- **Next step:** loop42-final (R42 ASK 1 declined / ASK 2 accepted, recorded).
+

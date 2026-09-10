@@ -1,0 +1,16 @@
+# CYCLE 102F10 — evidence for row A5 (ENDPOINT-GATED, PASS)
+# binary: /Users/bharris/Programs/CodeMonkey/.venv/bin/codemonkey
+# assertion mirrors acceptance_sweep.sh: 'Reply with exactly the word pong and nothing else.'
+# verdict detail: exit=0 out='pong' (rule fires only if the prompt reached the wire)
+
+# scripted endpoint http://127.0.0.1:50059/v1
+# script: {"model": "stub-model", "turns": ["NO-PROMPT-RECEIVED"], "rules": [{"contains": "pong", "reply": "pong"}]}
+
+$ exec Reply with exactly the word pong and nothing else.
+[exit 0]
+--- stdout ---
+pong
+--- stderr ---
+pong[agent] pong
+
+

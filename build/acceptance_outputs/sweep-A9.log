@@ -1,0 +1,20 @@
+# CYCLE 102F10 — evidence for row A9 (ENDPOINT-GATED, PASS)
+# binary: /Users/bharris/Programs/CodeMonkey/.venv/bin/codemonkey
+# assertion mirrors acceptance_sweep.sh: 'echo codemonkey_tool_test'
+# verdict detail: exit=0 stdout-has-sentinel=True stderr-has-command=True stderr-has-exit0=True
+
+# scripted endpoint http://127.0.0.1:50071/v1
+# script: {"model": "stub-model", "turns": ["codemonkey_tool_test"], "rules": [{"contains": "codemonkey_tool_test", "reply": "TOOL_CALL: {\"name\": \"shell\", \"arguments\": {\"command\": \"echo codemonkey_tool_test\"}}", "once": true}]}
+
+$ exec --sandbox workspace-write --approval never Use the shell tool to run: echo codemonkey_tool_test. Then reply with exactly the command output.
+[exit 0]
+--- stdout ---
+codemonkey_tool_test
+--- stderr ---
+TOOL_CALL: {"name": "shell", "arguments": {"command": "echo codemonkey_tool_test"}}[notice] native turn carried prompt-protocol tool call(s); parsing them
+$ echo codemonkey_tool_test
+[exit 0] codemonkey_tool_test
+
+codemonkey_tool_test[agent] codemonkey_tool_test
+
+

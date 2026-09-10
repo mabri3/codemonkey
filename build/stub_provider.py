@@ -12,6 +12,21 @@ repeats (lets stuck-detectors/advisories fire honestly). GET /v1/models
 answers so provider standup succeeds. Honors `stream:true` with SSE
 (`delta.content` chunks + `[DONE]`), plain JSON otherwise.
 
+102F10 — **rules make the stub an oracle, not a tape.** Optional:
+
+    {"model": "stub-model",
+     "turns": ["<fallback reply>"],
+     "rules": [{"contains": "<substring>", "reply": "<content>",
+                "once": false}, ...]}
+
+A rule fires when `contains` appears anywhere in the REQUEST (system prompt
++ message history, serialized). That is the whole point: a reply that is
+only produced when the binary actually sent some text is EVIDENCE that it
+sent it — "reply `banana` iff the request carried `banana`" fails loudly
+when stdin was not read, where a fixed tape would pass anyway. `once: true`
+fires at most once (script a tool call, then let `turns` supply the final
+answer). Rules are checked in order, first match wins.
+
 Only stdlib. Test tooling — never imported by src/.
 """
 
@@ -22,6 +37,8 @@ import sys
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 TURNS: list = []
+RULES: list = []
+MODEL = "stub"
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -39,7 +56,7 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         if self.path.rstrip("/").endswith("/models"):
-            self._send(json.dumps({"data": [{"id": "stub"}]}).encode(),
+            self._send(json.dumps({"data": [{"id": MODEL}]}).encode(),
                        "application/json")
         else:
             self.send_error(404)
@@ -54,6 +71,16 @@ class Handler(BaseHTTPRequestHandler):
         idx = min(state["n"], len(TURNS) - 1)
         state["n"] += 1
         content = TURNS[idx] if TURNS else "done"
+        # 102F10: rules are checked against what the binary ACTUALLY sent.
+        text = json.dumps(body.get("messages") or [], sort_keys=True)
+        for rule in RULES:
+            if not rule.get("contains") or rule["contains"] not in text:
+                continue
+            if rule.get("once") and rule.get("_fired"):
+                continue
+            rule["_fired"] = True
+            content = rule.get("reply", content)
+            break
         if body.get("stream"):
             chunks = [
                 {"choices": [{"delta": {"content": content[: len(content) // 2 + 1]},
@@ -75,10 +102,13 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def main(argv: list) -> int:
-    global TURNS
+    global TURNS, RULES, MODEL
     port = int(argv[1])
     with open(argv[2]) as f:
-        TURNS = json.load(f)["turns"]
+        script = json.load(f)
+    TURNS = script["turns"]
+    RULES = [dict(r) for r in script.get("rules", [])]
+    MODEL = script.get("model", "stub")
     assert TURNS, "script needs at least one turn"
     server = HTTPServer(("127.0.0.1", port), Handler)
     server._stub_state = {"n": 0}  # type: ignore[attr-defined]

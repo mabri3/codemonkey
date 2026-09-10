@@ -1,0 +1,17 @@
+# CYCLE 102F10 — evidence for row A7 (ENDPOINT-GATED, PASS)
+# binary: /Users/bharris/Programs/CodeMonkey/.venv/bin/codemonkey
+# assertion mirrors acceptance_sweep.sh: 'uv run codemonkey exec -'
+# verdict detail: exit=0 out='banana' (rule fires only if stdin reached the wire)
+
+# scripted endpoint http://127.0.0.1:50067/v1
+# script: {"model": "stub-model", "turns": ["NO-STDIN-PROMPT"], "rules": [{"contains": "banana", "reply": "banana"}]}
+
+$ exec -
+< stdin: 'Reply with exactly the word banana and nothing else.'
+[exit 0]
+--- stdout ---
+banana
+--- stderr ---
+banana[agent] banana
+
+
