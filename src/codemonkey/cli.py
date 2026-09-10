@@ -1192,5 +1192,80 @@ def _dispatch_exec_resume() -> None:
         sys.argv = [sys.argv[0], "exec-resume", *argv[2:]]
 
 
+@app.command()
+def evidence(
+    verb: Annotated[
+        str,
+        typer.Argument(help="pack <thread> | verify <pack-file>"),
+    ] = "pack",
+    target: Annotated[
+        str,
+        typer.Argument(help="thread id (pack) or pack file path (verify)"),
+    ] = "",
+    out: Annotated[
+        str,
+        typer.Option("--out", help="write the pack JSON here (default: stdout summary)"),
+    ] = "",
+) -> None:
+    """Evidence pack (loop45, cycle 105): a run's claims bound to the journal
+    records behind them, hash-chained so edits fail verification.
+
+    `pack <thread>` cuts a pack (redacted before hashing); `verify <file>`
+    re-checks it BOTH internally and against the journal on disk.
+    """
+    import json as _json
+    from pathlib import Path as _Path
+
+    from . import evidence as ev
+
+    if verb == "pack":
+        if not target:
+            typer.echo("usage: codemonkey evidence pack <thread-id> [--out FILE]",
+                       err=True)
+            raise typer.Exit(2)
+        from . import __version__ as _v
+        from .config import load_config
+        from .redact import needles_from_config
+
+        try:
+            needles = needles_from_config(load_config())
+        except Exception:
+            needles = []
+        try:
+            doc = ev.pack(target, workdir=_Path.cwd(), needles=needles,
+                          version=_v)
+        except FileNotFoundError as exc:
+            typer.echo(f"error: {exc}", err=True)
+            raise typer.Exit(1) from None
+        if out:
+            _Path(out).write_text(_json.dumps(doc, indent=2) + "\n")
+            typer.echo(f"wrote {out} ({doc['counts']['records']} records, "
+                       f"{doc['redactions']} redactions, head {doc['head'][:16]}…)")
+        else:
+            typer.echo(ev.render(doc))
+        raise typer.Exit(0)
+
+    if verb == "verify":
+        if not target:
+            typer.echo("usage: codemonkey evidence verify <pack-file>", err=True)
+            raise typer.Exit(2)
+        try:
+            doc = _json.loads(_Path(target).read_text())
+        except (OSError, ValueError) as exc:
+            typer.echo(f"error: cannot read pack {target}: {exc}", err=True)
+            raise typer.Exit(2) from None
+        result = ev.verify_against_journal(doc)
+        typer.echo(f"internal: {'ok' if result['internal'] else 'BROKEN'} · "
+                   f"journal: {result['journal']} · records {result['records']}")
+        for p in result["problems"]:
+            typer.echo(f"  - {p}", err=True)
+        typer.echo("PACK VERIFIES" if result["ok"] else "PACK DOES NOT VERIFY")
+        raise typer.Exit(0 if result["ok"] else 1)
+
+    typer.echo(f"error: unknown evidence verb {verb!r} "
+               f"(valid: pack, verify)", err=True)
+    raise typer.Exit(2)
+
+
 if __name__ == "__main__":
     main()

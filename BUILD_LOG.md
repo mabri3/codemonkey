@@ -3257,6 +3257,36 @@ them justifies waiving a row at v4.0.
 - **Known issues:** none; C104 is declined scope, recorded under R-A.
 - **Next step:** loop44-final, then C105/C106 and the v4.0 sweep.
 
+## 2026-09-10 — CYCLE 105 (loop45): evidence pack + hash-chained journal
+
+- **Files changed:** `src/codemonkey/evidence.py` (new),
+  `src/codemonkey/cli.py` (`evidence pack|verify` verbs),
+  `tests/test_evidence.py` (new, 16 tests), `build/evidence_probe.py` (new).
+- **What a pack is.** The run's claims, each citing the journal record INDEXES
+  behind it; every string redacted BEFORE hashing; every record chained
+  (`h_i = sha256(h_{i-1} ‖ canonical(record_i))`) so the head commits to the
+  whole sequence. Verification runs two independent checks — internal
+  consistency, and consistency against the journal on disk — and reports both.
+- **Entry probe (R-I, through the CLI).** `build/evidence_probe.py`:
+  scripted-endpoint run → `codemonkey evidence pack` *exit 0, 2 records, head
+  d1c637ae273d26b8…*; `codemonkey evidence verify` *exit 0, `internal: ok ·
+  journal: True`, PACK VERIFIES*; **tampered record → exit 1, `internal:
+  BROKEN`, PACK DOES NOT VERIFY**.
+- **Break run — first attempt VOID, and that is the finding.** `link()`
+  changed to hash the record alone → **14 passed on broken code**. My tests
+  did not discriminate a chain from a set of per-record digests, because the
+  positional comparison already catches reordering. Added the missing test
+  (the head must change when an EARLIER record changes); the same break then
+  went **1 failed / 15 passed** with `AssertionError: the head did not change
+  when an EARLIER record changed` and two identical digests printed
+  (`007ccf2c…`); restored → 16 passed.
+- **A second defect, in the probe itself:** its first run journaled nothing,
+  because the scripted tool call's trigger text was not in the prompt — the
+  probe asserted on a run that had done nothing. Fixed and re-run.
+- **Tests run:** `uv run pytest -q` → **814 passed, 5 skipped** (was 797/5).
+- **Known issues:** none.
+- **Next step:** C106 — endpoint-off verification + register completion.
+
 ## 2026-09-10 — CYCLE loop44-final: Loop 44 acceptance
 
 - **Files changed:** `build/BUILD_REPORT.md` (Loop 44 section), `build/plan.md`.

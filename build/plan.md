@@ -2514,11 +2514,36 @@ appended by its own research cycle, with loops 42-45 closed in parallel.
 
 ### loop45: cycles (selected from build/research-loop45.md, cycle R45)
 
-- [ ] CYCLE 105 — `loop45:` evidence pack + hash-chained journal: claims
+- [x] CYCLE 105 — `loop45:` evidence pack + hash-chained journal: claims
   linked to journal/command/diff/test evidence, redacted; broken chain
   fails verification | est: 40m |
   verify (R-I): pack from a real run; `uv run pytest -q
   tests/test_evidence.py` → exit 0 (≥5 tests); full suite green.
+  **DONE 2026-09-10.** `src/codemonkey/evidence.py` + the `codemonkey
+  evidence pack|verify` CLI verbs. A pack binds each of the run's claims to
+  the journal records behind it (`evidence` is a list of record INDEXES; a
+  claim with no evidence would be a bare assertion), redacts BEFORE hashing
+  (the pack is a document meant to be handed on), and chains
+  `h_i = sha256(h_{i-1} ‖ canonical(record_i))` so the head commits to every
+  record. Verification is TWO independent checks — internal (the pack's own
+  bytes reproduce its head) and against the live journal on disk — and both
+  must pass; a pack that passed only the first would be a consistent fiction.
+  **Entry probe (R-I, CLI, not pytest):** `build/evidence_probe.py` drives the
+  released binary against the scripted endpoint → `codemonkey evidence pack
+  <thread> --out pack.json` → *exit 0, 2 records, head `d1c637ae273d26b8…`*;
+  `codemonkey evidence verify pack.json` → *exit 0, `internal: ok · journal:
+  True · records 2`, PACK VERIFIES*; tampered record → **exit 1, `internal:
+  BROKEN`, PACK DOES NOT VERIFY**.
+  **Break run, first attempt VOID — and that is the finding.** With `link()`
+  hashing the record alone (prev link dropped), the suite was **14 passed on
+  broken code**: reordering was still caught by positional comparison, so
+  nothing pinned the chaining itself. Added
+  `test_the_head_commits_to_every_record_not_just_the_last` — the property
+  that actually distinguishes a chain from per-record digests — and the same
+  break then went **1 failed / 15 passed** with `AssertionError: the head did
+  not change when an EARLIER record changed` and both digests printed
+  identical (`007ccf2c…`); restored → **16 passed**. Suite 797 → **814
+  passed, 5 skipped**.
 - [ ] CYCLE 106 — `loop45:` endpoint-off verification + register completion:
   pack verifies with the model endpoint switched off; every register row
   PROVEN-LIVE / UNIT-ONLY-with-reason / DEAD | est: 30m |
