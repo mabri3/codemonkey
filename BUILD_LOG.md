@@ -3814,3 +3814,33 @@ them justifies waiving a row at v4.0.
   pinned in `test_lessons.py`.
 - **Next step:** CYCLE 112 — loop 47 acceptance + report (sweep, register,
   BUILD_REPORT section; the playbook-on/off arms hook named for loop 50).
+
+## 2026-09-10/11 — CYCLE 112 (loop47): loop 47 acceptance + the arms hook
+
+- **Files changed:** `src/codemonkey/skills_arms.py` (ARM_ENV: playbook-on/off
+  arms; both-store contamination via `_contamination_violations`; generic
+  on/off extraction; render iterates the actual arms), `cli.py` (eval routes
+  playbook-* labels), `build/probes/cycle112-arms-probe.out`,
+  `build/acceptance_outputs/summary-loop47-close.txt` + run log,
+  `build/BUILD_REPORT.md` (loop-47 section), register (`skills_arms` row
+  extended), plan tick, features.html.
+- **Probe results (literal, R-I):** `uv run codemonkey eval
+  build/suites/trivial.yaml --arms playbook-on,playbook-off` → **exit 0** —
+  both arms ran (the `[playbook] 0 admitted entries; budget: unlimited`
+  accounting line printed during the `playbook-on` arm), pass rates `None`
+  (never 0), forward transfer + retention **BLOCKED-with-reason** (the
+  re-probed `.176` Connection refused, provider call count visible),
+  contamination `checked 0 · CLEAN` (now covering BOTH stores), verdict
+  `BLOCKED`.
+- **Sweep (shipped form):** A1 `codemonkey 4.0.0`; offline rows exit 0;
+  nine live rows BLOCKED with reason (v4.0 exception list unchanged —
+  endpoint re-probed, still refused); **A15: 903 passed, 5 skipped**.
+  Post-sweep canonical suite: 903/5.
+- **Register:** loop-47 rows PROVEN-LIVE, transcripts named; no UNVALIDATED
+  row. Deletion verdict for the lessons store recorded (C111 row).
+- **Verdict:** **LOOP 47 COMPLETE.** The playbook mechanism is PROVEN-LIVE;
+  its live R-K number is **UNMEASURED-WITH-DATE** (one command when an
+  endpoint answers: `eval <suite> --arms playbook-on,playbook-off`).
+- **Next step:** CYCLE R48 — loop 48 research (parallel-distill-refine +
+  recursive tournament voting; structured rollout summaries; the R-F cost
+  gate), then CYCLE 113+.

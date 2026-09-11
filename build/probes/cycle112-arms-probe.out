@@ -1,0 +1,24 @@
+{"type": "thread.started", "thread_id": "30b9b35ac78e", "v": 1}
+[playbook] 0 admitted entries; budget: unlimited
+{"type": "turn.started", "thread_id": "30b9b35ac78e", "v": 1}
+{"type": "error", "message": "transport error contacting http://192.168.50.176:8080/v1/chat/completions: [Errno 61] Connection refused (after 4 attempts)", "v": 1}
+{"type": "thread.started", "thread_id": "72db50c48825", "v": 1}
+[playbook] 0 admitted entries; budget: unlimited
+{"type": "turn.started", "thread_id": "72db50c48825", "v": 1}
+{"type": "error", "message": "transport error contacting http://192.168.50.176:8080/v1/chat/completions: [Errno 61] Connection refused (after 4 attempts)", "v": 1}
+{"type": "thread.started", "thread_id": "efbda11777f9", "v": 1}
+{"type": "turn.started", "thread_id": "efbda11777f9", "v": 1}
+{"type": "error", "message": "transport error contacting http://192.168.50.176:8080/v1/chat/completions: [Errno 61] Connection refused (after 4 attempts)", "v": 1}
+{"type": "thread.started", "thread_id": "d494d9c02396", "v": 1}
+{"type": "turn.started", "thread_id": "d494d9c02396", "v": 1}
+{"type": "error", "message": "transport error contacting http://192.168.50.176:8080/v1/chat/completions: [Errno 61] Connection refused (after 4 attempts)", "v": 1}
+playbook arms on build/suites/trivial.yaml (statistic: hoeffding-gate (time-uniform certificate, R-H))
+arm           pass_rate  passed  tasks  tokens  wall_s
+------------  ---------  ------  -----  ------  ------
+playbook-on   None       0       0      0       0     
+playbook-off  None       0       0      0       0     
+forward transfer (BLOCKED): BLOCKED — endpoint unreachable at 2026-09-11T04:42:19Z: ProviderError: transport error contacting http://192.168.50.176:8080/v1/chat/completions: [Errno 61] Connection refused — arms ran, numbers withheld; never 0, never green
+retention check  (BLOCKED): BLOCKED — endpoint unreachable at 2026-09-11T04:42:19Z: ProviderError: transport error contacting http://192.168.50.176:8080/v1/chat/completions: [Errno 61] Connection refused — arms ran, numbers withheld; never 0, never green
+contamination: checked 0 · CLEAN
+verdict: BLOCKED
+matrix written: build/eval/skills_matrix.json

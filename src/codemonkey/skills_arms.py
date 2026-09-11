@@ -33,6 +33,17 @@ from typing import Callable, Optional
 
 STATISTIC = "hoeffding-gate (time-uniform certificate, R-H)"
 SKILLS_ARMS = ("skills-on", "skills-off")
+# loop47 C112: the arms matrix now covers BOTH learned surfaces — skills
+# (loop 46) and the playbook (loop 47) — so loop 50 measures them with one
+# harness. Each arm is one env switch; the comparator is always the same
+# suite run under the two values.
+ARM_ENV = {
+    "skills-on": ("CODEMONKEY_STRATEGY_SKILLS", "use"),
+    "skills-off": ("CODEMONKEY_STRATEGY_SKILLS", "off"),
+    "playbook-on": ("CODEMONKEY_STRATEGY_CONTEXT", "playbook"),
+    "playbook-off": ("CODEMONKEY_STRATEGY_CONTEXT", "static"),
+}
+ALL_ARMS = tuple(ARM_ENV)
 
 
 def _iso_now() -> str:
@@ -84,6 +95,53 @@ def _store_snapshot(store: Path) -> dict:
     return {r["name"]: r.get("status") for r in skills_mod.list_skills(store)}
 
 
+def _playbook_snapshot(workdir: Path) -> dict:
+    from . import playbook as playbook_mod
+
+    return {e["id"]: e.get("status")
+            for e in playbook_mod.list_entries(workdir)}
+
+
+def _contamination_violations(store: Path, before_skills: dict,
+                              before_playbook: dict, started: str) -> list[str]:
+    """Both learned stores must be UNCHANGED by the measurement, and every
+    entry in them must predate it — on either surface, a scored task that
+    contributed an artifact invalidates the number the arms produce."""
+    from . import playbook as playbook_mod
+    from . import skills as skills_mod
+
+    violations: list[str] = []
+    after_skills = _store_snapshot(store)
+    added = sorted(set(after_skills) - set(before_skills))
+    removed = sorted(set(before_skills) - set(after_skills))
+    if added:
+        violations.append(f"skills added during the measurement: {added}")
+    if removed:
+        violations.append(f"skills removed during the measurement: {removed}")
+    for name in sorted(after_skills):
+        try:
+            man = skills_mod.read_manifest(store, name)
+        except skills_mod.SkillError:
+            continue
+        if str(man.get("created") or "") >= started:
+            violations.append(
+                f"skill {name}: created {man.get('created')} — not before "
+                f"the measurement start {started}")
+    after_pb = _playbook_snapshot(store)
+    added = sorted(set(after_pb) - set(before_playbook))
+    removed = sorted(set(before_playbook) - set(after_pb))
+    if added:
+        violations.append(f"playbook entries added during the measurement: {added}")
+    if removed:
+        violations.append(f"playbook entries removed during the measurement: {removed}")
+    for e in playbook_mod.list_entries(store):
+        if str(e.get("first_seen") or "") >= started:
+            violations.append(
+                f"playbook {e['id']}: first_seen {e.get('first_seen')} — not "
+                f"before the measurement start {started}")
+    return violations
+
+
 def _run_suite_safe(suite, exec_fn) -> dict:
     """Run one arm's suite, converting a raised provider error into an
     emptied result — offline, `run_exec` raises the transport error instead
@@ -116,35 +174,42 @@ def run_skills_matrix(suite_path: Path, *, exec_fn=None,
 
     arms = list(arms or SKILLS_ARMS)
     for label in arms:
-        if label not in SKILLS_ARMS:
-            raise ValueError(f"unknown skills arm: {label!r} (want skills-on / "
-                             f"skills-off)")
+        if label not in ARM_ENV:
+            raise ValueError(f"unknown arm: {label!r} "
+                             f"(want one of {list(ARM_ENV)})")
+    surface = "skills" if all(l.startswith("skills-") for l in arms) \
+        else ("playbook" if all(l.startswith("playbook-") for l in arms)
+              else "mixed")
     store = Path(store) if store else Path.cwd()
     started = _iso_now()
     before = _store_snapshot(store)
+    before_pb = _playbook_snapshot(store)
 
     results: dict = {"suite": str(suite_path), "started": started,
+                     "surface": surface,
                      "statistic": STATISTIC, "arms": {}, "retention": {}}
-    prior = os.environ.get("CODEMONKEY_STRATEGY_SKILLS")
+    env_keys = {"CODEMONKEY_STRATEGY_SKILLS", "CODEMONKEY_STRATEGY_CONTEXT"}
+    prior_env = {k: os.environ.get(k) for k in env_keys}
     try:
         for label in arms:
-            os.environ["CODEMONKEY_STRATEGY_SKILLS"] = (
-                "use" if label == "skills-on" else "off")
+            key, val = ARM_ENV[label]
+            os.environ[key] = val
             results["arms"][label] = _summarize(
                 _run_suite_safe(suite_path, exec_fn))
             if retention_suite:
                 results["retention"][label] = _summarize(
                     _run_suite_safe(retention_suite, exec_fn))
     finally:
-        if prior is None:
-            os.environ.pop("CODEMONKEY_STRATEGY_SKILLS", None)
-        else:
-            os.environ["CODEMONKEY_STRATEGY_SKILLS"] = prior
+        for k, v in prior_env.items():
+            if v is None:
+                os.environ.pop(k, None)
+            else:
+                os.environ[k] = v
 
     reason = probe()
     results["endpoint"] = reason or "reachable"
-    on = results["arms"].get("skills-on", {})
-    off = results["arms"].get("skills-off", {})
+    on = results["arms"].get(arms[0], {}) if arms else {}
+    off = results["arms"].get(arms[-1], {}) if len(arms) > 1 else {}
     if reason:
         for field, srcdict in (("forward_transfer", results["arms"]),
                                ("retention_check", results["retention"])):
@@ -160,11 +225,11 @@ def run_skills_matrix(suite_path: Path, *, exec_fn=None,
             if (on_rate is not None and off_rate is not None) else None,
             "status": "MEASURED", "on_pass_rate": on_rate,
             "off_pass_rate": off_rate,
-            "note": "delta = skills-on pass rate − skills-off pass rate on the "
+            "note": f"delta = {arms[0]} pass rate − {arms[-1]} pass rate on the "
                     "same suite; no causal claim on one measurement",
         }
-        ron = results["retention"].get("skills-on", {}).get("pass_rate")
-        roff = results["retention"].get("skills-off", {}).get("pass_rate")
+        ron = results["retention"].get(arms[0], {}).get("pass_rate")
+        roff = results["retention"].get(arms[-1], {}).get("pass_rate")
         results["retention_check"] = {
             "value": (ron - roff) if (ron is not None and roff is not None)
             else None,
@@ -173,31 +238,15 @@ def run_skills_matrix(suite_path: Path, *, exec_fn=None,
         }
 
     # Contamination — the check that decides whether the transfer number
-    # above would MEAN anything: no scored task may contribute a skill.
-    after = _store_snapshot(store)
-    violations: list[str] = []
-    added = sorted(set(after) - set(before))
-    removed = sorted(set(before) - set(after))
-    if added:
-        violations.append(f"skills added during the measurement: {added}")
-    if removed:
-        violations.append(f"skills removed during the measurement: {removed}")
-    from . import skills as skills_mod
-
-    for name in sorted(after):
-        try:
-            man = skills_mod.read_manifest(store, name)
-        except skills_mod.SkillError:
-            continue
-        if str(man.get("created") or "") >= started:
-            violations.append(
-                f"{name}: created {man.get('created')} — not before the "
-                f"measurement start {started}")
+    # above would MEAN anything: no scored task may contribute an artifact
+    # to EITHER learned store (skills or playbook).
+    violations = _contamination_violations(store, before, before_pb, started)
     results["contamination"] = {
-        "checked": len(after),
+        "checked": len(_store_snapshot(store)),
+        "playbook_checked": len(_playbook_snapshot(store)),
         "violations": violations,
-        "rule": "the store must be unchanged by the measurement and every "
-                "skill must predate it (created < start)",
+        "rule": "both stores must be unchanged by the measurement and every "
+                "entry must predate it (created/first_seen < start)",
     }
 
     if violations:
@@ -217,12 +266,13 @@ def run_skills_matrix(suite_path: Path, *, exec_fn=None,
 
 def render_skills_table(results: dict) -> str:
     """Arms, the named statistic, transfer, retention, contamination."""
-    lines = [f"skills arms on {results.get('suite', '?')} "
+    surface = results.get("surface", "skills")
+    lines = [f"{surface} arms on {results.get('suite', '?')} "
              f"(statistic: {results.get('statistic', '?')})"]
     headers = ["arm", "pass_rate", "passed", "tasks", "tokens", "wall_s"]
     rows = []
-    for name in SKILLS_ARMS:
-        d = results.get("arms", {}).get(name, {})
+    for name in results.get("arms", {}):
+        d = results["arms"].get(name, {})
         rate = d.get("pass_rate")
         rows.append([name, ("None" if rate is None else f"{rate:.3f}"),
                      str(d.get("passed", "-")), str(d.get("tasks", "-")),

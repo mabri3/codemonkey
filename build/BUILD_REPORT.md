@@ -1417,3 +1417,47 @@ retention, statistic and contamination check are all in place; the matrix is
 **LOOP 46 COMPLETE** — the first arc where an artifact authored by run N can
 change run N+1 ships with every R-J/R-K control named, probed, and honest
 about the one thing it cannot yet measure.
+
+
+---
+
+# Loop 47 — Final Acceptance (CYCLE 112) — the evolving playbook
+
+**Date:** 2026-09-11 · **Entry:** R47 close-out (`5acad2c`); the arc
+authorized 2026-09-10 with the ordering waiver.
+
+| Cycle | Claim | Evidence |
+|---|---|---|
+| C107 | playbook store + deterministic delta merge | `playbook.py`: entry schema {id,kind,section,text,status,counter,evidence,provenance,history}; store `.codemonkey/playbook/playbook.json` gitignored by construction; deterministic id = sha256(kind, section, normalized text) → the merge is idempotent AND the dedup exact; merge = NON-LLM logic (append-as-quarantined, counters in place, refusals reported by index); byte-stability pinned (re-merge bumps counter, rewrites nothing). 11 tests; `cycle107-probe.out` |
+| C108 | the reflector — journal → evidence-cited deltas | `playbook.reflect()` is a PURE pass over the failclass taxonomy (no model call, no store writes); deltas group per (tool, category) and cite their record indexes; coarse taint marks shell/web_fetch-fed groups. 6 tests; `cycle108-probe.out` (15 checks; evidence `[1,3]` grouping on a real scripted run) |
+| C109 | injection — `context = playbook` + byte-regression guard | admitted entries render as an exactly-delimited block; quarantined/evicted never render (break-verified: gate dropped → discriminating test RED); budget enforced BEFORE rendering (0 → byte-equal; partial → 1/2 + held; absent → unlimited, said so). 7 tests; `cycle109-probe.out` (13 checks) + `cycle109-break.out` |
+| C110 | grow-and-refine + the 50-round collapse regression | 50 rounds: round-1 entry byte-stable, 51 entries, counter 55, monotone 6→78→153 words; the REWRITE-style control LOSES its round-1 entry — the regression can see the collapse (ACE case study, arXiv 2510.04618). 3 tests; `cycle110-collapse.out` |
+| C111 | R-A consolidation — lessons DELETED INTO the playbook | parity-gated migration (`migrate-lessons`): verified→admitted, tags→section lossless, two-way parity including drafts, byte-identical rollback on any drop, old file ARCHIVED; `lessons` module = shim, `lessons_cli` re-pointed; deletion-verdict row recorded. 15 tests; `cycle111-probe.out` |
+| C112 | loop 47 acceptance + the arms hook | `eval --arms playbook-on,playbook-off` → both arms + statistic + transfer/retention + contamination, BLOCKED-with-reason (`None`) with the endpoint down; contamination now covers BOTH learned stores; `cycle112-arms-probe.out` |
+
+## R-K hook — NAMED for loop 50
+
+`uv run codemonkey eval <suite> --arms playbook-on,playbook-off` runs the
+playbook arms through the same harness as loop 46's skills arms: forward
+transfer = pass-rate delta on a suite whose tasks did not author the entries;
+retention on the earlier suite; the named time-uniform statistic; and the
+contamination check (neither store may change during the measurement — on
+either surface, an artifact authored by a scored task invalidates the
+number). With no endpoint answering the verdict is **BLOCKED with the
+re-probe's own reason, `None` — never 0** (transcript:
+`cycle112-arms-probe.out`). The playbook's effect is therefore **UNMEASURED-
+WITH-DATE**, exactly as loop 46's transfer number: the mechanism is PROVEN-
+LIVE, the live number is not claimed.
+
+## Sweep at loop-47 close
+
+`bash build/acceptance_sweep.sh` (shipped form): offline rows exit 0; the
+nine live rows BLOCKED with reason — covered by the v4.0 named exception
+list (unchanged; the endpoint `.176` was re-probed literally during this
+acceptance and is still connection-refused).
+
+**LOOP 47 COMPLETE** — the second learned surface ships with every R-J
+control named and probed (quarantine, mechanical merge, evidence-cited
+reflection, byte-diffed injection, one-command revocation), the first R-A
+consolidation executed through a parity gate (four surfaces → two stores +
+one projection + one selector), and its live number honestly unclaimed.

@@ -2257,7 +2257,7 @@ appended by its own research cycle, with loops 42-45 closed in parallel.
   drop turns parity red. Tests: `test_lessons.py` 9/9 (re-pointed),
   `test_lessons_migration.py` 6/6 (planted verified-drop AND draft-drop
   refuse with byte-identical rollback). Suite **903/5**.
-- [ ] CYCLE 112 — `loop47:` loop 47 acceptance + report: register rows
+- [x] CYCLE 112 — `loop47:` loop 47 acceptance + report: register rows
   PROVEN-LIVE with probe transcripts named; the playbook-on/off arms hook
   NAMED for loop 50 (same BLOCKED discipline as loop 46 — no number without
   a run); suite green; sweep shipped form; BUILD_REPORT loop-47 section.
@@ -2266,6 +2266,20 @@ appended by its own research cycle, with loops 42-45 closed in parallel.
   BLOCKED-with-reason (the v4.0 named exception list covers them or a NEW
   named row is added); `uv run pytest -q` → exit 0; `build/CAPABILITY_
   REGISTER.md` no UNVALIDATED row; report committed; tag NOT cut (v5.0 is
+  loop 50's).
+  **DONE 2026-09-10.** Arms hook WIRED (not just named): `ARM_ENV` in
+  `skills_arms.py` covers `playbook-on/off`; CLI routes both pairs;
+  contamination snapshots BOTH stores; `eval --arms playbook-on,playbook-off`
+  → both arms ran (accounting line visible), transfer/retention
+  BLOCKED-with-reason, `None`, contamination CLEAN, verdict BLOCKED, exit 0
+  (`cycle112-arms-probe.out`). Sweep shipped form: A1 `codemonkey 4.0.0`,
+  offline rows exit 0, nine live rows BLOCKED with reason (v4.0 exception
+  list unchanged), **A15 903/5**; transcripts
+  `summary-loop47-close.txt`. Post-sweep canonical suite 903/5. Register:
+  all loop-47 rows PROVEN-LIVE with transcripts named, `skills_arms` row
+  extended; no UNVALIDATED row. BUILD_REPORT loop-47 section committed with
+  the R-K hook statement: the playbook's live number is
+  **UNMEASURED-WITH-DATE** (same discipline as loop 46). No tag (v5.0 is
   loop 50's).
 
 ### loop39: cycles (selected from build/research-loop39.md, cycle R39)

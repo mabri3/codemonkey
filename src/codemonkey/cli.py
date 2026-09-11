@@ -440,7 +440,8 @@ def eval(
         return
     if arms:
         labels = [a.strip() for a in arms.split(",") if a.strip()]
-        if any(l in ("skills-on", "skills-off") for l in labels):
+        if any(l in ("skills-on", "skills-off", "playbook-on", "playbook-off")
+               for l in labels):
             from .skills_arms import render_skills_table, run_skills_matrix
 
             retention = (Path(__file__).resolve().parents[2]

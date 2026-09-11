@@ -59,6 +59,7 @@
 │ redact         Secret-redaction repair pass.                                 │
 │ budget         VRAM→tokens budget calculator.                                │
 │ skills         Quarantined skill store.                                      │
+│ playbook       Evolving playbook: quarantined, delta-curated, revocable.     │
 │ exec           Non-interactive exec: run the agent once, print the final     │
 │                response. Use `exec resume [--last|THREAD_ID] [PROMPT]` to    │
 │                continue a session.                                           │
