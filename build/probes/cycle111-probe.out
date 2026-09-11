@@ -1,0 +1,22 @@
+--- 1. lessons now reads the PLAYBOOK (empty) not the old HOME file ---
+(no lessons)
+--- 2. migrate through the parity gate ---
+migrated 3 lesson(s) -> playbook (3 new entries, 2 verified admitted); parity OK
+lessons store archived -> /var/folders/xb/kzc31shn1pz2s_5l2fy6d7rh0000gn/T/tmp.bbfn5RSx0z/.codemonkey/lessons.json.migrated-20260911T043956Z
+exit=0
+--- 3. legacy surface answers from the new store ---
+pb-155fd5585c  [verified]  (shell, timeout)  use streaming deadlines for shell
+pb-4172345fe1  [verified]  (repo_map, parse)  repo_map chokes on generated dirs
+pb-f6840f6395  [draft]  (*, *)  draft: revisit retry policy
+{"id": "pb-155fd5585c", "tags": {"tool": "shell", "error_class": "timeout"}, "text": "use streaming deadlines for shell", "verified": true, "created": "2026-09-11T04:39:56Z"}
+--- 4. old file archived (not destroyed); playbook shows lesson entries ---
+pb-155fd5585c	admitted	lesson/shell|timeout	x1	use streaming deadlines for shell
+pb-4172345fe1	admitted	lesson/repo_map|parse	x1	repo_map chokes on generated dirs
+pb-f6840f6395	quarantined	lesson/*	x1	draft: revisit retry policy
+entries=3  words=14  counter_total=3
+  quarantined=1 admitted=2 evicted=0
+--- 5. parity function sees a dropped entry (break check) ---
+parity after a simulated drop: missing (dropped): ['use streaming deadlines for shell'] (+0 more)
+(the gate sees it — the migration would refuse and roll back)
+
+CYCLE111 PROBE: PASS

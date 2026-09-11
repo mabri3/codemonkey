@@ -2227,7 +2227,7 @@ appended by its own research cycle, with loops 42-45 closed in parallel.
   see the defect. Tests `tests/test_playbook_collapse.py` 3/3 (the control
   fails the same predicate set: MISSING + counter violation). Suite
   **895/5**.
-- [ ] CYCLE 111 — `loop47:` R-A consolidation — lessons DELETED INTO the
+- [x] CYCLE 111 — `loop47:` R-A consolidation — lessons DELETED INTO the
   playbook: migrate `~/.codemonkey/lessons.json` → `kind: lesson` entries
   (verified flag preserved; docstring carries the moved citations); the
   RETRIEVAL-PARITY GATE runs BEFORE the deletion lands — every previously
@@ -2241,6 +2241,22 @@ appended by its own research cycle, with loops 42-45 closed in parallel.
   (nothing dropped, nothing invented); `uv run codemonkey lessons list`
   still answers; break-verified control — drop one migrated entry, the
   parity gate must go red; register/deletion-table updated both ways.
+  **DONE 2026-09-10.** DECISION on the parity result: parity PASSED →
+  `lessons_cli` REWIRED (call shapes unchanged, backend = playbook) and
+  `lessons.py` reduced to a documented SHIM (legacy shapes preserved:
+  load_all/add/retrieve/mark_verified/extract_drafts); `lessons.json`
+  ARCHIVED (`.migrated-<stamp>`), never destroyed — deletion-verdict row
+  added. Semantics carried: verified→`admitted`; tags→`section` lossless
+  (`shell` / `shell|timeout`); retrievable-set two-way; drafts included in
+  the gate (strengthened after the draft-drop probe). `playbook.
+  migrate_lessons` + `migrate-lessons` CLI verb; parity rollback restores
+  store bytes exactly and leaves the file. Probe `cycle111-probe.out` PASS:
+  `lessons list` empty pre-migration (new store authoritative) → `migrated
+  3 lesson(s) … 2 verified admitted; parity OK` + archive path → legacy
+  list/retrieve answer from the playbook → stats `admitted=2` → simulated
+  drop turns parity red. Tests: `test_lessons.py` 9/9 (re-pointed),
+  `test_lessons_migration.py` 6/6 (planted verified-drop AND draft-drop
+  refuse with byte-identical rollback). Suite **903/5**.
 - [ ] CYCLE 112 — `loop47:` loop 47 acceptance + report: register rows
   PROVEN-LIVE with probe transcripts named; the playbook-on/off arms hook
   NAMED for loop 50 (same BLOCKED discipline as loop 46 — no number without

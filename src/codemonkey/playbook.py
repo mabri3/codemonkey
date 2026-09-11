@@ -373,3 +373,160 @@ def reflect(records: list, *, thread: str = "") -> list[dict]:
             },
         })
     return deltas
+
+
+# --- R-A consolidation: lessons DELETED INTO the playbook (cycle 111) --------
+#
+# Loop 47's R-A verdict: the `lessons` store (loop13, `~/.codemonkey/
+# lessons.json`) is DELETED INTO this store — one agent-authored accumulation
+# surface instead of two — with the semantics preserved verbatim:
+#   * verified flag  -> status `admitted` (the gate carries over unchanged);
+#   * tags {tool, error_class} -> the SECTION, losslessly encoded as
+#     `tool` or `tool|error_class` (retrieval scoring round-trips both);
+#   * the retrieval-parity gate runs BEFORE the deletion lands: every
+#     previously retrievable lesson must be retrievable from the playbook,
+#     or the migration ROLLS BACK (store bytes restored) and the lessons
+#     file stays where it is. A migration that loses one lesson is refused,
+#     not reported.
+# The moved citations (ACL 2026.acl-long.27 experience-following;
+# execute-distill-verify, arxiv 2606.24428) live here now:
+# experience-following guard = retrieve() scoped by tags; execute-distill-
+# verify = draft -> eval -> `admitted` in the store's own history.
+
+MIGRATE_SOURCE = "migrate:lessons"
+
+
+def lesson_section(tags: dict) -> str:
+    """Lossless tag encoding: `tool`, or `tool|error_class` when the class
+    is more than the wildcard (retrieval scoring skips `*` exactly as the
+    lessons store did)."""
+    tool = str((tags or {}).get("tool") or "*")
+    cls = str((tags or {}).get("error_class") or "*")
+    return tool if cls == "*" else f"{tool}|{cls}"
+
+
+def parse_section(section: str) -> dict:
+    """Inverse of lesson_section (a section without `|` is a bare tool)."""
+    if "|" in section:
+        tool, cls = section.split("|", 1)
+        return {"tool": tool, "error_class": cls}
+    return {"tool": section, "error_class": "*"}
+
+
+def lesson_deltas(lessons: list) -> list[dict]:
+    """Old-shape lesson entries -> playbook deltas. Pure."""
+    out = []
+    for e in lessons or []:
+        if not isinstance(e, dict) or not str(e.get("text") or "").strip():
+            continue
+        out.append({
+            "kind": "lesson",
+            "section": lesson_section(e.get("tags") or {}),
+            "text": str(e["text"]),
+            "evidence": [],
+            "provenance": {"run_id": f"migrate:{e.get('id', '?')}",
+                           "session_id": "", "taint_free": True,
+                           "source": MIGRATE_SOURCE},
+        })
+    return out
+
+
+def parity_violations(workdir: str | Path, *, verified_before: list[str],
+                      ids_before: set[str], source_texts: set[str],
+                      draft_before: list[str] | None = None) -> list[str]:
+    """The two-way parity check, callable on its own so the break-verifier
+    can drop one migrated entry and watch it go red.
+
+    missing  — a previously-verified lesson that no ADMITTED lesson entry
+               carries any more, or a previously-present draft that no
+               lesson entry carries at all (a drop either way: the
+               migration must not land);
+    invented — a lesson entry this migration ADDED whose text is not in the
+               source corpus (an invention: same refusal)."""
+    entries = [e for e in list_entries(workdir) if e.get("kind") == "lesson"]
+    admitted_texts = {e["text"] for e in entries if e.get("status") == "admitted"}
+    all_texts = {e["text"] for e in entries}
+    missing = sorted(set(verified_before) - admitted_texts)
+    dropped_drafts = sorted(set(draft_before or []) - all_texts)
+    invented = sorted({e["text"] for e in entries
+                       if e["id"] not in ids_before
+                       and e["text"] not in source_texts})
+    out = []
+    if missing:
+        out.append(f"missing (dropped): {missing[:3]} (+{max(0, len(missing) - 3)} more)")
+    if dropped_drafts:
+        out.append(f"drafts dropped: {dropped_drafts[:3]} (+{max(0, len(dropped_drafts) - 3)} more)")
+    if invented:
+        out.append(f"invented (not in source): {invented[:3]} (+{max(0, len(invented) - 3)} more)")
+    return out
+
+
+def migrate_lessons(workdir: str | Path, *, lesson_file=None,
+                    archive: bool = True) -> dict:
+    """Migrate `lessons.json` into this workspace's playbook through the
+    parity gate. See the header comment for the rules; raises PlaybookError
+    (with the store rolled back) when parity fails."""
+    import json as _json
+
+    workdir = Path(workdir)
+    path = Path(lesson_file) if lesson_file else (Path.home() / ".codemonkey" / "lessons.json")
+    if not path.exists():
+        return {"migrated": 0, "reason": f"no lessons file at {path}",
+                "archived": None}
+    try:
+        lessons = _json.loads(path.read_text())
+    except ValueError as exc:
+        raise PlaybookError(f"{path} is not valid JSON: {exc}") from None
+    if not isinstance(lessons, list):
+        raise PlaybookError(f"{path}: lessons file must be a JSON list")
+
+    verified_before = sorted({str(e["text"]) for e in lessons
+                              if isinstance(e, dict) and e.get("verified")
+                              and str(e.get("text") or "").strip()})
+    draft_before = sorted({str(e["text"]) for e in lessons
+                           if isinstance(e, dict) and not e.get("verified")
+                           and str(e.get("text") or "").strip()})
+    source_texts = {str(e["text"]) for e in lessons
+                    if isinstance(e, dict) and str(e.get("text") or "").strip()}
+
+    store_before: bytes | None = None
+    if store_path(workdir).exists():
+        store_before = store_path(workdir).read_bytes()
+    ids_before = {e["id"] for e in list_entries(workdir)}
+
+    deltas = lesson_deltas(lessons)
+    rep = merge_deltas(workdir, deltas)
+    for e in lessons:
+        if isinstance(e, dict) and e.get("verified") and str(e.get("text") or "").strip():
+            eid = entry_id("lesson", lesson_section(e.get("tags") or {}), str(e["text"]))
+            try:
+                set_status(workdir, eid, "admitted",
+                           reason="migrated verified lesson")
+            except PlaybookError:
+                pass
+
+    violations = parity_violations(workdir, verified_before=verified_before,
+                                   draft_before=draft_before,
+                                   ids_before=ids_before,
+                                   source_texts=source_texts)
+    if violations:
+        # ROLL BACK: the deletion does not land without parity.
+        if store_before is None:
+            try:
+                store_path(workdir).unlink()
+            except OSError:
+                pass
+        else:
+            store_path(workdir).write_bytes(store_before)
+        raise PlaybookError(
+            "parity gate FAILED — migration rolled back, lessons file "
+            "untouched: " + "; ".join(violations))
+
+    archived = None
+    if archive:
+        stamp = _now().replace(":", "").replace("-", "")
+        archived = path.with_name(path.name + f".migrated-{stamp}")
+        os.replace(path, archived)
+    return {"migrated": len(deltas), "entries_added": rep["added"],
+            "verified": len(verified_before), "archived": str(archived),
+            "refused_deltas": rep["refused"]}

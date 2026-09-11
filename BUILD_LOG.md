@@ -3781,3 +3781,36 @@ them justifies waiving a row at v4.0.
   same BLOCKED discipline.
 - **Next step:** CYCLE 111 — R-A consolidation: lessons DELETED INTO the
   playbook with the retrieval-parity gate BEFORE the deletion lands.
+
+## 2026-09-10 — CYCLE 111 (loop47): R-A consolidation — lessons DELETED INTO the playbook
+
+- **Files changed:** `src/codemonkey/playbook.py` (`lesson_section`/
+  `parse_section` lossless tag encoding, `lesson_deltas`, `parity_violations`,
+  `migrate_lessons` — parity gate + byte-identical rollback + archive),
+  `playbook_cli.py` (`migrate-lessons` verb), `lessons.py` (REWRITTEN as a
+  shim over the playbook — legacy call shapes preserved; moved citations in
+  the docstring), `tests/test_lessons.py` (re-pointed at the new store, 9),
+  `tests/test_lessons_migration.py` (new, 6), `build/probes/cycle111-probe.sh`
+  + `.out`; register: lessons rows re-annotated + deletion-verdict row.
+- **Probe results (literal, R-I):** `cycle111-probe.sh` → **PASS** —
+  `lessons list` → `(no lessons)` before migration (the playbook is the
+  authoritative store; the old file is only read by the migration); `playbook
+  migrate-lessons` → `migrated 3 lesson(s) -> playbook (3 new entries, 2
+  verified admitted); parity OK` + archive path
+  (`lessons.json.migrated-20260911T043956Z`); the old file is gone from its
+  live path and present as the archive; `lessons list` answers from the
+  playbook with `(shell, timeout)` tags and `[verified]/[draft]` markers;
+  `lessons retrieve "shell timeout issue"` → the verified hit; `playbook
+  stats` → `admitted=2 quarantined=1`; a simulated drop makes the parity
+  function print `missing (dropped): [...]`.
+- **Tests run:** 9 + 6 new/re-pointed; full suite **903 passed, 5 skipped**
+  (was 895/5). The planted-drop tests (verified AND draft) refuse with
+  `parity gate FAILED` and restore the store byte-identically.
+- **Known issue / decision record:** parity gate scope CHANGED during this
+  cycle — the first draft covered verified lessons only; a draft-drop probe
+  proved the gap and drafts are now covered (a migration that loses ANY
+  lesson refuses). `add()` now dedups identical lesson texts (counter bump)
+  where the loop13 store appended duplicates — intended (store doctrine),
+  pinned in `test_lessons.py`.
+- **Next step:** CYCLE 112 — loop 47 acceptance + report (sweep, register,
+  BUILD_REPORT section; the playbook-on/off arms hook named for loop 50).

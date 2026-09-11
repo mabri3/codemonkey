@@ -107,6 +107,34 @@ def merge_cmd(
     raise typer.Exit(0)
 
 
+@app.command("migrate-lessons")
+def migrate_lessons_cmd(
+    file: str = typer.Option("", "--file",
+                             help="lessons.json path (default: ~/.codemonkey/lessons.json)"),
+) -> None:
+    """R-A: migrate a lessons store INTO this workspace's playbook through
+    the retrieval-parity gate. The old file is ARCHIVED, not destroyed; on
+    any parity failure the playbook is rolled back byte-identically and the
+    lessons file stays where it is. Exit 1 = refused migration; 0 = migrated
+    or nothing to migrate."""
+    from . import playbook
+
+    try:
+        rep = playbook.migrate_lessons(Path.cwd(), lesson_file=(file or None))
+    except playbook.PlaybookError as exc:
+        typer.echo(f"error: {exc}", err=True)
+        raise typer.Exit(1) from None
+    if rep.get("migrated", 0) == 0:
+        typer.echo(f"nothing to migrate: {rep.get('reason', '')}")
+        raise typer.Exit(0)
+    typer.echo(f"migrated {rep['migrated']} lesson(s) -> playbook "
+               f"({rep['entries_added']} new entries, {rep['verified']} "
+               f"verified admitted); parity OK")
+    if rep.get("archived"):
+        typer.echo(f"lessons store archived -> {rep['archived']}")
+    raise typer.Exit(0)
+
+
 @app.command("stats")
 def stats_cmd() -> None:
     """Entry counts by status, total words, total counter — the numbers the

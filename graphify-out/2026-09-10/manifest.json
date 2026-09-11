@@ -1085,14 +1085,14 @@
     "semantic_hash": "1a2f7689b326e940011a6d6a4f6ea665"
   },
   "src/codemonkey/playbook.py": {
-    "mtime": 1789101253.673769,
-    "ast_hash": "78e95e6347ba0821da8768bb95141a9a",
-    "semantic_hash": "78e95e6347ba0821da8768bb95141a9a"
+    "mtime": 1789101355.6901357,
+    "ast_hash": "15fef6b576004959f140372140ec1ab4",
+    "semantic_hash": "15fef6b576004959f140372140ec1ab4"
   },
   "src/codemonkey/playbook_cli.py": {
-    "mtime": 1789100952.3106172,
-    "ast_hash": "bc0f279ba8b8bcb864f1dcc7c1e85d0d",
-    "semantic_hash": "bc0f279ba8b8bcb864f1dcc7c1e85d0d"
+    "mtime": 1789101355.804476,
+    "ast_hash": "4d8c049c3a1b623ff3368cb172f1a8b8",
+    "semantic_hash": "4d8c049c3a1b623ff3368cb172f1a8b8"
   },
   "tests/test_playbook_store.py": {
     "mtime": 1789100774.6790516,
@@ -1108,5 +1108,10 @@
     "mtime": 1789101217.6116073,
     "ast_hash": "20548226d122a2fdc426b902bc2ed7e3",
     "semantic_hash": "20548226d122a2fdc426b902bc2ed7e3"
+  },
+  "tests/test_playbook_collapse.py": {
+    "mtime": 1789101377.2354841,
+    "ast_hash": "b2446dea3bb45346cfc1dc45f236b16c",
+    "semantic_hash": "b2446dea3bb45346cfc1dc45f236b16c"
   }
 }

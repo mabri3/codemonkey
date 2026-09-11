@@ -54,7 +54,7 @@ difference; `pytest` alone never qualifies):
 | journal | PROVEN-LIVE | journal threads written by real runs (31F1); `journal list` (P-CLI) |
 | journal_cli | PROVEN-LIVE | same as journal (the `journal` command surface) |
 | learnedctx | PROVEN-LIVE | cycle-75 real-run A/B: learned drops the non-overlapping fragment (observable system-prompt difference) |
-| lessons | PROVEN-LIVE | `lessons list` (P-CLI) + injection path (its cycle probes) |
+| lessons | PROVEN-LIVE | loop47 C111 (R-A): now a SHIM over the playbook store — `codemonkey lessons list` answers from the migrated playbook (verified/draft markers, tags `(shell, timeout)` preserved, ids `pb-…`); `codemonkey playbook migrate-lessons` → `migrated 3 lesson(s) … 2 verified admitted; parity OK` + old file ARCHIVED (`lessons.json.migrated-…`); retrieve returns the verified hit; a simulated drop turns the parity function red (`build/probes/cycle111-probe.out`); unit behavior re-pinned in `tests/test_lessons.py` (9) + `tests/test_lessons_migration.py` (6 incl. the planted-drop refusal + byte-identical rollback) |
 | lessons_cli | PROVEN-LIVE | same as lessons (the `lessons` command surface) |
 | loop | PROVEN-LIVE | every exec run's turn loop (A9 tool loop end-to-end, P-SWEEP) |
 | matrix | PROVEN-LIVE | `--strategy-matrix` bake-off run (its cycle probe) |
@@ -145,6 +145,7 @@ last generation is exactly how coverage claims drift.
 
 | module | verdict | evidence |
 |---|---|---|
+| `~/.codemonkey/lessons.json` (the STORE; the `lessons` module remains a shim) | DELETED INTO THE PLAYBOOK (loop47 C111) | R-A per `build/research-loop47.md`: one agent-authored accumulation surface, not two. Parity-gated migration: every previously-verified lesson retrievable after (two-way; drafts too), verified→`admitted`, tags→section encoding, retrieval scoring unchanged; old file ARCHIVED (`.migrated-<stamp>`), never destroyed; planted-drop tests refuse + roll back byte-identically (`build/probes/cycle111-probe.out`) |
 | lessons_gate | DELETED | `gate_lesson_with_eval` has zero src callers (`lessons_cli` manages verified flags directly via `mark_verified`); no entry probe earnable without a new surface. Removed with `tests/test_lessons_gate.py`. |
 | rolepresets | DELETED | `resolve_role_preset` has zero src callers and no `role_presets` config key exists; no entry probe earnable. Removed with `tests/test_role_presets.py`. |
 | truthpass | DELETED | no CLI command and zero src importers; the ledger-check function it served is superseded by this register. Removed with `tests/test_truthpass.py`. |
