@@ -2286,6 +2286,17 @@ appended by its own research cycle, with loops 42-45 closed in parallel.
   Attachment (verified 2026-09-11): `build/suites/rubric.yaml` (suite
   schema), `eval.run_suite` (scoring), `build/stub_provider.py` (offline
   turns).
+  **DONE 2026-09-11.** `_score_task` counts every DECLARED check
+  individually (needles + exit + trajectory + rubric steps) →
+  `checks_passed/checks_total/fix_rate` per task; suite-level aggregate
+  over checks, `None` when none declared. CLI prints `fix_rate` on the
+  suite line and per task. `build/suites/long-horizon.yaml` (3
+  order-dependent tasks, `ephemeral: false`, run from a scratch dir).
+  Probe `cycle122-probe.out` **PASS (11/11)**: the real suite through the
+  CLI in order (3/3, 2/2, 2/2), lh2-first control `[FAIL] fix_rate=0.5
+  (1/2)` + needle named, 2-of-3 fixture `fix_rate: 0.667, pass_rate 0.0`.
+  Tests `test_long_horizon.py` 4/4 incl. the empty-suite `None` pin.
+  Suite **944/5**.
 - [ ] CYCLE 123 — `loop50:` v5.0 close: bump to 5.0.0 in `pyproject.toml`
   and `src/codemonkey/__init__.py`; sweep RUN (shipped form); the
   per-loop VERDICTS written (46/47/48/49 — KEPT with its number OR its

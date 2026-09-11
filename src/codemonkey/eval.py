@@ -100,10 +100,37 @@ def _score_task(task: dict, *, exit_code: int, stdout: str,
         if not rubric_result["passed"]:
             ok = False
 
+    # loop50 C122: Fix Rate (SWE-EVO's partial-progress idea, local and
+    # named): every DECLARED check counts individually — stdout needles,
+    # forbidden needles, the exit contract, trajectory needles, rubric steps
+    # — so a task passing 2 of 3 checks is fix_rate 0.667 with pass_rate 0.
+    # No target number; no threshold reads it.
+    _fp = _ft = 0
+    for needle in task.get("expect_stdout_contains") or []:
+        _ft += 1
+        _fp += 1 if needle in stdout else 0
+    for needle in task.get("expect_stdout_not_contains") or []:
+        _ft += 1
+        _fp += 1 if needle not in stdout else 0
+    _ft += 1                                   # the exit contract is declared
+    _fp += 1 if exit_code == want_exit else 0
+    if want_tools:
+        _it2 = iter(_trajectory_from_events(events))
+        for t in want_tools:
+            _ft += 1
+            _fp += 1 if t in _it2 else 0
+    if rubric_result is not None:
+        for step in rubric_result.get("steps") or []:
+            _ft += 1
+            _fp += 1 if step.get("passed") else 0
+
     result = {
         "id": task["id"],
         "ok": ok,
         "checks": checks,
+        "checks_passed": _fp,
+        "checks_total": _ft,
+        "fix_rate": (round(_fp / _ft, 3) if _ft else None),
         "detail": detail,
         "tokens": _tokens_from_events(events),
         "wall_seconds": round(wall, 2),
@@ -263,6 +290,12 @@ def run_suite(suite_path: Path, *, exec_fn=None,
     results["pass_rate"] = round(
         sum(1 for t in results["tasks"] if t["ok"]) / max(1, len(results["tasks"])), 3
     )
+    # loop50 C122: suite-level Fix Rate — declared checks, not tasks.
+    _fp_sum = sum(t.get("checks_passed", 0) for t in results["tasks"])
+    _ft_sum = sum(t.get("checks_total", 0) for t in results["tasks"])
+    results["fix_rate"] = (round(_fp_sum / _ft_sum, 3) if _ft_sum else None)
+    results["checks_passed"] = _fp_sum
+    results["checks_total"] = _ft_sum
     results["total_tokens"] = sum(t["tokens"] for t in results["tasks"])
     results["wall_seconds"] = round(sum(t["wall_seconds"] for t in results["tasks"]), 2)
     results["finished"] = time.time()

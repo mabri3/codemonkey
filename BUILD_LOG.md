@@ -4117,3 +4117,26 @@ them justifies waiving a row at v4.0.
   refusal path itself is what exit 2 exercises. The misfiled-order control
   shows the order check can see a reversed executed list.
 - **Next step:** CYCLE 122 — the long-horizon suite + Fix Rate.
+
+## 2026-09-11 — CYCLE 122 (loop50): the long-horizon suite + Fix Rate
+
+- **Files changed:** `src/codemonkey/eval.py` (per-check counting →
+  `checks_passed/checks_total/fix_rate` per task + suite aggregate, `None`
+  when no checks declared), `src/codemonkey/cli.py` (suite line + task lines
+  print `fix_rate`), `build/suites/long-horizon.yaml` (new — 3
+  order-dependent tasks, SWE-EVO's shape at repo scale),
+  `tests/test_long_horizon.py` (new, 4), `build/probes/cycle122-probe.{py,out}`,
+  register row.
+- **Probe results (literal, R-I):** `cycle122-probe.py` → **PASS (11/11)**
+  through the CLI with the real harness: the suite runs in order
+  (`[PASS] lh1  fix_rate=1.0 (3/3)`, `lh2 (2/2)`, `lh3 (2/2)`; suite line
+  `fix_rate: 1.0`); order-dependence control `lh2` first in a fresh
+  workspace → `[FAIL] lh2  fix_rate=0.5 (1/2)` with
+  `{"missing_stdout": ["step-two got ALPHA-BUILD"]}`; 2-of-3 fixture →
+  `pass_rate: 0.0  fix_rate: 0.667` + `[FAIL] p1  fix_rate=0.667 (2/3)`.
+- **Tests run:** 4/4 new (incl. the empty-suite `None`-not-zero pin); full
+  suite **944 passed, 5 skipped** (was 940/5).
+- **Notes:** one probe iteration went red on MY expectation (lh1 declares 3
+  checks, not 2) — fixed the assertion, not the code. The suite writes
+  `state/` in the CWD: run it from a scratch directory (noted in the file).
+- **Next step:** CYCLE 123 — v5.0 close (bump, sweep, verdicts, tag, Gate 7).

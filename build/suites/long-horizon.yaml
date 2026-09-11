@@ -1,0 +1,36 @@
+# Long-horizon suite — SWE-EVO's SHAPE at repo scale (loop50 C122).
+#
+# Order-dependent BY CONSTRUCTION: every task consumes the previous task's
+# artifact, so running task N+1 first in a fresh workspace fails its
+# precondition check (the discriminating control in tests/test_long_horizon.py).
+# Multi-step: each task demands several tool steps; the checks grade the
+# final state's stdout contract.
+#
+# Run from a SCRATCH directory (tasks write ./state/) — e.g.
+#    cd "$(mktemp -d)" && uv run --project ~/Programs/CodeMonkey codemonkey \
+#        eval ~/Programs/CodeMonkey/build/suites/long-horizon.yaml
+name: long-horizon
+notice: "order-dependent: lh2 needs state/step1.txt from lh1; lh3 too; run from a scratch dir"
+tasks:
+  - id: lh1
+    prompt: >-
+      Multi-step job, step 1: create the file state/step1.txt containing the
+      token ALPHA-BUILD, then answer with exactly: step-one done (ALPHA-BUILD)
+    expect_stdout_contains: ["step-one done", "ALPHA-BUILD"]
+    expect_exit: 0
+    ephemeral: false
+  - id: lh2
+    prompt: >-
+      Multi-step job, step 2: read state/step1.txt from the previous step and
+      answer with exactly: step-two got ALPHA-BUILD
+    expect_stdout_contains: ["step-two got ALPHA-BUILD"]
+    expect_exit: 0
+    ephemeral: false
+  - id: lh3
+    prompt: >-
+      Multi-step job, step 3: append the token from state/step1.txt plus the
+      suffix -FINAL into state/step3.txt, then answer with exactly:
+      step-three wrote ALPHA-BUILD-FINAL
+    expect_stdout_contains: ["step-three wrote ALPHA-BUILD-FINAL"]
+    expect_exit: 0
+    ephemeral: false

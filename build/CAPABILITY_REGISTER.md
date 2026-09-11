@@ -43,7 +43,7 @@ difference; `pytest` alone never qualifies):
 | digest | PROVEN-LIVE | `codemonkey digest` of a run thread (its cycle probe; `--help` green at HEAD, P-CLI) |
 | digest_cli | PROVEN-LIVE | same as digest (the `digest` command surface) |
 | dryrun | PROVEN-LIVE | `exec --dry-run` preview mode (cycle-59 probe) |
-| eval | PROVEN-LIVE | live suites: trivial early-stop (77) + rubric suite (78) |
+| eval | PROVEN-LIVE | live suites: trivial early-stop (77) + rubric suite (78); loop50 C122: `fix_rate` per task + per suite over DECLARED checks (2-of-3 → `fix_rate 0.667, pass_rate 0`; empty suite → `None`, never 0), printed on the CLI's suite and task lines; the long-horizon suite (`build/suites/long-horizon.yaml`) runs through the real harness and its ORDER-DEPENDENCE control — lh2 first in a fresh workspace → `[FAIL] lh2 fix_rate=0.5 (1/2)` with the missing needle named (`build/probes/cycle122-probe.out`; `tests/test_long_horizon.py` 4/4) |
 | events | PROVEN-LIVE | `from . import events` in exec; every `--json` run carries its `thread.started`/item stream (e.g. 79 event-sink traces) |
 | exec | PROVEN-LIVE | `exec` text/JSON runs (A5–A7, P-SWEEP; 77/78 live suites) |
 | graphquery | PROVEN-LIVE | cycle-74: `graph_*` agent tools in a real run + `codemonkey graph <symbol>` |

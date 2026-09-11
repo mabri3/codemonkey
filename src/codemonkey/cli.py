@@ -506,6 +506,7 @@ def eval(
 
         typer.echo(json.dumps(_rs(results), indent=2))
     typer.echo(f"suite: {results['suite']}  pass_rate: {results['pass_rate']}  "
+               f"fix_rate: {results.get('fix_rate')}  "
                f"tokens: {results['total_tokens']}  wall: {results['wall_seconds']}s")
     cert = results.get("certificate") or {}
     if cert.get("certified_pass") is not None:
@@ -515,7 +516,8 @@ def eval(
                    f"stopped_early={results.get('stopped_early', False)}")
     for t in results["tasks"]:
         mark = "PASS" if t["ok"] else "FAIL"
-        typer.echo(f"  [{mark}] {t['id']}")
+        typer.echo(f"  [{mark}] {t['id']}  fix_rate={t.get('fix_rate')} "
+                   f"({t.get('checks_passed')}/{t.get('checks_total')})")
         if not t["ok"]:
             typer.echo(f"         {json.dumps(t.get('detail', {}))}")
         rub = t.get("rubric")
