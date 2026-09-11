@@ -1,0 +1,37 @@
+--- 1. static baseline (no store) ---
+ok
+  [PASS] static run carries the baseline context block
+  [PASS] static carries no playbook header
+--- 2. playbook mode, empty store -> byte-equal to static ---
+ok
+  [PASS] byte-equal
+    stderr: [playbook] 0 admitted entries; budget: unlimited
+[agent] ok
+--- 3. quarantined entry -> still byte-equal ---
+ok
+  [PASS] quarantined text absent (byte-equal to static)
+  [PASS] quarantined text literally absent
+--- 4. admit TWO entries -> exactly the block added ---
+ok
+  [PASS] block present
+  [PASS] removing the block reproduces static byte-for-byte
+  [PASS] block sits before the tool-protocol section
+    stderr: [playbook] 2/2 entries injected (~8 words); budget: unlimited
+[agent] ok
+--- 5. budget 0 -> omitted, byte-equal, and the line says so ---
+ok
+  [PASS] byte-equal to static (absence, not a note)
+  [PASS] accounting line names the omission
+    stderr: [playbook] 0/2 entries injected; budget: 0 words (CODEMONKEY_PLAYBOOK_BUDGET) — block omitted, 2 held
+[agent] ok
+--- 6. partial budget: one fits, one is held ---
+ok
+  [PASS] first entry renders, second does not
+  [PASS] line counts 1/2 + 1 held
+    stderr: [playbook] 1/2 entries injected (~4 words); budget: 6 words (CODEMONKEY_PLAYBOOK_BUDGET) — 1 held (do not fit)
+[agent] ok
+--- 7. revoke the loaded entry -> back to byte-equal ---
+ok
+  [PASS] both revoked -> byte-equal to static
+
+CYCLE109 PROBE: PASS

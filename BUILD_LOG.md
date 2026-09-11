@@ -3716,3 +3716,43 @@ them justifies waiving a row at v4.0.
 - **Next step:** CYCLE 109 — injection: `context = playbook` + the
   byte-regression guard (static byte-identical; playbook = static + exactly
   the admitted entries; budget accounting printed).
+
+## 2026-09-10 — CYCLE 109 (loop47): injection — `context = playbook` + byte-regression guard
+
+- **Files changed:** `src/codemonkey/strategies/context.py` (VALID_CONTEXT +
+  `playbook_block_and_account`; assembler for `playbook`), `config.py`
+  (env map `CODEMONKEY_PLAYBOOK_BUDGET`; `KNOWN_STRATEGIES["context"]` +=
+  `playbook`), `exec.py` (the `playbook` branch beside `learned`; block
+  appended inside `system_extra`; accounting line on stderr; fail-soft),
+  `tests/test_playbook_injection.py` (new, 7 tests),
+  `build/probes/cycle109-probe.{py,out}`, `build/probes/cycle109-break.{sh,out}`.
+- **Probe results (literal, R-I):** `cycle109-probe.py` → **PASS (13/13)**:
+  static baseline carries the context block, no playbook header; empty store
+  byte-equal; quarantined entry byte-equal AND text literally absent; two
+  admitted entries → block present, `replace("\n\n"+block,"") == static`
+  byte-for-byte, block before the tool-protocol section; budget 0 →
+  byte-equal + `[playbook] 0/2 entries injected; budget: 0 words
+  (CODEMONKEY_PLAYBOOK_BUDGET) — block omitted, 2 held`; budget 6 → `1/2
+  entries injected (~4 words); budget: 6 words — 1 held (do not fit)` with
+  the held text absent; revoke both → byte-equal again.
+- **Break-verification:** `cycle109-break.sh` → **PASS** — the admitted-gate
+  line was replaced with an unfiltered return; a LIVE check confirmed the
+  break took (a quarantined entry loaded); under the break
+  `test_quarantined_and_evicted_entries_never_render` went **RED**
+  (`1 failed, 6 passed`); restore byte-identical (`d7102a1a…`); green again
+  (`7 passed`). Note: only the one gate test is discriminating under this
+  break by design — budget tests hold regardless of the gate (budget excludes
+  before the gate is consulted).
+- **Tests run:** 7/7 new; full suite **892 passed, 5 skipped** (was 885/5).
+- **Known issues / observations:** (1) the strategy valid-name list lives in
+  TWO registries (`config.KNOWN_STRATEGIES` validation vs
+  `strategies.DOMAINS` selection) — they can drift silently; recorded for a
+  later fix/R-A cycle. (2) The C109 test file's first draft asserted the
+  block at the END of the prompt; the block lands at the end of
+  `system_extra` (before the tool-protocol section) — the probe's
+  `replace(boundary+block)` form is placement-agnostic and now pins both
+  directions; the placement itself is also pinned (after `## Memory`, before
+  `You have tools.`).
+- **Next step:** CYCLE 110 — grow-and-refine + the 50-round collapse
+  regression (round-1 entries byte-stable, size bounded, a rewrite-style
+  control that FAILS the same regression).

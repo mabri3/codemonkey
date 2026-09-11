@@ -101,6 +101,8 @@ ENV_MAP: dict[str, str] = {
     "CODEMONKEY_STRATEGY_CONTEXT": "strategies.context",
     "CODEMONKEY_STRATEGY_SKILLS": "strategies.skills",
     "CODEMONKEY_CONTEXT_BUDGET": "context_budget",
+    # loop47 cycle 109: the playbook injection budget (words; absent = unlimited)
+    "CODEMONKEY_PLAYBOOK_BUDGET": "playbook_budget",
 }
 
 # Suffix of var name → provider field, e.g. CODEMONKEY_MODEL → providers.<active>.model
@@ -232,7 +234,7 @@ KNOWN_STRATEGIES: dict[str, list[str]] = {
     "compaction": ["summarizing", "sliding-window"],
     "memory": ["adaptive", "file", "none"],
     "session_state": ["jsonl", "sqlite"],
-    "context": ["static", "learned"],
+    "context": ["static", "learned", "playbook"],
     "skills": ["off", "use", "learn"],
 }
 

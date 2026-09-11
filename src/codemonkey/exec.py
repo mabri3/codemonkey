@@ -510,6 +510,21 @@ def run_exec(
                 block = f"{block}\n\n{job_text}" if block else job_text
             if repo_map_text:
                 block = (block + "\n\n" if block else "") + repo_map_text
+        # loop47 cycle 109: `playbook` = the static assembly PLUS a block of
+        # ADMITTED playbook entries (quarantined/evicted never render). The
+        # budget is enforced BEFORE rendering and the accounting line prints
+        # per run; absent budget = unlimited and the line SAYS so.
+        if _ctx_name == "playbook":
+            try:
+                from .strategies.context import playbook_block_and_account
+
+                _pb_text, _pb_line = playbook_block_and_account(Path(workdir), cfg)
+                if _pb_line:
+                    sys.stderr.write(_pb_line + "\n")
+                if _pb_text:
+                    block = (block + "\n\n" if block else "") + _pb_text
+            except Exception as _pb_exc:  # fail soft, exactly like the others
+                sys.stderr.write(f"[playbook] injection skipped: {_pb_exc}\n")
         if block:
             system_extra = system_extra + "\n\n" + block
 

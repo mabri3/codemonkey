@@ -1,0 +1,16 @@
+--- applying the break (admitted-gate dropped) ---
+break applied: load_admitted no longer filters status
+--- break must take effect (live check, else the run is VOID) ---
+break verified live: a quarantined entry now LOADS
+--- the discriminating tests under the break (must go RED) ---
+=========================== short test summary info ============================
+FAILED tests/test_playbook_injection.py::test_quarantined_and_evicted_entries_never_render
+1 failed, 6 passed in 0.15s
+--- restoring ---
+before: d7102a1a2a486ef98d2a3200c96d9813aabede59cd8370a107b8cb4997f2bdae
+after:  d7102a1a2a486ef98d2a3200c96d9813aabede59cd8370a107b8cb4997f2bdae
+--- green again ---
+.......                                                                  [100%]
+7 passed in 0.14s
+
+CYCLE109 BREAK-VERIFY: PASS

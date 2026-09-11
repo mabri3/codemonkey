@@ -2179,7 +2179,7 @@ appended by its own research cycle, with loops 42-45 closed in parallel.
   re-run; store absent after reflection; merge → both quarantined with
   evidence on disk. Tests `tests/test_playbook_reflect.py` 6/6. Suite
   **885/5**.
-- [ ] CYCLE 109 — `loop47:` injection — `context = playbook` + byte-regression
+- [x] CYCLE 109 — `loop47:` injection — `context = playbook` + byte-regression
   guard: `strategies/context.py` gains `playbook` (valid: static|learned|
   playbook); admitted entries render under `CODEMONKEY_PLAYBOOK_BUDGET`
   (absent = unlimited and the line SAYS so; enforcement before spend, spend
@@ -2189,6 +2189,23 @@ appended by its own research cycle, with loops 42-45 closed in parallel.
   entries' block; add a quarantined entry → prompt unchanged; budget=0 →
   block absent with the printed accounting line; a break-verified control
   (delete the admitted-gate; the byte-diff test must go red).
+  **DONE 2026-09-10.** `strategies/context.py` + `playbook` (VALID_CONTEXT +
+  `playbook_block_and_account`; budget unit = WORDS, learnedctx's unit);
+  `config.py` env map `CODEMONKEY_PLAYBOOK_BUDGET` (+ the second registry
+  `KNOWN_STRATEGIES["context"]` — **observation: the valid-name list lives in
+  TWO places** (`config.KNOWN_STRATEGIES` for validation, `strategies.DOMAINS`
+  for selection) and they can drift silently; recorded for a later fix/R-A
+  cycle); `exec.py` playbook branch (block appended inside `system_extra`,
+  accounting line on stderr, fail-soft). Probe `cycle109-probe.out` **PASS
+  (13 checks)**: empty/quarantined store → byte-equal to static; two admitted
+  → exactly the block (`replace(block,"") == static` byte-for-byte, block
+  before the tool-protocol section); budget 0 → byte-equal + `0/2 … block
+  omitted`; budget 6 → `1/2 … 1 held` (held text absent); revoke → byte-equal
+  again. **Break-verify `cycle109-break.out` PASS**: gate dropped → live check
+  confirmed the break, `test_quarantined_and_evicted_entries_never_render`
+  went RED, restore byte-identical (`d7102a1a…`), suite green. Tests
+  `tests/test_playbook_injection.py` 7/7 (incl. corrupt store → fail-closed +
+  audible). Suite **892/5**.
 - [ ] CYCLE 110 — `loop47:` grow-and-refine + the 50-round collapse
   regression: counters update in place; exact+normalized-text dedup; the
   50-round synthetic delta run must leave round-1 entries BYTE-STABLE and
