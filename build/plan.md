@@ -2171,6 +2171,17 @@ appended by its own research cycle, with loops 42-45 closed in parallel.
   verify: in-process — tainted run → force compaction → tracker still
   tainted + the propagation is journaled; spill → read-back → still tainted;
   a clean twin passes both with `tainted: false` (the negative control).
+  **DONE 2026-09-10.** `spill(taint=)` writes a `.taint.json` SIDECAR for
+  untrusted-derived spills (content untouched); `taint_for_path` +
+  `source_for` check it BEFORE the outside-root rule → read-back attributes
+  `spill`; `truncate_with_spill(taint=)` wired at the loop's spill site;
+  compaction records `taint.propagation{run_tainted, messages_tainted_
+  derived, dropped}` when it drops tainted-derived messages (index tracker
+  cleared after the record; indices are stale post-rewrite). Probe
+  `cycle118-probe.out` **PASS (7/7)**: tainted sidecar present / clean spill
+  none; read-backs `["spill"]` vs `["outside_read"]`; propagation record
+  `{run_tainted: true, messages_tainted_derived: 1, dropped: 1}`; tracker
+  sticky; clean twin: no record, tracker clean. Tests 3/3. Suite **931/5**.
 - [ ] CYCLE 119 — `loop49:` the metadata-only admission gate, hardened:
   `playbook admit` REFUSES `taint_free: false` entries (journal
   `playbook.refused{reason:"tainted"}`) with a deliberate, journaled

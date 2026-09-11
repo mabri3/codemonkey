@@ -23,22 +23,50 @@ def spill_dir() -> Path:
     return d
 
 
-def spill(output: str, *, tool: str = "shell") -> Path:
-    """Write output verbatim to a spill file; returns its path."""
+def spill(output: str, *, tool: str = "shell", taint: dict | None = None) -> Path:
+    """Write output verbatim to a spill file; returns its path.
+
+    loop49 C118: when the spilled output is untrusted-derived (`taint` with
+    `tainted: true`), a SIDECAR `<file>.taint.json` records its sources —
+    reading the spill back later re-derives the taint from the sidecar, so a
+    rewrite onto disk cannot launder it. The file content is untouched."""
     h = hashlib.sha256(f"{tool}:{output}".encode()).hexdigest()[:16]
     p = spill_dir() / f"{time.strftime('%Y%m%d-%H%M%S')}-{tool}-{h}.txt"
     p.write_text(output)
+    if taint and taint.get("tainted"):
+        sidecar = p.with_name(p.name + ".taint.json")
+        sidecar.write_text(json.dumps({
+            "sources": list(taint.get("sources") or []),
+            "tainted": True,
+            "at": time.time(),
+        }) + "\n")
     return p
 
 
+def taint_for_path(path) -> dict | None:
+    """The taint a spill path carries per its sidecar, or None. A path that
+    is not a spill (or whose spill was clean) has no sidecar."""
+    p = Path(path)
+    sidecar = p.with_name(p.name + ".taint.json")
+    if not sidecar.exists():
+        return None
+    try:
+        data = json.loads(sidecar.read_text())
+    except (OSError, ValueError):
+        return {"sources": [], "tainted": True, "note": "unreadable sidecar — treated as tainted"}
+    return data
+
+
 def truncate_with_spill(output: str, budget: int, *, tool: str = "shell",
-                        head_frac: float = 0.6) -> str:
+                        head_frac: float = 0.6,
+                        taint: dict | None = None) -> str:
     """Cycle-17-compatible truncation, with a spill pointer when the output
     exceeds budget. Under budget -> unchanged. Over budget -> head+tail with
-    PARTIAL marker carrying the spill path."""
+    PARTIAL marker carrying the spill path (and, when `taint` says the
+    content is untrusted-derived, a sidecar — loop49 C118)."""
     if len(output) <= budget:
         return output
-    path = spill(output, tool=tool)
+    path = spill(output, tool=tool, taint=taint)
     keep = max(1, budget - 120)  # room for marker + path
     head = int(keep * head_frac)
     tail = keep - head

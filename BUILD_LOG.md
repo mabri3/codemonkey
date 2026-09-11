@@ -4017,3 +4017,26 @@ them justifies waiving a row at v4.0.
   (delegate child output; admitted-skill dispatch output).
 - **Tests run:** 4/4 new; full suite **928 passed, 5 skipped** (was 924/5).
 - **Next step:** CYCLE 118 — taint propagation through compaction + spill.
+
+## 2026-09-10 — CYCLE 118 (loop49): propagation — spill sidecars + compaction records
+
+- **Files changed:** `src/codemonkey/spill.py` (`spill(taint=)` sidecar
+  `<file>.taint.json`; `taint_for_path`), `src/codemonkey/taint.py`
+  (`source_for` checks the sidecar BEFORE the outside-root rule → `spill`),
+  `src/codemonkey/loop.py` (`truncate_with_spill(taint=result.taint)`;
+  `_msg_taint` index tracker + `taint.propagation` journal record when a
+  compaction drops tainted-derived messages), `tests/test_taint_propagation.py`
+  (new, 3), `build/probes/cycle118-probe.{py,out}`, register row extended.
+- **Probe results (literal, R-I):** `cycle118-probe.py` → **PASS (7/7)** —
+  tainted spill sidecar `{sources: ['web_fetch'], tainted: True}`; clean
+  spill has none; read-backs: `['spill']` vs `['outside_read']` (no
+  laundering); compaction record `{run_tainted: True,
+  messages_tainted_derived: 1, dropped: 1}`; tracker sticky; clean twin:
+  no record + clean tracker.
+- **Tests run:** 3/3 new; full suite **931 passed, 5 skipped** (was 928/5).
+- **Notes:** compaction records may recur per compaction (expected — each
+  rewrite that drops tainted-derived messages is itself a propagation
+  event); indices are stale post-rewrite and cleared on record. Pyright
+  caught `tainted` being a @property (two call-sites fixed before tests).
+- **Next step:** CYCLE 119 — the admission gate: `playbook admit` refuses
+  tainted entries; `--override` journaled; the text-blindness pin.

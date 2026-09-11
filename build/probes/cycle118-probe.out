@@ -1,0 +1,15 @@
+--- a. spill sidecar + read-back ---
+    tainted sidecar: {'sources': ['web_fetch'], 'tainted': True, 'at': 1789103382.412705}
+  [PASS] tainted spill has a tainted sidecar
+  [PASS] clean spill has NO sidecar
+    tainted read-back: ['spill']
+    clean   read-back: ['outside_read']
+  [PASS] tainted spill read-back attributes `spill`
+  [PASS] clean spill read-back is not laundered into `spill`
+--- b. compaction propagation ---
+    propagation records: 2; first: {'run_tainted': True, 'messages_tainted_derived': 1, 'dropped': 1}
+  [PASS] propagation journaled with counts
+  [PASS] sticky: tracker still tainted after the rewrite
+  [PASS] clean twin compacts with NO propagation record (+ tracker clean)
+
+CYCLE118 PROBE: PASS

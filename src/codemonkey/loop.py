@@ -125,6 +125,9 @@ def run_turns(
     from . import taint as taint_mod
 
     _taint = ctx.extra.setdefault("taint", taint_mod.TaintTracker())
+    # loop49 C118: index -> taint sources of tainted-derived messages, for the
+    # compaction propagation record (stale after a compaction; cleared then).
+    _msg_taint: dict[int, list] = {}
     turn_tokens = 0
     turns_seen = 0
 
@@ -252,6 +255,25 @@ def run_turns(
                             "content": "[prior context] Earlier conversation was condensed by policy; the system prompt still fully applies.",
                         })
                     messages = kept
+                    # loop49 C118: a compaction that DROPPED tainted-derived
+                    # messages journals the propagation — the condensed stack
+                    # is tainted-derived even though the text was rewritten
+                    # (sticky: the run tracker is untouched by compaction).
+                    if _msg_taint and journal_thread:
+                        try:
+                            from .journal import record as _jr_tp
+
+                            _jr_tp(journal_thread, "taint.propagation",
+                                   tool="compaction", key=str(n_dropped),
+                                   fields={
+                                       "run_tainted": bool(_taint.tainted),
+                                       "messages_tainted_derived":
+                                           len(_msg_taint),
+                                       "dropped": n_dropped,
+                                   })
+                        except OSError:
+                            pass
+                        _msg_taint.clear()
                     if on_event:
                         on_event({
                             "type": "notice",
@@ -811,6 +833,9 @@ def run_turns(
                     result_output = truncate_with_spill(
                         result_output, max(200, observation_budget - obs_spent),
                         tool=name,
+                        # loop49 C118: untrusted-derived output keeps its taint
+                        # on disk (sidecar) — the pointer cannot launder it.
+                        taint=(meta or {}).get("taint"),
                     )
                 except OSError:
                     # spill unavailable (disk/home unwritable): fall back to the
@@ -834,6 +859,12 @@ def run_turns(
                     "content": f"TOOL_RESULT {name}:\n{result_output}",
                 }
             )
+            # loop49 C118: remember which messages are tainted-derived so a
+            # compaction that drops them journals the propagation (the index
+            # is stale after compaction — cleared when the record lands).
+            if (meta or {}).get("taint", {}).get("tainted"):
+                _msg_taint[len(messages) - 1] = list(
+                    meta["taint"].get("sources") or [])
             # ---- self-heal edit retries (loop3, cycle 16) ----------------
             # edit_file failure with a structured error (near-miss anchors /
             # match counts) is actionable: schedule ONE corrective re-prompt.

@@ -77,6 +77,17 @@ def source_for(tool: str, args: dict, ctx, output: str, ok: bool) -> str:
             wd = Path(ctx.workdir).resolve()
         except Exception:
             return ""
+        # loop49 C118: a spill read-back keeps the taint its sidecar records
+        # — checked BEFORE the generic outside-root rule so the attribution
+        # is specific ("spill", not "outside_read").
+        try:
+            from .spill import taint_for_path as _tfp
+
+            _t = _tfp(rp)
+            if _t and _t.get("tainted"):
+                return "spill"
+        except Exception:
+            pass
         if rp != wd and wd not in rp.parents:
             return "outside_read"
     return ""
