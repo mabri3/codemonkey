@@ -3592,3 +3592,38 @@ them justifies waiving a row at v4.0.
   four verbs — the designed reversal, so `disable` cannot dead-end the
   library with no unblocked path (recorded here as a decision).
 - **Next step:** CYCLE 87 — R-K measurement + loop 46 acceptance.
+
+## 2026-09-10 — CYCLE 87 (loop46): R-K measurement + loop 46 acceptance
+
+- **Files changed:** `src/codemonkey/skills_arms.py` (new — the arms matrix:
+  skills-on vs skills-off, forward transfer, retention on the earlier suite,
+  the named statistic, contamination check, BLOCKED-with-reason shape),
+  `src/codemonkey/cli.py` (`eval --arms skills-on,...` routes to it; exit 1
+  only on contamination), `tests/test_skills_arms.py` (new, 6 tests),
+  `build/probes/cycle87-arms-probe.out`, `build/eval/skills_matrix.json`,
+  `build/CAPABILITY_REGISTER.md` (skills_arms row + skills* rows refreshed),
+  `build/BUILD_REPORT.md` (loop-46 section), `build/plan.md` (C87 ticked),
+  `features.html`.
+- **Probe results (literal, R-I):** `uv run codemonkey eval
+  build/suites/trivial.yaml --arms skills-on,skills-off` → **exit 0**, both
+  arms printed, `statistic: hoeffding-gate (time-uniform certificate, R-H)`,
+  `forward transfer (BLOCKED): … Connection refused — arms ran, numbers
+  withheld; never 0, never green`; retention BLOCKED likewise;
+  `contamination: checked 0 · CLEAN`; verdict `BLOCKED`. The arms performed
+  real exec attempts (thread.started + transport error per task).
+- **A latent defect found and fixed in this matrix's own path:** `run_exec`
+  RAISES the transport error (rather than returning an exit code), which
+  killed the first CLI run with a traceback; `_run_suite_safe` converts the
+  raise into the honest BLOCKED shape. **Observation recorded** (not silently
+  changed): loop 40's `run_f2p_matrix` has the same latent shape — named in
+  the loop-46 exception rows.
+- **Tests run:** new file 6/6; full suite **868 passed, 5 skipped** (was 862/5).
+- **Register:** `skills_arms` row added; `skills*` rows refreshed with C84–C86
+  probe evidence; 74/74 modules · 67 PROVEN-LIVE · 7 UNIT-ONLY · 0 UNVALIDATED.
+- **Sweep (shipped form):** offline rows exit 0; nine live rows BLOCKED with
+  reason — covered by the v4.0 named exception list (unchanged; endpoint
+  still refused). Transcript: `build/acceptance_outputs/summary-loop46-close.txt`.
+- **Verdict:** **KEPT (mechanism); the R-K number is UNMEASURED-WITH-DATE** —
+  "changed", not "learned", until an endpoint answers (one command to close).
+- **Next step:** R47 research — the evolving playbook + the R-A consolidation
+  verdict over the five accumulation surfaces.

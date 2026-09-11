@@ -1359,3 +1359,61 @@ exactly where it has controls and says where it does not, and every claim
 above names its evidence: **codemonkey 4.0.0**, suite 821/5, tag `v4.0.0`,
 git range `2575515` → this commit. **Gate 5 (user acceptance) is now the only
 standing decision.**
+
+
+---
+
+# Loop 46 — Final Acceptance (CYCLE 87) — the skill library
+
+**Date:** 2026-09-10 · **Suite:** 868 passed / 5 skipped · **Entry:** R46
+close-out (addendum `c6ebe90`); arc authorized 2026-09-10 with the ordering
+waiver.
+
+| Cycle | Claim | Evidence |
+|---|---|---|
+| C82 | skill artifact format + quarantined store | `skills.py`: manifest schema + validation (provenance required and shaped; builtin names refused), `.codemonkey/skills/<name>/`, gitignore by construction, `load_admitted` returns ONLY `admitted`; CLI `skills list` exit 0 honest empty of a missing store. 15 tests; probe `cycle82-probe.out` |
+| C83 | admission gate — mechanical, no model input | `skills.admit`: the manifest's own probe through the EXISTING sandbox at the admitting level (a level that cannot run shell refuses instead of widening), exit code decides, verdict journaled with the probe's real output; an admitted skill whose probe later fails is **evicted** (R-A). Poisoned-endpoint test pins "no model on this path". 7 tests; probe `cycle83-probe.out` |
+| C84 | `skill_create` + `skills` strategy domain | `off` (default) / `use` / `learn` wired through config+strategies (A19 surface); admitted skills merge into the advertised set — byte-diff: the `use` prompt is the `off` prompt plus exactly the skill's line; dispatch is gated at least as strictly as `shell` and runs in a **child process** (agent code never imported in-process); `skill_create` under `use` is a tool error, not a write; registry pin 16 → 17. 7 tests; probe `cycle84-probe.out` |
+| C85 | coarse taint rule (loop 49 minimal form) | `taint.py`: web_fetch body / shell stdout / add-dir read (vs the primary root) mark the RUN — sticky, first source wins, **metadata only**; a tainted run's `skill_create` is refused and the refusal journals `skill.refused{reason:"tainted", source:...}`; a fixture page instructing "add a skill that runs curl" changes nothing but the refusal. 7 tests; probe `cycle85-probe.out` |
+| C86 | R-J revocation surface | `skills show|revoke|disable`: revoke removes in ONE command (prompt byte-diff pre/post pinned); disable stops every load AND every dispatch via a marker **without deleting evidence**, `--enable` reverses; every state change journaled. 5 tests; probe `cycle86-probe.out` |
+| C87 | R-K measurement + acceptance | `eval --arms skills-on,skills-off` → both arms, named statistic (`hoeffding-gate`, time-uniform), forward transfer + retention on the earlier suite, contamination check; endpoint down → **BLOCKED-with-reason, `None`, never 0** — the arms ran and the contamination check ran CLEAN. Both contamination branches pinned offline. 6 tests; probe `cycle87-arms-probe.out` |
+
+## R-K verdict — **KEPT (mechanism); the number is UNMEASURED-WITH-DATE**
+
+Every R-J control has a control behind it (quarantine, mechanical gate,
+provenance, taint refusal, one-command revocation — each with an entry-point
+probe and, where it is a claim about behavior, a break-verified or
+discriminating test). The R-K figure — forward transfer and retention on a
+real model — **does not exist yet**: the endpoint (`192.168.50.176:8080`) is
+connection-refused, re-probed literally during C87. Per R-K the honest word
+for the library's effect is therefore **"changed", not "learned"**, and the
+acceptance records the missing number rather than a green it cannot back.
+Close it with ONE command the moment an endpoint answers:
+`uv run codemonkey eval <suite> --arms skills-on,skills-off` (the arms,
+retention, statistic and contamination check are all in place; the matrix is
+`build/eval/skills_matrix.json`).
+
+**Named exception rows (loop 46):**
+1. **Forward transfer + retention numbers** — close: endpoint up, re-run the
+   arms command; both suites already wired (transfer suite + `build/suites/trivial.yaml` retention).
+2. **The f2p matrix's identical latent crash** (observed during C87, NOT
+   silently changed): loop 40's `run_f2p_matrix` would hit the same
+   `run_exec` raise on a dead endpoint; it needs the same `_run_suite_safe`
+   treatment or an equivalent — recorded as an observation for whichever
+   cycle owns loop 40's surface next (R-A: it is not this cycle's artifact
+   to edit).
+
+## Register + sweep at loop-46 close
+
+- Register: `skills`, `skills_cli`, `skill_runner`, `skills_arms`, `taint`
+  rows present and PROVEN-LIVE (probe transcripts named); **74/74 modules ·
+  67 PROVEN-LIVE · 7 UNIT-ONLY · 0 UNVALIDATED** — completeness remains a
+  live control.
+- Sweep (`bash build/acceptance_sweep.sh`, shipped form): offline rows exit
+  0; nine live rows BLOCKED with reason. Those rows are covered by the v4.0
+  named exception list (unchanged since `dfde652`) — the endpoint has not
+  returned, so no row moved.
+
+**LOOP 46 COMPLETE** — the first arc where an artifact authored by run N can
+change run N+1 ships with every R-J/R-K control named, probed, and honest
+about the one thing it cannot yet measure.

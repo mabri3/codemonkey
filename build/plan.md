@@ -2081,7 +2081,7 @@ appended by its own research cycle, with loops 42-45 closed in parallel.
   zero skills loaded and the run still succeeds; `skills show demo_ok` prints
   provenance including the originating run id;
   `uv run pytest -q tests/test_skills_cli.py` → exit 0 (≥5 tests).
-- [ ] CYCLE 87 — `loop46:` R-K measurement + loop 46 acceptance: an eval run
+- [x] CYCLE 87 — `loop46:` R-K measurement + loop 46 acceptance: an eval run
   with library-on and library-off arms over a suite whose tasks were NOT the
   tasks that produced the skills, reporting forward transfer and a retention
   check on an earlier suite under R-H's time-uniform statistic; register rows
@@ -2095,6 +2095,26 @@ appended by its own research cycle, with loops 42-45 closed in parallel.
   scored task contributed a skill; `build/CAPABILITY_REGISTER.md` has no
   UNVALIDATED row; `bash build/acceptance_sweep.sh` → all exit 0;
   `uv run pytest -q` → exit 0; report committed.
+  **DONE 2026-09-10.** `eval --arms skills-on,skills-off` → exit 0, both arms
+  printed, statistic named (`hoeffding-gate`), forward transfer and retention
+  **BLOCKED-with-reason** (endpoint `.176` connection-refused, re-probed
+  literally) — never 0, never green; the arms ran (real exec attempts) and
+  the contamination check ran **CLEAN** (`build/probes/cycle87-arms-probe.out`;
+  matrix `build/eval/skills_matrix.json`). Offline plumbing + BOTH
+  contamination branches (a skill created mid-measurement; a backdated store
+  entry) pinned in `tests/test_skills_arms.py`. A latent defect was found and
+  fixed in this matrix's own path: `run_exec` RAISES the transport error
+  rather than returning an exit code, killing the first CLI run — the matrix
+  now converts the raise into the honest BLOCKED shape (the same latent shape
+  exists in loop 40's f2p matrix, observed and recorded here rather than
+  silently changed). Register: `skills*` rows updated + `skills_arms` added;
+  74/74 modules · 67 PROVEN-LIVE · 7 UNIT-ONLY · 0 UNVALIDATED. Sweep: offline
+  rows exit 0, nine live rows BLOCKED with reason (the v4.0 named exception
+  list covers them — unchanged). Suite **868 passed, 5 skipped**. Verdict:
+  **KEPT (mechanism) — the R-K number is UNMEASURED-WITH-DATE**; every R-J
+  control has a control behind it, and "learned" is not claimed without the
+  missing number (R-K: say "changed", not "learned"). Report: BUILD_REPORT
+  loop-46 section.
 
 ### loop39: cycles (selected from build/research-loop39.md, cycle R39)
 

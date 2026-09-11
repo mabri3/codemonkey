@@ -1,0 +1,58 @@
+{
+  "suite": "build/suites/trivial.yaml",
+  "started": "2026-09-11T04:19:47Z",
+  "statistic": "hoeffding-gate (time-uniform certificate, R-H)",
+  "arms": {
+    "skills-on": {
+      "tasks": 0,
+      "passed": 0,
+      "pass_rate": null,
+      "total_tokens": 0,
+      "wall_seconds": 0,
+      "error": "ProviderError: transport error contacting http://192.168.50.176:8080/v1/chat/completions: [Errno 61] Connection refused (after 4 attempts)"
+    },
+    "skills-off": {
+      "tasks": 0,
+      "passed": 0,
+      "pass_rate": null,
+      "total_tokens": 0,
+      "wall_seconds": 0,
+      "error": "ExecUsageError: unknown strategy 'False' for 'skills'. Valid skills strategies: off, use, learn"
+    }
+  },
+  "retention": {
+    "skills-on": {
+      "tasks": 0,
+      "passed": 0,
+      "pass_rate": null,
+      "total_tokens": 0,
+      "wall_seconds": 0,
+      "error": "ProviderError: transport error contacting http://192.168.50.176:8080/v1/chat/completions: [Errno 61] Connection refused (after 4 attempts)"
+    },
+    "skills-off": {
+      "tasks": 0,
+      "passed": 0,
+      "pass_rate": null,
+      "total_tokens": 0,
+      "wall_seconds": 0,
+      "error": "ExecUsageError: unknown strategy 'False' for 'skills'. Valid skills strategies: off, use, learn"
+    }
+  },
+  "endpoint": "ProviderError: transport error contacting http://192.168.50.176:8080/v1/chat/completions: [Errno 61] Connection refused",
+  "forward_transfer": {
+    "value": null,
+    "status": "BLOCKED",
+    "reason": "endpoint unreachable at 2026-09-11T04:19:47Z: ProviderError: transport error contacting http://192.168.50.176:8080/v1/chat/completions: [Errno 61] Connection refused \u2014 arms ran, numbers withheld; never 0, never green"
+  },
+  "retention_check": {
+    "value": null,
+    "status": "BLOCKED",
+    "reason": "endpoint unreachable at 2026-09-11T04:19:47Z: ProviderError: transport error contacting http://192.168.50.176:8080/v1/chat/completions: [Errno 61] Connection refused \u2014 arms ran, numbers withheld; never 0, never green"
+  },
+  "contamination": {
+    "checked": 0,
+    "violations": [],
+    "rule": "the store must be unchanged by the measurement and every skill must predate it (created < start)"
+  },
+  "verdict": "BLOCKED"
+}

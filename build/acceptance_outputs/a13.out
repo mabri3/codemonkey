@@ -40,3 +40,4 @@ strategies:
   memory: file
   session_state: jsonl
   context: static
+  skills: 'off'

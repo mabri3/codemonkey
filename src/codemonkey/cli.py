@@ -439,9 +439,23 @@ def eval(
         typer.echo(f"matrix written: {Path(out_dir) / 'delegation_matrix.json'}")
         return
     if arms:
+        labels = [a.strip() for a in arms.split(",") if a.strip()]
+        if any(l in ("skills-on", "skills-off") for l in labels):
+            from .skills_arms import render_skills_table, run_skills_matrix
+
+            retention = (Path(__file__).resolve().parents[2]
+                         / "build" / "suites" / "trivial.yaml")
+            results = run_skills_matrix(
+                suite, arms=labels,
+                retention_suite=retention if retention.is_file() else None,
+                out_dir=out_dir)
+            typer.echo(render_skills_table(results))
+            typer.echo(f"matrix written: {Path(out_dir) / 'skills_matrix.json'}")
+            contaminated = bool(
+                (results.get("contamination") or {}).get("violations"))
+            raise typer.Exit(1 if contaminated else 0)
         from .matrix import render_f2p_table, run_f2p_matrix
 
-        labels = [a.strip() for a in arms.split(",") if a.strip()]
         results = run_f2p_matrix(suite, arms=labels, out_dir=out_dir)
         typer.echo(render_f2p_table(results))
         typer.echo(f"matrix written: {Path(out_dir) / 'f2p_matrix.json'}")
