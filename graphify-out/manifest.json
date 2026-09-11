@@ -1018,5 +1018,10 @@
     "mtime": 1789063071.1990752,
     "ast_hash": "5607763bbd5fd2623dafdda6ab1e4ab3",
     "semantic_hash": "5607763bbd5fd2623dafdda6ab1e4ab3"
+  },
+  "tests/test_register.py": {
+    "mtime": 1789086951.5929878,
+    "ast_hash": "5efd518d9fc5cbf59710462397df6247",
+    "semantic_hash": "5efd518d9fc5cbf59710462397df6247"
   }
 }
