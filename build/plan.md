@@ -1986,7 +1986,7 @@ appended by its own research cycle, with loops 42-45 closed in parallel.
   never-a-target note, and the R-L attachment re-verification — including one
   correction (`envquarantine.py` moved to `tests/` by cycle 81; C85's taint
   rule attaches to the loop's `ToolResult` path instead).
-- [ ] CYCLE R47 — Loop 47 research: the evolving playbook (ACE-style delta
+- [x] CYCLE R47 — Loop 47 research: the evolving playbook (ACE-style delta
   curation over the journal; generator/reflector/curator; brevity-bias and
   context-collapse regressions) INCLUDING an R-A consolidation verdict over
   CodeMonkey's five overlapping accumulation surfaces (lessons, compiled
@@ -1994,6 +1994,18 @@ appended by its own research cycle, with loops 42-45 closed in parallel.
   deleted into the others | est: 40m |
   verify: `build/research-loop47.md` with ≥5 cited candidates, a ranked
   SELECTED section, and the consolidation verdict stated per surface.
+  **DONE 2026-09-10.** `build/research-loop47.md` (12,011 bytes): entry
+  condition FULFILLED (`65db0a2`), core-design NO; ACE (arXiv 2510.04618,
+  ICLR 2026) cited with its published numbers up front and the never-a-target
+  sentence; 5 candidate sections with URLs + R-I probe shapes (C1–C5) plus 2
+  rejections WITH reasons (monolithic rewrite — the collapse case study;
+  cross-repo sharing — deferred, R-J provenance stops at this machine); the
+  R-A verdict stated per surface — playbook INTRODUCED (the one agent-authored
+  store), lessons DELETED INTO it (verify-gate semantics preserved, parity
+  gate before the deletion lands), memory SURVIVES (operator author), compile_
+  rules SURVIVES (enforcement projection, consumer is permissions), learnedctx
+  REFRAMED as the selector not a store (gains a playbook class). Cycles
+  107–112 appended below.
 - [ ] CYCLE R48 — Loop 48 research: parallel-distill-refine + recursive
   tournament voting as the correct form of loop 38's `--best-of`; structured
   rollout summaries vs raw trajectories as the comparison substrate; the
@@ -2115,6 +2127,78 @@ appended by its own research cycle, with loops 42-45 closed in parallel.
   control has a control behind it, and "learned" is not claimed without the
   missing number (R-K: say "changed", not "learned"). Report: BUILD_REPORT
   loop-46 section.
+
+### loop47: cycles (selected from build/research-loop47.md, cycle R47 — AUTHORIZED 2026-09-10)
+
+- [ ] CYCLE 107 — `loop47:` playbook store + deterministic delta merge:
+  `playbook.py` — entry schema {id, kind, section, text, status, counter,
+  provenance}; store `.codemonkey/playbook/playbook.json` (gitignored by
+  construction, same quarantine pattern as `skills.py`); `merge_deltas()` is
+  NON-LLM logic: append new by id, counter-update existing in place,
+  exact-duplicate collapse, status defaults `quarantined`; `playbook_cli.py`
+  (`list|show`); register row. | est: 60m |
+  verify: `HOME=$T uv run codemonkey playbook list` on an empty store → exit
+  0 honest empty; a round-trip merge → `playbook show <id>` prints the
+  entry with its counter and provenance; quarantined entries never load
+  (asserted in-process against the same store); merge unit tests include
+  append/update/dedup branches; register completeness control fires on the
+  new module and the row is added.
+- [ ] CYCLE 108 — `loop47:` the reflector — journal → evidence-cited deltas:
+  `playbook.reflect(records)` is a PURE deterministic pass (no model call;
+  failure classes + outcomes → candidate deltas that cite their record
+  indexes, evidence-style borrowed from `evidence.py`); CLI `playbook reflect
+  <thread>` prints deltas — it does NOT merge (merge is the explicit verb);
+  tainted-run provenance marks deltas from tainted spans. | est: 60m |
+  verify: a scripted failing run → `playbook reflect <thread>` prints ≥1
+  delta naming its failure class and the record indexes it derives from;
+  re-reflecting the same thread is byte-identical; the store is unchanged
+  by reflection (byte-compare before/after); a clean thread yields the
+  honest empty (exit 0).
+- [ ] CYCLE 109 — `loop47:` injection — `context = playbook` + byte-regression
+  guard: `strategies/context.py` gains `playbook` (valid: static|learned|
+  playbook); admitted entries render under `CODEMONKEY_PLAYBOOK_BUDGET`
+  (absent = unlimited and the line SAYS so; enforcement before spend, spend
+  printed); quarantined/evicted entries never render. | est: 60m |
+  verify: in-process byte-diff — `static` prompt byte-identical to the
+  pre-cycle baseline; `playbook` prompt = `static` + exactly the admitted
+  entries' block; add a quarantined entry → prompt unchanged; budget=0 →
+  block absent with the printed accounting line; a break-verified control
+  (delete the admitted-gate; the byte-diff test must go red).
+- [ ] CYCLE 110 — `loop47:` grow-and-refine + the 50-round collapse
+  regression: counters update in place; exact+normalized-text dedup; the
+  50-round synthetic delta run must leave round-1 entries BYTE-STABLE and
+  total size linear-bounded — the property a rewrite-style system fails
+  (ACE case study: 18,282→122 tokens at 66.7%→57.1%, below the 63.7%
+  baseline). | est: 60m |
+  verify: `build/probes/cycle110-collapse.py` → 50 rounds applied through
+  the real merge path; assert round-1 entry bytes unchanged (byte-compare),
+  size bounded, dedup collapsed the planted exact dup; a REWRITE-style
+  control implementation fails the same regression (the control that proves
+  the regression can see the defect); transcript committed.
+- [ ] CYCLE 111 — `loop47:` R-A consolidation — lessons DELETED INTO the
+  playbook: migrate `~/.codemonkey/lessons.json` → `kind: lesson` entries
+  (verified flag preserved; docstring carries the moved citations); the
+  RETRIEVAL-PARITY GATE runs BEFORE the deletion lands — every previously
+  retrievable lesson retrievable after, or the deletion aborts and the file
+  stays; `lessons_cli` rewired to the playbook (or deleted with its register
+  row moved to the deletion-verdict table — decide on the parity result and
+  record which); `lessons.py` reduced to a shim or removed per the verdict.
+  | est: 60m |
+  verify: parity probe — snapshot `lessons.retrieve(verified_only=True)`
+  before, migrate, re-retrieve from the playbook, SET-EQUAL both directions
+  (nothing dropped, nothing invented); `uv run codemonkey lessons list`
+  still answers; break-verified control — drop one migrated entry, the
+  parity gate must go red; register/deletion-table updated both ways.
+- [ ] CYCLE 112 — `loop47:` loop 47 acceptance + report: register rows
+  PROVEN-LIVE with probe transcripts named; the playbook-on/off arms hook
+  NAMED for loop 50 (same BLOCKED discipline as loop 46 — no number without
+  a run); suite green; sweep shipped form; BUILD_REPORT loop-47 section.
+  | est: 40m |
+  verify: `bash build/acceptance_sweep.sh` → offline rows exit 0, live rows
+  BLOCKED-with-reason (the v4.0 named exception list covers them or a NEW
+  named row is added); `uv run pytest -q` → exit 0; `build/CAPABILITY_
+  REGISTER.md` no UNVALIDATED row; report committed; tag NOT cut (v5.0 is
+  loop 50's).
 
 ### loop39: cycles (selected from build/research-loop39.md, cycle R39)
 

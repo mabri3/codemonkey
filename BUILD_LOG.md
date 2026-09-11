@@ -3627,3 +3627,35 @@ them justifies waiving a row at v4.0.
   "changed", not "learned", until an endpoint answers (one command to close).
 - **Next step:** R47 research — the evolving playbook + the R-A consolidation
   verdict over the five accumulation surfaces.
+
+## 2026-09-10 — CYCLE R47 (research): the evolving playbook + the R-A consolidation verdict
+
+- **Files changed:** `build/research-loop47.md` (new, 12,011 bytes);
+  `build/plan.md` (R47 ticked with DONE record; `### loop47: cycles` appended,
+  C107–C112 each with a literal verify probe).
+- **Citations (web, real):** ACE — arXiv 2510.04618 (ICLR 2026): +10.6%
+  agents / +8.6% finance, −86.9% adaptation latency, the 18,282→122-token
+  collapse case (66.7%→57.1%, below the 63.7% no-adaptation baseline);
+  Experience Compression Spectrum — arXiv 2604.15877v1 (cross-community
+  citation rate <1% over 1,136 refs; traces→memory→skills→rules axis);
+  ExpeL — arXiv 2308.10144 (AAAI-24); Memory-for-Agents survey —
+  arXiv 2603.07670 (relevance, not storage, is the bottleneck);
+  ExpGraph — arXiv 2605.30712 (frozen executor + external experience).
+  Never-a-target sentence recorded for the ACE numbers.
+- **In-repo grounding:** all five surfaces read at `65db0a2` — `lessons.py`
+  (verified-gate semantics, `lessons.json`), `compile_rules.py` (draft ask
+  rules → operator saves → permissions), memory strategies (`file|adaptive|
+  none`), `learnedctx.py` (a SELECTOR over four sources, stores nothing),
+  playbook (absent). The verdict merges by ROLE, never across trust postures.
+- **R-A verdict (per surface):** playbook INTRODUCED; lessons DELETED INTO it
+  (parity gate before the deletion lands, cycle 111); memory SURVIVES;
+  compile_rules SURVIVES (enforcement projection); learnedctx REFRAMED
+  (selector, gains a `playbook` class). Accumulation surfaces: 4+1 → 2.
+- **Rejected with reasons:** C6 monolithic rewrite (the collapse case study);
+  C7 cross-repo sharing (deferred — R-J provenance stops at this machine).
+- **Core-design: NO** — acceptance terms written; one recorded note (the
+  lessons.json deletion is an R-A disposal with a parity gate, not silent).
+- **Probes:** none of the code kind — this cycle's verify is the file itself
+  (≥5 cited candidates, SELECTED, per-surface verdict) + the appended cycles.
+- **Tests run:** none (no src change); suite untouched at 868/5.
+- **Next step:** CYCLE 107 — the playbook store + deterministic delta merge.
