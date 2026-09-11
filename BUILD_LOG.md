@@ -3995,3 +3995,25 @@ them justifies waiving a row at v4.0.
 - **Tests run:** none (no src change); suite untouched at 924/5.
 - **Next step:** CYCLE 117 — the ToolResult taint bit + per-record markers
   + the read-path sweep.
+
+## 2026-09-10 — CYCLE 117 (loop49): the taint bit on ToolResult + per-record markers
+
+- **Files changed:** `src/codemonkey/tools/base.py` (`ToolResult.taint`
+  {sources, tainted}; default clean; explicitly filled by the LOOP),
+  `src/codemonkey/loop.py` (taint computed once, carried on the result +
+  meta; journal `fields={tainted, taint_sources}` on every outcome record),
+  `tests/test_taint_results.py` (new, 4), `build/probes/cycle117-probe.{py,out}`,
+  `THREAT_MODEL.md` (read-path sweep table), register `taint` row extended.
+- **Probe results (literal, R-I):** `cycle117-probe.py` → **PASS (7/7)** —
+  write_file `tainted=False` · web_fetch `['web_fetch']` · read_file AFTER
+  the fetch `tainted=False` (record-level, not run-level) · shell
+  `['shell']` (coarse); add-dir outside read → `outside_read`; denied read
+  (no add-dir) → status error, honestly not a source; sweep table in
+  THREAT_MODEL.md.
+- **Discovery recorded:** a bare out-of-workspace `read_file` is
+  sandbox-DENIED before content is consumed ("outside allowed roots") — the
+  reachable outside-read path is an operator-granted add-dir root, and
+  source_for covers exactly that. The sweep table names the remaining gaps
+  (delegate child output; admitted-skill dispatch output).
+- **Tests run:** 4/4 new; full suite **928 passed, 5 skipped** (was 924/5).
+- **Next step:** CYCLE 118 — taint propagation through compaction + spill.

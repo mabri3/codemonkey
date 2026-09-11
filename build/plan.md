@@ -2152,6 +2152,17 @@ appended by its own research cycle, with loops 42-45 closed in parallel.
   exactly the right turns; a clean run's records carry `tainted: false`
   (attested, never omitted); the read-path sweep table committed in the
   threat model (covered or named per path).
+  **DONE 2026-09-10.** `ToolResult.taint` (filled by the LOOP, never by
+  tools — a tool cannot author its own cleanliness claim); per-record
+  journal `fields={tainted, taint_sources}` attested on EVERY outcome; the
+  executor's meta carries it through. Probe `cycle117-probe.out` **PASS
+  (7/7)**: write clean / fetch `['web_fetch']` / read-after-fetch CLEAN
+  (record-level attribution — the run-scope gap this cycle closed) / shell
+  coarse; add-dir read → `outside_read`; denied read → error + clean;
+  sweep table committed. **Discovery recorded:** a bare out-of-workspace
+  `read_file` is sandbox-DENIED before any content is consumed (not a
+  source — correctly); the reachable outside-read path is an add-dir root.
+  Tests 4/4. Suite **928/5**.
 - [ ] CYCLE 118 — `loop49:` propagation — taint survives compaction and a
   spill round-trip: compaction of tainted-derived messages marks the output
   (summary provenance / sliding-window keeps markers); `truncate_with_spill`

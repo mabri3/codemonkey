@@ -16,10 +16,16 @@ class ToolResult:
     output: str
     ok: bool = True
     meta: dict = None
+    taint: dict = None   # loop49 C117: filled by the LOOP after execution —
+                         # {"sources": [...], "tainted": bool}. Tools never
+                         # set it; the loop computes it from `source_for` so
+                         # a tool cannot author its own cleanliness claim.
 
     def __post_init__(self):
         if self.meta is None:
             self.meta = {}
+        if self.taint is None:
+            self.taint = {"sources": [], "tainted": False}
         if len(self.output) > MAX_OUTPUT:
             self.output = self.output[:MAX_OUTPUT] + TRUNCATE_MARKER.format(limit=MAX_OUTPUT)
 

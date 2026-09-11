@@ -136,3 +136,22 @@ authorized. Recorded explicitly so it is not re-asked:
 - Hand another agent a pack, not the journal: `codemonkey evidence pack
   <thread> --out pack.json` then `codemonkey evidence verify pack.json` —
   and verify it on THEIR machine, where no model endpoint is needed.
+
+## Read-path sweep — injection paths, covered or NAMED (loop49 C117)
+
+Required by `build/research-loop49.md` §threat model: every path by which
+content this repo did not author can enter a run, with its status. "Covered"
+means the per-record taint field (`outcome.tainted` / `taint_sources`,
+attested on every record) names it; "NAMED" means it is a recorded gap, not
+an unexamined assumption.
+
+| path | status | detail |
+|---|---|---|
+| `web_fetch` bodies | COVERED | source `web_fetch`; success-with-text only; per-record since C117 |
+| `shell` stdout/stderr | COVERED (coarse) | source `shell` — ANY output text, exit code irrelevant; conservative by design |
+| path reads (`read_file`/`list_dir`/`glob`/`search`) resolving outside the primary workspace root **under an operator-granted add-dir** | COVERED | source `outside_read`; success-only (an errored read consumed nothing) |
+| the same read WITHOUT an add-dir root | DENIED-BY-SANDBOX | refused before content is consumed ("outside allowed roots"); correctly NOT a source; pinned by test |
+| tainted spill read-backs | NAMED, closes in C118 | a spilled untrusted output's pointer re-enters history; the marker round-trip lands in cycle 118 |
+| `delegate` / `delegate_batch` child output | NAMED GAP | a child run's text re-enters the parent without inheriting the child's taint; revisit after this arc |
+| admitted-skill dispatch output | NAMED GAP | treated as repo-local command output; the C83 admission gate (probe exit code) is the control that exists |
+| `repo_map` / `graph_*` / `digest` (repo-internal views) | TRUSTED-POSTURE | repo content is operator-authored; no outside read, no recorded gap |

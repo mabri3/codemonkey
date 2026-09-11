@@ -1,0 +1,17 @@
+--- a. attestation + record-level attribution ---
+    write_file  tainted=False sources=[]
+    web_fetch   tainted=True sources=['web_fetch']
+    read_file   tainted=False sources=[]
+    shell       tainted=True sources=['shell']
+  [PASS] 4 outcome records
+  [PASS] every record ATTESTED (tainted present)
+  [PASS] write clean / fetch marked / read-after-fetch clean / shell coarse
+--- b. out-of-workspace reads (add-dir vs denied) ---
+    with add-dir:   tainted=True sources=['outside_read']
+  [PASS] add-dir outside read carries outside_read
+    without add-dir: status=error tainted=False
+  [PASS] denied read is an error, honestly not a source
+--- c. sweep table committed ---
+  [PASS] read-path sweep table present in THREAT_MODEL.md
+
+CYCLE117 PROBE: PASS

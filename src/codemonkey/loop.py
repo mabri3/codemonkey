@@ -664,9 +664,17 @@ def run_turns(
                         {"raised": True, "_jkey": jkey})
             # loop46 cycle 85: coarse taint — web_fetch output, shell stdout or
             # an add-dir read marks the RUN (metadata only; content never seen).
+            # loop49 cycle 117: the same answer now travels WITH the result —
+            # `result.taint` (filled here, never by the tool) and the journal
+            # record's `fields` carry it per turn, so a later attribution can
+            # name WHICH turn saw untrusted content (run-scoped was the gap).
+            meta = {"_jkey": jkey, "taint": {"sources": [], "tainted": False}}
             try:
                 _src = taint_mod.source_for(
                     name, call.get("args") or {}, ctx, result.output, result.ok)
+                result.taint = ({"sources": [_src], "tainted": True} if _src
+                                else {"sources": [], "tainted": False})
+                meta = {"_jkey": jkey, "taint": dict(result.taint)}
                 if _src:
                     _taint.note(_src)
             except Exception:
@@ -680,6 +688,11 @@ def run_turns(
                         error_class=("tool-error" if not result.ok else ""),
                         duration_ms=int((time.monotonic() - t0) * 1000),
                         output=result.output,
+                        # loop49 cycle 117: per-turn taint ATTESTED on every
+                        # outcome record (True or False — never omitted), so
+                        # attribution to turns is a journal read, not a guess.
+                        fields={"tainted": bool(result.taint.get("tainted")),
+                                "taint_sources": list(result.taint.get("sources") or [])},
                         **_shell_kw(),
                         )
                 except OSError:
@@ -700,7 +713,8 @@ def run_turns(
                     repro_tracker.note_write(str((call.get("args") or {}).get("path", "")))
                 except Exception:
                     pass
-            return (idx, name, result.ok, result.output, {"_jkey": jkey})
+            return (idx, name, result.ok, result.output,
+                    meta if isinstance(meta, dict) else {"_jkey": jkey})
 
         max_workers = min(len(calls), 8) if len(calls) > 1 else 1
         if max_workers > 1:
