@@ -2087,6 +2087,21 @@ appended by its own research cycle, with loops 42-45 closed in parallel.
   refusal at the boundary, provider-call count shows the crossing call never
   happened (the C103 pattern); normal budgets → projected line printed,
   run proceeds; `--best-of 1` prints nothing new (byte-identical output).
+  **DONE 2026-09-10.** Spend counter fed at the event funnel (works with and
+  without `--json`); `_bo_cost_gate` prints `[bestofn] projected extra
+  spend: K × ~N tokens; declared tokens=…, spent so far=…` BEFORE each
+  candidate boundary (and before the refine) and refuses when
+  `spent + estimate > declared` — exit 4, `budget.exhausted
+  {stage:"bestofn-boundary"}`, completed `via:"budget-refusal"`, resumable
+  job. Probe `cycle115-probe.out` **PASS (10/10)**: 25-token budget →
+  refusal before candidate 2 (provider-call count == 2 — the crossing call
+  never happened; tree keeps candidate 1; exit 4; real job id); 1000-token
+  budget → projection printed, run proceeds, exit 0; tournament + refine
+  gated identically. Tests `test_bestofn_costgate.py` 5/5. **Defect found
+  and fixed:** the C103 breach path's `resumable job:` line read `job_id`
+  from a dict keyed `id` and printed `None` — both call sites fixed, the
+  C103 path verified live (probe §c: `resumable job: job-2026…`). Suite
+  **924/5**.
 - [ ] CYCLE 116 — `loop48:` loop 48 acceptance + report: probe transcripts
   named in the register; suite green; sweep shipped form; BUILD_REPORT
   loop-48 section; the refine-vs-none live delta named

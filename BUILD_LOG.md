@@ -3926,3 +3926,28 @@ them justifies waiving a row at v4.0.
   text is the winner's, never a claim the machine check passed).
 - **Next step:** CYCLE 115 — the cost gate: projected spend printed BEFORE
   candidate 2; declared budgets enforced at the same boundary.
+
+## 2026-09-10 — CYCLE 115 (loop48): the cost gate — printed before the spend, enforced at the boundary
+
+- **Files changed:** `src/codemonkey/exec.py` (spend counter at the event
+  funnel; `_bo_cost_gate` + boundary calls in both best-of branches and
+  before the refine; exit-4 refusal path with resumable job; **job-id key
+  fix in BOTH resumable-job lines** — the C103 turn-boundary path read
+  `job_id` from a dict keyed `id` and printed `None`),
+  `tests/test_bestofn_costgate.py` (new, 5), `build/probes/cycle115-probe.{py,out}`,
+  register rows (`bestofn`, `budgets` fix note), features.html.
+- **Probe results (literal, R-I):** `cycle115-probe.py` → **PASS (10/10)** —
+  (a) declared 25 tokens: `[bestofn] projected extra spend: 2 more
+  candidate(s) × ~20 tokens = ~40 tokens; declared tokens=25, spent so
+  far=20` → refusal before candidate 2 (`provider calls == 2` — the crossing
+  call never happened), exit 4, `budget.exhausted{stage:"bestofn-boundary"}`,
+  tree keeps candidate 1, `resumable job: job-20260910-215732-ff75cf`;
+  (b) declared 1000: projection printed, run proceeds, exit 0, verified tree;
+  (c) the C103 turn-boundary breach prints `resumable job: job-2026…` (was
+  `None`).
+- **Tests run:** 5/5 new (+ budgets 17/17 still green); full suite **924
+  passed, 5 skipped** (was 919/5).
+- **Known issue / observation:** the fix to the C103 line is a defect fix
+  (wrong dict key → `None` in operator output), not a behavior change; the
+  refusal path reuses the C103 resumability pattern (job + stderr + event).
+- **Next step:** CYCLE 116 — loop 48 acceptance + report.

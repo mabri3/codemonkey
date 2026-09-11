@@ -1,0 +1,22 @@
+--- a. tiny budget: refused BEFORE candidate 2's call ---
+one
+    | [bestofn] projected extra spend: 2 more candidate(s) × ~20 tokens = ~40 tokens; declared tokens=25, spent so far=20
+    | [budget] tokens limit 25 would be crossed by the next attempt (observed 20, estimate 20) — refused before the provider call
+    | [budget] resumable job: job-20260910-215732-ff75cf
+  [PASS] exit 4 — exit=4
+  [PASS] provider calls == 2 (candidate 2 never started) — n=2
+  [PASS] tree keeps candidate 1
+  [PASS] budget.exhausted stage=bestofn-boundary
+  [PASS] projection line printed
+  [PASS] REAL job id (not None)
+--- b. budget fits: projection prints, run proceeds ---
+two
+  [PASS] exit 0 and verified tree
+  [PASS] projection printed on the fit path
+--- c. C103 turn-boundary breach prints a REAL job id (fix check) ---
+BUDGET REACHED — tokens limit 15 (total tokens billed across turns); observed 20 at turn 2. The run stopped itself before crossing the limit. Declared: tokens=15. Resume from the job file, or re-run with a deliberately raised budget.
+  [PASS] turn-boundary breach still fires (exit 4) — exit=4
+  [PASS] breach names the turn boundary
+  [PASS] resumable job line carries a REAL id — ['[budget] resumable job: job-20260910-215732-f9404b']
+
+CYCLE115 PROBE: PASS

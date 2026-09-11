@@ -262,10 +262,16 @@ def run_exec(
     ctx.extra["run_id"] = run_id
     ctx.extra["session_id"] = thread_id
     _emit_base = emit_fn or (lambda ev: events.emit(ev, json_mode=json_mode))
+    # loop48 cycle 115: the cost gate's spend counter — fed at the event
+    # funnel so it works with or without --json (event_sink may be None).
+    _bo_usage_total = {"tokens": 0}
 
     def emit(ev: dict) -> None:
         from .events import stamp as _stamp
 
+        if ev.get("type") == "turn.completed":
+            _bo_usage_total["tokens"] += int(
+                (ev.get("usage") or {}).get("total_tokens") or 0)
         _stamp(ev)  # loop43 cycle 101: versioned envelope at the funnel
         if event_sink is not None:
             event_sink.append(ev)
@@ -703,6 +709,38 @@ def run_exec(
             "exclusive: the machine verifier is tier 1 and settles the "
             "selection where it can")
 
+    # loop48 cycle 115: the cost gate — projected extra spend printed BEFORE
+    # it is incurred, and a declared token budget enforced at the same
+    # boundary so the crossing provider call never happens (R-F: a limit
+    # that is only reported is not a limit).
+    _bo_budget_refused: Optional[dict] = None
+
+    def _bo_cost_gate(_done: int, _remaining: int) -> bool:
+        """Print the projection; return True = the run must not proceed."""
+        nonlocal _bo_budget_refused
+        _spent = int(_bo_usage_total["tokens"])
+        _avg = (_spent // _done) if _done else 0
+        _decl_tok = _declared_budget.tokens
+        sys.stderr.write(
+            f"[bestofn] projected extra spend: {_remaining} more candidate(s) "
+            f"× ~{_avg} tokens = ~{_remaining * _avg} tokens; declared "
+            f"tokens={'unlimited' if _decl_tok is None else _decl_tok}, "
+            f"spent so far={_spent}\n")
+        if _decl_tok is not None and _spent + _avg > _decl_tok:
+            _bo_budget_refused = {
+                "field": "tokens", "limit": _decl_tok, "observed": _spent,
+                "estimate": _avg,
+                "reason": f"the next attempt (~{_avg} tokens) would cross "
+                          f"the declared token budget ({_decl_tok})"}
+            emit({"type": "budget.exhausted", "thread_id": thread_id,
+                  "field": "tokens", "limit": _decl_tok, "observed": _spent,
+                  "projected": _spent + _avg, "stage": "bestofn-boundary"})
+            emit({"type": "bestofn.completed", "thread_id": thread_id,
+                  "ok": False, "index": None, "via": "budget-refusal",
+                  "last_fail_tail": _bo_budget_refused["reason"]})
+            return True
+        return False
+
     def _run_once(_jrun):
         _unload_retried = False
         try:
@@ -784,6 +822,8 @@ def run_exec(
             _bo_cand_texts: list = []
             for _bi in range(_eff_best_of):
                 if _bi > 0:
+                    if _bo_cost_gate(_bi, _eff_best_of - _bi):
+                        break
                     _bo_restore2(workdir, _bo_snap2)
                     history = list(_base_history)
                 emit({"type": "bestofn.attempt", "thread_id": thread_id,
@@ -791,11 +831,15 @@ def run_exec(
                 turn = _run_once(f"{run_id}:b{_bi}")
                 _bo_cand_snaps.append(_bo_snapshot2(workdir))
                 _bo_cand_texts.append(getattr(turn, "content", "") or "")
-            _bo_sel = _bo_tournament(
-                [{"text": _t} for _t in _bo_cand_texts],
-                compare_fn=lambda a, b, _cmd=tournament_compare: _bo_cmp_cmd(
-                    _cmd, a, b, workdir))
-            if _bo_sel["selected"] is not None:
+            _bo_sel = None
+            if _bo_budget_refused is None:
+                _bo_sel = _bo_tournament(
+                    [{"text": _t} for _t in _bo_cand_texts],
+                    compare_fn=lambda a, b, _cmd=tournament_compare: _bo_cmp_cmd(
+                        _cmd, a, b, workdir))
+            if _bo_sel is None:
+                pass  # refused at the boundary: the gate already emitted
+            elif _bo_sel["selected"] is not None:
                 _bo_restore2(workdir, _bo_cand_snaps[_bo_sel["selected"]])
                 turn.content = _bo_cand_texts[_bo_sel["selected"]]
                 _bestofn_ok = True
@@ -824,6 +868,8 @@ def run_exec(
             _bo_failures: list = []
             for _bi in range(_eff_best_of):
                 if _bi > 0:
+                    if _bo_cost_gate(_bi, _eff_best_of - _bi):
+                        break
                     _bo_restore(workdir, _bo_snap)
                     history = list(_base_history)
                 emit({"type": "bestofn.attempt", "thread_id": thread_id,
@@ -840,7 +886,9 @@ def run_exec(
                                      "text": getattr(turn, "content", "") or ""})
             else:
                 _bo_refined = False
-                if refine_seeded:
+                if refine_seeded and _bo_cost_gate(_eff_best_of, 1):
+                    pass  # refused at the boundary: no refine call starts
+                elif refine_seeded:
                     # loop48 cycle 113: ONE seeded refine attempt — the
                     # losers' bounded evidence becomes the seed (PDR), the
                     # SAME machine check decides, and the refined tree stands.
@@ -1038,6 +1086,27 @@ def run_exec(
         except OSError as exc:
             sys.stderr.write(f"[warn] could not persist session: {exc}\n")
 
+    if _bo_budget_refused is not None:
+        # loop48 cycle 115: refused at a best-of boundary BEFORE the spend —
+        # exit 4 (the declared-budget code), the refusal named, and a
+        # resumable job written exactly like a turn-boundary breach (C103).
+        _br = _bo_budget_refused
+        sys.stderr.write(
+            f"[budget] {_br['field']} limit {_br['limit']} would be crossed "
+            f"by the next attempt (observed {_br['observed']}, estimate "
+            f"{_br['estimate']}) — refused before the provider call\n")
+        try:
+            from . import jobs as _jobs
+            _job = _jobs.create(
+                f"resume after budget refusal: {_br['field']} limit "
+                f"{_br['limit']} cannot fit another candidate at the "
+                f"best-of boundary",
+                ["inspect the run's trace", "raise the budget deliberately, "
+                 "or continue with the candidate already on disk"])
+            sys.stderr.write(f"[budget] resumable job: {_job.get('id')}\n")
+        except Exception as _exc:                     # pragma: no cover
+            sys.stderr.write(f"[warn] no resume job written: {_exc}\n")
+        return 4
     if _bestofn_ok is False:
         # best-of ran and no candidate passed the verifier: the tree keeps
         # the last attempt's evidence and the exit code says so.
@@ -1067,7 +1136,7 @@ def run_exec(
                 ["inspect the run's trace and job record",
                  "resume from the checkpoint, or re-run with a deliberately "
                  "raised budget"])
-            sys.stderr.write(f"[budget] resumable job: {_job.get('job_id')}\n")
+            sys.stderr.write(f"[budget] resumable job: {_job.get('id')}\n")
         except Exception as _exc:                     # pragma: no cover
             sys.stderr.write(f"[warn] no resume job written: {_exc}\n")
         return 4
