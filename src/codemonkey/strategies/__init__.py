@@ -4,6 +4,8 @@ Config-selected, env-overridable, pluggable by domain:
   - compaction:    summarizing (default) | sliding-window
   - memory:        file (default)        | none
   - session_state: jsonl (default)       | sqlite
+  - context:       static (default)      | learned
+  - skills:        off (default)         | use | learn   (loop46)
 
 Selector precedence: CODEMONKEY_STRATEGY_<DOMAIN> env var > strategies.<domain>
 in config > default. Unknown names raise ValueError; the CLI surface maps that
@@ -30,6 +32,10 @@ DOMAINS = {
     "memory": {"env": "CODEMONKEY_STRATEGY_MEMORY", "valid": VALID_MEMORY, "default": "file"},
     "session_state": {"env": "CODEMONKEY_STRATEGY_SESSION_STATE", "valid": VALID_STORES, "default": "jsonl"},
     "context": {"env": "CODEMONKEY_STRATEGY_CONTEXT", "valid": VALID_CONTEXT, "default": "static"},
+    # loop46 cycle 84: the skill library load policy. `off` (default) | `use`
+    # (load ADMITTED skills only) | `learn` (use + `skill_create` allowed).
+    # Nothing here loads quarantined artifacts — that gate is skills.admit.
+    "skills": {"env": "CODEMONKEY_STRATEGY_SKILLS", "valid": ("off", "use", "learn"), "default": "off"},
 }
 
 

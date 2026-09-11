@@ -3502,3 +3502,36 @@ them justifies waiving a row at v4.0.
 - **Next step:** CYCLE 84 — `skill_create` tool + strategy domain `skills`
   (`off` default | `use` | `learn`); admitted skills merge into SPECS/PARAMS
   at run start.
+
+## 2026-09-10 — CYCLE 84 (loop46): `skill_create` tool + strategy domain `skills`
+
+- **Files changed:** `src/codemonkey/tools/skill_create.py` (new tool),
+  `src/codemonkey/skill_runner.py` (new — child-process host for a skill's
+  tool.py; agent-authored code is never imported in-process),
+  `src/codemonkey/skills.py` (`dispatch()`: admitted-only, gated at least as
+  strictly as shell), `src/codemonkey/loop.py` (admitted skills merge into
+  the advertised set under `use`/`learn`; dispatch routing; native `params`),
+  `src/codemonkey/strategies/__init__.py` + `config.py` (skills domain:
+  `off` default | `use` | `learn`; env; A19 validation),
+  `src/codemonkey/sandbox.py` (skill_create = write tool),
+  `argvalidate.py` (skill_create contract), `exec.py` (run/session ids into
+  ctx.extra for provenance), `tests/test_skills_strategy.py` (new, 7 tests),
+  `tests/test_tools.py` (registry pin 16 → 17), `build/probes/cycle84-probe.{sh,out}`,
+  `build/CAPABILITY_REGISTER.md` (skill_runner row), `features.html`.
+- **Probe results (literal, R-I):** `codemonkey config` → `skills: 'off'`;
+  `CODEMONKEY_STRATEGY_SKILLS=bogus` → **exit 2**, `Valid skills strategies:
+  off, use, learn`; `python -m codemonkey.skill_runner tool.py '{"n":7}'` →
+  `{"ok": true, "output": "runner-direct:7", "error": ""}`; through real
+  `run_turns` with a recording provider: the `use` system prompt is the `off`
+  prompt **plus exactly one line** (byte-diff asserted), an admitted skill is
+  callable end-to-end (`util-ran:hi` on the trace), and a read-only run is
+  `sandbox-denied`. Transcript: `build/probes/cycle84-probe.out`.
+- **Defect the tests caught:** the advertised skill line omitted the callable
+  NAME (spec text only) — a tool the model could never have called; fixed to
+  `name: spec (skill; …)` before commit.
+- **Tests run:** new file 7/7; full suite **850 passed, 5 skipped** (was 843/5).
+- **Register:** skill_runner row added (the completeness control fired on it —
+  as designed); 71/71 modules · 64 PROVEN-LIVE · 7 UNIT-ONLY · 0 UNVALIDATED.
+- **Known issues:** none. The taint rule is C85's: provenance `taint_free`
+  records False until the tracker is wired (stated, not faked).
+- **Next step:** CYCLE 85 — the coarse taint rule.

@@ -66,6 +66,10 @@ DEFAULTS: dict = {
         "memory": "file",
         "session_state": "jsonl",
         "context": "static",
+        # loop46 cycle 84: the skill library's load policy. `off` (default) =
+        # nothing loads; `use` = admitted skills join the tool set; `learn` =
+        # use + the model may author new QUARANTINED candidates.
+        "skills": "off",
     },
 }
 
@@ -95,6 +99,7 @@ ENV_MAP: dict[str, str] = {
     "CODEMONKEY_STRATEGY_MEMORY": "strategies.memory",
     "CODEMONKEY_STRATEGY_SESSION_STATE": "strategies.session_state",
     "CODEMONKEY_STRATEGY_CONTEXT": "strategies.context",
+    "CODEMONKEY_STRATEGY_SKILLS": "strategies.skills",
     "CODEMONKEY_CONTEXT_BUDGET": "context_budget",
 }
 
@@ -228,6 +233,7 @@ KNOWN_STRATEGIES: dict[str, list[str]] = {
     "memory": ["adaptive", "file", "none"],
     "session_state": ["jsonl", "sqlite"],
     "context": ["static", "learned"],
+    "skills": ["off", "use", "learn"],
 }
 
 _ENUMS: dict[str, list] = {

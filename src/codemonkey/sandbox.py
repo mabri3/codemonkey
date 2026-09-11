@@ -30,7 +30,7 @@ _READ_TOOLS = frozenset(
     {"read_file", "list_dir", "glob", "search", "update_plan", "web_fetch", "repo_map", "update_memory",
      "graph_query", "graph_path", "graph_explain"}
 )
-_WRITE_TOOLS = frozenset({"write_file", "edit_file"})
+_WRITE_TOOLS = frozenset({"write_file", "edit_file", "skill_create"})
 _SHELL_TOOLS = frozenset({"shell"})
 
 

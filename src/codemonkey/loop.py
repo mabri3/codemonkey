@@ -95,6 +95,12 @@ def run_turns(
     """
     fallback = fallback or FallbackRecorded()
     specs = tool_registry.SPECS
+    # loop46 cycle 84: admitted skills join the advertised tool set when the
+    # `skills` strategy says so (`use` | `learn`). Quarantined / evicted /
+    # disabled entries are NOT loaded (R-J); a built-in name always wins.
+    skill_specs, skill_params = _skill_tools(ctx)
+    if skill_specs:
+        specs = {**specs, **skill_specs}
     system = prompt_protocol.prompt_block(specs, memory_enabled=memory_enabled)
     if system_extra:
         system = system_extra + "\n\n" + system
@@ -256,7 +262,7 @@ def run_turns(
                     messages,
                     system=system,
                     stream=stream,
-                    tools=_native_specs(specs, provider),
+                    tools=_native_specs(specs, provider, skill_params),
                     on_token=on_token,
                     cache_prompt=prompt_cache,
                 )
@@ -384,7 +390,7 @@ def run_turns(
                         elif native_first:
                             retry = provider.chat(
                                 messages, system=system, stream=stream,
-                                tools=_native_specs(specs, provider), on_token=on_token,
+                                tools=_native_specs(specs, provider, skill_params), on_token=on_token,
                                 cache_prompt=prompt_cache,
                             )
                         else:
@@ -632,7 +638,10 @@ def run_turns(
                     jkey = ""
             t0 = time.monotonic()
             try:
-                result = tool_registry.dispatch(name, call.get("args") or {}, ctx)
+                if name in skill_specs:
+                    result = _dispatch_skill(name, call.get("args") or {}, ctx)
+                else:
+                    result = tool_registry.dispatch(name, call.get("args") or {}, ctx)
             except Exception as exc:  # isolation: sibling calls must survive
                 if journal_thread and jkey:
                     try:
@@ -1122,8 +1131,55 @@ def run_turns(
     return last_turn
 
 
-def _native_specs(specs: dict, provider=None) -> list[dict]:
-    """Native tool array in the wire shape this provider's protocol expects."""
+def _native_specs(specs: dict, provider=None, params: dict | None = None) -> list[dict]:
+    """Native tool array in the wire shape this provider's protocol expects.
+
+    `params` (loop46 cycle 84) supplies wire schemas for ad-hoc tools (admitted
+    skills) that are not in the global registry; built-ins fall back to it
+    internally."""
     from .native import tool_specs_for
 
-    return tool_specs_for(getattr(provider, "protocol", "openai"), specs)
+    return tool_specs_for(getattr(provider, "protocol", "openai"), specs, params)
+
+
+def _skill_tools(ctx) -> tuple[dict, dict]:
+    """loop46 cycle 84: the admitted skills a run may see, as
+    ({name: spec_line}, {name: wire_schema}) — or ({}, {}) when the `skills`
+    strategy is `off`.
+
+    Quarantined / evicted / disabled / invalid entries are never loaded
+    (R-J), and a name that collides with a built-in loses to the built-in."""
+    from . import skills as skills_mod
+    from . import strategies as strat_mod
+
+    cfg = (getattr(ctx, "extra", None) or {}).get("config")
+    try:
+        strategy = strat_mod.select_strategy("skills", cfg)
+    except Exception:
+        strategy = "off"
+    if strategy not in ("use", "learn"):
+        return {}, {}
+    specs: dict = {}
+    params: dict = {}
+    for row in skills_mod.load_admitted(ctx.workdir):
+        if row["name"] in tool_registry.SPECS:  # built-ins always win
+            continue
+        specs[row["name"]] = (f"{row['name']}: {row['spec']} (skill; "
+                              f"probe-verified at admission — revocable)")
+        params[row["name"]] = row.get("params") or {"type": "object",
+                                                    "properties": {}}
+    return specs, params
+
+
+def _dispatch_skill(name: str, args: dict, ctx):
+    """Route one skill call through the quarantine-aware dispatcher."""
+    from . import skills as skills_mod
+    from .tools.base import ToolResult
+
+    r = skills_mod.dispatch(ctx.workdir, name, args,
+                            level=getattr(ctx, "sandbox", "workspace-write"),
+                            timeout=float(getattr(ctx, "timeout", 120.0)))
+    if r["ok"]:
+        return ToolResult(output=r["output"])
+    detail = r["error"] or r["output"] or "skill call failed"
+    return ToolResult(output=f"error: {detail}", ok=False)

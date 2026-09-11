@@ -217,6 +217,7 @@ def list_skills(workdir: str | Path) -> list[dict]:
             out.append({
                 "name": man["name"], "status": man["status"],
                 "spec": man["spec"], "probe": man["probe"],
+                "params": man["params"],
                 "provenance": man["provenance"], "valid": True,
                 "dir": str(d),
             })
@@ -361,3 +362,67 @@ def admit(workdir: str | Path, name: str, *, level: Optional[str] = None,
             "status": man["status"],
             "reason": f"probe exit {code} — stays {man['status']}",
             "output": combined, "level": level, "thread": thread}
+
+
+# --- dispatch: calling an admitted skill (cycle 84) --------------------------
+#
+# A skill call is gated at least as strictly as `shell` (a skill's body is
+# arbitrary code — the gate proves it RUNS, not that it is tame), and the
+# skill's tool.py executes in a CHILD process: agent-authored code is never
+# imported into this one. The parent checks the gate; the child only runs.
+
+def dispatch(workdir: str | Path, name: str, args: dict, *,
+             level: str = "workspace-write", timeout: float = 60.0) -> dict:
+    """Call an admitted skill. Returns `{"ok", "output", "error"}`.
+
+    Refused when the skill is not `admitted` (R-J: quarantined/evicted/
+    disabled read as not loaded) or when the sandbox level cannot run it."""
+    import subprocess
+    import sys
+
+    from . import sandbox as sandbox_mod
+
+    workdir = Path(workdir)
+    try:
+        man = read_manifest(workdir, name)
+    except SkillError as exc:
+        return {"ok": False, "output": "", "error": str(exc)}
+    if man["status"] != "admitted":
+        return {"ok": False, "output": "",
+                "error": f"skill {name!r} is {man['status']!r} — not callable "
+                         f"until admitted (R-J)"}
+    ctx = sandbox_mod.ToolContext(workdir=workdir, sandbox=level,
+                                  timeout=timeout)
+    try:
+        sandbox_mod.check("shell", ctx)
+    except sandbox_mod.SandboxError as exc:
+        return {"ok": False, "output": "",
+                "error": f"sandbox-denied: a skill executes code; {exc}"}
+    tool_path = skill_dir(workdir, name) / "tool.py"
+    if not tool_path.is_file():
+        return {"ok": False, "output": "",
+                "error": f"{name}: tool.py is missing — the store entry is "
+                         f"incomplete"}
+    try:
+        proc = subprocess.run(
+            [sys.executable, "-m", "codemonkey.skill_runner", str(tool_path),
+             json.dumps(args or {})],
+            cwd=str(workdir), capture_output=True, text=True, timeout=timeout,
+            stdin=subprocess.DEVNULL)
+    except subprocess.TimeoutExpired:
+        return {"ok": False, "output": "",
+                "error": f"{name}: timed out after {timeout}s"}
+    out = (proc.stdout or "").strip()
+    payload = None
+    if out:
+        try:
+            payload = json.loads(out.splitlines()[-1])
+        except ValueError:
+            payload = None
+    if proc.returncode != 0 or not isinstance(payload, dict):
+        detail = (proc.stderr or "").strip()[-600:] or "no result payload"
+        return {"ok": False, "output": out[-600:],
+                "error": f"{name}: exit {proc.returncode}; {detail}"}
+    err = str(payload.get("error", ""))
+    return {"ok": bool(payload.get("ok")), "output": str(payload.get("output", "")),
+            "error": err}

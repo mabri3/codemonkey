@@ -15,6 +15,7 @@ from . import (
     update_plan,
     web_fetch,
     write_file,
+    skill_create,
     graph as graph_mod,
 )
 
@@ -33,6 +34,7 @@ _MODULES = {
     "update_memory": update_memory,
     "update_plan": update_plan,
     "web_fetch": web_fetch,
+    "skill_create": skill_create,
     "graph_query": graph_mod.GraphQueryTool,
     "graph_path": graph_mod.GraphPathTool,
     "graph_explain": graph_mod.GraphExplainTool,
@@ -53,6 +55,7 @@ SPECS = {
     "update_memory": "update_memory(fact) -> append a durable fact to memory (disabled when strategies.memory=none)",
     "update_plan": "update_plan(mode=append|replace|clear, content, id, status=pending|in_progress|completed) -> renders plan",
     "web_fetch": "web_fetch(url) -> bounded GET (60s, 512KB) of a doc page",
+    "skill_create": skill_create.SPEC,
     "graph_query": "graph_query(symbol, max_results=20) -> graphify nodes matching symbol + their edges (reports [stale] when the graph is older than HEAD)",
     "graph_path": "graph_path(from, to, max_depth=4) -> shortest relation path between two symbols in the code graph",
     "graph_explain": "graph_explain(name) -> node summary + neighbors for a codebase symbol from the code graph",
@@ -230,6 +233,7 @@ PARAMS: dict[str, dict] = {
         "properties": {"name": _s("Symbol/concept to explain from the code graph.")},
         "required": ["name"],
     },
+    "skill_create": skill_create.PARAMS,
 }
 
 

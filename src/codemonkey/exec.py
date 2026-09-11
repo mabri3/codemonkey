@@ -253,6 +253,12 @@ def run_exec(
 
     thread_id = events.new_thread_id()
     run_id = uuid.uuid4().hex[:8]  # 31F1: journal idempotency scope
+    # loop46 cycle 84: provenance for anything this run writes INTO the skill
+    # store (skill_create). taint_free is intentionally NOT set here — cycle
+    # 85 wires the tracker; until then the field records False, never a
+    # claimed cleanliness.
+    ctx.extra["run_id"] = run_id
+    ctx.extra["session_id"] = thread_id
     _emit_base = emit_fn or (lambda ev: events.emit(ev, json_mode=json_mode))
 
     def emit(ev: dict) -> None:

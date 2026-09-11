@@ -1,0 +1,14 @@
+=== (a) codemonkey config (skills default) ===
+strategies:
+  compaction: summarizing
+  memory: file
+  session_state: jsonl
+  context: static
+  skills: 'off'
+exit=0
+=== (b) CODEMONKEY_STRATEGY_SKILLS=bogus ===
+exit=2
+error: unknown strategy 'bogus' for 'skills'. Valid skills strategies: off, use, learn
+=== (c) skill_runner direct ===
+{"ok": true, "output": "runner-direct:7", "error": ""}
+exit=0

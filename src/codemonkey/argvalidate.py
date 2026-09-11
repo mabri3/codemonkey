@@ -29,6 +29,9 @@ PARAMS: dict[str, dict] = {
     "web_fetch": {"required": ["url"], "types": {"url": str}},
     "update_memory": {"required": [], "types": {"path": str, "content": str}},
     "job_update": {"required": [], "types": {"job_id": str, "step_id": str, "status": str}},
+    "skill_create": {"required": ["name", "spec", "probe"],
+                     "types": {"name": str, "spec": str, "probe": str,
+                               "params": dict, "tool_src": str}},
 }
 
 
