@@ -1,0 +1,24 @@
+$ codemonkey skills show demo_ok  [exit 0]
+  demo_ok  [admitted]
+    spec:    says hello
+    probe:   echo ok
+    params:  {"properties": {}, "type": "object"}
+    provenance: run_id=r-orig session_id=s1 taint_free=True
+    created: 2026-09-11T04:16:14Z
+    2026-09-11T04:16:14Z  quarantined -> admitted  (C86 probe)
+pre-revoke  prompt has 'demo_ok': True
+$ codemonkey skills revoke demo_ok  [exit 0]
+  demo_ok: revoked (was admitted) — removed; the next load cannot see it
+post-revoke prompt has 'demo_ok': False
+$ codemonkey skills list  [exit 0]  -> no skills installed (/private/var/folders/xb/kzc31shn1pz2s_5l2fy6d7rh0000gn/T/cm86-4i4sa01w/.codemonkey/skills)
+$ codemonkey skills revoke nope  [exit 2]  error: no skill named 'nope' in /private/var/folders/xb/kzc31shn1pz2s_5l2fy6d7rh0000gn/T/cm86-4i4sa01w/.codemonkey/skills
+$ codemonkey skills disable  [exit 0]  skill library DISABLED for /private/var/folders/xb/kzc31shn1pz2s_5l2fy6d7rh0000gn/T/cm86-4i4sa01w — zero skills load; evidence kept on disk
+  load_admitted while disabled: []
+  list still shows evidence: ['demo_two']
+  disabled prompt has 'demo_two': False
+$ codemonkey skills disable --enable  [exit 0]  skill library ENABLED for /private/var/folders/xb/kzc31shn1pz2s_5l2fy6d7rh0000gn/T/cm86-4i4sa01w — admitted skills load again
+  load_admitted after enable: ['demo_two']
+--- journal ---
+  skill.revoked key=demo_ok status=was-admitted
+  skills.disabled key=* status=disabled
+  skills.enabled key=* status=enabled

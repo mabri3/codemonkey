@@ -3567,3 +3567,28 @@ them justifies waiving a row at v4.0.
   The "outside read" source is judged against the PRIMARY root (add-dir reads
   count as outside) — stated in `taint.py`.
 - **Next step:** CYCLE 86 — the R-J revocation surface (`skills show|revoke|disable`).
+
+## 2026-09-10 — CYCLE 86 (loop46): the R-J revocation surface
+
+- **Files changed:** `src/codemonkey/skills.py` (`revoke()` — one command, the
+  skill is REMOVED; `set_disabled()`/`is_disabled()` — library-level marker,
+  never a deletion; `load_admitted` and `dispatch` honor it),
+  `src/codemonkey/skills_cli.py` (`show <name>`, `revoke <name>`,
+  `disable [--enable]` — every state change journaled),
+  `tests/test_skills_cli.py` (new, 5 tests), `build/probes/cycle86_probe.py` +
+  `cycle86-probe.out`, `features.html`.
+- **Probe results (literal, R-I):** `skills show demo_ok` → full record incl.
+  `run_id=r-orig` and the `quarantined -> admitted` history; the pre-revoke
+  `skills=use` prompt contains `demo_ok` (`True`), after `skills revoke
+  demo_ok` (exit 0) it does not (`False`) — the byte-diff; `skills list` →
+  honest empty; `revoke nope` → **exit 2**, refused not ignored; `skills
+  disable` → `load_admitted == []`, evidence kept (`list` still shows the
+  second skill), the disabled prompt lacks it, and a run still completes;
+  `disable --enable` restores loading; journal carries
+  `skill.revoked key=demo_ok status=was-admitted`, `skills.disabled`,
+  `skills.enabled`. Transcript: `build/probes/cycle86-probe.out`.
+- **Tests run:** new file 5/5; full suite **862 passed, 5 skipped** (was 857/5).
+- **Known issues:** none. `--enable` is the one flag beyond the sentence's
+  four verbs — the designed reversal, so `disable` cannot dead-end the
+  library with no unblocked path (recorded here as a decision).
+- **Next step:** CYCLE 87 — R-K measurement + loop 46 acceptance.

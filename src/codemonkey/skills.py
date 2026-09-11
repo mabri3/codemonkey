@@ -232,9 +232,55 @@ def list_skills(workdir: str | Path) -> list[dict]:
 def load_admitted(workdir: str | Path) -> list[dict]:
     """The ONLY loader a run may use this era: valid manifests with status
     exactly `admitted`. Everything else — quarantined, evicted, disabled,
-    invalid — reads as not loaded. No store → `[]`."""
+    invalid — reads as not loaded. No store → `[]`.
+
+    A library-level disable flag (R-J: `codemonkey skills disable`) reads as
+    zero skills WITHOUT deleting any evidence — the manifests and history
+    stay on disk; only the load stops."""
+    if is_disabled(workdir):
+        return []
     return [r for r in list_skills(workdir)
             if r["valid"] and r["status"] == "admitted"]
+
+
+DISABLED_MARKER = ".disabled"
+
+
+def is_disabled(workdir: str | Path) -> bool:
+    return (store_root(workdir) / DISABLED_MARKER).exists()
+
+
+def set_disabled(workdir: str | Path, disabled: bool,
+                 reason: str = "") -> bool:
+    """Turn the whole library off (or back on) for this workspace. The off
+    state is a marker file, never a deletion — every manifest, log and
+    verdict survives, so `disable` is reversible and auditable. Returns the
+    new state."""
+    root = store_root(workdir)
+    marker = root / DISABLED_MARKER
+    if disabled:
+        root.mkdir(parents=True, exist_ok=True)
+        _atomic_write(marker, json.dumps({"at": _now(), "reason": reason}) + "\n")
+    else:
+        try:
+            marker.unlink()
+        except FileNotFoundError:
+            pass
+    return disabled
+
+
+def revoke(workdir: str | Path, name: str) -> dict:
+    """R-J revocation in one command: the skill is REMOVED (its store
+    directory is deleted), which restores prior behavior immediately — the
+    next load cannot see it. The removal itself is journaled by the caller
+    (`skill.revoked`), so the act is auditable even though the artifact is
+    gone. A skill that never existed is refused, not silently ignored."""
+    import shutil
+
+    man = read_manifest(workdir, name)  # validates existence (raises SkillError)
+    d = skill_dir(workdir, name)
+    shutil.rmtree(d)
+    return {"name": name, "removed": True, "was": man["status"]}
 
 
 def set_status(workdir: str | Path, name: str, status: str,
@@ -383,6 +429,11 @@ def dispatch(workdir: str | Path, name: str, args: dict, *,
     from . import sandbox as sandbox_mod
 
     workdir = Path(workdir)
+    if is_disabled(workdir):
+        return {"ok": False, "output": "",
+                "error": f"the skill library is disabled for this workspace "
+                         f"(codemonkey skills disable) — nothing loads, so "
+                         f"nothing is callable"}
     try:
         man = read_manifest(workdir, name)
     except SkillError as exc:
