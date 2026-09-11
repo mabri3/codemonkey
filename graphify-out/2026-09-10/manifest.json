@@ -20,9 +20,9 @@
     "semantic_hash": "45b5ecd8e0d9e22cdc08d4dd8260f701"
   },
   "src/codemonkey/cli.py": {
-    "mtime": 1789099041.119828,
-    "ast_hash": "341905176ae69078a9537004ca00c109",
-    "semantic_hash": "341905176ae69078a9537004ca00c109"
+    "mtime": 1789100341.0138936,
+    "ast_hash": "c3c9d0201b24e07e60b632ada26a1db1",
+    "semantic_hash": "c3c9d0201b24e07e60b632ada26a1db1"
   },
   "src/codemonkey/config.py": {
     "mtime": 1789099500.7646875,
@@ -1073,5 +1073,15 @@
     "mtime": 1789100163.163608,
     "ast_hash": "354b9cdbbad0f240c7b6b28797a2aad7",
     "semantic_hash": "354b9cdbbad0f240c7b6b28797a2aad7"
+  },
+  "src/codemonkey/skills_arms.py": {
+    "mtime": 1789100381.527631,
+    "ast_hash": "0312e0a970a009eb8ef313d452e84441",
+    "semantic_hash": "0312e0a970a009eb8ef313d452e84441"
+  },
+  "tests/test_skills_arms.py": {
+    "mtime": 1789100352.4757116,
+    "ast_hash": "1a2f7689b326e940011a6d6a4f6ea665",
+    "semantic_hash": "1a2f7689b326e940011a6d6a4f6ea665"
   }
 }

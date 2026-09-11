@@ -554,6 +554,13 @@ try:
 except ImportError:  # pragma: no cover
     pass
 try:
+    from .playbook_cli import app as _playbook_app
+
+    app.add_typer(_playbook_app, name="playbook",
+                  help="Evolving playbook: quarantined, delta-curated, revocable.")
+except ImportError:  # pragma: no cover
+    pass
+try:
     from .digest_cli import digest_cmd
 
     app.command(name="digest", help="Plain-text digest of one run (thread).")(digest_cmd)

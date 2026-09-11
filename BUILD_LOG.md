@@ -3659,3 +3659,34 @@ them justifies waiving a row at v4.0.
   (≥5 cited candidates, SELECTED, per-surface verdict) + the appended cycles.
 - **Tests run:** none (no src change); suite untouched at 868/5.
 - **Next step:** CYCLE 107 — the playbook store + deterministic delta merge.
+
+## 2026-09-10 — CYCLE 107 (loop47): playbook store + deterministic delta merge
+
+- **Files changed:** `src/codemonkey/playbook.py` (new — store at
+  `.codemonkey/playbook/playbook.json`, gitignored by construction; entry
+  {id, kind, section, text, status, counter, first/last_seen, provenance,
+  history}; deterministic id `sha256(kind, section, normalized text)` so the
+  merge is idempotent and the dedup exact; `merge_deltas` = non-LLM logic:
+  append-as-quarantined, counter/last_seen bumps in place, refusals REPORTED
+  with index+reason and nothing partial; `load_admitted` = the only loader;
+  `set_status`/`revoke`/`playbook_thread`), `playbook_cli.py` (new —
+  list|show|merge|admit|revoke), `cli.py` (playbook typer app),
+  `tests/test_playbook_store.py` (new, 11 tests), register rows `playbook` +
+  `playbook_cli`, `build/probes/cycle107-probe.{sh,out}`.
+- **Probe results (literal, R-I):** `bash build/probes/cycle107-probe.sh` →
+  **PASS** — honest empty (exit 0); merge → `merged: added=2 updated=0
+  refused=1 total=2` + `refused delta[2]: kind 'rant' is not one of [...]`;
+  quarantined `load_admitted → []`; `show` prints counter + provenance
+  (run_id/session_id/taint_free/source); `admit` → loads; re-merge → counter
+  1→2 with the text byte-identical and the status preserved; `revoke` → entry
+  gone, `show` after → exit 2; journal (thread `playbook-ws`) carries
+  `playbook.merged`, `playbook.admitted`, `playbook.revoked`.
+- **Tests run:** `tests/test_playbook_store.py` 11/11; full suite **879
+  passed, 5 skipped** (was 868/5).
+- **Register:** `playbook`/`playbook_cli` rows PROVEN-LIVE with the probe
+  transcript named; completeness control green (879/5 includes it).
+- **Known issue:** none new. Byte-stability is the invariant cycle 110's
+  50-round regression measures; the load gate (who may admit → injection) is
+  cycle 109's policy, deliberately not in this module.
+- **Next step:** CYCLE 108 — the reflector (`playbook reflect <thread>`:
+  journal records → evidence-cited deltas; prints, never merges).

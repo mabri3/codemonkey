@@ -87,6 +87,8 @@ difference; `pytest` alone never qualifies):
 | impact | PROVEN-LIVE | `codemonkey graph run_turns` prints cross-file `calls` edges; loader reads `links` (2328 nodes / 4339 edges, 892 cross-file) after 98F1 |
 | ladder | UNIT-ONLY | scripted L1/L2/L3 runner green (`tests/test_segment.py`); the LIVE ladder is BLOCKED with the endpoint down (C99/C100) |
 | partial | UNIT-ONLY | counts `write_file`/`edit_file` outcomes only — shell-mediated edits are not observable from the journal, and the limit is stated in its own output (96F1) |
+| playbook | PROVEN-LIVE | `codemonkey playbook` full round-trip: no store → exit 0 honest empty; `merge` 2 deltas + 1 invalid kind → `added=2 updated=0 refused=1` with the reason printed (nothing partial); quarantined entries `load_admitted → []`; `show` prints counter+provenance; `admit` → loads; re-merge → counter 1→2 with the TEXT byte-identical; `revoke` → entry gone, `show` exit 2 (removed); journal carries `playbook.merged/admitted/revoked` (`build/probes/cycle107-probe.out`, loop47 C107) |
+| playbook_cli | PROVEN-LIVE | same as playbook (the `playbook` command surface) |
 | recovery | PROVEN-LIVE | conformance `budget` stub run → `failure_report.budget_exhausted` on the wire from the released binary |
 | repro | PROVEN-LIVE | conformance `verify` stub run → `repro.verdict` on the wire from the released binary |
 | stuck | PROVEN-LIVE | conformance `gaveup` stub run → `stuck` on the wire from the released binary |

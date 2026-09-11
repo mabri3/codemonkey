@@ -1,0 +1,42 @@
+
+--- 1. list with no store (honest empty) ---
+no playbook entries (/private/var/folders/xb/kzc31shn1pz2s_5l2fy6d7rh0000gn/T/tmp.LjPavTF9Dw/ws/.codemonkey/playbook/playbook.json)
+exit=0
+
+--- 2. merge two valid deltas + one refusal ---
+merged: added=2 updated=0 refused=1 total=2
+  refused delta[2]: delta[2]: kind 'rant' is not one of ['strategy', 'pitfall', 'schema', 'tool_pattern', 'lesson']
+exit=0
+
+--- 3. list shows 2 quarantined entries ---
+pb-f4cfa9d065	quarantined	strategy/tools	x1	prefer rg over grep in this repo
+pb-6a3ef53e3b	quarantined	pitfall/context	x1	never rewrite accumulated context wholesale
+
+--- 4. in-process: quarantined entries do NOT load ---
+load_admitted -> [] (quarantined excluded)
+
+--- 5. show one entry (full record) ---
+entry: pb-f4cfa9d065
+pb-f4cfa9d065  [quarantined]  strategy/tools
+  text:     prefer rg over grep in this repo
+  counter:  1  (first_seen 2026-09-11T04:26:35Z, last_seen 2026-09-11T04:26:35Z)
+  provenance: run_id=probe-r1 session_id=probe-s1 taint_free=True source=operator:probe
+exit=0
+
+--- 6. admit -> loads; re-merge -> counter bumps, bytes stable ---
+pb-f4cfa9d065: admitted — it may now reach a prompt (context = playbook)
+text before: prefer rg over grep in this repo
+text after:  prefer rg over grep in this repo
+counter: 2
+load_admitted -> 1 admitted (the re-merge changed no bytes it loads)
+
+--- 7. revoke in one command -> gone ---
+pb-f4cfa9d065: revoked (was admitted) — removed; the next load cannot see it
+exit=0
+error: no playbook entry with id 'pb-f4cfa9d065'
+show-after-revoke exit=2
+
+--- 8. journal carries the acts ---
+journal[playbook-ws] types: ['playbook.merged', 'playbook.admitted', 'playbook.merged', 'playbook.revoked']
+
+CYCLE107 PROBE: PASS

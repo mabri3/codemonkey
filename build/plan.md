@@ -2130,7 +2130,7 @@ appended by its own research cycle, with loops 42-45 closed in parallel.
 
 ### loop47: cycles (selected from build/research-loop47.md, cycle R47 — AUTHORIZED 2026-09-10)
 
-- [ ] CYCLE 107 — `loop47:` playbook store + deterministic delta merge:
+- [x] CYCLE 107 — `loop47:` playbook store + deterministic delta merge:
   `playbook.py` — entry schema {id, kind, section, text, status, counter,
   provenance}; store `.codemonkey/playbook/playbook.json` (gitignored by
   construction, same quarantine pattern as `skills.py`); `merge_deltas()` is
@@ -2143,6 +2143,18 @@ appended by its own research cycle, with loops 42-45 closed in parallel.
   (asserted in-process against the same store); merge unit tests include
   append/update/dedup branches; register completeness control fires on the
   new module and the row is added.
+  **DONE 2026-09-10.** `playbook.py` + `playbook_cli.py` (list|show|merge|
+  admit|revoke); deterministic id = sha256(kind, section, normalized-text)
+  → merge is idempotent AND the dedup exact; byte-stability pinned (re-merge
+  bumps counter, never rewrites text/status/provenance). Probe
+  `build/probes/cycle107-probe.out` PASS: honest empty → merge 2+1-refused
+  (`added=2 updated=0 refused=1`, kind refusal printed) → quarantined
+  `load_admitted → []` → show (counter+provenance) → admit → re-merge →
+  counter 1→2, text byte-identical, load unchanged → revoke → gone, show
+  exit 2 → journal `playbook.merged/admitted/revoked`. Tests
+  `tests/test_playbook_store.py` 11/11 (incl. corrupt-store loud error,
+  gitignore-by-construction, whitespace identity). Register: `playbook`,
+  `playbook_cli` rows added — completeness control green. Suite **879/5**.
 - [ ] CYCLE 108 — `loop47:` the reflector — journal → evidence-cited deltas:
   `playbook.reflect(records)` is a PURE deterministic pass (no model call;
   failure classes + outcomes → candidate deltas that cite their record
