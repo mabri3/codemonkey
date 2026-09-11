@@ -132,24 +132,61 @@ def test_binary_addressable_docs_only():
 
 
 def test_type_coverage_enumerates_contract(tmp_path):
-    """102F7: every §2 ON-THE-WIRE type appears on a binary-produced
-    stream; raw tool.* never does. Four stub-driven runs, union compared."""
+    """102F7/102F8: the §2 list — PARSED FROM THE DOCUMENT — is enumerated
+    against streams the binary produced, and every documented wire type is
+    accounted for."""
     cov = _drv.type_coverage(tmp_path)
-    assert cov["ok"] and cov["covered"] == len(_drv.WIRE_TYPES), cov
+    assert cov["ok"], cov
+    assert cov["covered"] == cov["documented"]["wire"], cov
 
 
-def test_wire_and_internal_sets_documented():
-    """Both directions of §2/code agreement, pinned mechanically: every
-    wire type is documented ON-THE-WIRE, every internal type in the
-    internal carve-out."""
+def test_the_contract_lists_are_parsed_not_copied():
+    """102F8: `build/contract.md` §2 is the source of truth.
+
+    This replaces a test that iterated over a hand-maintained copy of the list
+    in `conformance.py` and checked only code -> doc. A type added to §2 with
+    nothing producing it was invisible — demonstrated on HEAD by adding
+    `checkpoint.created` to §2 and watching the suite stay green. The parser
+    now reads the marked regions, so the document drives the control.
+    """
+    from pathlib import Path as _P
+
+    doc_text = (_P(__file__).parent.parent / "build" / "contract.md").read_text()
+    wire, internal = _drv.parse_contract_types()
+    for t in sorted(wire):
+        assert f"`{t}`" in doc_text, t
+    for t in sorted(internal):
+        assert f"`{t}`" in doc_text, t
+    # the markers are load-bearing: without them the parser refuses to run
+    assert _drv.WIRE_BEGIN in doc_text and _drv.WIRE_END in doc_text
+    assert _drv.INTERNAL_BEGIN in doc_text and _drv.INTERNAL_END in doc_text
+
+
+def test_contract_type_counts_are_pinned():
+    """The exact counts, so a change to a BINDING document is deliberate.
+
+    Adding a type here means adding a run that produces it; removing one is a
+    major bump under §2's own compatibility rule. The runtime floor in
+    `parse_contract_types` guards the other failure — a parse that matches
+    nothing must never read as "all covered", which is this same bug one level
+    down.
+    """
+    wire, internal = _drv.parse_contract_types()
+    assert len(wire) == 18, sorted(wire)
+    assert len(internal) == 2, sorted(internal)
+
+
+def test_the_budget_pair_is_disambiguated_in_the_contract():
+    """102F8: two events one character apart, with different producers and
+    different effects, are spelled out in the binding document and their
+    payloads are asserted disjoint by the coverage probe."""
     from pathlib import Path as _P
 
     doc = (_P(__file__).parent.parent / "build" / "contract.md").read_text()
-    for t in sorted(_drv.WIRE_TYPES):
-        assert f"`{t}`" in doc, t
-    for t in sorted(_drv.INTERNAL_TYPES):
-        assert f"`{t}`" in doc, t
-    assert "INTERNAL, deliberately not on the wire" in doc
+    assert "disambiguation (102F8)" in doc
+    assert "report only" in doc, "the recovery event's effect must be stated"
+    assert "halts the run" in doc, "the declared-budget event's effect must be stated"
+    assert "neither type is renamed" in doc.lower()
 
 
 def test_run_binary_closes_stdin(monkeypatch):

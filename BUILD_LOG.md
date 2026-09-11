@@ -3287,6 +3287,48 @@ them justifies waiving a row at v4.0.
 - **Known issues:** none.
 - **Next step:** C106 — endpoint-off verification + register completion.
 
+## 2026-09-10 — CYCLE 102F8: the coverage gate enumerated a COPY of the contract
+
+- **Files changed:** `build/conformance.py` (contract parser + set equality both
+  ways + budget-pair disjointness), `build/contract.md` (§2 markers, producer
+  conditions, disambiguation table), `tests/test_conformance.py` (3 new tests
+  replacing the code→doc-only one).
+- **The defect.** `WIRE_TYPES` was a hand-maintained frozenset in the driver;
+  `contract.md` was never read; the test that claimed to pin agreement iterated
+  over the code's copy and checked only code → doc. Adding `checkpoint.created`
+  to §2's ON-THE-WIRE list left `tests/test_conformance.py` at **13 passed**.
+  §2 has been PUBLISHED BINDING since `3bdb346` — a binding document with no
+  drift control.
+- **The fix.** The document is the source of truth: the wire and internal lists
+  live in marked regions, `parse_contract_types()` reads them, and the probe
+  asserts SET EQUALITY both ways — documented-but-unproducible FAILS, and
+  **produced-but-undocumented** FAILS (a direction that did not exist at all).
+  The leak check stays. The parser refuses to run without its markers and
+  enforces a floor, so a parse that matches nothing cannot read as "all
+  covered"; the exact counts (18/2) are pinned in the test.
+- **The gate caught its own parser on first run.** The token regex required a
+  dot, silently dropping `error`, `notice` and `stuck` — 15 of 18 types. The
+  floor and the new direction reported it immediately. This is the failure mode
+  the cycle exists to prevent, reproduced inside the fix for it.
+- **Disambiguation decided, not deferred.** `failure_report.budget_exhausted`
+  (recovery report — `{report}`, report-only) vs `budget.exhausted` (declared
+  budget — `{field…}`, halts, exit 4): an explicit table in §2, **no rename**
+  (a rename is a breaking change under §2's own rule; the defect was
+  documentation), and the probe asserts the payloads are disjoint on real
+  streams so the table cannot drift from the events.
+- **Break runs (both required, both on the artifact).** A: bogus
+  `checkpoint.created` in §2 → `FAIL [coverage] documented §2 types never
+  produced: ['checkpoint.created']`, exit 1, count pin also fires; removed →
+  green. B: exec.py's `budget.exhausted` branch disabled → `FAIL [coverage]
+  documented §2 types never produced: ['budget.exhausted']`, exit 1; restored →
+  green.
+- **Ledger correction.** My 102F9 note said the ASK's `102F8` citation
+  "resolves to nothing". The search was right; the inference was not — it was
+  assigned work dropped from a paste. Corrected in plan.md at the citation.
+- **Tests run:** conformance 10/10 PASS (`18 §2 types`); `uv run pytest -q` →
+  **816 passed, 5 skipped** (was 814/5).
+- **Next step:** C106 — endpoint-off verification + register completion.
+
 ## 2026-09-10 — CYCLE loop44-final: Loop 44 acceptance
 
 - **Files changed:** `build/BUILD_REPORT.md` (Loop 44 section), `build/plan.md`.

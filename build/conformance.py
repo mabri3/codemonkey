@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import socket
 import subprocess
 import sys
@@ -183,18 +184,61 @@ def live_probe(workdir: Path) -> dict:
 # raw tool.* on the wire. 102F6 found plan.* missing by asserting one
 # documented type; it found only that one because it asserted only that
 # one. Enumerate, don't sample.
-WIRE_TYPES = frozenset({
-    "thread.started", "turn.started", "turn.completed",
-    "item.started", "item.completed",
-    "verify.started", "verify.completed",
-    "plan.started", "plan.completed", "plan.rolled_back",
-    "repro.verdict",
-    "failure_report.gave_up", "failure_report.consulted",
-    "failure_report.budget_exhausted",
-    "budget.exhausted",
-    "stuck", "error", "notice",
-})
-INTERNAL_TYPES = frozenset({"tool.started", "tool.completed"})
+CONTRACT = REPO / "build" / "contract.md"
+WIRE_BEGIN = "<!-- WIRE-TYPES:BEGIN -->"
+WIRE_END = "<!-- WIRE-TYPES:END -->"
+INTERNAL_BEGIN = "<!-- INTERNAL-TYPES:BEGIN -->"
+INTERNAL_END = "<!-- INTERNAL-TYPES:END -->"
+_TYPE_TOKEN = re.compile(r"`([a-z][a-z0-9_]*(?:\.[a-z][a-z0-9_]*)?)`")
+# The optional dotted part is REQUIRED to be optional: `error`, `notice` and
+# `stuck` are type names without a namespace. The first version of this regex
+# demanded a dot and silently parsed 15 of §2's 18 wire types — caught by the
+# count pin and by the both-directions set check, which is exactly why both
+# exist. INVARIANT: a marked region contains TYPE NAMES ONLY (plus each name's
+# payload notes in braces); a stray backticked word there would be reported by
+# name as "documented but never produced", and would change the pinned count.
+# Floor for the parse. A regex that matches nothing must not read as "all
+# covered" — that is this cycle's own defect one level down. It is a FLOOR and
+# not an exact pin on purpose: removing a type from §2 is a legitimate (if
+# major) edit, and an exact pin here would forbid it. The exact counts are
+# pinned in tests/test_conformance.py, where a change is visible and deliberate.
+MIN_WIRE_TYPES, MIN_INTERNAL_TYPES = 8, 2
+
+
+def _marked_region(text: str, begin: str, end: str) -> str:
+    i = text.find(begin)
+    j = text.find(end, i + 1) if i >= 0 else -1
+    if i < 0 or j < 0:
+        raise ConformanceFailure(
+            f"[contract] marker pair {begin!r} … {end!r} not found in "
+            f"build/contract.md — §2 is the source of truth and this parser "
+            f"refuses to degrade to an empty list")
+    return text[i + len(begin):j]
+
+
+def parse_contract_types(path=None) -> tuple[frozenset, frozenset]:
+    """The §2 wire and internal type sets, read OUT OF the document (102F8).
+
+    These used to be hand-maintained constants here — a copy of the contract
+    that no edit to the contract could affect. §2 is binding (3bdb346), so
+    the document is the source and the code follows it.
+    """
+    text = (path or CONTRACT).read_text()
+    wire = frozenset(
+        _TYPE_TOKEN.findall(_marked_region(text, WIRE_BEGIN, WIRE_END)))
+    internal = frozenset(
+        _TYPE_TOKEN.findall(_marked_region(text, INTERNAL_BEGIN, INTERNAL_END)))
+    if len(wire) < MIN_WIRE_TYPES or len(internal) < MIN_INTERNAL_TYPES:
+        raise ConformanceFailure(
+            f"[contract] the §2 parse produced wire={len(wire)} "
+            f"internal={len(internal)} types, below the floor "
+            f"({MIN_WIRE_TYPES}/{MIN_INTERNAL_TYPES}) — the markers or the list "
+            f"format changed. An empty parse must never read as 'all covered'.")
+    both = wire & internal
+    if both:
+        raise ConformanceFailure(
+            f"[contract] §2 lists types as BOTH wire and internal: {sorted(both)}")
+    return wire, internal
 
 # 102F10/103: the exit code each stub run produced — the §1 control for a code
 # that can only be observed on a run (4 = declared-budget breach).
@@ -316,6 +360,7 @@ def type_coverage(workdir: Path) -> dict:
     }
     union: set = set()
     per_run: dict = {}
+    events_by_run: dict = {}
     for name, spec in runs.items():
         turns, args = spec[0], spec[1]
         env_extra = spec[2] if len(spec) > 2 else None
@@ -328,17 +373,56 @@ def type_coverage(workdir: Path) -> dict:
         events = _stub_run(workdir / name, name, turns, args, home, env_extra)
         types = {e.get("type", "") for e in events}
         per_run[name] = sorted(types)
+        events_by_run[name] = events
         union |= types
+
+    # 102F8: §2 is the source of truth, parsed out of the document itself.
+    wire_types, internal_types = parse_contract_types()
+
     # envelope validator already pinned v on every event (check_stream).
-    missing = sorted(t for t in WIRE_TYPES if t not in union)
-    leaked = sorted(t for t in INTERNAL_TYPES if t in union)
+    # SET EQUALITY, BOTH DIRECTIONS. Documented-but-unproducible is the
+    # direction 102F7 added; produced-but-undocumented is the one that was
+    # missing entirely, and it is how a stream starts emitting something the
+    # binding contract does not describe.
+    missing = sorted(t for t in wire_types if t not in union)
+    undocumented = sorted(t for t in union
+                          if t not in wire_types and t not in internal_types)
+    leaked = sorted(t for t in internal_types if t in union)
     if missing:
         raise ConformanceFailure(
             f"[coverage] documented §2 types never produced: {missing} "
             f"(per-run: {per_run})")
+    if undocumented:
+        raise ConformanceFailure(
+            f"[coverage] types on the wire that §2 documents NOWHERE: "
+            f"{undocumented} — either document them as wire types (with a run "
+            f"that produces them) or stop emitting them (per-run: {per_run})")
     if leaked:
         raise ConformanceFailure(
             f"[coverage] INTERNAL types on the wire: {leaked}")
+
+    # 102F8: the two budget events must be distinguishable ON THE WIRE, not
+    # only in the disambiguation table. `failure_report.budget_exhausted` is
+    # the recovery report ({report}); `budget.exhausted` is the declared-budget
+    # halt ({field}). A payload that fits both would make the pair confusable
+    # in exactly the way the table exists to prevent.
+    _rec = [e for e in events_by_run.get("budget", [])
+            if e.get("type") == "failure_report.budget_exhausted"]
+    _dec = [e for e in events_by_run.get("budgetlimit", [])
+            if e.get("type") == "budget.exhausted"]
+    if not _rec or not _dec:
+        raise ConformanceFailure(
+            f"[coverage] the budget pair is not both observable: recovery="
+            f"{len(_rec)} declared={len(_dec)} — the disambiguation in §2 "
+            f"describes events no run produces")
+    if any("field" in e for e in _rec) or any("report" in e for e in _dec) \
+            or not any("report" in e for e in _rec) \
+            or not any("field" in e for e in _dec):
+        raise ConformanceFailure(
+            f"[coverage] the two budget events are not disjoint on the wire: "
+            f"recovery keys={sorted(k for k in _rec[0])}, declared "
+            f"keys={sorted(k for k in _dec[0])}")
+
     # loop44 C103: contract §1's code 4 ("budget breach") is documented BEFORE
     # its implementation; this is the control that makes the row a claim.
     got = _LAST_EXIT.get("budgetlimit")
@@ -349,7 +433,9 @@ def type_coverage(workdir: Path) -> dict:
     return {"probe": "type-coverage", "ok": True,
             "runs": {k: len(v) for k, v in per_run.items()},
             "exit_codes": dict(_LAST_EXIT),
-            "covered": len(union & WIRE_TYPES)}
+            "documented": {"wire": len(wire_types),
+                           "internal": len(internal_types)},
+            "covered": len(union & wire_types)}
 
 
 def main() -> int:

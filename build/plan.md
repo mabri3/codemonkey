@@ -2359,6 +2359,41 @@ appended by its own research cycle, with loops 42-45 closed in parallel.
   first run of a multi-run row)**, and the break run (delete
   `sweep-A7.log`, the artifact, not a stand-in) went **14 passed → 2 failed
   naming A7 → 14 passed**. Suite 763 → **777 passed, 5 skipped**.
+- [x] CYCLE 102F8 — the coverage gate enumerates a COPY of the contract.
+  `WIRE_TYPES` was a hand-maintained frozenset in `build/conformance.py`
+  (`:186`); the driver never read `contract.md`, and
+  `test_wire_and_internal_sets_documented` asserted only code → doc while its
+  docstring claimed both directions. Demonstrated on HEAD: adding
+  `checkpoint.created` {group} to §2's ON-THE-WIRE list — nothing produces it —
+  left `tests/test_conformance.py` at **13 passed**. Since §2 is PUBLISHED
+  BINDING (`3bdb346`), that was a binding document with no drift control.
+  **FIX:** `parse_contract_types()` reads the wire and internal lists out of
+  the marked regions of `contract.md` (`<!-- WIRE-TYPES:BEGIN/END -->`,
+  `<!-- INTERNAL-TYPES:BEGIN/END -->`) and the probe asserts **SET EQUALITY in
+  both directions** — documented-but-unproducible FAILS, and
+  produced-but-undocumented FAILS (a direction that did not exist at all). The
+  leak check stays. The parser REFUSES to run without its markers and enforces
+  a floor (8 wire / 2 internal) so a parse that matches nothing cannot read as
+  "all covered"; the exact counts (18/2) are pinned in the test, where a change
+  to a binding document is deliberate and visible.
+  **The gate caught its own parser immediately:** the first token regex
+  required a dot, so `error`, `notice` and `stuck` were silently dropped — 15
+  of 18 — and both the floor and the new both-directions check reported it.
+  **§2 disambiguation (decision, not deferred):** `failure_report.budget_exhausted`
+  (loop-39 RECOVERY report: `{report}`, report-only, run continues) and
+  `budget.exhausted` (loop-44 C103 DECLARED budget: `{field…}`, HALTS, exit 4)
+  get an explicit table in §2; **neither is renamed** — renaming a type in a
+  binding document is a breaking change under §2's own compatibility rule, and
+  the defect was documentation, not the API. The probe now also asserts their
+  payloads are **disjoint on the wire**, so the table cannot drift from the
+  events.
+  **BREAK RUN A (bogus documented type):** `checkpoint.created` added to §2 →
+  `FAIL [coverage] documented §2 types never produced: ['checkpoint.created']`,
+  conformance exit 1, count pin also fires (19 ≠ 18); removed → green.
+  **BREAK RUN B (deleted forwarding branch):** exec.py's `budget.exhausted`
+  branch disabled → `FAIL [coverage] documented §2 types never produced:
+  ['budget.exhausted']`, exit 1; restored → green.
+  Suite 797 → **816 passed, 5 skipped**.
 - [x] CYCLE 102F6 — F2 (LOW): C97 probe CLI-addressable. DONE (binary path,
   not reword): `build/stub_provider.py` (scripted OpenAI-compatible turns
   over real HTTP, JSON+SSE, zero product changes) + `tests/test_changeplan_cli.py`
@@ -2414,17 +2449,22 @@ appended by its own research cycle, with loops 42-45 closed in parallel.
   the exact defect this arc has hit eight times. §3 stays advisory and
   marked as such until it has a probe." → **contract.md §1 + §2 are BINDING;
   §3 is explicitly ADVISORY-UNTIL-PROBED and must say so in the document.**
-  **LEDGER NOTE (102F9, 2026-09-10): the citation "102F8" in this ASK
-  resolves to nothing.** Searched: `build/plan.md` (the line above is its
-  only occurrence in the repo), the working tree, and `git log --all` — no
-  entry, no commit, no report. The break-verified envelope/type controls that
-  DO exist are **102F1** (envelope: `2 failed` / "event missing v:
-  'thread.started'", was 7 passed), **102F7** (wire/internal type coverage:
-  RED listing `plan.started/plan.rolled_back/plan.completed`, restored green)
-  and **102F5** (real-trace emit break: `AssertionError: loop must emit a
-  real verdict`, 2 failed / 11 passed). Recorded rather than silently mapped:
-  a cited control that does not exist is the 102F7 defect class — a
-  documented artifact that no run can produce.
+  **LEDGER NOTE (102F9, 2026-09-10; CORRECTED by 102F8 the same day):** this
+  ASK cites `102F8` as a break-verified control. At the time of the search,
+  `build/plan.md` (the line above was its only occurrence in the repo), the
+  working tree and `git log --all` all agreed that **no such cycle existed** —
+  and that part was correct. **The inference was wrong:** 102F8 was work the
+  user had assigned and which had been dropped from the paste, not a dangling
+  citation. It was assigned and built the same day (entry below). The lesson is
+  the same one this arc keeps re-learning in the other direction: a search that
+  finds nothing establishes that nothing EXISTS, not that nothing was MEANT —
+  so the honest record was "no artifact under this name", which is what the
+  original note said, and not "the ASK is mistaken", which is what it implied.
+  The controls that existed at that moment were **102F1** (envelope: `2 failed`
+  / "event missing v: 'thread.started'", was 7 passed), **102F7** (wire/internal
+  type coverage: RED listing `plan.started/plan.rolled_back/plan.completed`,
+  restored green) and **102F5** (real-trace emit break: `AssertionError: loop
+  must emit a real verdict`, 2 failed / 11 passed).
   **ASK 2 —** "NO SERVER. Hold at deferred client, recorded as a decision,
   not a deferral-by-default." → **no MCP server surface is built; the
   deferral is recorded as a decision in contract.md + the report.**

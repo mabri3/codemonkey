@@ -40,37 +40,73 @@ Every event crossing the exec boundary carries **`v: 1`**
 (`events.SCHEMA_V`, stamped at the exec funnel — `exec.emit` +
 `exec.on_event`). Compatibility rule: minor versions ADD fields only;
 removing/renaming a field or changing its type bumps major and is
-announced here. A consumer MUST ignore unknown fields and MUST reject
-(`ValueError`) an event whose `v` it does not understand — the C102
-conformance suite pins this with a deliberate schema break.
+announced here. **Removing or renaming a TYPE is likewise a major bump** —
+this section is binding (loop43-final, `3bdb346`) and the coverage probe
+parses the two lists below rather than a copy of them (102F8). A consumer
+MUST ignore unknown fields and MUST reject (`ValueError`) an event whose `v`
+it does not understand — the C102 conformance suite pins this with a
+deliberate schema break.
+
+**The lists below are the SOURCE OF TRUTH (102F8).** `build/conformance.py`
+parses the type names out of the marked regions and asserts **set equality**
+against what real runs produce, in both directions: a documented type no run
+produces FAILS, and a produced type that is documented nowhere FAILS. The
+marker comments are load-bearing — the parser refuses to run without them
+rather than silently matching nothing — and the marked regions must contain
+**type names only** (with each name's payload notes in braces). The parsed
+counts are pinned in `tests/test_conformance.py`.
 
 Core `type`s (stable set; new types are additive). Wire versus internal
 (102F7 decision, written not defaulted):
 
-- ON THE WIRE (every binary `--json` run can produce these; the coverage
-  probe in `build/conformance.py` FAILS if any is unproducible):
-  `thread.started` {thread_id} · `turn.started` {} · `turn.completed`
-  {usage{total_tokens, prompt_tokens, completion_tokens}} ·
-  `item.started`/`item.completed` {item{id, type, tool, …}, thread_id} ·
-  `verify.started` {command} · `verify.completed` {ok, exit_code} (runs
-  with a verifier configured) ·
-  `plan.started`/`plan.completed`/`plan.rolled_back` {report} (only with
-  `--atomic-plan`) · `repro.verdict` {report{verdict}} (only with a
-  verifier configured) · `failure_report.gave_up` /
- `failure_report.consulted` / `failure_report.budget_exhausted` {report} ·
- `budget.exhausted` {field, limit, observed, turn, declared, meaning}
- (runs with a declared budget — loop44 C103; the recovery report above is a
- DIFFERENT event and neither substitutes for the other) ·
- `stuck` {tool, error_class, streak} (report-only detector; on the wire
-  since loop 39, documented here in 102F7) · `error` {message} ·
-  `notice` {message}.
-- INTERNAL, deliberately not on the wire: `tool.started` {name, args} and
-  `tool.completed` {name, ok, output, error_class?} are the loop's raw
-  per-call feed; `item.*` is their public projection (the renderer reads
-  `$ command` / `[edit] path` off items, 51F5). Forwarding both would put
-  every call on the stream twice. Consumers MUST read `item.*`, never
-  `tool.*`; a future change that emits raw `tool.*` on stdout breaks this
-  contract.
+- ON THE WIRE (every binary `--json` run can produce these, under the
+  conditions noted after the list):
+  <!-- WIRE-TYPES:BEGIN -->
+  `thread.started` {thread_id} ·
+  `turn.started` {} ·
+  `turn.completed` {usage{total_tokens, prompt_tokens, completion_tokens}} ·
+  `item.started` · `item.completed` {item{id, type, tool, …}, thread_id} ·
+  `verify.started` {command} · `verify.completed` {ok, exit_code} ·
+  `plan.started` · `plan.completed` · `plan.rolled_back` {report} ·
+  `repro.verdict` {report{verdict}} ·
+  `failure_report.gave_up` · `failure_report.consulted` ·
+  `failure_report.budget_exhausted` {report} ·
+  `budget.exhausted` {field, limit, observed, turn, declared, meaning} ·
+  `stuck` {tool, error_class, streak} ·
+  `error` {message} · `notice` {message}
+  <!-- WIRE-TYPES:END -->
+  **Producer conditions:** `verify.started`/`verify.completed` and
+  `repro.verdict` need a verifier configured; `plan.*` needs
+  `--atomic-plan` (`plan.completed` on success, `plan.rolled_back` on a
+  gave-up); `budget.exhausted` needs a declared budget (loop44 C103);
+  `failure_report.*` needs the recovery policy to fire; `stuck` is a
+  report-only detector (on the wire since loop 39, documented in 102F7) and
+  never terminates a run.
+- INTERNAL, deliberately not on the wire:
+  <!-- INTERNAL-TYPES:BEGIN -->
+  `tool.started` {name, args} · `tool.completed` {name, ok, output, error_class?}
+  <!-- INTERNAL-TYPES:END -->
+  These are the loop's raw per-call feed; `item.*` is their public
+  projection (the renderer reads `$ command` / `[edit] path` off items,
+  51F5). Forwarding both would put every call on the stream twice.
+  Consumers MUST read `item.*`, never `tool.*`; a future change that emits
+  raw `tool.*` on stdout breaks this contract, and the coverage probe
+  watches for exactly that.
+
+**Two budget events, one character apart — disambiguation (102F8).** These
+are different events with different producers, and neither substitutes for
+the other:
+
+| event | producer | fires when | payload | effect |
+|---|---|---|---|---|
+| `failure_report.budget_exhausted` | loop-39 recovery policy | the POST-ERROR turn budget is spent after a first error | `report`, `policy`, `would_save_*` | **report only** — the run continues to its own end |
+| `budget.exhausted` | loop-44 C103 declared budget | a budget declared BEFORE the run (`turns`/`tokens`/`seconds`/`files`) is reached or crossed | `field`, `limit`, `observed`, `turn`, `declared`, `meaning` | **halts the run** — exit code 4 |
+
+The payloads are disjoint (`report` vs `field`), and the coverage probe
+asserts that disjointness on real streams rather than trusting this table.
+**Decision: neither type is renamed.** Renaming a type in a binding document
+is a breaking change under this section's own compatibility rule, and the
+defect here was documentation, not the API.
 
 Payload rule (102F5): `report` objects nested inside events are PAYLOADS,
 not events — they carry no `type` and no `v`. A consumer walking for
@@ -124,14 +160,16 @@ gate), pinned by `tests/test_conformance_live_stub.py`. Observed result:
 PASS`, exit 0. **Named residual (not waived as a class): a real model
 *choosing* a tool. Closes by: endpoint up, conformance run with no stub.**
 
-**Coverage** (102F7): `type_coverage` in `build/conformance.py` enumerates
-§2's ON-THE-WIRE list against streams the binary produced across six
-offline stub-driven runs (verify pass-with-retry, atomic gave-up,
-successful atomic run, max-turns, alternating-failure burn, declared-budget
-halt) and FAILS on any documented type no run produces — plus FAILS if raw
-`tool.*` ever appears on the wire, and (C103) FAILS if the declared-budget
-run does not exit **4**, which is how §1's newest code is controlled.
-Enumerate, don't sample.
+**Coverage** (102F7, reworked by 102F8): `type_coverage` in
+`build/conformance.py` **parses** §2's two type lists out of this document
+(the marked regions) and asserts **set equality** against streams the binary
+produced across six offline stub-driven runs (verify pass-with-retry, atomic
+gave-up, successful atomic run, max-turns, alternating-failure burn,
+declared-budget halt). It FAILS on a documented type no run produces, on a
+produced type documented nowhere, if raw `tool.*` appears on the wire, if the
+two budget events' payloads are not disjoint, and (C103) if the
+declared-budget run does not exit **4**. Enumerate, don't sample — and read
+the contract, don't copy it.
 
 A deliberate envelope break (delete `events.stamp`'s `setdefault`) FAILS
 the suite. 102F1 corrected the C102 claim: as shipped, the break-control
