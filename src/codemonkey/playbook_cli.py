@@ -187,25 +187,41 @@ def reflect_cmd(
 def admit_cmd(
     entry_id: str = typer.Argument(..., help="entry to admit for injection"),
     reason: str = typer.Option("", "--reason", help="why (journaled)"),
+    override: bool = typer.Option(
+        False, "--override",
+        help="Deliberate operator override: admit despite tainted provenance "
+             "(journaled as an override, recorded in the entry's history)."),
 ) -> None:
     """Admit an entry: only `admitted` entries may reach a prompt (cycle
-    109's gate). Journaled (`playbook.admitted`)."""
+    109's gate). Tainted-derived entries are REFUSED unless `--override`.
+    Exit 0 = admitted · 1 = refused (reason on stderr) · 2 = usage error."""
     from . import journal, playbook
 
     cwd = Path.cwd()
+    res = playbook.admit_entry(cwd, entry_id, override=override, reason=reason)
     try:
-        e = playbook.set_status(cwd, entry_id, "admitted",
-                                reason=reason or "operator admit")
-    except playbook.PlaybookError as exc:
-        typer.echo(f"error: {exc}", err=True)
-        raise typer.Exit(2) from None
-    try:
-        journal.record(playbook.playbook_thread(cwd), "playbook.admitted",
-                       tool="playbook", key=entry_id, status="admitted")
+        if res["ok"]:
+            journal.record(playbook.playbook_thread(cwd), "playbook.admitted",
+                           tool="playbook", key=entry_id,
+                           status=("override" if res.get("override")
+                                   else "admitted"),
+                           fields={"override": bool(res.get("override"))})
+        else:
+            journal.record(playbook.playbook_thread(cwd), "playbook.refused",
+                           tool="playbook", key=entry_id,
+                           status=str(res.get("refused") or "refused"),
+                           fields={"reason": str(res.get("refused") or "")})
     except Exception:
         pass
-    typer.echo(f"{entry_id}: admitted — it may now reach a prompt "
-               f"(context = playbook)")
+    if not res["ok"]:
+        typer.echo(f"error: {entry_id}: {res['reason']}", err=True)
+        raise typer.Exit(1)
+    if res.get("override"):
+        typer.echo(f"{entry_id}: admitted — OVERRIDE recorded (tainted "
+                   f"provenance accepted deliberately; journal + history)")
+    else:
+        typer.echo(f"{entry_id}: admitted — it may now reach a prompt "
+                   f"(context = playbook)")
     raise typer.Exit(0)
 
 

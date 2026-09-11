@@ -45,9 +45,9 @@
     "semantic_hash": "dfbf3763c6db4d0823d5e630e8cfa48e"
   },
   "src/codemonkey/loop.py": {
-    "mtime": 1789103058.4351528,
-    "ast_hash": "b6ec4fdf986c0a2d3bb99a315c409d7f",
-    "semantic_hash": "b6ec4fdf986c0a2d3bb99a315c409d7f"
+    "mtime": 1789103288.2174914,
+    "ast_hash": "e95486300ae364b05f39b2c9fca2d1ad",
+    "semantic_hash": "e95486300ae364b05f39b2c9fca2d1ad"
   },
   "src/codemonkey/native.py": {
     "mtime": 1788476351.082512,
@@ -385,9 +385,9 @@
     "semantic_hash": "130c00d0b170f695ba2fe8a57f124b99"
   },
   "src/codemonkey/spill.py": {
-    "mtime": 1788402164.6720495,
-    "ast_hash": "7052dbd52a7b461aa1e357e552ef6bb2",
-    "semantic_hash": "7052dbd52a7b461aa1e357e552ef6bb2"
+    "mtime": 1789103241.9948647,
+    "ast_hash": "98c9dffb1aed96fc051a0ee192743a22",
+    "semantic_hash": "98c9dffb1aed96fc051a0ee192743a22"
   },
   "tests/conftest.py": {
     "mtime": 1788552637.398633,
@@ -1060,9 +1060,9 @@
     "semantic_hash": "7fbdb3f04e78fcfc4bffa077bdf8b77f"
   },
   "src/codemonkey/taint.py": {
-    "mtime": 1789099952.4556808,
-    "ast_hash": "24569b00d540b73a2f318f3ddcd61542",
-    "semantic_hash": "24569b00d540b73a2f318f3ddcd61542"
+    "mtime": 1789103241.928736,
+    "ast_hash": "5e71e5cd6681534a6fe03e41fe39fff5",
+    "semantic_hash": "5e71e5cd6681534a6fe03e41fe39fff5"
   },
   "tests/test_skill_taint.py": {
     "mtime": 1789100021.1643841,
@@ -1138,5 +1138,10 @@
     "mtime": 1789103096.105132,
     "ast_hash": "f42cb3f59e5fef2ef31b36894004a567",
     "semantic_hash": "f42cb3f59e5fef2ef31b36894004a567"
+  },
+  "tests/test_taint_propagation.py": {
+    "mtime": 1789103303.510783,
+    "ast_hash": "15ab7189f6fa8801ab31ff77d77b949e",
+    "semantic_hash": "15ab7189f6fa8801ab31ff77d77b949e"
   }
 }

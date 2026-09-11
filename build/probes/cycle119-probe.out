@@ -1,0 +1,24 @@
+--- 1. live run fetches the injected fixture; skill_create refused ---
+    skill.refused rows: [('tainted', 'tainted')]
+  [PASS] write-side: skill_create refused from the tainted run
+  [PASS] fetch record marked
+--- 2. reflect -> merge lands taint_free:false ---
+  [PASS] reflected deltas carry taint_free false
+  [PASS] merge ok — merged: added=1 updated=0 refused=0 total=1
+  [PASS] entry id captured — pb-c0a14ac9a2
+--- 3. admit refuses; override admits and journals ---
+    refuse: exit=1 :: error: pb-c0a14ac9a2: provenance.taint_free is false — a tainted-derived entry may not reach a prompt without 
+  [PASS] refused exit 1 + reason
+    override: exit=0 :: pb-c0a14ac9a2: admitted — OVERRIDE recorded (tainted provenance accepted deliberately; journal + history)
+  [PASS] override exit 0
+  [PASS] entry history carries the override
+--- 4. text-blindness: instructional vs inert tainted twins ---
+  [PASS] both refused exit 1
+  [PASS] verdicts byte-identical apart from the id
+  [PASS] clean instruction-shaped sibling admits (exit 0)
+--- 5. skills path: refuse before the probe; override runs it ---
+    refuse: exit=1 :: cand_x: QUARANTINED — provenance.taint_free is false — a tainted-derived skill may not be admitted without --o
+  [PASS] skills refuse exit 1, probe not run
+  [PASS] skills override admits (probe ran, exit 0)
+
+CYCLE119 PROBE: PASS

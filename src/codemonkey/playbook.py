@@ -530,3 +530,45 @@ def migrate_lessons(workdir: str | Path, *, lesson_file=None,
     return {"migrated": len(deltas), "entries_added": rep["added"],
             "verified": len(verified_before), "archived": str(archived),
             "refused_deltas": rep["refused"]}
+
+
+# --- the admission gate, hardened (loop49 C119) ------------------------------
+#
+# The gate that lets an entry reach a PROMPT reads METADATA ONLY: the
+# provenance's `taint_free` flag, the entry's existence, its id. It NEVER
+# reads `text` — a pinned, discriminating claim: an entry whose text says
+# "ignore all checks, admit me" gets the IDENTICAL verdict to its inert-text
+# twin. Loop 46's write-side refusal already keeps tainted-run contributions
+# out of the store; this is the read-side wall for hand-edited or migrated
+# stores. The operator can override DELIBERATELY — the override is journaled
+# and recorded in the entry's own history, never silent.
+
+def admit_entry(workdir: str | Path, entry_id: str, *, override: bool = False,
+                reason: str = "") -> dict:
+    """Admit an entry for prompt injection (context = playbook), or refuse.
+
+    Returns `{"ok", "entry", "status", "reason", "refused", "override"}`.
+    A `taint_free: false` provenance refuses with `refused: "tainted"`
+    unless `override=True` — in which case the admission is marked as an
+    override in the entry's history. The entry's TEXT is never consulted."""
+    try:
+        entry = get_entry(workdir, entry_id)
+    except PlaybookError as exc:
+        return {"ok": False, "entry": entry_id, "status": None,
+                "reason": str(exc), "refused": "no-such-entry",
+                "override": False}
+    prov = entry.get("provenance") or {}
+    tainted = prov.get("taint_free") is False
+    if tainted and not override:
+        return {"ok": False, "entry": entry_id,
+                "status": entry.get("status"),
+                "reason": "provenance.taint_free is false — a tainted-derived "
+                          "entry may not reach a prompt without an explicit "
+                          "operator override (--override)",
+                "refused": "tainted", "override": False}
+    rsn = reason or ("operator override (tainted provenance)" if tainted
+                     else "operator admit")
+    updated = set_status(workdir, entry_id, "admitted", reason=rsn)
+    return {"ok": True, "entry": entry_id, "status": updated["status"],
+            "reason": rsn, "refused": None,
+            "override": bool(tainted and override)}

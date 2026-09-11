@@ -2195,6 +2195,19 @@ appended by its own research cycle, with loops 42-45 closed in parallel.
   journals the override; the inert-twin outputs are byte-identical (verdict
   and journal), proving text-blindness; a clean sibling admits with no
   override.
+  **DONE 2026-09-11.** `playbook.admit_entry` (metadata-only gate; refusal
+  `refused:"tainted"`; override recorded in journal AND the entry's own
+  history), CLI `admit --override` (exit 1 refusal / 0 admitted),
+  `skills.admit(override=)` (refuses BEFORE the probe; `skills admit
+  --override`), `lessons.mark_verified` routed through the gate (tainted →
+  None; un-verify always allowed). Probe `cycle119-probe.out` **PASS
+  (12/12)** through the released CLI: the charter shape verbatim
+  (fetch→refused write-side→reflect→merge→`admit` exit 1 with the taint
+  cited→`--override` exit 0 + override in `show` history); text-blindness
+  byte-identical verdicts (instructional vs inert twins, apart from the id)
+  + clean instruction-shaped sibling admitted; skills path refused before
+  its probe with `--override` running it. Tests
+  `test_admission_gate.py` 4/4. Suite **935/5**.
 - [ ] CYCLE 120 — `loop49:` loop 49 acceptance + report: the charter probe
   transcript named in the register; suite green; sweep shipped form;
   BUILD_REPORT loop-49 section; live injection-resistance firing

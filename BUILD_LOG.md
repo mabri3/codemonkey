@@ -4040,3 +4040,28 @@ them justifies waiving a row at v4.0.
   caught `tainted` being a @property (two call-sites fixed before tests).
 - **Next step:** CYCLE 119 — the admission gate: `playbook admit` refuses
   tainted entries; `--override` journaled; the text-blindness pin.
+
+## 2026-09-11 — CYCLE 119 (loop49): the admission gate, hardened
+
+- **Files changed:** `src/codemonkey/playbook.py` (`admit_entry` — the
+  metadata-only gate), `playbook_cli.py` (`admit --override`; exit 1
+  refusal / 0 admitted; journal `playbook.refused{status:"tainted"}` /
+  `playbook.admitted{override:true, status:"override"}`),
+  `src/codemonkey/skills.py` + `skills_cli.py` (`admit(override=)` — refuses
+  BEFORE the probe; `--override`), `src/codemonkey/lessons.py`
+  (`mark_verified` routes through the gate), `tests/test_admission_gate.py`
+  (new, 4), `build/probes/cycle119-probe.{py,out}`, register rows.
+- **Probe results (literal, R-I):** `cycle119-probe.py` → **PASS (12/12)**
+  through the released CLI: fixture page fetched live → write-side refusal
+  (`skill.refused{status:"tainted"}`) → reflect deltas taint_free false →
+  merge → **`playbook admit` exit 1** with the taint cited → **`--override`
+  exit 0** + `show` history carries the override; text-blindness: tainted
+  instructional vs inert twins → byte-identical verdicts apart from the id,
+  clean instruction-shaped sibling admits; skills: refused before the probe
+  (exit 1), `--override` ran it (ADMITTED).
+- **Tests run:** 4/4 new; full suite **935 passed, 5 skipped** (was 931/5).
+- **Notes:** same-id merges never rewrite provenance (first writer keeps) —
+  used deliberately in the text-blindness positive control (distinct text =>
+  distinct id). The lessons path's ADMIT door is the gate; un-verify stays
+  free.
+- **Next step:** CYCLE 120 — loop 49 acceptance + report.

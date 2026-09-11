@@ -333,7 +333,7 @@ def _excerpt(text: str, n: int = 400) -> str:
 
 
 def admit(workdir: str | Path, name: str, *, level: Optional[str] = None,
-          timeout: float = 60.0) -> dict:
+          timeout: float = 60.0, override: bool = False) -> dict:
     """Run the candidate's self-probe and let the exit code decide.
 
     Returns `{"name", "ok", "probe_exit", "status", "reason", "output",
@@ -352,6 +352,25 @@ def admit(workdir: str | Path, name: str, *, level: Optional[str] = None,
                          f"(valid: {list(sandbox_mod.LEVELS)})")
     man = read_manifest(workdir, name)
     thread = skill_thread(workdir)
+    prov = man.get("provenance") or {}
+    if prov.get("taint_free") is False and not override:
+        # loop49 C119: read-side gate — a manifest with tainted provenance
+        # (hand-edited, migrated, or written before the write-side rule) is
+        # refused WITHOUT running its probe; the operator override is
+        # explicit and journaled.
+        try:
+            journal_mod.record(thread, "skill.refused", tool="skills",
+                               key=name, status="tainted",
+                               fields={"reason": "tainted",
+                                       "source": str(prov.get("source")
+                                                     or "provenance")})
+        except Exception:
+            pass
+        return {"name": name, "ok": False, "probe_exit": None,
+                "status": man["status"],
+                "reason": "provenance.taint_free is false — a tainted-derived "
+                          "skill may not be admitted without --override",
+                "output": "", "level": level, "thread": thread}
 
     def _journal(rtype: str, exit_code: object, output: str) -> None:
         try:

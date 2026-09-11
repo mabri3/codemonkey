@@ -96,15 +96,25 @@ def retrieve(task_text: str, *, min_overlap: int = 1,
 
 def mark_verified(lesson_id: str, verified: bool = True):
     """Flip the verified flag — i.e. admit/quarantine the playbook entry.
-    Returns the legacy-shaped entry, or None when no such lesson exists."""
+
+    loop49 C119: ADMITTING routes through the playbook's admission gate —
+    a tainted-derived lesson cannot be verified into the retrievable set
+    (returns None like a missing lesson); UN-verifying is always allowed.
+    Returns the legacy-shaped entry, or None when the flip did not happen."""
     cwd = Path.cwd()
+    if verified:
+        res = _pb.admit_entry(cwd, lesson_id)
+        if not res["ok"]:
+            return None
+        try:
+            return _view(_pb.get_entry(cwd, lesson_id))
+        except _pb.PlaybookError:
+            return None
     try:
         e = _pb.get_entry(cwd, lesson_id)
     except _pb.PlaybookError:
         return None
     if e.get("kind") != "lesson":
         return None
-    e = _pb.set_status(cwd, lesson_id,
-                       "admitted" if verified else "quarantined",
-                       reason="mark_verified" if verified else "unverified")
+    e = _pb.set_status(cwd, lesson_id, "quarantined", reason="unverified")
     return _view(e)

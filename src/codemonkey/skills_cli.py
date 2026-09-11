@@ -130,16 +130,22 @@ def admit_cmd(
              "the gate never runs a probe above it)"),
     timeout: float = typer.Option(60.0, "--timeout",
                                   help="probe timeout, seconds"),
+    override: bool = typer.Option(
+        False, "--override",
+        help="Deliberate operator override: admit despite tainted provenance "
+             "(journaled as an override)."),
 ) -> None:
     """Run a candidate's self-probe and promote it on exit 0 only.
 
-    Exit 0 = admitted · 1 = refused or evicted (see the reason) · 2 = usage
-    error (unknown skill, invalid manifest, unknown sandbox level)."""
+    Tainted-derived manifests are refused BEFORE the probe runs unless
+    `--override`. Exit 0 = admitted · 1 = refused or evicted (see the reason)
+    · 2 = usage error (unknown skill, invalid manifest, unknown sandbox)."""
     from . import skills
 
     try:
         result = skills.admit(Path.cwd(), name,
-                              level=(sandbox or None), timeout=timeout)
+                              level=(sandbox or None), timeout=timeout,
+                              override=override)
     except skills.SkillError as exc:
         typer.echo(f"error: {exc}", err=True)
         raise typer.Exit(2) from None
