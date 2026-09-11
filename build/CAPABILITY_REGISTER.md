@@ -77,6 +77,28 @@ difference; `pytest` alone never qualifies):
 | status_mod | PROVEN-LIVE | `codemonkey status` (P-CLI, exit 0) |
 | unload | UNIT-ONLY | single-slot unload fallback unit-tested (`test_unload_fallback.py`); live LM-Studio-evict induction is unavailable, so the fallback branch has no live proof |
 | verifyhint | PROVEN-LIVE | verifier hint notice on runs without `verify_command` (cycle-63 probe) |
+| budgets | PROVEN-LIVE | conformance `budgetlimit` stub run through the RELEASED BINARY → exit 4 + `budget.exhausted` on the wire (loop44 C103) |
+| changeplan | PROVEN-LIVE | `tests/test_changeplan_cli.py` drives the released binary: exit 3, tree byte-identical, `plan.rolled_back` naming the plan (102F6) |
+| discover | UNIT-ONLY | repo-declared test-command discovery is asserted in-process (`tests/test_discover_verify.py`); no CLI surface of its own, and no run behind it |
+| evidence | PROVEN-LIVE | `codemonkey evidence pack` → `verify`: fresh pack verifies, tampered pack exits 1, and verification is green with the model endpoint SWITCHED OFF (`build/evidence_probe.py`, loop45 C105/C106) |
+| f2p | UNIT-ONLY | labels come from a real `run_turns` trace but only under pytest (`tests/test_f2p_gate.py`, 102F5); no CLI or eval surface has printed a label at HEAD |
+| failclass | PROVEN-LIVE | `codemonkey journal show <thread>` prints taxonomy rows (C88 scripted failing exec run) |
+| impact | PROVEN-LIVE | `codemonkey graph run_turns` prints cross-file `calls` edges; loader reads `links` (2328 nodes / 4339 edges, 892 cross-file) after 98F1 |
+| ladder | UNIT-ONLY | scripted L1/L2/L3 runner green (`tests/test_segment.py`); the LIVE ladder is BLOCKED with the endpoint down (C99/C100) |
+| partial | UNIT-ONLY | counts `write_file`/`edit_file` outcomes only — shell-mediated edits are not observable from the journal, and the limit is stated in its own output (96F1) |
+| recovery | PROVEN-LIVE | conformance `budget` stub run → `failure_report.budget_exhausted` on the wire from the released binary |
+| repro | PROVEN-LIVE | conformance `verify` stub run → `repro.verdict` on the wire from the released binary |
+| stuck | PROVEN-LIVE | conformance `gaveup` stub run → `stuck` on the wire from the released binary |
+
+**Completeness is now CHECKED, not asserted (C106, 2026-09-10).** The rows
+above for loops 39-45 were added by an audit (`build/register_audit.py`) that
+found **12 modules with no row at all** while this file claimed one row per
+module: the claim was true when written (loop 38, cycle 81) and nothing ever
+re-checked it — the same defect class as a binding document with no drift
+control. `tests/test_register.py` now fails if a module in
+`src/codemonkey/` has no ACTIVE row, or if an active row names a module that
+no longer exists. Deleted modules belong in the deletion-verdict table below,
+not in this one.
 
 ## Deletion verdicts (R-A, this cycle)
 

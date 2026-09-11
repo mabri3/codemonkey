@@ -2584,11 +2584,36 @@ appended by its own research cycle, with loops 42-45 closed in parallel.
   not change when an EARLIER record changed` and both digests printed
   identical (`007ccf2c…`); restored → **16 passed**. Suite 797 → **814
   passed, 5 skipped**.
-- [ ] CYCLE 106 — `loop45:` endpoint-off verification + register completion:
+- [x] CYCLE 106 — `loop45:` endpoint-off verification + register completion:
   pack verifies with the model endpoint switched off; every register row
   PROVEN-LIVE / UNIT-ONLY-with-reason / DEAD | est: 30m |
   verify (R-I): endpoint-off verification log committed; tests green; full
   suite green.
+  **DONE 2026-09-10.**
+  **(a) Endpoint-off verification, real run.** `build/evidence_probe.py` now
+  re-cuts a pack and verifies it with `CODEMONKEY_BASE_URL` pointed at a dead
+  port: `$ (endpoint switched off) codemonkey evidence verify pack-fresh.json`
+  → **exit 0, `internal: ok · journal: True · records 2`, PACK VERIFIES.** A
+  pack is checkable on a machine with no model, which is the whole point of
+  having one. (`CODEMONKEY_MODEL` was also set to a nonexistent model.)
+  **(b) The register's completeness claim was never controlled — and was
+  false.** `build/CAPABILITY_REGISTER.md` opens "One row per module in
+  `src/codemonkey/`". True at cycle 81; **nothing re-checked it since.**
+  `build/register_audit.py` found **12 modules with no row at all** — every
+  module loops 39-45 added: budgets, changeplan, discover, evidence, f2p,
+  failclass, impact, ladder, partial, recovery, repro, stuck. All 12 added with
+  a status and a probe I can name; modules whose only evidence is in-process
+  pytest are marked **UNIT-ONLY with that reason** (discover, f2p, ladder,
+  partial) rather than promoted. Register now reads **68 rows / 68 modules**,
+  statuses **61 PROVEN-LIVE · 7 UNIT-ONLY · 0 UNVALIDATED**.
+  **(c) The control.** `tests/test_register.py` (4 tests) fails if a module has
+  no ACTIVE row, if an active row names a module that no longer exists, if any
+  row is UNVALIDATED, or if a row carries no status. Break-verified against the
+  artifact: deleting the `budgets` row → `AssertionError: modules in
+  src/codemonkey/ with no ACTIVE register row: ['budgets']`; restored → 4
+  passed. **This is 102F8's defect class in a second document** — a claim with
+  no control behind it — found by asking the same question of a different file.
+  Suite 816 → **820 passed, 5 skipped**.
 - [ ] CYCLE loop45-final — v4.0 closing acceptance: sweep zero BLOCKED **or
   an individually justified exception list** (GATE CORRECTION 2026-09-10 —
   clause restored, see :1727; each waived row named with reason + what would

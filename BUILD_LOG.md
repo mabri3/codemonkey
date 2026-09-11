@@ -3329,6 +3329,35 @@ them justifies waiving a row at v4.0.
   **816 passed, 5 skipped** (was 814/5).
 - **Next step:** C106 — endpoint-off verification + register completion.
 
+## 2026-09-10 — CYCLE 106 (loop45): endpoint-off verification + register completion
+
+- **Files changed:** `build/evidence_probe.py` (endpoint-off step),
+  `build/register_audit.py` (new), `build/CAPABILITY_REGISTER.md`,
+  `tests/test_register.py` (new, 4 tests).
+- **Endpoint-off verification.** `$ (endpoint switched off) codemonkey
+  evidence verify pack-fresh.json` → **exit 0, `internal: ok · journal: True`,
+  PACK VERIFIES**, with `CODEMONKEY_BASE_URL` on a dead port and
+  `CODEMONKEY_MODEL` set to a model that does not exist. A pack is checkable
+  where no model is.
+- **The register's completeness claim was false and uncontrolled.**
+  `build/register_audit.py` found **12 modules with no row** (budgets,
+  changeplan, discover, evidence, f2p, failclass, impact, ladder, partial,
+  recovery, repro, stuck — every module loops 39-45 added) under an opening
+  sentence claiming one row per module, written at cycle 81 and never
+  re-checked. Same defect class as 102F8, in a second document.
+- **Completion.** 12 rows added with nameable probes; the four whose only
+  evidence is in-process pytest (discover, f2p, ladder, partial) are
+  **UNIT-ONLY with the reason stated**, not promoted. **68 rows / 68 modules ·
+  61 PROVEN-LIVE · 7 UNIT-ONLY · 0 UNVALIDATED.**
+- **The control, break-verified.** `tests/test_register.py` fails on a module
+  with no ACTIVE row, on an active row for a deleted module, on UNVALIDATED,
+  and on a row with no status. Break: delete the `budgets` row →
+  `AssertionError: modules in src/codemonkey/ with no ACTIVE register row:
+  ['budgets']`; restored → 4 passed.
+- **Tests run:** `uv run pytest -q` → **820 passed, 5 skipped** (was 816/5).
+- **Next step:** loop45-final / v4.0 with the named exception list, then
+  R47-R50 and the loop 46-50 build cycles.
+
 ## 2026-09-10 — CYCLE loop44-final: Loop 44 acceptance
 
 - **Files changed:** `build/BUILD_REPORT.md` (Loop 44 section), `build/plan.md`.

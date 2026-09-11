@@ -103,6 +103,26 @@ def main() -> int:
                 if "chain broken" not in t.stderr:
                     failures.append(f"no chain-broken reason: {t.stderr!r}")
 
+            # 5. C106: verification must not depend on a model endpoint. The
+            # whole point of a pack is that someone else can check it later,
+            # on a machine that may have no model at all.
+            good_pack = tmp / "pack-fresh.json"
+            p2 = run(["evidence", "pack", thread, "--out", str(good_pack)], env, tmp)
+            if p2.returncode != 0:
+                failures.append(f"could not re-cut the pack: {p2.stderr}")
+            else:
+                off_env = dict(env)
+                off_env["CODEMONKEY_BASE_URL"] = "http://127.0.0.1:1/v1"
+                off_env["CODEMONKEY_MODEL"] = "no-such-model"
+                off = run(["evidence", "verify", str(good_pack)], off_env, tmp)
+                print(f"$ (endpoint switched off) codemonkey evidence verify "
+                      f"pack-fresh.json")
+                print(f"[exit {off.returncode}] {off.stdout.strip()}")
+                if off.returncode != 0 or "PACK VERIFIES" not in off.stdout:
+                    failures.append(
+                        f"verification needed a model endpoint: {off.stdout} "
+                        f"{off.stderr}")
+
     if failures:
         print("\nPROBE FAILED:")
         for f in failures:
