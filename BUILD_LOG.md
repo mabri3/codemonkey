@@ -3844,3 +3844,31 @@ them justifies waiving a row at v4.0.
 - **Next step:** CYCLE R48 — loop 48 research (parallel-distill-refine +
   recursive tournament voting; structured rollout summaries; the R-F cost
   gate), then CYCLE 113+.
+
+## 2026-09-10 — CYCLE R48 (research): the refine pass + tournament selector + cost gate
+
+- **Files changed:** `build/research-loop48.md` (new, 9,215 bytes);
+  `build/plan.md` (R48 ticked with DONE record; `### loop48: cycles` appended,
+  C113–C116 each with a literal verify probe); `features.html` (C112 entry —
+  owed from the acceptance cycle).
+- **Citations (web, real):** PDR — arXiv 2604.16529 (70.9→77.6% SWE-bench
+  Verified, 46.9→59.1% Terminal-Bench v2; structured summaries beat raw
+  trajectories; scaling turns accumulates early errors); Snell et al. ICLR
+  2025 — arXiv 2408.03314 (compute-optimal >4× vs best-of-N; easy→revision,
+  hard→sampling); PoLL — arXiv 2404.18796 (juries > single judge, >7×
+  cheaper); Parallel-R1 — arXiv 2509.07980 (training-time, DEFERRED —
+  frozen executor). Never-a-target sentence recorded.
+- **In-repo grounding (re-verified at `9a3657f`):** `bestofn.py` first-pass-
+  wins + zero-residue reset; `exec.py:662–681` raising without
+  `--verify-command` for N>1; `digest.py` / `budgets.py` / `cost.py` /
+  `branches.py` as attachments.
+- **KEEPS vs REPLACES (the cycle's explicit obligation):** keeps the CLI
+  surface, first-pass fast path, snapshot reset, default-OFF, machine
+  verifier; replaces last-tail failure with ONE seeded refine, opaque
+  candidate text with bounded summaries, and the no-verifier usage error
+  with an injected-compare tournament (honest empty without one).
+- **Rejected with reasons:** C5 default-on/unattended scaling (R-F + two
+  published findings); C6 RL-trained parallel thinking (frozen executor).
+- **Core-design: NO** — acceptance terms recorded.
+- **Tests run:** none (no src change); suite untouched at 903/5.
+- **Next step:** CYCLE 113 — the refine pass in the best-of path.

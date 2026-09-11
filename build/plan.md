@@ -2006,13 +2006,71 @@ appended by its own research cycle, with loops 42-45 closed in parallel.
   rules SURVIVES (enforcement projection, consumer is permissions), learnedctx
   REFRAMED as the selector not a store (gains a playbook class). Cycles
   107–112 appended below.
-- [ ] CYCLE R48 — Loop 48 research: parallel-distill-refine + recursive
+- [x] CYCLE R48 — Loop 48 research: parallel-distill-refine + recursive
   tournament voting as the correct form of loop 38's `--best-of`; structured
   rollout summaries vs raw trajectories as the comparison substrate; the
   cost-gate design (R-F: OFF by default, cost printed before the run) | est:
   40m |
   verify: `build/research-loop48.md` with ≥5 cited candidates, ranked
   SELECTED, and an explicit statement of what `bestofn` keeps vs replaces.
+  **DONE 2026-09-10.** `build/research-loop48.md` (9,215 bytes): entry
+  FULFILLED (`9a3657f`), core-design NO; PDR (2604.16529, 70.9→77.6 /
+  46.9→59.1, never-a-target), Snell compute-optimal (>4× vs best-of-N; easy
+  → revision, hard → sampling), PoLL juries (2404.18796), Parallel-R1
+  (2509.07980, deferred — frozen executor); in-repo attachments re-verified
+  at `9a3657f` (`bestofn.py` first-pass-wins + snapshot reset; `exec.py:662–
+  681`; `digest.py`, `budgets.py`/`cost.py`); 4 candidates + 2 rejections
+  WITH reasons; **KEEPS vs REPLACES stated explicitly** (keeps surface/
+  fast path/reset/default-OFF/verifier; replaces last-tail failure with ONE
+  seeded refine, opaque text with bounded summaries, usage-error with
+  injected-compare tournament). Cycles 113–116 appended below.
+
+### loop48: cycles (selected from build/research-loop48.md, cycle R48 — AUTHORIZED 2026-09-10)
+
+- [ ] CYCLE 113 — `loop48:` the refine pass — losers' evidence seeds one
+  sequential attempt: when ALL candidates fail the machine verifier (and a
+  refine is enabled), assemble a bounded seed from the candidates' verifier
+  tails + summaries, run ONE refine attempt through the same
+  provider/verify path, and let the SAME machine check decide; emit
+  `bestofn.refine` {candidates, refined, verified}; `--best-of 1` and the
+  first-pass path stay byte-identical. | est: 75m |
+  verify: scripted-provider exec run where no candidate passes but the seed
+  makes the refine pass → exit 0, `bestofn.refine` shows candidates=N,
+  refined=1, verified=True, and the workspace holds the refined tree;
+  candidate-1-pass run makes ZERO extra calls (call count pinned); honest
+  failure unchanged when refine also fails.
+- [ ] CYCLE 114 — `loop48:` the tournament selector (offline, injected) —
+  no-verifier case: `bestofn.select_by_tournament(candidates, compare_fn)`
+  deterministic pairwise structure; with a `compare_fn`, the winner is
+  deterministic across shuffled inputs; without one, `{"selected": None,
+  "reason": "no comparison provided"}` — never a model guess; wire as the
+  documented fallback when `--best-of N` runs with no `--verify-command`
+  (still a usage error by default, now ALSO reachable via an explicit
+  `--tournament-compare` file/cmd whose output is machine-checked). | est:
+  60m |
+  verify: in-process tests — determinism under shuffle (2 runs, same
+  winner), honest empty without compare, malformed compare output → refused
+  with reason; CLI probe: `--best-of 3 --tournament-compare ./cmp.sh` on a
+  scripted run selects the winner the cmp returns.
+- [ ] CYCLE 115 — `loop48:` the cost gate — printed BEFORE the spend,
+  enforced at the boundary: `--best-of N` (N>1) prints the projected extra
+  cost (N−1) × current candidate figures (tokens/wall) before candidate 2;
+  the declared budgets (C103 machinery) are enforced at the same boundary —
+  a run whose declared tokens cannot fit candidate 2 refuses with
+  `budget.exhausted` (exit 4) BEFORE the crossing provider call. | est:
+  60m |
+  verify: `--best-of 3` + tiny `--budget-tokens` → projected line printed,
+  refusal at the boundary, provider-call count shows the crossing call never
+  happened (the C103 pattern); normal budgets → projected line printed,
+  run proceeds; `--best-of 1` prints nothing new (byte-identical output).
+- [ ] CYCLE 116 — `loop48:` loop 48 acceptance + report: probe transcripts
+  named in the register; suite green; sweep shipped form; BUILD_REPORT
+  loop-48 section; the refine-vs-none live delta named
+  UNMEASURED-WITH-DATE with the hook command. | est: 40m |
+  verify: `bash build/acceptance_sweep.sh` → offline rows exit 0, live rows
+  BLOCKED-with-reason; `uv run pytest -q` → exit 0; register no
+  UNVALIDATED row; report committed; no tag (v5.0 is loop 50's).
+
 - [ ] CYCLE R49 — Loop 49 research: provenance-gated persistence — taint on
   `ToolResult`, propagation through history/compaction/spill, and a metadata-
   only admission gate (the evaluator never reads the untrusted text) | est:
