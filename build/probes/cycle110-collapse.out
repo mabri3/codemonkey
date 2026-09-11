@@ -1,0 +1,19 @@
+--- 1. fifty rounds through the REAL merge path ---
+  words after rounds 1/25/50: {0: 6, 24: 78, 49: 153}
+  stats: {"entries": 51, "by_status": {"quarantined": 51, "admitted": 0, "evicted": 0}, "words": 153, "counter_total": 105}
+  [PASS] round-1 entry byte-stable after 50 rounds
+  [PASS] no duplicates, one entry per distinct delta — entries=51
+  [PASS] recurring counter 50 + 5 whitespace twins
+  [PASS] growth monotone (never shrinks)
+--- 2. released CLI: stats + one more merge ---
+  entries=51  words=153  counter_total=105
+  quarantined=51 admitted=0 evicted=0
+  [PASS] CLI stats exits 0 and reports 51 entries
+  merged: added=1 updated=0 refused=0 total=52
+  [PASS] CLI merge adds the 52nd entry
+  [PASS] stats follows the CLI merge
+--- 3. the REWRITE-style control must fail the regression ---
+  rewrite control: round-1 entry present after 50 rounds: False
+  [PASS] the control's round-1 entry is GONE (regression sees the collapse)
+
+CYCLE110 PROBE: PASS

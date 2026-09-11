@@ -25,9 +25,9 @@
     "semantic_hash": "ed37e657e8ee46736294cb19209e80dd"
   },
   "src/codemonkey/config.py": {
-    "mtime": 1789099500.7646875,
-    "ast_hash": "ba593737f20c5284d463d6bed24ba15f",
-    "semantic_hash": "ba593737f20c5284d463d6bed24ba15f"
+    "mtime": 1789101189.7318273,
+    "ast_hash": "f6d29383db510a5034cc42d4117bc0c2",
+    "semantic_hash": "f6d29383db510a5034cc42d4117bc0c2"
   },
   "src/codemonkey/events.py": {
     "mtime": 1788670106.6931286,
@@ -35,9 +35,9 @@
     "semantic_hash": "fa6f7d17d46f7b64d7dc9e843e387490"
   },
   "src/codemonkey/exec.py": {
-    "mtime": 1789099559.723768,
-    "ast_hash": "70d4fc19bcaa4ed3fdbac7bfa37d6f97",
-    "semantic_hash": "70d4fc19bcaa4ed3fdbac7bfa37d6f97"
+    "mtime": 1789101140.2551277,
+    "ast_hash": "8dc1d4016a9a45ad2f37f3a5abd1d260",
+    "semantic_hash": "8dc1d4016a9a45ad2f37f3a5abd1d260"
   },
   "src/codemonkey/instructions.py": {
     "mtime": 1788373203.899547,
@@ -815,9 +815,9 @@
     "semantic_hash": "3e8277c40803822c82ba3b97b52cdddb"
   },
   "src/codemonkey/strategies/context.py": {
-    "mtime": 1788536551.986423,
-    "ast_hash": "fa69e27af76067af53ae8ffe1e98c5f6",
-    "semantic_hash": "fa69e27af76067af53ae8ffe1e98c5f6"
+    "mtime": 1789101135.2663577,
+    "ast_hash": "ee99637362a0f2eae00df414ff8c24ee",
+    "semantic_hash": "ee99637362a0f2eae00df414ff8c24ee"
   },
   "src/codemonkey/strategies/staticctx.py": {
     "mtime": 1788536556.5615757,
@@ -1085,7 +1085,7 @@
     "semantic_hash": "1a2f7689b326e940011a6d6a4f6ea665"
   },
   "src/codemonkey/playbook.py": {
-    "mtime": 1789100958.9401958,
+    "mtime": 1789101253.673769,
     "ast_hash": "78e95e6347ba0821da8768bb95141a9a",
     "semantic_hash": "78e95e6347ba0821da8768bb95141a9a"
   },
@@ -1103,5 +1103,10 @@
     "mtime": 1789100969.5317292,
     "ast_hash": "548f49d3cc322a660645b3b92dcd1f41",
     "semantic_hash": "548f49d3cc322a660645b3b92dcd1f41"
+  },
+  "tests/test_playbook_injection.py": {
+    "mtime": 1789101217.6116073,
+    "ast_hash": "20548226d122a2fdc426b902bc2ed7e3",
+    "semantic_hash": "20548226d122a2fdc426b902bc2ed7e3"
   }
 }

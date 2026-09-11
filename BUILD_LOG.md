@@ -3756,3 +3756,28 @@ them justifies waiving a row at v4.0.
 - **Next step:** CYCLE 110 — grow-and-refine + the 50-round collapse
   regression (round-1 entries byte-stable, size bounded, a rewrite-style
   control that FAILS the same regression).
+
+## 2026-09-10 — CYCLE 110 (loop47): grow-and-refine + the 50-round collapse regression
+
+- **Files changed:** `src/codemonkey/playbook.py` (`store_stats`),
+  `playbook_cli.py` (`stats` verb), `tests/test_playbook_collapse.py` (new,
+  3 tests), `build/probes/cycle110-collapse.py` + `.out`, register row.
+- **Probe results (literal, R-I):** `cycle110-collapse.py` → **PASS (7/7)** —
+  50 rounds through the REAL merge path: words after rounds 1/25/50 =
+  6/78/153 (monotone), stats `entries=51, words=153, counter_total=105`;
+  round-1 entry byte-stable (`json.dumps(sort_keys=True)` equal after 50
+  rounds); recurring counter 55 (50 rounds + 5 whitespace twins collapsed by
+  normalized identity); CLI `playbook stats` → `entries=51 … quarantined=51`;
+  CLI `playbook merge` → `added=1 total=52`, stats follows; **the rewrite
+  control (keep-last-10 + truncate) is GONE at round 1 after 50 rounds** —
+  the regression demonstrably sees the collapse shape (ACE case study).
+- **Tests run:** 3/3 new (incl. `test_the_rewrite_control_fails_the_same_
+  regression` — the predicate set returns violations for the control and `[]`
+  for the real store; and a re-merge byte-stability pin). Full suite **895
+  passed, 5 skipped** (was 892/5).
+- **Known issue:** dedup is exact + whitespace-normalized (no embeddings in
+  this repo — stated in playbook.py); the 50-round regression is synthetic
+  (deterministic, offline) — the R-K-style live numbers remain loop 50's,
+  same BLOCKED discipline.
+- **Next step:** CYCLE 111 — R-A consolidation: lessons DELETED INTO the
+  playbook with the retrieval-parity gate BEFORE the deletion lands.

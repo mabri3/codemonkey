@@ -294,6 +294,20 @@ def playbook_thread(workdir: str | Path) -> str:
     return f"playbook-{name}"
 
 
+def store_stats(workdir: str | Path) -> dict:
+    """Sizes for the boundedness claims (cycle 110): entries per status,
+    total words, total counter. The 50-round regression reads these to show
+    that accumulation grows monotonically and never collapses."""
+    entries = list_entries(workdir)
+    return {
+        "entries": len(entries),
+        "by_status": {s: sum(1 for e in entries if e.get("status") == s)
+                      for s in STATUSES},
+        "words": sum(len(str(e.get("text") or "").split()) for e in entries),
+        "counter_total": sum(int(e.get("counter", 0)) for e in entries),
+    }
+
+
 # --- the reflector: journal → evidence-cited deltas (cycle 108) --------------
 #
 # Where candidates COME FROM, deterministically. ACE's Reflector distills

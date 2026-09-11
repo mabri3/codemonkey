@@ -2206,7 +2206,7 @@ appended by its own research cycle, with loops 42-45 closed in parallel.
   went RED, restore byte-identical (`d7102a1a…`), suite green. Tests
   `tests/test_playbook_injection.py` 7/7 (incl. corrupt store → fail-closed +
   audible). Suite **892/5**.
-- [ ] CYCLE 110 — `loop47:` grow-and-refine + the 50-round collapse
+- [x] CYCLE 110 — `loop47:` grow-and-refine + the 50-round collapse
   regression: counters update in place; exact+normalized-text dedup; the
   50-round synthetic delta run must leave round-1 entries BYTE-STABLE and
   total size linear-bounded — the property a rewrite-style system fails
@@ -2217,6 +2217,16 @@ appended by its own research cycle, with loops 42-45 closed in parallel.
   size bounded, dedup collapsed the planted exact dup; a REWRITE-style
   control implementation fails the same regression (the control that proves
   the regression can see the defect); transcript committed.
+  **DONE 2026-09-10.** `playbook.store_stats` (+ CLI `playbook stats` —
+  entries/words/counter_total by status; missing store = honest zeros with
+  the note). Probe `cycle110-collapse.out` **PASS (7 checks)**: 50 rounds →
+  round-1 entry byte-stable (`json.dumps(sort_keys)` equal), 51 entries
+  (no sprawl), recurring counter = 50+5 twins, growth monotone 6→78→153
+  words; CLI `stats` 51 → `merge` 52 → `stats` 52; **rewrite control
+  (keep-last-10 + truncate) loses its round-1 entry** — the regression can
+  see the defect. Tests `tests/test_playbook_collapse.py` 3/3 (the control
+  fails the same predicate set: MISSING + counter violation). Suite
+  **895/5**.
 - [ ] CYCLE 111 — `loop47:` R-A consolidation — lessons DELETED INTO the
   playbook: migrate `~/.codemonkey/lessons.json` → `kind: lesson` entries
   (verified flag preserved; docstring carries the moved citations); the

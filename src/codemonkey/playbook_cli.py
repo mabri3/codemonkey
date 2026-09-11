@@ -107,6 +107,29 @@ def merge_cmd(
     raise typer.Exit(0)
 
 
+@app.command("stats")
+def stats_cmd() -> None:
+    """Entry counts by status, total words, total counter — the numbers the
+    boundedness claims read. Exit 0 on a missing store (honest zeros with a
+    note that the store does not exist; numbers, never a green)."""
+    from . import playbook
+
+    cwd = Path.cwd()
+    try:
+        st = playbook.store_stats(cwd)
+    except playbook.PlaybookError as exc:
+        typer.echo(f"error: {exc}", err=True)
+        raise typer.Exit(2) from None
+    exists = playbook.store_path(cwd).exists()
+    note = "" if exists else " (store does not exist yet)"
+    bs = st["by_status"]
+    typer.echo(f"entries={st['entries']}{note}  words={st['words']}  "
+               f"counter_total={st['counter_total']}")
+    typer.echo(f"  quarantined={bs['quarantined']} admitted={bs['admitted']} "
+               f"evicted={bs['evicted']}")
+    raise typer.Exit(0)
+
+
 @app.command("reflect")
 def reflect_cmd(
     thread: str = typer.Argument(..., help="journal thread to reflect on"),
