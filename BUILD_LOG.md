@@ -4081,3 +4081,18 @@ them justifies waiving a row at v4.0.
   model-behavior firing is **UNMEASURED-WITH-DATE** (endpoint refused).
 - **Next step:** CYCLE R50 research (continual-learning measurement +
   long-horizon suite), then CYCLE 121+ and the v5.0 close.
+
+## 2026-09-11 — CYCLE R50 (research): continual-learning measurement + v5.0 close
+
+- **Files changed:** `build/research-loop50.md` (new, 7,655 bytes);
+  `build/plan.md` (R50 ticked; cycles 121–123 appended).
+- **Selects:** C1 the CL protocol runner over the existing arms (the exact
+  library-on/off structure loops 46–48 reuse); C2 the long-horizon suite by
+  SWE-EVO's SHAPE (order-dependent, machine-graded); C3 Fix Rate beside pass
+  rate; C4 the verdicts + v5.0 close. C5 rejected with reasons.
+- **Probes run:** none (research cycle); attachment points verified against
+  the tree: `skills_arms.py` `ARM_ENV` (both surfaces), `eval.run_suite` +
+  `early_stop` gate replay, `certify.hoeffding_gate`, `build/stub_provider.py`.
+- **Known issues:** none. Live CL figures are endpoint-gated → BLOCKED
+  discipline applies to their rows.
+- **Next step:** CYCLE 121 — the CL protocol runner.

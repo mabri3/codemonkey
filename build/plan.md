@@ -2224,13 +2224,70 @@ appended by its own research cycle, with loops 42-45 closed in parallel.
   threat-model sweep table referenced; live injection-resistance firing
   UNMEASURED-WITH-DATE. No tag (v5.0 is loop 50's).
 
-- [ ] CYCLE R50 — Loop 50 research: continual-learning measurement (forward
+- [x] CYCLE R50 — Loop 50 research: continual-learning measurement (forward
   transfer, retention, stability-plasticity) under R-H's time-uniform
   statistic, plus a long-horizon suite modeled on SWE-EVO's shape run through
   `sessions` | est: 40m |
   verify: `build/research-loop50.md` with ≥5 cited candidates, ranked
   SELECTED, and the exact arm structure (library-on vs library-off) the loop
   46-48 acceptance cycles will reuse.
+  **DONE 2026-09-11.** `build/research-loop50.md` (7,655 bytes): SWE-EVO
+  (2512.18470: 48 tasks, avg 21 files, GPT-5.4 25% vs 72.80% SWE-bench
+  Verified; Fix Rate) + SWE-Bench-CL CL-F1 (2507.00014) up front with
+  never-a-target; 4 SELECTED in rank order (C1 CL protocol runner over the
+  existing arms — the library-on/off structure loops 46–48 reuse; C2 the
+  long-horizon suite by SWE-EVO's SHAPE; C3 Fix Rate; C4 verdicts + v5.0
+  close) + C5 rejected (mechanism-as-measured; deletion on an unmeasurable
+  rate); the verdict matrix the close must fill; acceptance terms
+  (core-design NO). Cycles 121–123 appended below.
+
+### loop50: cycles (selected from build/research-loop50.md, cycle R50 — AUTHORIZED 2026-09-10)
+
+- [ ] CYCLE 121 — `loop50:` the CL protocol runner: `eval <suite> --arms
+  <surface>-on,<surface>-off --cl-protocol --retention <earlier-suite>`
+  extends `skills_arms` (no fork): runs the suite IN ORDER per arm, then the
+  retention suite, and reports forward transfer + retention BOTH under the
+  named statistic (kind `hoeffding-gate`); sequential order asserted on the
+  trace; endpoint down → BLOCKED (None, never 0) with the reason re-probed.
+  | est: 60m |
+  verify: scripted exec through the real path (offline): both arms complete,
+  the trace shows the suite run in FILE ORDER per arm (no interleave), the
+  forward-transfer and retention figures print with the statistic named, and
+  with the endpoint down both read BLOCKED-with-reason; `--cl-protocol`
+  without `--retention` → usage error (exit 2); retention suite identical to
+  the transfer suite → usage error.
+  Attachment (verified 2026-09-11): `src/codemonkey/skills_arms.py`
+  (`ARM_ENV` covers `playbook-on/off`, C112), `src/codemonkey/eval.py`
+  (`run_suite`, `early_stop` replay), `src/codemonkey/certify.py`
+  (`hoeffding_gate`).
+- [ ] CYCLE 122 — `loop50:` the long-horizon suite + Fix Rate:
+  `build/suites/long-horizon.yaml` — multi-step tasks, task N+1 REQUIRES
+  task N's artifact (order-dependent by construction), machine-graded;
+  `eval` reports `fix_rate` (checks passed / checks declared, per task)
+  beside `pass_rate`; a fully-passing task is 1.0/1.0; no target number.
+  | est: 60m |
+  verify: the suite runs to completion offline through the real path (real
+  `run_exec`, scripted provider where the endpoint is needed) and prints per
+  task `fix_rate` + `pass_rate`; the ORDER-DEPENDENCE control passes — task
+  2 run FIRST in a scratch workspace FAILS its precondition check (the
+  discriminating run); a 2-of-3-checks fixture prints `fix_rate 0.667,
+  pass_rate 0`.
+  Attachment (verified 2026-09-11): `build/suites/rubric.yaml` (suite
+  schema), `eval.run_suite` (scoring), `build/stub_provider.py` (offline
+  turns).
+- [ ] CYCLE 123 — `loop50:` v5.0 close: bump to 5.0.0 in `pyproject.toml`
+  and `src/codemonkey/__init__.py`; sweep RUN (shipped form); the
+  per-loop VERDICTS written (46/47/48/49 — KEPT with its number OR its
+  mechanism + named missing rate; DELETED with its reason; R-A: no deletion
+  triggers on an unmeasurable rate); THREAT_MODEL refresh; BUILD_REPORT v5.0
+  section + evidence pack + Gate 7 handoff; register final; tag `v5.0.0`.
+  | est: 60m |
+  verify: `uv run codemonkey --version` → `codemonkey 5.0.0`; sweep A1 5.0.0
+  + offline rows exit 0 + live rows BLOCKED-with-reason + A15 count
+  committed; the v5.0 report section carries the four verdicts;
+  `git tag` on the pushed commit; Gate 7 handoff names what the operator
+  accepts and the named exception list (per-row, per the v2.0/v3.0/v4.0
+  precedent).
 
 ### loop46: cycles (selected from build/research-loop46.md, cycle R46 — AUTHORIZED 2026-09-10)
 
