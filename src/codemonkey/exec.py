@@ -152,6 +152,7 @@ def run_exec(
     dry_run: bool = False,
     best_of: int = 1,
     refine_seeded: bool = False,
+    tournament_compare: Optional[str] = None,
     verify_command: Optional[str] = None,
     atomic_plan: bool = False,
 ) -> int:
@@ -679,10 +680,11 @@ def run_exec(
         on_event({"type": "notice",
                   "message": f"verify: discovered `{_eff_verify}` from "
                              f"{_eff_verify_origin.split(':', 1)[1]}"})
-    if _eff_best_of > 1 and not _eff_verify:
+    if _eff_best_of > 1 and not _eff_verify and not tournament_compare:
         raise ExecUsageError(
             "--best-of N>1 requires a verify command: pass --verify-command "
-            "or set config verify_command")
+            "or set config verify_command (or select by tournament with "
+            "--tournament-compare)")
     if _eff_best_of > 1 and dry_run:
         raise ExecUsageError(
             "--best-of N>1 cannot combine with --dry-run: candidates never "
@@ -691,6 +693,15 @@ def run_exec(
         raise ExecUsageError(
             "--refine-seeded requires --best-of N>1: there are no failed "
             "candidates to seed a refine from")
+    if tournament_compare and _eff_best_of <= 1:
+        raise ExecUsageError(
+            "--tournament-compare requires --best-of N>1: a tournament needs "
+            "candidates to compare")
+    if tournament_compare and _eff_verify:
+        raise ExecUsageError(
+            "--tournament-compare and a verify command are mutually "
+            "exclusive: the machine verifier is tier 1 and settles the "
+            "selection where it can")
 
     def _run_once(_jrun):
         _unload_retried = False
@@ -757,7 +768,53 @@ def run_exec(
     _base_history = list(history)
     _bestofn_ok: Optional[bool] = None  # None = best-of not engaged
     try:
-        if _eff_best_of > 1:
+        if _eff_best_of > 1 and tournament_compare and not _eff_verify:
+            # loop48 cycle 114: tier-2 selection — no machine verifier; the
+            # operator's comparison command IS the judgment, machine-checked
+            # ("a"/"b"/"equal" only). Per-candidate snapshots so the WINNER's
+            # tree stands afterwards; a malformed verdict refuses the
+            # selection and the last tree stays (default KEEP).
+            from .bestofn import restore_tree as _bo_restore2
+            from .bestofn import run_compare_cmd as _bo_cmp_cmd
+            from .bestofn import select_by_tournament as _bo_tournament
+            from .bestofn import snapshot_tree as _bo_snapshot2
+
+            _bo_snap2 = _bo_snapshot2(workdir)
+            _bo_cand_snaps: list = []
+            _bo_cand_texts: list = []
+            for _bi in range(_eff_best_of):
+                if _bi > 0:
+                    _bo_restore2(workdir, _bo_snap2)
+                    history = list(_base_history)
+                emit({"type": "bestofn.attempt", "thread_id": thread_id,
+                      "index": _bi, "tries": _eff_best_of})
+                turn = _run_once(f"{run_id}:b{_bi}")
+                _bo_cand_snaps.append(_bo_snapshot2(workdir))
+                _bo_cand_texts.append(getattr(turn, "content", "") or "")
+            _bo_sel = _bo_tournament(
+                [{"text": _t} for _t in _bo_cand_texts],
+                compare_fn=lambda a, b, _cmd=tournament_compare: _bo_cmp_cmd(
+                    _cmd, a, b, workdir))
+            if _bo_sel["selected"] is not None:
+                _bo_restore2(workdir, _bo_cand_snaps[_bo_sel["selected"]])
+                turn.content = _bo_cand_texts[_bo_sel["selected"]]
+                _bestofn_ok = True
+                emit({"type": "bestofn.tournament", "thread_id": thread_id,
+                      "selected": _bo_sel["selected"], "wins": _bo_sel["wins"],
+                      "pairings": _bo_sel["pairings"],
+                      "reason": _bo_sel["reason"]})
+                emit({"type": "bestofn.completed", "thread_id": thread_id,
+                      "ok": True, "index": _bo_sel["selected"],
+                      "tries": _eff_best_of, "via": "tournament"})
+            else:
+                _bestofn_ok = False
+                emit({"type": "bestofn.tournament", "thread_id": thread_id,
+                      "selected": None, "pairings": _bo_sel["pairings"],
+                      "reason": _bo_sel["reason"]})
+                emit({"type": "bestofn.completed", "thread_id": thread_id,
+                      "ok": False, "index": None, "tries": _eff_best_of,
+                      "via": "tournament", "last_fail_tail": _bo_sel["reason"]})
+        elif _eff_best_of > 1:
             from .bestofn import restore_tree as _bo_restore
             from .bestofn import score_with_verifier as _bo_verify
             from .bestofn import snapshot_tree as _bo_snapshot

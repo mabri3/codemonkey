@@ -1,0 +1,14 @@
+--- 1. help carries the option ---
+  [PASS] --tournament-compare in exec --help
+--- 2. the command's pick wins (candidate 2), tree restored ---
+  exit=0  stdout='[edit] answer.txt (write_file)\n[edit] answer.txt (write_file)\n[agent] attempt two done\nattempt two done'
+  answer.txt='TWO'
+  [PASS] exit 0 — exit=0
+  [PASS] winner's tree stands (attempt 2)
+  [PASS] stdout carries the WINNER's message
+--- 3. malformed command refuses; last tree stays; exit 1 ---
+  exit=1  answer.txt='TWO'
+  [PASS] exit 1 — exit=1
+  [PASS] last tree KEPT
+
+CYCLE114 PROBE: PASS

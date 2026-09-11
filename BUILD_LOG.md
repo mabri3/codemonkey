@@ -3900,3 +3900,29 @@ them justifies waiving a row at v4.0.
   parse order is a CLI-contract change that belongs to its own cycle.
 - **Next step:** CYCLE 114 — the tournament selector (offline, injected
   compare; honest empty without one).
+
+## 2026-09-10 — CYCLE 114 (loop48): the tournament selector — tier-2, injected, machine-checked
+
+- **Files changed:** `src/codemonkey/bestofn.py`
+  (`select_by_tournament` + `run_compare_cmd` + VERDICTS),
+  `src/codemonkey/exec.py` (tier-2 branch: `--tournament-compare` param,
+  usage checks — mutually exclusive with `--verify-command`, requires
+  best-of N>1 — per-candidate snapshots, winner's tree restored, malformed →
+  last tree KEPT), `src/codemonkey/cli.py` (`--tournament-compare`, flags
+  before the prompt), `tests/test_bestofn_tournament.py` (new, 10),
+  `build/probes/cycle114-probe.{py,out}`, register `bestofn` row extended,
+  features.html (C113 + C114 entries).
+- **Probe results (literal, R-I):** `cycle114-probe.py` → **PASS (6/6)**
+  through the CLI: help carries the option; scripted run
+  `--best-of 2 --tournament-compare <cmd>` → the command's pick (candidate 2)
+  wins, `answer.txt == "TWO"` (winner's tree), stdout = the winner's message,
+  exit 0; malformed command (`echo maybe`) → exit 1 with the LAST tree kept.
+- **Tests run:** 10/10 new (permutation determinism on a strict order,
+  ties→lower index, honest empty without a comparison, malformed/raising
+  refusals, `run_compare_cmd` verdict/crash/timeout shapes, both exec-level
+  runs, both usage errors). Full suite **919 passed, 5 skipped** (was 909/5).
+- **Known issue:** none new; selection is not verification (stated on the
+  surface — a tournament pick exits 0 with `via:"tournament"` and the run's
+  text is the winner's, never a claim the machine check passed).
+- **Next step:** CYCLE 115 — the cost gate: projected spend printed BEFORE
+  candidate 2; declared budgets enforced at the same boundary.

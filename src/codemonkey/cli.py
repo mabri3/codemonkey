@@ -803,6 +803,10 @@ def exec(
         bool,
         typer.Option("--refine-seeded", help="After --best-of N>1 exhausts failing candidates, ONE more attempt is seeded with their bounded failure evidence (PDR); the same verifier decides. Off by default."),
     ] = False,
+    tournament_compare: Annotated[
+        Optional[str],
+        typer.Option("--tournament-compare", help="Shell command: two candidate payload file paths appended; first stdout line must be a/b/equal. Tier-2 selection when no --verify-command exists. Flags go BEFORE the prompt."),
+    ] = None,
     atomic_plan: Annotated[
         bool,
         typer.Option("--atomic-plan", help="Opt-in atomic change plan (loop41): the run's edits land whole or roll back whole on declared failure. Off by default."),
@@ -860,6 +864,7 @@ def exec(
             dry_run=dry_run,
             best_of=best_of,
             refine_seeded=refine_seeded,
+            tournament_compare=tournament_compare,
             verify_command=verify_command,
             atomic_plan=atomic_plan,
         )

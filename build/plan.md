@@ -2065,6 +2065,17 @@ appended by its own research cycle, with loops 42-45 closed in parallel.
   winner), honest empty without compare, malformed compare output → refused
   with reason; CLI probe: `--best-of 3 --tournament-compare ./cmp.sh` on a
   scripted run selects the winner the cmp returns.
+  **DONE 2026-09-10.** `bestofn.select_by_tournament` (round-robin, canonical
+  order, wins; ties → lower index; malformed verdict / raising compare →
+  refused naming the pair) + `run_compare_cmd` (temp payload files, first
+  stdout line, crashes/timeouts returned as reason strings); exec tier-2
+  branch (`--tournament-compare`, mutually exclusive with `--verify-command`,
+  per-candidate snapshots → the WINNER's tree restored; malformed → last
+  tree KEPT, exit 1); CLI option (flags-first). Probe `cycle114-probe.out`
+  **PASS (6/6)** through the CLI: cmd's pick wins (tree restored, stdout =
+  winner's message, exit 0); malformed → exit 1 + last tree kept. Tests
+  `test_bestofn_tournament.py` 10/10 (permutation determinism pinned on a
+  strict order). Suite **919/5**.
 - [ ] CYCLE 115 — `loop48:` the cost gate — printed BEFORE the spend,
   enforced at the boundary: `--best-of N` (N>1) prints the projected extra
   cost (N−1) × current candidate figures (tokens/wall) before candidate 2;
