@@ -59,6 +59,20 @@ job is to continue that machine, not invent a new process.
   probes fall back with a note. **Never fake a probe**; record BLOCKED + reason.
 - The 6F4 guard test enforces removal of TEMP providers when home recovers.
   Removing them while wedged will fail the suite on purpose.
+- A control must be exercised against the artifact it protects, not a
+  stand-in. A break run that comes back green is VOID until you prove the
+  break took effect — assert the import origin, not just that tests ran.
+  In-process break runs against a detached worktree are invalid under an
+  editable install: use `PYTHONPATH` and assert `codemonkey.__file__`.
+- "every", "all", "one per", "complete" in a control or a document requires
+  a control that goes red when it stops being true — and the break run must
+  exercise each branch of that quantifier. Otherwise the word comes out.
+- A measurement that contradicts a design premise is re-derived from primary
+  data before the premise is downgraded. A pin detects that evidence
+  CHANGED; it cannot detect that the evidence was WRONG when written.
+- A self-authored constraint that blocks all remaining work, with no
+  unblocked path, is escalated to the user as a decision — not obeyed as a
+  fact.
 - Python: always through `uv run`; Python 3.11.15; no global installs.
 - Secrets: `.env`/API keys never in git; providers reference `*_env` names.
 

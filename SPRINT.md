@@ -204,8 +204,12 @@ REJECTED for this arc — it is a core-design change requiring its own
 authorization. R46 research is DONE (2026-09-04): `build/research-loop46.md`
 committed; `loop46:` build cycles 82-87 appended — 82 skill store · 83
 admission gate · 84 `skill_create` + `skills` strategy domain · 85 coarse taint
-rule · 86 revocation CLI · 87 R-K measurement + acceptance. **Ordering is
-binding: nothing in this arc starts before loop 45's v4.0 acceptance.**
+rule · 86 revocation CLI · 87 R-K measurement + acceptance. **Ordering
+WAIVED by the user 2026-09-10:** loops 46-50 are AUTHORIZED and may be built
+without waiting for loop 45's v4.0 acceptance. The original constraint
+("nothing in this arc starts before loop 45's v4.0 acceptance") was
+self-authored in `build/loops-46-50-proposal.md` and is lifted. v4.0 still
+ships, with its named exception list.
 
 ## Ticks (every 5 min)
 
