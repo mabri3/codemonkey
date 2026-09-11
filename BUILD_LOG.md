@@ -4140,3 +4140,32 @@ them justifies waiving a row at v4.0.
   checks, not 2) — fixed the assertion, not the code. The suite writes
   `state/` in the CWD: run it from a scratch directory (noted in the file).
 - **Next step:** CYCLE 123 — v5.0 close (bump, sweep, verdicts, tag, Gate 7).
+
+## 2026-09-11 — CYCLE 123 (loop50): v5.0 close — version, sweep, verdicts, tag
+
+- **Files changed:** `pyproject.toml` + `src/codemonkey/__init__.py`
+  (4.0.0 → 5.0.0), `build/BUILD_REPORT.md` (v5.0 section: four per-loop
+  verdicts + CL protocol note + Gate 7 handoff + the named exception
+  list), `THREAT_MODEL.md` (v5.0 refresh), `features.html` (v5.0 entry),
+  `build/plan.md` (C123 ticked), sweep evidence
+  (`build/acceptance_outputs/summary-v50-close.txt` + run log), register
+  (final: 70 PROVEN-LIVE / 0 UNVALIDATED).
+- **Sweep (shipped form):** A1 exit 0 → `codemonkey 5.0.0`; 11 rows
+  exit 0; live rows A4/A5/A6… BLOCKED with the reason named (home
+  llama.cpp wedged; no fallback provider — the v4.0 exception-list rows
+  unchanged); **A15 exit 0 → 944 passed, 5 skipped**. Post-sweep
+  canonical suite: 944/5.
+- **The verdicts:** 46 KEPT (mechanism live; transfer/retention
+  UNMEASURED-WITH-DATE), 47 KEPT (50-round byte-stability + injection
+  byte-bounds + parity-gated consolidation; playbook-on/off rate
+  UNMEASURED-WITH-DATE), 48 KEPT (refine/tournament/cost-gate probes;
+  refine-vs-none delta UNMEASURED-WITH-DATE), 49 KEPT (attestation +
+  sidecars + text-blind gate; live firing UNMEASURED-WITH-DATE); the one
+  DELETION (lessons.json → playbook) executed with parity evidence; no
+  deletion triggered on an unmeasurable rate.
+- **Verdict:** **v5.0.0 shipped; loops 46–50 COMPLETE.** Gate 7 handoff
+  written for the operator. Live model-behavior numbers remain
+  UNMEASURED-WITH-DATE, each with its one-command re-run.
+- **Next step:** none scheduled — awaiting Gate 7 acceptance and/or a live
+  endpoint to close the UNMEASURED-WITH-DATE rows via one `--cl-protocol`
+  run.

@@ -20,9 +20,9 @@
     "semantic_hash": "45b5ecd8e0d9e22cdc08d4dd8260f701"
   },
   "src/codemonkey/cli.py": {
-    "mtime": 1789103982.259977,
-    "ast_hash": "fbecc501761588c18d1ca57316ff6997",
-    "semantic_hash": "fbecc501761588c18d1ca57316ff6997"
+    "mtime": 1789104144.4023092,
+    "ast_hash": "0eb4796d26937e5a1d45a6aca77b4d92",
+    "semantic_hash": "0eb4796d26937e5a1d45a6aca77b4d92"
   },
   "src/codemonkey/config.py": {
     "mtime": 1789101189.7318273,
@@ -360,9 +360,9 @@
     "semantic_hash": "0be571560509b6bd6e59799a47ae3c53"
   },
   "src/codemonkey/eval.py": {
-    "mtime": 1788641790.4461696,
-    "ast_hash": "a9499ecc7b36774a85a11507fc264187",
-    "semantic_hash": "a9499ecc7b36774a85a11507fc264187"
+    "mtime": 1789104137.3494282,
+    "ast_hash": "66599a76ae647316a3c5087ce52abab3",
+    "semantic_hash": "66599a76ae647316a3c5087ce52abab3"
   },
   "src/codemonkey/journal.py": {
     "mtime": 1789099952.8059273,
@@ -1153,5 +1153,10 @@
     "mtime": 1789104001.8689806,
     "ast_hash": "6d8156c8bc9eead4a85df9cccdeeb9c8",
     "semantic_hash": "6d8156c8bc9eead4a85df9cccdeeb9c8"
+  },
+  "tests/test_long_horizon.py": {
+    "mtime": 1789104151.8302498,
+    "ast_hash": "1b0feae0802b65256e7a89c614dd3c02",
+    "semantic_hash": "1b0feae0802b65256e7a89c614dd3c02"
   }
 }

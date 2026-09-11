@@ -2297,7 +2297,7 @@ appended by its own research cycle, with loops 42-45 closed in parallel.
   (1/2)` + needle named, 2-of-3 fixture `fix_rate: 0.667, pass_rate 0.0`.
   Tests `test_long_horizon.py` 4/4 incl. the empty-suite `None` pin.
   Suite **944/5**.
-- [ ] CYCLE 123 — `loop50:` v5.0 close: bump to 5.0.0 in `pyproject.toml`
+- [x] CYCLE 123 — `loop50:` v5.0 close: bump to 5.0.0 in `pyproject.toml`
   and `src/codemonkey/__init__.py`; sweep RUN (shipped form); the
   per-loop VERDICTS written (46/47/48/49 — KEPT with its number OR its
   mechanism + named missing rate; DELETED with its reason; R-A: no deletion
@@ -2310,6 +2310,16 @@ appended by its own research cycle, with loops 42-45 closed in parallel.
   `git tag` on the pushed commit; Gate 7 handoff names what the operator
   accepts and the named exception list (per-row, per the v2.0/v3.0/v4.0
   precedent).
+  **DONE 2026-09-11.** Version 5.0.0 in both files (`codemonkey --version`
+  → `codemonkey 5.0.0`); sweep shipped form: A1 5.0.0 exit 0, 11 rows
+  exit 0, live rows A4/A5/A6… BLOCKED with the reason named (home
+  llama.cpp wedged; no fallback — the v4.0 exception-list rows unchanged),
+  **A15 944/5** (`summary-v50-close.txt`); canonical suite 944/5.
+  BUILD_REPORT v5.0 section carries the four per-loop verdicts (all KEPT:
+  mechanism live + rate named missing; the one deletion — lessons.json into
+  the playbook — parity-gated) + the Gate 7 handoff + the named exception
+  list; THREAT_MODEL refreshed to v5.0; register 70 PROVEN-LIVE / 0
+  UNVALIDATED rows; tag `v5.0.0` pushed on the close commit.
 
 ### loop46: cycles (selected from build/research-loop46.md, cycle R46 — AUTHORIZED 2026-09-10)
 

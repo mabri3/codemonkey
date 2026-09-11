@@ -1562,3 +1562,64 @@ mechanism is PROVEN-LIVE offline; the model-behavior firing is not claimed.
 travels with the data (per record, through rewrites, onto disk), and the
 doors that let artifacts reach future prompts are guarded by metadata the
 untrusted content cannot touch.
+
+
+---
+
+# v5.0 — Release Acceptance (CYCLE 123) — the compounding arc closes
+
+**Date:** 2026-09-11 · **Version:** 5.0.0 (`pyproject.toml:3`,
+`src/codemonkey/__init__.py:3`) · **Tag:** `v5.0.0` · **Arc:** loops 46–50,
+authorized 2026-09-10 with the ordering waiver; R47–R50 research files
+under `build/research-loop{47,48,49,50}.md`.
+
+## The per-loop verdicts (the deliverable the arc owes)
+
+**R-A rule applied throughout: no deletion triggers on an unmeasurable
+rate; a KEPT mechanism with an unmeasured number states both plainly. The
+one deletion this arc executed — lessons.json DELETED INTO the playbook —
+was parity-gated and verified, not assumed.**
+
+| loop | surface | verdict | evidence for the verdict |
+|---|---|---|---|
+| 46 | skills: quarantined store, mechanical gate, taint, revoke | **KEPT** | mechanism PROVEN-LIVE (C82–C87 probes: admission on exit code never a model; child-process runner; revocation byte-diff `4644a458`→`22d9cbd6`; taint refusal from a fetched payload). *Rate:* skills-on/off forward transfer + retention **UNMEASURED-WITH-DATE** (endpoint refused 2026-09-11; re-run: `uv run codemonkey eval build/suites/trivial.yaml --arms skills-on,skills-off`) |
+| 47 | playbook: delta curation, injection, R-A consolidation | **KEPT** | byte-stable under 50 rounds (round-1 entry unchanged; rewrite control COLLAPSED — the regression can see the defect); injection proves exact-bounded bytes (quarantined never renders; budget enforced pre-spend); lessons migration parity-gated with rollback. *Rate:* playbook-on/off transfer **UNMEASURED-WITH-DATE** (re-run: `--arms playbook-on,playbook-off`) |
+| 48 | bestofn: refine pass, tournament, cost gate | **KEPT** | refine fires zero extra calls when candidate 1 passes; tournament deterministic + machine-checked with malformed-refusal; cost gate refuses BEFORE the crossing provider call (call count pinned 2, not 4) and prints the projection first. *Rate:* refine-vs-none delta **UNMEASURED-WITH-DATE** (re-run: `--best-of 2 --refine-seeded` on a live suite) |
+| 49 | provenance-gated persistence | **KEPT** | per-record attestation (clean/marked/clean-after-fetch); spill sidecars survive the round trip; compaction records; the metadata-only gate refuses tainted with a journaled override, TEXT-BLIND by pin. *Rate:* live injected-payload firing **UNMEASURED-WITH-DATE** (needs the endpoint; fixture + command named in `cycle119-probe.py`) |
+| — | `~/.codemonkey/lessons.json` (the store) | **DELETED INTO THE PLAYBOOK** | parity-gated migration (two-way set equality; rollback on any drop; archive kept as evidence); register deletion-verdict table updated |
+
+**Deletions rejected:** none of the four surfaces earned a deletion — a
+deletion requires a measured near-zero over an observable population, and
+the endpoint-down state establishes neither presence nor absence.
+
+## The CL protocol, ready for the first live run
+
+`codemonkey eval <suite> --arms <surface>-on,<surface>-off --cl-protocol
+--retention <earlier-suite>` runs the SWE-Bench-CL shape (per-arm
+sequential blocks, file order; transfer + retention under the named
+statistic). History worth noting: the refine/tournament/delta mechanisms
+inherit their numbers from this ONE command family the moment the endpoint
+answers — every UNMEASURED-WITH-DATE row above closes with it.
+
+## Gate 7 — handoff to the operator
+
+**What to accept:** `v5.0.0` — tag on the pushed commit; suite green; the
+sweep's shipped form green on every offline row; live rows BLOCKED with
+their reasons named, never waived.
+
+**The named exception list (per row, what would close it — same policy as
+v2.0/v3.0/v4.0, `plan.md` precedent):**
+
+*Model-clause residuals (4):* A4/A5/A9/A16 clauses asserting real-model
+behavior — closed by an endpoint-up sweep run.
+*Loop 42's unmeasured rows (3):* closed by the same endpoint-up run.
+*Loop 43's 5 advisory `contract.md` §3 clauses:* closed by their named
+conversion criteria (unchanged since v4.0).
+*Loop 46/47/48 transfer + retention rates:* UNMEASURED-WITH-DATE —
+closed by one `--cl-protocol` run against a live endpoint.
+*Loop 49 injected-payload firing:* UNMEASURED-WITH-DATE — closed by the
+`cycle119` fixture run against a live endpoint.
+
+**What the operator is NOT accepting:** any claim that the compounding
+loop improves measured pass rates — that number does not exist yet, and
+this report does not imply it in either direction.

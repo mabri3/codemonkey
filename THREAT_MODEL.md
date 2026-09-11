@@ -1,8 +1,25 @@
-# THREAT_MODEL — codemonkey v4.0
+# THREAT_MODEL — codemonkey v5.0
 
 What the sandbox and governance layers DO promise, and what they explicitly
 do NOT. Read this before running codemonkey unattended on a machine that
 matters.
+
+**Refresh at v5.0 (2026-09-11, CYCLE 123):** the compounding-loop surfaces
+are now documented — agent-authored persistence (skills, the playbook) is
+guarded on BOTH sides of the store. WRITE side: a run marked by
+`web_fetch` / shell output / add-dir reads may create neither skills nor
+admitted playbook entries (`skill.refused{reason:"tainted"}`). READ side:
+the admission gate is METADATA-ONLY (provenance, exit codes, ids — never
+the entry's text; the text-blindness twin test is the pin), a tainted
+entry is REFUSED at admission with a deliberate, journaled `--override`,
+and revocation restores prior prompt bytes exactly. Provenance also
+SURVIVES the machinery that rewrites context: every tool outcome carries
+attested `tainted`/`taint_sources`, tainted spills keep sidecars so
+read-backs attribute `spill`, and compaction records which of its dropped
+messages were tainted-derived. The read-path sweep table below names every
+injection path that exists, marks the two remaining gaps (delegate child
+output; admitted-skill dispatch output), and records that a DENIED read is
+honestly clean — nothing was consumed.
 
 **Refresh at v4.0 (2026-09-10, CYCLE loop45-final):** two new surfaces are
 documented below — autonomy budgets (loop 44) and evidence packs (loop 45).
