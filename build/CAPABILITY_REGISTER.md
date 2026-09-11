@@ -1,7 +1,8 @@
-# CAPABILITY_REGISTER — CodeMonkey v3.x (built cycle 81, loop 38)
+# CAPABILITY_REGISTER — CodeMonkey v4.x (built cycle 81, loop 38; live through the v4.0 close)
 
-One row per module in `src/codemonkey/` (56 rows = `ls src/codemonkey/*.py |
-wc -l` at commit of this cycle). No UNVALIDATED rows: every module reads
+One row per module in `src/codemonkey/` (the count is re-checked against the
+tree on every suite run — see the completeness note below; 70 modules at the
+loop-46 opening, cycle 82). No UNVALIDATED rows: every module reads
 PROVEN-LIVE (entry probe named), UNIT-ONLY (reason stated), or DEAD with its
 deletion verdict. R-A disposal rule: a module that cannot earn an entry probe
 is deleted in the cycle that audits it; the verdict is recorded, not silent.
@@ -89,6 +90,8 @@ difference; `pytest` alone never qualifies):
 | recovery | PROVEN-LIVE | conformance `budget` stub run → `failure_report.budget_exhausted` on the wire from the released binary |
 | repro | PROVEN-LIVE | conformance `verify` stub run → `repro.verdict` on the wire from the released binary |
 | stuck | PROVEN-LIVE | conformance `gaveup` stub run → `stuck` on the wire from the released binary |
+| skills | PROVEN-LIVE | `codemonkey skills list` on a repo with no store → exit 0 honest empty; a hand-written quarantined skill listed with status `quarantined`; `skills.load_admitted('.') == []` (quarantined NOT loaded) (`build/probes/cycle82-probe.sh`, loop46 C82) |
+| skills_cli | PROVEN-LIVE | same as skills (the `skills` command surface) |
 
 **Completeness is now CHECKED, not asserted (C106, 2026-09-10).** The rows
 above for loops 39-45 were added by an audit (`build/register_audit.py`) that

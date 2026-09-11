@@ -534,6 +534,12 @@ try:
 except ImportError:  # pragma: no cover
     pass
 try:
+    from .skills_cli import app as _skills_app
+
+    app.add_typer(_skills_app, name="skills", help="Quarantined skill store.")
+except ImportError:  # pragma: no cover
+    pass
+try:
     from .digest_cli import digest_cmd
 
     app.command(name="digest", help="Plain-text digest of one run (thread).")(digest_cmd)

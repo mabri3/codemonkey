@@ -1,0 +1,21 @@
+=== (a) repo with no store ===
+no skills installed (/private/var/folders/xb/kzc31shn1pz2s_5l2fy6d7rh0000gn/T/tmp.nerfbFxhCo/.codemonkey/skills)
+exit=0
+=== (b) hand-written quarantined skill ===
+demo_manual	quarantined	hand-written candidate; never ran
+  probe: echo demo ok
+  provenance: run=manual session=- taint_free=True
+exit=0
+=== (c) quarantined skills are NOT loaded ===
+load_admitted: [] (quarantined skills not loaded)
+exit=0
+=== (d) skills --help ===
+                                                                                
+ Usage: codemonkey skills [OPTIONS] COMMAND [ARGS]...                           
+                                                                                
+ Quarantined skill store.                                                       
+                                                                                
+╭─ Options ────────────────────────────────────────────────────────────────────╮
+│ --help          Show this message and exit.                                  │
+╰──────────────────────────────────────────────────────────────────────────────╯
+exit=0

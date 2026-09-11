@@ -3441,3 +3441,34 @@ them justifies waiving a row at v4.0.
   5 skipped**.
 - **Known issues:** none.
 - **Next step:** CYCLE 82 — skill artifact format + quarantined store.
+
+## 2026-09-10 — CYCLE 82 (loop46): skill artifact format + quarantined store
+
+- **Files changed:** `src/codemonkey/skills.py` (new — manifest schema +
+  validation, `.codemonkey/skills/<name>/` store, quarantine-only loading,
+  status transitions with history, builtin-collision refusal,
+  gitignore-by-construction, atomic writes), `src/codemonkey/skills_cli.py`
+  (new — `skills list`), `src/codemonkey/cli.py` (registration),
+  `tests/test_skills_store.py` (new, 15 tests), `build/probes/cycle82-probe.sh`
+  + `.out`, `build/CAPABILITY_REGISTER.md` (skills/skills_cli rows; header
+  count now live-checked), `features.html`, this entry.
+- **Probe results (literal, R-I):** `codemonkey skills list` on a store-less
+  repo → `no skills installed (...)` exit 0 (honest empty); a hand-written
+  quarantined skill → `demo_manual	quarantined	...` + probe + provenance
+  lines, exit 0; `skills.load_admitted('.') == []` (quarantined NOT loaded),
+  exit 0. Transcript: `build/probes/cycle82-probe.out`.
+- **A defect the new tests caught:** the params validator accepted
+  `{"type": "object"}` with `properties` missing — its own
+  `.get("properties", {})` default defeated the check. The discriminating
+  "schema rejection" case went red; fixed before commit.
+- **Tests run:** `uv run pytest -q tests/test_skills_store.py` → **15
+  passed**; full suite **836 passed, 5 skipped** (was 821/5).
+- **Register:** the completeness control fired on the two new modules exactly
+  as designed (suite red: `no ACTIVE register row: ['skills']`) → rows added
+  (skills, skills_cli — both PROVEN-LIVE with the CLI probe). Register:
+  70/70 modules · 63 PROVEN-LIVE · 7 UNIT-ONLY · 0 UNVALIDATED.
+- **Known issues:** none. Skills are NOT loaded by any run yet (by design —
+  the gate is C83, the strategy domain is C84).
+- **Next step:** CYCLE 83 — the admission gate: a candidate's self-probe run
+  through the EXISTING sandbox; promote on exit 0 only; evict on later
+  failure (R-A); a model's opinion is never an input.
