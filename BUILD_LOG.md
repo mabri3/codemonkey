@@ -3690,3 +3690,29 @@ them justifies waiving a row at v4.0.
   cycle 109's policy, deliberately not in this module.
 - **Next step:** CYCLE 108 — the reflector (`playbook reflect <thread>`:
   journal records → evidence-cited deltas; prints, never merges).
+
+## 2026-09-10 — CYCLE 108 (loop47): the reflector — journal → evidence-cited deltas
+
+- **Files changed:** `src/codemonkey/playbook.py` (reflect() + optional
+  validated `evidence` list[int] through validate/normalize/merge; module
+  docstring extended), `src/codemonkey/playbook_cli.py` (`reflect <thread>
+  [--out f]`), `tests/test_playbook_reflect.py` (new, 6 tests),
+  `build/probes/cycle108-probe.py` + `.out`, register row extended.
+- **Probe results (literal, R-I):** `uv run python build/probes/cycle108-
+  probe.py` → **PASS (15/15 checks)** — scripted failing run through the
+  REAL `run_turns` produced outcome records at indexes 1/3/4; reflect
+  grouped the two shell wrong-tool failures into ONE delta citing evidence
+  `[1,3]` and the write_file schema failure into one citing `[4]`; shell
+  group `taint_free: false` (stdout source), write_file group `true`; CLI
+  `playbook reflect` output byte-identical on re-run and equal to in-process
+  output; store absent after reflection; `playbook merge deltas.json` →
+  `added=2` both `quarantined`, evidence persisted on disk; re-reflect after
+  merge still byte-identical (reflection never touches the store).
+- **Tests run:** `tests/test_playbook_reflect.py` 6/6 (+ store 11/11);
+  full suite **885 passed, 5 skipped** (was 879/5).
+- **Known issue:** evidence is first-writer-keeps on re-merge (same doctrine
+  as provenance); recorded here — cycle 110 may revisit if counters alone
+  prove insufficient. No other issues.
+- **Next step:** CYCLE 109 — injection: `context = playbook` + the
+  byte-regression guard (static byte-identical; playbook = static + exactly
+  the admitted entries; budget accounting printed).

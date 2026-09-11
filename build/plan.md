@@ -2166,6 +2166,19 @@ appended by its own research cycle, with loops 42-45 closed in parallel.
   re-reflecting the same thread is byte-identical; the store is unchanged
   by reflection (byte-compare before/after); a clean thread yields the
   honest empty (exit 0).
+  **DONE 2026-09-10.** `playbook.reflect(records, thread=)` — pure: no model
+  call, no store writes; grouping per (tool, category) via the EXISTING
+  `failclass` taxonomy; `kind: pitfall`, `section: failures`, evidence =
+  sorted record indexes; unmapped/transient yield no candidate; coarse taint
+  (shell/web_fetch groups marked `taint_free: False` — text is always a
+  template). Merge schema gained optional validated `evidence` (list[int],
+  normalized sorted, first-writer-keeps). CLI `playbook reflect <thread>
+  [--out f]`. Probe `cycle108-probe.out` PASS (15 checks): scripted failing
+  run through real `run_turns` → outcome records at indexes 1/3/4 → reflect
+  deltas cite `[1,3]` (both shell failures) and `[4]`; CLI byte-identical on
+  re-run; store absent after reflection; merge → both quarantined with
+  evidence on disk. Tests `tests/test_playbook_reflect.py` 6/6. Suite
+  **885/5**.
 - [ ] CYCLE 109 — `loop47:` injection — `context = playbook` + byte-regression
   guard: `strategies/context.py` gains `playbook` (valid: static|learned|
   playbook); admitted entries render under `CODEMONKEY_PLAYBOOK_BUDGET`

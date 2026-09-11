@@ -107,6 +107,31 @@ def merge_cmd(
     raise typer.Exit(0)
 
 
+@app.command("reflect")
+def reflect_cmd(
+    thread: str = typer.Argument(..., help="journal thread to reflect on"),
+    out: str = typer.Option("", "--out", help="write deltas JSON to this file "
+                                              "(default: stdout)"),
+) -> None:
+    """Reflect a thread's journal into candidate deltas (JSON).
+
+    PURE: no model call, no merge — the store is untouched. Save the output
+    and hand it to `playbook merge` explicitly (or pipe it). An empty or
+    missing thread reflects to `[]` (honest empty, exit 0)."""
+    from . import journal, playbook
+
+    records = journal.read_thread(thread)
+    deltas = playbook.reflect(records, thread=thread)
+    text = json.dumps(deltas, indent=2) + "\n"
+    if out:
+        Path(out).write_text(text)
+        typer.echo(f"reflected: {len(deltas)} delta(s) from {len(records)} "
+                   f"record(s) -> {out}", err=True)
+    else:
+        typer.echo(text, nl=False)
+    raise typer.Exit(0)
+
+
 @app.command("admit")
 def admit_cmd(
     entry_id: str = typer.Argument(..., help="entry to admit for injection"),

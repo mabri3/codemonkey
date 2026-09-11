@@ -133,10 +133,17 @@ def validate_delta(delta: object, index: int) -> None:
     if not isinstance(prov["taint_free"], bool):
         raise PlaybookError(f"delta[{index}]: provenance.taint_free must be a "
                             f"boolean")
+    ev = delta.get("evidence")
+    if ev is not None and (not isinstance(ev, list) or not all(
+            isinstance(x, int) and not isinstance(x, bool) for x in ev)):
+        raise PlaybookError(
+            f"delta[{index}]: evidence must be a list of integer record "
+            f"indexes (the journal positions a reflector derived it from)")
 
 
 def normalize_delta(delta: dict) -> dict:
-    """The stored shape of one validated delta."""
+    """The stored shape of one validated delta. `evidence` is optional —
+    a hand-written delta may carry none; a reflected one always does."""
     section = delta.get("section", "general")
     text = normalize_text(delta["text"])
     return {
@@ -144,6 +151,7 @@ def normalize_delta(delta: dict) -> dict:
         "kind": delta["kind"],
         "section": section,
         "text": text,
+        "evidence": sorted(int(x) for x in (delta.get("evidence") or [])),
         "provenance": {k: v for k, v in delta["provenance"].items()
                        if k in ("run_id", "session_id", "taint_free",
                                 "source")},
@@ -225,6 +233,7 @@ def merge_deltas(workdir: str | Path, deltas: list) -> dict:
                 "id": nd["id"], "kind": nd["kind"], "section": nd["section"],
                 "text": nd["text"], "status": "quarantined", "counter": 1,
                 "first_seen": _now(), "last_seen": _now(),
+                "evidence": nd["evidence"],
                 "provenance": nd["provenance"], "history": [],
             }
             order.append(nd["id"])
@@ -283,3 +292,70 @@ def playbook_thread(workdir: str | Path) -> str:
     and readable, so \"the journal carries playbook.merged\" is checkable."""
     name = Path(workdir).resolve().name or "workspace"
     return f"playbook-{name}"
+
+
+# --- the reflector: journal → evidence-cited deltas (cycle 108) --------------
+#
+# Where candidates COME FROM, deterministically. ACE's Reflector distills
+# insights with an LLM; this repo already owns a deterministic classifier for
+# the same signal (failclass.py, AgentRx labels), so the repo-sized reflector
+# is a PURE PASS over journal records: no model call anywhere, same records →
+# byte-identical deltas, and it NEVER merges — the store is untouched by
+# reflection (merge is the explicit verb, run by the operator).
+
+TAINT_SOURCE_TOOLS = ("web_fetch", "shell")
+
+
+def reflect(records: list, *, thread: str = "") -> list[dict]:
+    """Journal records → candidate deltas citing the record indexes they
+    derive from.
+
+    Failure outcomes are classified by the existing taxonomy and grouped per
+    (tool, category): one candidate delta per group, `kind: pitfall`,
+    `evidence` = the sorted record indexes. Transient-infrastructure and
+    uncoded classes stay UNMAPPED and produce no candidate — a delta that
+    says "something failed" teaches nothing. Determinism is total: the
+    output is a pure function of `records` (the same thread reflects to the
+    same bytes), and the store is never read or written here.
+
+    Taint posture is coarse (loop 49 refines it): a group whose contributing
+    records include a source tool (web_fetch / shell stdout) is marked
+    `taint_free: False`. The delta's own text is always a template over
+    (tool, category, reason, count) — never the untrusted output itself.
+    """
+    from . import failclass as fc
+
+    groups: dict[tuple[str, str], dict] = {}
+    for i, rec in enumerate(records or []):
+        if not isinstance(rec, dict) or rec.get("type") != "outcome":
+            continue
+        if str(rec.get("status") or "") != "error":
+            continue
+        cat, reason = fc.classify_record(rec)
+        if cat == fc.UNMAPPED:
+            continue
+        tool = str(rec.get("tool") or "?")
+        g = groups.setdefault((tool, cat),
+                              {"indexes": [], "reason": reason, "taint": False})
+        g["indexes"].append(i)
+        if tool in TAINT_SOURCE_TOOLS:
+            g["taint"] = True
+
+    deltas: list[dict] = []
+    for (tool, cat) in sorted(groups):
+        g = groups[(tool, cat)]
+        n = len(g["indexes"])
+        deltas.append({
+            "kind": "pitfall",
+            "section": "failures",
+            "text": f"{tool} → {cat}: {g['reason']}; {n} occurrence(s) on "
+                    f"thread {thread or '?'}",
+            "evidence": sorted(g["indexes"]),
+            "provenance": {
+                "run_id": f"reflect:{thread or 'unknown'}",
+                "session_id": thread or "",
+                "taint_free": not g["taint"],
+                "source": f"reflect:{thread or 'unknown'}",
+            },
+        })
+    return deltas
