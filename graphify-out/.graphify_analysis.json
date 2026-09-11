@@ -1083,6 +1083,43 @@
       "tests_test_cost_test_summarize_totals"
     ],
     "21": [
+      "src_codemonkey_jobs",
+      "src_codemonkey_jobs_atomic_write",
+      "src_codemonkey_jobs_create",
+      "src_codemonkey_jobs_job_path",
+      "src_codemonkey_jobs_jobs_dir",
+      "src_codemonkey_jobs_load",
+      "src_codemonkey_jobs_py_path",
+      "src_codemonkey_jobs_rationale_1",
+      "src_codemonkey_jobs_rationale_74",
+      "src_codemonkey_jobs_save",
+      "src_codemonkey_jobs_set_step",
+      "tests_test_job_exec",
+      "tests_test_job_exec_rationale_1",
+      "tests_test_job_exec_rationale_18",
+      "tests_test_job_exec_run_exec",
+      "tests_test_job_exec_test_cross_run_resume_shows_progress",
+      "tests_test_job_exec_test_ephemeral_does_not_write",
+      "tests_test_job_exec_test_invalid_marker_ignored",
+      "tests_test_job_exec_test_job_injection_and_persist",
+      "tests_test_job_exec_test_unknown_job_id_errors",
+      "tests_test_job_exec_turn",
+      "tests_test_job_exec_turn_init",
+      "tests_test_jobs",
+      "tests_test_jobs_jhome",
+      "tests_test_jobs_py_fixture",
+      "tests_test_jobs_rationale_1",
+      "tests_test_jobs_rationale_40",
+      "tests_test_jobs_subprocess_run",
+      "tests_test_jobs_test_atomic_write_survives_crash",
+      "tests_test_jobs_test_cli_jobs_flow",
+      "tests_test_jobs_test_create_and_show",
+      "tests_test_jobs_test_done_and_fail_statuses",
+      "tests_test_jobs_test_list_jobs_sorted",
+      "tests_test_jobs_test_step_transitions",
+      "tests_test_jobs_test_unknown_job_step_bad_status"
+    ],
+    "22": [
       "src_codemonkey_playbook",
       "src_codemonkey_playbook_atomic_write",
       "src_codemonkey_playbook_cli_rationale_140",
@@ -1119,7 +1156,7 @@
       "src_codemonkey_playbook_validate_delta",
       "src_codemonkey_playbook_write_store"
     ],
-    "22": [
+    "23": [
       "src_codemonkey_repro",
       "src_codemonkey_repro_enabled",
       "src_codemonkey_repro_is_test_path",
@@ -1154,7 +1191,7 @@
       "tests_test_repro_gate_turn",
       "tests_test_repro_gate_turn_init"
     ],
-    "23": [
+    "24": [
       "chatturn",
       "declared",
       "providerbase",
@@ -1188,7 +1225,7 @@
       "tests_test_verify_gate_writethendone_chat",
       "tests_test_verify_gate_writethendone_init"
     ],
-    "24": [
+    "25": [
       "src_codemonkey_lessons",
       "src_codemonkey_lessons_add",
       "src_codemonkey_lessons_cli",
@@ -1222,7 +1259,7 @@
       "tests_test_lessons_test_tag_encoding_round_trips",
       "tests_test_lessons_test_unverified_excluded"
     ],
-    "25": [
+    "26": [
       "src_codemonkey_protocol_prompt_block",
       "src_codemonkey_protocol_rationale_21",
       "tests_test_prefix_stability",
@@ -1256,7 +1293,7 @@
       "tests_test_prefix_stability_turn",
       "tests_test_prefix_stability_turn_init"
     ],
-    "26": [
+    "27": [
       "tests_test_changeplan",
       "tests_test_changeplan_cleanshellprov",
       "tests_test_changeplan_cleanshellprov_chat",
@@ -1290,7 +1327,7 @@
       "tests_test_changeplan_turn",
       "tests_test_changeplan_turn_init"
     ],
-    "27": [
+    "28": [
       "src_codemonkey_grounding",
       "src_codemonkey_grounding_locate",
       "src_codemonkey_grounding_pre_apply_validate",
@@ -1322,39 +1359,6 @@
       "tests_test_grounding_test_python_syntax_caught",
       "tests_test_grounding_test_python_valid_passes",
       "tests_test_grounding_test_symbol_index_defines"
-    ],
-    "28": [
-      "src_codemonkey_strategies_adaptivememory",
-      "src_codemonkey_strategies_adaptivememory_rationale_1",
-      "src_codemonkey_strategies_memory",
-      "src_codemonkey_strategies_memory_filememory",
-      "src_codemonkey_strategies_memory_filememory_add_fact",
-      "src_codemonkey_strategies_memory_filememory_init",
-      "src_codemonkey_strategies_memory_filememory_load",
-      "src_codemonkey_strategies_memory_get_memory",
-      "src_codemonkey_strategies_memory_memory_path",
-      "src_codemonkey_strategies_memory_nomemory",
-      "src_codemonkey_strategies_memory_nomemory_add_fact",
-      "src_codemonkey_strategies_memory_nomemory_load",
-      "src_codemonkey_strategies_memory_py_path",
-      "src_codemonkey_strategies_memory_rationale_1",
-      "src_codemonkey_strategies_memory_rationale_25",
-      "src_codemonkey_strategies_memory_rationale_52",
-      "src_codemonkey_strategies_memory_rationale_71",
-      "tests_test_memory_adaptive_test_round_trip_add_then_load",
-      "tests_test_memory_wiring",
-      "tests_test_memory_wiring_ctx",
-      "tests_test_memory_wiring_rationale_1",
-      "tests_test_memory_wiring_spyprovider",
-      "tests_test_memory_wiring_spyprovider_chat",
-      "tests_test_memory_wiring_spyprovider_init",
-      "tests_test_memory_wiring_test_fact_appears_verbatim_in_system",
-      "tests_test_memory_wiring_test_get_memory_none_returns_nomemory",
-      "tests_test_memory_wiring_test_memory_none_hides_fact_and_tool",
-      "tests_test_memory_wiring_test_update_memory_advertised_in_specs",
-      "tests_test_memory_wiring_test_update_memory_appends_and_idempotent",
-      "tests_test_memory_wiring_turn",
-      "tests_test_memory_wiring_turn_init"
     ],
     "29": [
       "src_codemonkey_tools_base",
@@ -1519,38 +1523,6 @@
       "tests_test_instructions_turn_init"
     ],
     "34": [
-      "src_codemonkey_jobs_cli",
-      "src_codemonkey_jobs_cli_jobs_create",
-      "src_codemonkey_jobs_cli_jobs_done",
-      "src_codemonkey_jobs_cli_jobs_fail",
-      "src_codemonkey_jobs_cli_jobs_list",
-      "src_codemonkey_jobs_cli_jobs_show",
-      "src_codemonkey_jobs_cli_py_command",
-      "src_codemonkey_jobs_cli_rationale_1",
-      "src_codemonkey_jobs_create",
-      "src_codemonkey_jobs_load",
-      "src_codemonkey_jobs_rationale_100",
-      "src_codemonkey_jobs_rationale_74",
-      "src_codemonkey_jobs_render",
-      "src_codemonkey_jobs_set_step",
-      "tests_test_job_exec",
-      "tests_test_job_exec_rationale_1",
-      "tests_test_job_exec_rationale_18",
-      "tests_test_job_exec_run_exec",
-      "tests_test_job_exec_test_cross_run_resume_shows_progress",
-      "tests_test_job_exec_test_ephemeral_does_not_write",
-      "tests_test_job_exec_test_invalid_marker_ignored",
-      "tests_test_job_exec_test_job_injection_and_persist",
-      "tests_test_job_exec_test_unknown_job_id_errors",
-      "tests_test_job_exec_turn",
-      "tests_test_job_exec_turn_init",
-      "tests_test_jobs_rationale_40",
-      "tests_test_jobs_test_atomic_write_survives_crash",
-      "tests_test_jobs_test_create_and_show",
-      "tests_test_jobs_test_done_and_fail_statuses",
-      "tests_test_jobs_test_step_transitions"
-    ],
-    "35": [
       "src_codemonkey_providers_base_chatturn",
       "src_codemonkey_providers_base_providerbase_chat",
       "src_codemonkey_providers_base_rationale_29",
@@ -1582,7 +1554,7 @@
       "tests_test_providers_test_chatturn_defaults",
       "tokensink"
     ],
-    "36": [
+    "35": [
       "src_codemonkey_repomap",
       "src_codemonkey_repomap_cache_path",
       "src_codemonkey_repomap_format_map",
@@ -1614,7 +1586,7 @@
       "tests_test_repomap_relevance_test_relevance_overrides_recency",
       "tests_test_repomap_relevance_test_score_counts_path_and_symbols"
     ],
-    "37": [
+    "36": [
       "src_codemonkey_strategies_init",
       "src_codemonkey_strategies_init_build",
       "src_codemonkey_strategies_init_py_valueerror",
@@ -1646,7 +1618,7 @@
       "tests_test_strategies_test_summarizing_triggers_and_summarizes_with_provider",
       "tests_test_strategies_test_valid_sets"
     ],
-    "38": [
+    "37": [
       "src_codemonkey_stuck",
       "src_codemonkey_stuck_classify_outcome",
       "src_codemonkey_stuck_enabled",
@@ -1678,7 +1650,7 @@
       "tests_test_stuck_test_raised_and_plain_tool_error",
       "tests_test_stuck_test_rule_deny_maps_auth"
     ],
-    "39": [
+    "38": [
       "src_codemonkey_recovery",
       "src_codemonkey_recovery_consult",
       "src_codemonkey_recovery_failure_report",
@@ -1709,7 +1681,7 @@
       "tests_test_recovery_turn",
       "tests_test_recovery_turn_init"
     ],
-    "40": [
+    "39": [
       "src_codemonkey_failclass",
       "src_codemonkey_failclass_classify_record",
       "src_codemonkey_failclass_output",
@@ -1739,7 +1711,7 @@
       "tests_test_failclass_turn",
       "tests_test_failclass_turn_init"
     ],
-    "41": [
+    "40": [
       "src_codemonkey_journal",
       "src_codemonkey_journal_args_key",
       "src_codemonkey_journal_classify_error",
@@ -1768,6 +1740,35 @@
       "tests_test_journal_wiring_rationale_117",
       "tests_test_journal_wiring_test_run_scope_changes_the_idempotency_key",
       "tests_test_journal_wiring_test_same_run_replay_still_hits"
+    ],
+    "41": [
+      "src_codemonkey_strategies_adaptivememory",
+      "src_codemonkey_strategies_adaptivememory_rationale_1",
+      "src_codemonkey_strategies_memory",
+      "src_codemonkey_strategies_memory_filememory",
+      "src_codemonkey_strategies_memory_filememory_add_fact",
+      "src_codemonkey_strategies_memory_filememory_init",
+      "src_codemonkey_strategies_memory_filememory_load",
+      "src_codemonkey_strategies_memory_memory_path",
+      "src_codemonkey_strategies_memory_nomemory",
+      "src_codemonkey_strategies_memory_nomemory_add_fact",
+      "src_codemonkey_strategies_memory_nomemory_load",
+      "src_codemonkey_strategies_memory_py_path",
+      "src_codemonkey_strategies_memory_rationale_1",
+      "src_codemonkey_strategies_memory_rationale_25",
+      "src_codemonkey_strategies_memory_rationale_52",
+      "tests_test_memory_wiring",
+      "tests_test_memory_wiring_ctx",
+      "tests_test_memory_wiring_rationale_1",
+      "tests_test_memory_wiring_spyprovider",
+      "tests_test_memory_wiring_spyprovider_chat",
+      "tests_test_memory_wiring_spyprovider_init",
+      "tests_test_memory_wiring_test_fact_appears_verbatim_in_system",
+      "tests_test_memory_wiring_test_memory_none_hides_fact_and_tool",
+      "tests_test_memory_wiring_test_update_memory_advertised_in_specs",
+      "tests_test_memory_wiring_test_update_memory_appends_and_idempotent",
+      "tests_test_memory_wiring_turn",
+      "tests_test_memory_wiring_turn_init"
     ],
     "42": [
       "src_codemonkey_redact",
@@ -2040,6 +2041,56 @@
       "tests_test_bestofn_tournament_write_call"
     ],
     "52": [
+      "src_codemonkey_sandbox_rationale_43",
+      "src_codemonkey_sandbox_toolcontext",
+      "src_codemonkey_skill_runner",
+      "src_codemonkey_skill_runner_main",
+      "src_codemonkey_skill_runner_rationale_1",
+      "tests_test_repomap_inject",
+      "tests_test_repomap_inject_ctx",
+      "tests_test_repomap_inject_git_repo",
+      "tests_test_repomap_inject_py_fixture",
+      "tests_test_repomap_inject_rationale_1",
+      "tests_test_repomap_inject_rationale_112",
+      "tests_test_repomap_inject_spyprovider",
+      "tests_test_repomap_inject_spyprovider_chat",
+      "tests_test_repomap_inject_spyprovider_init",
+      "tests_test_repomap_inject_test_budget_omission_marker",
+      "tests_test_repomap_inject_test_density_breaks_recency_ties",
+      "tests_test_repomap_inject_test_empty_map_renders_empty",
+      "tests_test_repomap_inject_test_gate_off_by_default_absent",
+      "tests_test_repomap_inject_test_injection_identical_across_two_turns",
+      "tests_test_repomap_inject_test_injection_never_exceeds_budget",
+      "tests_test_repomap_inject_test_rank_recent_before_stale",
+      "tests_test_repomap_inject_turn",
+      "tests_test_repomap_inject_turn_init"
+    ],
+    "53": [
+      "src_codemonkey_strategies_adaptivememory_adaptivememory",
+      "src_codemonkey_strategies_adaptivememory_adaptivememory_init",
+      "src_codemonkey_strategies_adaptivememory_adaptivememory_load",
+      "src_codemonkey_strategies_adaptivememory_rationale_15",
+      "src_codemonkey_strategies_memory_get_memory",
+      "src_codemonkey_strategies_memory_rationale_71",
+      "tests_test_memory_adaptive",
+      "tests_test_memory_adaptive_mem",
+      "tests_test_memory_adaptive_rationale_1",
+      "tests_test_memory_adaptive_rationale_131",
+      "tests_test_memory_adaptive_rationale_88",
+      "tests_test_memory_adaptive_recordingprovider",
+      "tests_test_memory_adaptive_recordingprovider_chat",
+      "tests_test_memory_adaptive_recordingprovider_init",
+      "tests_test_memory_adaptive_test_adaptive_selectable_via_env",
+      "tests_test_memory_adaptive_test_budget_honored_and_unselected_absent",
+      "tests_test_memory_adaptive_test_default_memory_stays_file",
+      "tests_test_memory_adaptive_test_empty_memory_loads_empty",
+      "tests_test_memory_adaptive_test_real_run_file_strategy_injects_everything",
+      "tests_test_memory_adaptive_test_real_run_injects_only_selected_lines",
+      "tests_test_memory_adaptive_test_round_trip_add_then_load",
+      "tests_test_memory_adaptive_test_unknown_memory_exit2_message_lists_adaptive",
+      "tests_test_memory_wiring_test_get_memory_none_returns_nomemory"
+    ],
+    "54": [
       "src_codemonkey_checkpoints",
       "src_codemonkey_checkpoints_begin_call",
       "src_codemonkey_checkpoints_checkpoint",
@@ -2063,7 +2114,7 @@
       "src_codemonkey_checkpoints_rationale_99",
       "src_codemonkey_checkpoints_restore_latest"
     ],
-    "53": [
+    "55": [
       "src_codemonkey_spill",
       "src_codemonkey_spill_prune",
       "src_codemonkey_spill_py_path",
@@ -2087,7 +2138,7 @@
       "tests_test_spill_test_spill_writes_verbatim",
       "tests_test_spill_test_under_budget_untouched"
     ],
-    "54": [
+    "56": [
       "tests_test_bestofn_exec",
       "tests_test_bestofn_exec_patched_run",
       "tests_test_bestofn_exec_rationale_1",
@@ -2111,7 +2162,7 @@
       "tests_test_bestofn_exec_verifier",
       "tests_test_bestofn_exec_write_call"
     ],
-    "55": [
+    "57": [
       "tests_test_playbook_collapse",
       "tests_test_playbook_collapse_deltas_for",
       "tests_test_playbook_collapse_rationale_1",
@@ -2135,7 +2186,7 @@
       "tests_test_playbook_collapse_test_remerge_after_the_run_still_changes_no_bytes",
       "tests_test_playbook_collapse_test_the_rewrite_control_fails_the_same_regression"
     ],
-    "56": [
+    "58": [
       "src_codemonkey_config",
       "src_codemonkey_config_configerror",
       "src_codemonkey_config_deep_merge",
@@ -2158,7 +2209,30 @@
       "tests_test_memory_wiring_test_unknown_memory_name_exit2",
       "tests_test_retry_test_config_default_and_env_override"
     ],
-    "57": [
+    "59": [
+      "src_codemonkey_status_mod",
+      "src_codemonkey_status_mod_collect",
+      "src_codemonkey_status_mod_cost_section",
+      "src_codemonkey_status_mod_eval_section",
+      "src_codemonkey_status_mod_jobs_section",
+      "src_codemonkey_status_mod_py_path",
+      "src_codemonkey_status_mod_rationale_1",
+      "src_codemonkey_status_mod_rationale_122",
+      "src_codemonkey_status_mod_render",
+      "src_codemonkey_status_mod_render_frame",
+      "src_codemonkey_status_mod_sessions_section",
+      "tests_test_status",
+      "tests_test_status_op_home",
+      "tests_test_status_py_fixture",
+      "tests_test_status_rationale_1",
+      "tests_test_status_test_baseline_and_cost",
+      "tests_test_status_test_empty_store_tolerance",
+      "tests_test_status_test_jobs_progress",
+      "tests_test_status_test_journal_classes",
+      "tests_test_status_test_render_includes_sections",
+      "tests_test_status_test_spill_bytes"
+    ],
+    "60": [
       "tests_test_graph_tools",
       "tests_test_graph_tools_ctx",
       "tests_test_graph_tools_ctx_init",
@@ -2181,7 +2255,7 @@
       "tests_test_graph_tools_write_graph",
       "toolcontext"
     ],
-    "58": [
+    "61": [
       "src_codemonkey_bestofn_rationale_142",
       "src_codemonkey_bestofn_refine_seed",
       "tests_test_bestofn_refine",
@@ -2203,7 +2277,7 @@
       "tests_test_bestofn_refine_verifier",
       "tests_test_bestofn_refine_write_call"
     ],
-    "59": [
+    "62": [
       "src_codemonkey_budget",
       "src_codemonkey_budget_cli",
       "src_codemonkey_budget_cli_budget_show",
@@ -2225,7 +2299,7 @@
       "tests_test_budget_test_safe_limit_rounds_down_to_1k",
       "tests_test_budget_test_yaml_block_render"
     ],
-    "60": [
+    "63": [
       "src_codemonkey_playbook_cli",
       "src_codemonkey_playbook_cli_admit_cmd",
       "src_codemonkey_playbook_cli_list_cmd",
@@ -2247,7 +2321,7 @@
       "src_codemonkey_playbook_rationale_324",
       "src_codemonkey_playbook_reflect"
     ],
-    "61": [
+    "64": [
       "src_codemonkey_providers_anthropic_anthropicprovider",
       "src_codemonkey_providers_anthropic_anthropicprovider_block_text",
       "src_codemonkey_providers_anthropic_anthropicprovider_body",
@@ -2269,29 +2343,7 @@
       "tests_test_retry_streamctx_exit",
       "tests_test_retry_streamctx_init"
     ],
-    "62": [
-      "src_codemonkey_status_mod",
-      "src_codemonkey_status_mod_collect",
-      "src_codemonkey_status_mod_cost_section",
-      "src_codemonkey_status_mod_eval_section",
-      "src_codemonkey_status_mod_py_path",
-      "src_codemonkey_status_mod_rationale_1",
-      "src_codemonkey_status_mod_rationale_122",
-      "src_codemonkey_status_mod_render",
-      "src_codemonkey_status_mod_render_frame",
-      "src_codemonkey_status_mod_sessions_section",
-      "tests_test_status",
-      "tests_test_status_op_home",
-      "tests_test_status_py_fixture",
-      "tests_test_status_rationale_1",
-      "tests_test_status_test_baseline_and_cost",
-      "tests_test_status_test_empty_store_tolerance",
-      "tests_test_status_test_jobs_progress",
-      "tests_test_status_test_journal_classes",
-      "tests_test_status_test_render_includes_sections",
-      "tests_test_status_test_spill_bytes"
-    ],
-    "63": [
+    "65": [
       "tests_test_contract",
       "tests_test_contract_okprov",
       "tests_test_contract_okprov_chat",
@@ -2313,7 +2365,7 @@
       "tests_test_contract_turn",
       "tests_test_contract_turn_init"
     ],
-    "64": [
+    "66": [
       "src_codemonkey_claims",
       "src_codemonkey_claims_annotate",
       "src_codemonkey_claims_check_claims",
@@ -2334,7 +2386,7 @@
       "tests_test_verify_claims_test_file_claim_missing_unverified",
       "tests_test_verify_claims_test_reply_without_claims_noop"
     ],
-    "65": [
+    "67": [
       "src_codemonkey_retry",
       "src_codemonkey_retry_annotate",
       "src_codemonkey_retry_attempts_for",
@@ -2355,7 +2407,7 @@
       "tests_test_retry_test_parse_retry_after",
       "tests_test_retry_test_sleep_delay_full_jitter_bounds"
     ],
-    "66": [
+    "68": [
       "src_codemonkey_sandbox_check",
       "src_codemonkey_sandbox_rationale_89",
       "tests_test_sandbox",
@@ -2376,28 +2428,7 @@
       "tests_test_sandbox_test_workspace_write_allows_shell_through_dispatch",
       "tests_test_sandbox_ws"
     ],
-    "67": [
-      "src_codemonkey_strategies_adaptivememory_adaptivememory",
-      "src_codemonkey_strategies_adaptivememory_adaptivememory_init",
-      "src_codemonkey_strategies_adaptivememory_adaptivememory_load",
-      "src_codemonkey_strategies_adaptivememory_rationale_15",
-      "tests_test_memory_adaptive",
-      "tests_test_memory_adaptive_mem",
-      "tests_test_memory_adaptive_rationale_1",
-      "tests_test_memory_adaptive_rationale_131",
-      "tests_test_memory_adaptive_rationale_88",
-      "tests_test_memory_adaptive_recordingprovider",
-      "tests_test_memory_adaptive_recordingprovider_chat",
-      "tests_test_memory_adaptive_recordingprovider_init",
-      "tests_test_memory_adaptive_test_adaptive_selectable_via_env",
-      "tests_test_memory_adaptive_test_budget_honored_and_unselected_absent",
-      "tests_test_memory_adaptive_test_default_memory_stays_file",
-      "tests_test_memory_adaptive_test_empty_memory_loads_empty",
-      "tests_test_memory_adaptive_test_real_run_file_strategy_injects_everything",
-      "tests_test_memory_adaptive_test_real_run_injects_only_selected_lines",
-      "tests_test_memory_adaptive_test_unknown_memory_exit2_message_lists_adaptive"
-    ],
-    "68": [
+    "69": [
       "src_codemonkey_tools_base_toolresult",
       "src_codemonkey_tools_base_toolresult_post_init",
       "src_codemonkey_tools_graph",
@@ -2418,7 +2449,7 @@
       "src_codemonkey_tools_graph_run_path",
       "tests_test_graph_tools_test_f4_single_file_layout_bfs_path"
     ],
-    "69": [
+    "70": [
       "tests_test_bestofn_costgate",
       "tests_test_bestofn_costgate_rationale_1",
       "tests_test_bestofn_costgate_rationale_157",
@@ -2439,7 +2470,7 @@
       "tests_test_bestofn_costgate_verifier",
       "tests_test_bestofn_costgate_write_call"
     ],
-    "70": [
+    "71": [
       "src_codemonkey_digest",
       "src_codemonkey_digest_build_digest",
       "src_codemonkey_digest_cli",
@@ -2459,7 +2490,7 @@
       "tests_test_digest_test_route_fallback_flag",
       "tests_test_digest_test_tool_counts"
     ],
-    "71": [
+    "72": [
       "src_codemonkey_graphquery",
       "src_codemonkey_graphquery_find_graph_dir",
       "src_codemonkey_graphquery_graph_query",
@@ -2479,47 +2510,7 @@
       "tests_test_graphquery_test_no_match_empty",
       "tests_test_graphquery_test_pinned_symbol_lookup"
     ],
-    "72": [
-      "src_codemonkey_sandbox_rationale_43",
-      "src_codemonkey_sandbox_toolcontext",
-      "src_codemonkey_skill_runner",
-      "src_codemonkey_skill_runner_main",
-      "src_codemonkey_skill_runner_rationale_1",
-      "tests_test_selfheal",
-      "tests_test_selfheal_ctx",
-      "tests_test_selfheal_editflakyprovider",
-      "tests_test_selfheal_editflakyprovider_chat",
-      "tests_test_selfheal_editflakyprovider_init",
-      "tests_test_selfheal_rationale_1",
-      "tests_test_selfheal_rationale_22",
-      "tests_test_selfheal_test_no_retry_when_edit_ok",
-      "tests_test_selfheal_test_non_edit_failures_do_not_retry",
-      "tests_test_selfheal_test_retry_after_edit_failure",
-      "tests_test_selfheal_test_retry_limit_respected",
-      "tests_test_selfheal_turn",
-      "tests_test_selfheal_turn_init"
-    ],
     "73": [
-      "tests_test_repomap_inject",
-      "tests_test_repomap_inject_ctx",
-      "tests_test_repomap_inject_git_repo",
-      "tests_test_repomap_inject_py_fixture",
-      "tests_test_repomap_inject_rationale_1",
-      "tests_test_repomap_inject_rationale_112",
-      "tests_test_repomap_inject_spyprovider",
-      "tests_test_repomap_inject_spyprovider_chat",
-      "tests_test_repomap_inject_spyprovider_init",
-      "tests_test_repomap_inject_test_budget_omission_marker",
-      "tests_test_repomap_inject_test_density_breaks_recency_ties",
-      "tests_test_repomap_inject_test_empty_map_renders_empty",
-      "tests_test_repomap_inject_test_gate_off_by_default_absent",
-      "tests_test_repomap_inject_test_injection_identical_across_two_turns",
-      "tests_test_repomap_inject_test_injection_never_exceeds_budget",
-      "tests_test_repomap_inject_test_rank_recent_before_stale",
-      "tests_test_repomap_inject_turn",
-      "tests_test_repomap_inject_turn_init"
-    ],
-    "74": [
       "baseexception",
       "src_codemonkey_unload",
       "src_codemonkey_unload_fallback_route",
@@ -2538,7 +2529,7 @@
       "tests_test_unload_fallback_turn_init",
       "tests_test_unload_fallback_unloadederror"
     ],
-    "75": [
+    "74": [
       "src_codemonkey_certify",
       "src_codemonkey_certify_hoeffding_gate",
       "src_codemonkey_certify_m_certificate",
@@ -2557,7 +2548,7 @@
       "tests_test_certify_test_old_name_warns_but_still_works",
       "tests_test_certify_test_tied_undecided"
     ],
-    "76": [
+    "75": [
       "src_codemonkey_compile_rules",
       "src_codemonkey_compile_rules_compile_corrections",
       "src_codemonkey_compile_rules_merge_rules",
@@ -2576,7 +2567,7 @@
       "tests_test_compile_rules_test_over_threshold_compile",
       "tests_test_compile_rules_test_under_threshold_skipped"
     ],
-    "77": [
+    "76": [
       "src_codemonkey_evidence",
       "src_codemonkey_evidence_build_chain",
       "src_codemonkey_evidence_canonical",
@@ -2595,7 +2586,7 @@
       "src_codemonkey_evidence_verify",
       "src_codemonkey_evidence_verify_against_journal"
     ],
-    "78": [
+    "77": [
       "src_codemonkey_skills_arms",
       "src_codemonkey_skills_arms_contamination_violations",
       "src_codemonkey_skills_arms_endpoint_probe",
@@ -2614,7 +2605,7 @@
       "src_codemonkey_skills_arms_store_snapshot",
       "src_codemonkey_skills_arms_summarize"
     ],
-    "79": [
+    "78": [
       "tests_test_checkpoints",
       "tests_test_checkpoints_ctx_of",
       "tests_test_checkpoints_rationale_1",
@@ -2633,7 +2624,7 @@
       "tests_test_checkpoints_test_undo_in_another_workspace_refuses",
       "tests_test_checkpoints_test_undo_restores_every_file_of_a_batch"
     ],
-    "80": [
+    "79": [
       "tests_test_playbook_injection",
       "tests_test_playbook_injection_admit",
       "tests_test_playbook_injection_delta",
@@ -2652,7 +2643,7 @@
       "tests_test_playbook_injection_test_playbook_mode_empty_store_is_byte_equal_to_static",
       "tests_test_playbook_injection_test_quarantined_and_evicted_entries_never_render"
     ],
-    "81": [
+    "80": [
       "tests_test_skills_strategy",
       "tests_test_skills_strategy_admitted_skill",
       "tests_test_skills_strategy_ctx",
@@ -2671,7 +2662,7 @@
       "tests_test_skills_strategy_turn",
       "tests_test_skills_strategy_turn_init"
     ],
-    "82": [
+    "81": [
       "graphify",
       "tests_test_changeplan_home",
       "tests_test_impact",
@@ -2689,7 +2680,7 @@
       "tests_test_impact_test_path_endpoint_resolution_prefers_exact_match",
       "tests_test_impact_test_search_files_uses_real_tool"
     ],
-    "83": [
+    "82": [
       "src_codemonkey_permissions",
       "src_codemonkey_permissions_evaluate",
       "src_codemonkey_permissions_rationale_1",
@@ -2707,7 +2698,7 @@
       "tests_test_permissions_test_pattern_requires_subject",
       "tests_test_permissions_test_wildcard_tool"
     ],
-    "84": [
+    "83": [
       "tests_test_idempotency",
       "tests_test_idempotency_ctx",
       "tests_test_idempotency_jhome",
@@ -2725,7 +2716,7 @@
       "tests_test_idempotency_turn",
       "tests_test_idempotency_turn_init"
     ],
-    "85": [
+    "84": [
       "src_codemonkey_loop",
       "src_codemonkey_loop_native_specs",
       "src_codemonkey_loop_rationale_1",
@@ -2742,7 +2733,7 @@
       "src_codemonkey_protocol_rationale_128",
       "src_codemonkey_protocol_rationale_46"
     ],
-    "86": [
+    "85": [
       "src_codemonkey_routing",
       "src_codemonkey_routing_rationale_1",
       "src_codemonkey_routing_rationale_30",
@@ -2759,7 +2750,7 @@
       "tests_test_routing_test_prompt_glob_match",
       "tests_test_routing_test_route_stats_aggregation"
     ],
-    "87": [
+    "86": [
       "src_codemonkey_sandbox",
       "src_codemonkey_sandbox_rationale_1",
       "src_codemonkey_sandbox_rationale_104",
@@ -2776,7 +2767,7 @@
       "src_codemonkey_tools_search_rationale_1",
       "src_codemonkey_tools_search_run"
     ],
-    "88": [
+    "87": [
       "tests_test_obsbudget",
       "tests_test_obsbudget_ctx",
       "tests_test_obsbudget_rationale_1",
@@ -2793,7 +2784,7 @@
       "tests_test_obsbudget_twofatoutputsprovider_chat",
       "tests_test_obsbudget_twofatoutputsprovider_init"
     ],
-    "89": [
+    "88": [
       "tests_test_sessions_persist",
       "tests_test_sessions_persist_pairs",
       "tests_test_sessions_persist_patch_provider",
@@ -2810,7 +2801,7 @@
       "tests_test_sessions_persist_test_single_run_stores_user_and_assistant",
       "tests_test_sessions_persist_tmp_sessions"
     ],
-    "90": [
+    "89": [
       "tests_test_skills_cli",
       "tests_test_skills_cli_admit",
       "tests_test_skills_cli_cli",
@@ -2827,7 +2818,7 @@
       "tests_test_skills_cli_turn",
       "tests_test_skills_cli_turn_init"
     ],
-    "91": [
+    "90": [
       "src_codemonkey_affinity",
       "src_codemonkey_affinity_batch_by_model",
       "src_codemonkey_affinity_rationale_1",
@@ -2843,7 +2834,7 @@
       "tests_test_batch_by_model_test_mixed_route_shapes",
       "tests_test_batch_by_model_test_order_preserved_within_group"
     ],
-    "92": [
+    "91": [
       "src_codemonkey_argvalidate",
       "src_codemonkey_argvalidate_rationale_1",
       "src_codemonkey_argvalidate_rationale_39",
@@ -2859,7 +2850,7 @@
       "tests_test_arg_validation_test_valid_pass_through",
       "tests_test_arg_validation_test_wrong_type_detected"
     ],
-    "93": [
+    "92": [
       "src_codemonkey_digest_digest_recent",
       "src_codemonkey_digest_rationale_63",
       "src_codemonkey_digest_render_multi",
@@ -2875,7 +2866,7 @@
       "tests_test_watch_digest_test_render_multi_sections",
       "tests_test_watch_digest_whome"
     ],
-    "94": [
+    "93": [
       "src_codemonkey_recovery_rationale_120",
       "src_codemonkey_recovery_rationale_126",
       "src_codemonkey_recovery_rationale_141",
@@ -2891,7 +2882,7 @@
       "src_codemonkey_recovery_recoverytracker_saved_vs_max_turns",
       "tests_test_enforced_stop_test_tracker_advisory_turn_defaults_none"
     ],
-    "95": [
+    "94": [
       "src_codemonkey_sandbox_can",
       "src_codemonkey_sandbox_py_exception",
       "src_codemonkey_sandbox_py_path",
@@ -2907,7 +2898,7 @@
       "tests_test_sandbox_test_can_matrix",
       "tests_test_tools_test_sandbox_can_matrix"
     ],
-    "96": [
+    "95": [
       "tests_test_config",
       "tests_test_config_clean_env",
       "tests_test_config_py_fixture",
@@ -2923,7 +2914,7 @@
       "tests_test_config_test_user_config_then_project_overrides",
       "tests_test_config_test_version_flag"
     ],
-    "97": [
+    "96": [
       "tests_test_parallel",
       "tests_test_parallel_ctx",
       "tests_test_parallel_parallelprovider",
@@ -2939,7 +2930,7 @@
       "tests_test_parallel_turn",
       "tests_test_parallel_turn_init"
     ],
-    "98": [
+    "97": [
       "tests_test_playbook_store",
       "tests_test_playbook_store_delta",
       "tests_test_playbook_store_rationale_1",
@@ -2955,7 +2946,7 @@
       "tests_test_playbook_store_test_tainted_provenance_is_recorded_not_sanitized",
       "tests_test_playbook_store_test_whitespace_normalization_is_the_identity"
     ],
-    "99": [
+    "98": [
       "tests_test_repomap",
       "tests_test_repomap_ctx",
       "tests_test_repomap_ctx_getattr",
@@ -2971,7 +2962,7 @@
       "tests_test_repomap_test_repo_map_tool_pattern_filter",
       "tests_test_repomap_test_touch_invalidates_only_that_file"
     ],
-    "100": [
+    "99": [
       "src_codemonkey_exec_rationale_95",
       "src_codemonkey_exec_read_optional_stdin",
       "tests_test_exec_robustness",
@@ -2986,7 +2977,7 @@
       "tests_test_exec_robustness_test_reported_flag_is_settable_and_survives_raise",
       "tests_test_exec_robustness_with_stdin"
     ],
-    "101": [
+    "100": [
       "src_codemonkey_impact",
       "src_codemonkey_impact_compare",
       "src_codemonkey_impact_graph_callers",
@@ -3001,7 +2992,7 @@
       "src_codemonkey_impact_rationale_91",
       "src_codemonkey_impact_search_files"
     ],
-    "102": [
+    "101": [
       "src_codemonkey_learnedctx",
       "src_codemonkey_learnedctx_assemble",
       "src_codemonkey_learnedctx_rationale_1",
@@ -3016,7 +3007,7 @@
       "tests_test_learnedctx_test_original_order_in_selection",
       "tests_test_learnedctx_test_recency_decay_prefers_the_note_feelings"
     ],
-    "103": [
+    "102": [
       "src_codemonkey_native",
       "src_codemonkey_native_anthropic_tool_specs",
       "src_codemonkey_native_openai_tool_result_message",
@@ -3031,7 +3022,7 @@
       "src_codemonkey_native_tool_specs_for",
       "tests_test_protocol_test_native_openai_spec_shape"
     ],
-    "104": [
+    "103": [
       "src_codemonkey_strategies_compaction",
       "src_codemonkey_strategies_compaction_estimate_tokens",
       "src_codemonkey_strategies_compaction_get_compactor",
@@ -3045,6 +3036,21 @@
       "tests_test_strategies_test_summarizing_falls_back_when_provider_fails",
       "tests_test_strategies_test_summarizing_no_provider_degrades_gracefully",
       "valueerror"
+    ],
+    "104": [
+      "tests_test_selfheal",
+      "tests_test_selfheal_ctx",
+      "tests_test_selfheal_editflakyprovider",
+      "tests_test_selfheal_editflakyprovider_chat",
+      "tests_test_selfheal_editflakyprovider_init",
+      "tests_test_selfheal_rationale_1",
+      "tests_test_selfheal_rationale_22",
+      "tests_test_selfheal_test_no_retry_when_edit_ok",
+      "tests_test_selfheal_test_non_edit_failures_do_not_retry",
+      "tests_test_selfheal_test_retry_after_edit_failure",
+      "tests_test_selfheal_test_retry_limit_respected",
+      "tests_test_selfheal_turn",
+      "tests_test_selfheal_turn_init"
     ],
     "105": [
       "tests_test_skills_arms",
@@ -3119,6 +3125,19 @@
       "tests_test_slim_test_under_threshold_untouched"
     ],
     "110": [
+      "src_codemonkey_jobs_cli",
+      "src_codemonkey_jobs_cli_jobs_create",
+      "src_codemonkey_jobs_cli_jobs_done",
+      "src_codemonkey_jobs_cli_jobs_fail",
+      "src_codemonkey_jobs_cli_jobs_list",
+      "src_codemonkey_jobs_cli_jobs_show",
+      "src_codemonkey_jobs_cli_py_command",
+      "src_codemonkey_jobs_cli_rationale_1",
+      "src_codemonkey_jobs_list_jobs",
+      "src_codemonkey_jobs_rationale_100",
+      "src_codemonkey_jobs_render"
+    ],
+    "111": [
       "src_codemonkey_verifyhint",
       "src_codemonkey_verifyhint_rationale_1",
       "src_codemonkey_verifyhint_rationale_13",
@@ -3131,7 +3150,7 @@
       "tests_test_verifyhint_test_suggestion_object_stable",
       "tests_test_verifyhint_test_suggestion_when_pytest_used"
     ],
-    "111": [
+    "112": [
       "tests_test_hygiene_6f4",
       "tests_test_hygiene_6f4_home_reachable",
       "tests_test_hygiene_6f4_home_server_inference_alive",
@@ -3144,7 +3163,7 @@
       "tests_test_hygiene_6f4_test_temp_unblock_provider_removed_when_home_serves_inference",
       "tests_test_hygiene_6f4_tmp_store"
     ],
-    "112": [
+    "113": [
       "tests_test_journal_wiring",
       "tests_test_journal_wiring_exec_once",
       "tests_test_journal_wiring_patch_tool_provider",
@@ -3157,7 +3176,7 @@
       "tests_test_journal_wiring_test_journal_thread_is_listed_after_an_exec_run",
       "tests_test_journal_wiring_test_resumed_run_rewrites_instead_of_replaying"
     ],
-    "113": [
+    "114": [
       "tests_test_lessons_migration",
       "tests_test_lessons_migration_lessons_file",
       "tests_test_lessons_migration_migrate",
@@ -3170,7 +3189,7 @@
       "tests_test_lessons_migration_test_real_home_file_is_not_touched_by_tests",
       "tests_test_lessons_migration_test_retrieval_parity_on_real_tasks"
     ],
-    "114": [
+    "115": [
       "tests_test_register",
       "tests_test_register_audit",
       "tests_test_register_rationale_1",
@@ -3183,7 +3202,7 @@
       "tests_test_register_test_no_active_row_names_a_module_that_does_not_exist",
       "tests_test_register_test_no_row_is_unvalidated"
     ],
-    "115": [
+    "116": [
       "tests_test_strategies_cfg",
       "tests_test_strategies_rationale_36",
       "tests_test_stuck_rationale_117",
@@ -3196,7 +3215,7 @@
       "tests_test_stuck_turn",
       "tests_test_stuck_turn_init"
     ],
-    "116": [
+    "117": [
       "src_codemonkey_bestofn_best_of_n",
       "src_codemonkey_bestofn_rationale_17",
       "src_codemonkey_bestofn_rationale_30",
@@ -3207,18 +3226,6 @@
       "tests_test_bestofn_test_none_pass_returns_evidence",
       "tests_test_bestofn_test_scored_in_order",
       "tests_test_bestofn_test_verifier_pass_and_fail"
-    ],
-    "117": [
-      "src_codemonkey_jobs",
-      "src_codemonkey_jobs_atomic_write",
-      "src_codemonkey_jobs_job_path",
-      "src_codemonkey_jobs_jobs_dir",
-      "src_codemonkey_jobs_list_jobs",
-      "src_codemonkey_jobs_py_path",
-      "src_codemonkey_jobs_rationale_1",
-      "src_codemonkey_jobs_save",
-      "src_codemonkey_status_mod_jobs_section",
-      "tests_test_jobs_test_list_jobs_sorted"
     ],
     "118": [
       "doc::/Users/bharris/Programs/CodeMonkey/AGENTS.md",
@@ -3307,15 +3314,6 @@
       "src_codemonkey_cli_version_callback"
     ],
     "126": [
-      "tests_test_jobs",
-      "tests_test_jobs_jhome",
-      "tests_test_jobs_py_fixture",
-      "tests_test_jobs_rationale_1",
-      "tests_test_jobs_subprocess_run",
-      "tests_test_jobs_test_cli_jobs_flow",
-      "tests_test_jobs_test_unknown_job_step_bad_status"
-    ],
-    "127": [
       "tests_test_knobs",
       "tests_test_knobs_rationale_1",
       "tests_test_knobs_rationale_31",
@@ -3324,7 +3322,7 @@
       "tests_test_knobs_test_env_override_applied",
       "tests_test_knobs_test_exec_passes_knobs_to_run_turns"
     ],
-    "128": [
+    "127": [
       "src_codemonkey_cli_dispatch_exec_resume",
       "src_codemonkey_cli_exectypergroup",
       "src_codemonkey_cli_exectypergroup_resolve_command",
@@ -3332,7 +3330,7 @@
       "src_codemonkey_cli_rationale_1221",
       "src_codemonkey_cli_rationale_657"
     ],
-    "129": [
+    "128": [
       "src_codemonkey_playbook_entry_id",
       "src_codemonkey_playbook_normalize_delta",
       "src_codemonkey_playbook_normalize_text",
@@ -3340,110 +3338,110 @@
       "src_codemonkey_playbook_rationale_73",
       "src_codemonkey_playbook_rationale_79"
     ],
-    "130": [
+    "129": [
       "tests_test_conformance_live_stub",
       "tests_test_conformance_live_stub_rationale_1",
       "tests_test_conformance_live_stub_rationale_40",
       "tests_test_conformance_live_stub_test_live_probe_passes_against_a_scripted_endpoint",
       "tests_test_conformance_live_stub_test_the_scripted_endpoint_actually_served_the_run"
     ],
-    "131": [
+    "130": [
       "src_codemonkey_playbook_lesson_deltas",
       "src_codemonkey_playbook_lesson_section",
       "src_codemonkey_playbook_rationale_400",
       "src_codemonkey_playbook_rationale_417"
     ],
-    "132": [
+    "131": [
       "doc::/Users/bharris/Programs/CodeMonkey/README.md",
       "section::README.md::CodeMonkey"
     ],
-    "133": [
+    "132": [
       "doc::/Users/bharris/Programs/CodeMonkey/features.html",
       "section::features.html::While the home llama.cpp inference is wedged (2026-09-02), l"
     ],
-    "134": [
+    "133": [
       "src_codemonkey_playbook_parse_section",
       "src_codemonkey_playbook_rationale_409"
     ],
-    "135": [
+    "134": [
       "pkg_codemonkey"
     ],
-    "136": [
+    "135": [
       "section::CLAUDE.md::CLAUDE.md"
     ],
-    "137": [
+    "136": [
       "src_codemonkey_cli_py_command"
     ],
-    "138": [
+    "137": [
       "src_codemonkey_exec_py_exception"
     ],
-    "139": [
+    "138": [
       "src_codemonkey_exec_py_path"
     ],
-    "140": [
+    "139": [
       "src_codemonkey_journal_cli_py_command"
     ],
-    "141": [
+    "140": [
       "src_codemonkey_journal_py_path"
     ],
-    "142": [
+    "141": [
       "src_codemonkey_lessons_gate_py_path"
     ],
-    "143": [
+    "142": [
       "src_codemonkey_lessons_py_path"
     ],
-    "144": [
+    "143": [
       "src_codemonkey_loop_py_chatturn"
     ],
-    "145": [
+    "144": [
       "src_codemonkey_loop_py_providerbase"
     ],
-    "146": [
+    "145": [
       "src_codemonkey_loop_py_toolcontext"
     ],
-    "147": [
+    "146": [
       "src_codemonkey_playbook_cli_py_command"
     ],
-    "148": [
+    "147": [
       "src_codemonkey_providers_openai_py_client"
     ],
-    "149": [
+    "148": [
       "src_codemonkey_skills_cli_py_command"
     ],
-    "150": [
+    "149": [
       "src_codemonkey_skills_py_path"
     ],
-    "151": [
+    "150": [
       "src_codemonkey_skills_py_valueerror"
     ],
-    "152": [
+    "151": [
       "src_codemonkey_truthpass_py_path"
     ],
-    "153": [
+    "152": [
       "tests_conftest_py_fixture"
     ],
-    "154": [
+    "153": [
       "tests_test_batch_edit_py_fixture"
     ],
-    "155": [
+    "154": [
       "tests_test_checkpoints_py_fixture"
     ],
-    "156": [
+    "155": [
       "tests_test_lessons_gate_py_fixture"
     ],
-    "157": [
+    "156": [
       "tests_test_lessons_py_fixture"
     ],
-    "158": [
+    "157": [
       "tests_test_strategies_py_fixture"
     ],
-    "159": [
+    "158": [
       "tests_test_tools_py_fixture"
     ],
-    "160": [
+    "159": [
       "tests_test_tools_py_toolcontext"
     ],
-    "161": [
+    "160": [
       "tests_test_truthpass_py_fixture"
     ]
   },
@@ -3469,27 +3467,27 @@
     "18": 0.12380952380952381,
     "19": 0.09365079365079365,
     "20": 0.08571428571428572,
-    "21": 0.1361344537815126,
-    "22": 0.09090909090909091,
-    "23": 0.12298387096774194,
-    "24": 0.12701612903225806,
-    "25": 0.0967741935483871,
-    "26": 0.0907258064516129,
-    "27": 0.09032258064516129,
-    "28": 0.1032258064516129,
+    "21": 0.12100840336134454,
+    "22": 0.1361344537815126,
+    "23": 0.09090909090909091,
+    "24": 0.12298387096774194,
+    "25": 0.12701612903225806,
+    "26": 0.0967741935483871,
+    "27": 0.0907258064516129,
+    "28": 0.09032258064516129,
     "29": 0.11397849462365592,
     "30": 0.06881720430107527,
     "31": 0.12413793103448276,
     "32": 0.10804597701149425,
     "33": 0.11724137931034483,
-    "34": 0.135632183908046,
-    "35": 0.09425287356321839,
-    "36": 0.12413793103448276,
-    "37": 0.09195402298850575,
-    "38": 0.09655172413793103,
-    "39": 0.08866995073891626,
-    "40": 0.1349206349206349,
-    "41": 0.1111111111111111,
+    "34": 0.09425287356321839,
+    "35": 0.12413793103448276,
+    "36": 0.09195402298850575,
+    "37": 0.09655172413793103,
+    "38": 0.08866995073891626,
+    "39": 0.1349206349206349,
+    "40": 0.1111111111111111,
+    "41": 0.11965811965811966,
     "42": 0.11692307692307692,
     "43": 0.14461538461538462,
     "44": 0.09846153846153846,
@@ -3500,72 +3498,72 @@
     "49": 0.11594202898550725,
     "50": 0.13043478260869565,
     "51": 0.14624505928853754,
-    "52": 0.1471861471861472,
-    "53": 0.13852813852813853,
-    "54": 0.18181818181818182,
-    "55": 0.15584415584415584,
-    "56": 0.16666666666666666,
-    "57": 0.18095238095238095,
-    "58": 0.18421052631578946,
-    "59": 0.18421052631578946,
-    "60": 0.11052631578947368,
-    "61": 0.12631578947368421,
-    "62": 0.15789473684210525,
-    "63": 0.13157894736842105,
-    "64": 0.16374269005847952,
-    "65": 0.14035087719298245,
-    "66": 0.18128654970760233,
-    "67": 0.13450292397660818,
-    "68": 0.2046783625730994,
-    "69": 0.23976608187134502,
-    "70": 0.20261437908496732,
-    "71": 0.16993464052287582,
+    "52": 0.11067193675889328,
+    "53": 0.11067193675889328,
+    "54": 0.1471861471861472,
+    "55": 0.13852813852813853,
+    "56": 0.18181818181818182,
+    "57": 0.15584415584415584,
+    "58": 0.16666666666666666,
+    "59": 0.1523809523809524,
+    "60": 0.18095238095238095,
+    "61": 0.18421052631578946,
+    "62": 0.18421052631578946,
+    "63": 0.11052631578947368,
+    "64": 0.12631578947368421,
+    "65": 0.13157894736842105,
+    "66": 0.16374269005847952,
+    "67": 0.14035087719298245,
+    "68": 0.18128654970760233,
+    "69": 0.2046783625730994,
+    "70": 0.23976608187134502,
+    "71": 0.20261437908496732,
     "72": 0.16993464052287582,
-    "73": 0.13071895424836602,
-    "74": 0.14705882352941177,
-    "75": 0.19117647058823528,
-    "76": 0.16911764705882354,
-    "77": 0.17647058823529413,
-    "78": 0.21323529411764705,
-    "79": 0.19852941176470587,
-    "80": 0.27205882352941174,
-    "81": 0.20588235294117646,
-    "82": 0.15,
+    "73": 0.14705882352941177,
+    "74": 0.19117647058823528,
+    "75": 0.16911764705882354,
+    "76": 0.17647058823529413,
+    "77": 0.21323529411764705,
+    "78": 0.19852941176470587,
+    "79": 0.27205882352941174,
+    "80": 0.20588235294117646,
+    "81": 0.15,
+    "82": 0.2,
     "83": 0.2,
-    "84": 0.2,
-    "85": 0.19047619047619047,
-    "86": 0.18095238095238095,
-    "87": 0.2,
-    "88": 0.24761904761904763,
-    "89": 0.26666666666666666,
-    "90": 0.2571428571428571,
-    "91": 0.27472527472527475,
-    "92": 0.21978021978021978,
-    "93": 0.17582417582417584,
+    "84": 0.19047619047619047,
+    "85": 0.18095238095238095,
+    "86": 0.2,
+    "87": 0.24761904761904763,
+    "88": 0.26666666666666666,
+    "89": 0.2571428571428571,
+    "90": 0.27472527472527475,
+    "91": 0.21978021978021978,
+    "92": 0.17582417582417584,
+    "93": 0.15384615384615385,
     "94": 0.15384615384615385,
-    "95": 0.15384615384615385,
-    "96": 0.1978021978021978,
+    "95": 0.1978021978021978,
+    "96": 0.24175824175824176,
     "97": 0.24175824175824176,
-    "98": 0.24175824175824176,
-    "99": 0.16483516483516483,
-    "100": 0.1794871794871795,
-    "101": 0.28205128205128205,
-    "102": 0.24358974358974358,
-    "103": 0.20512820512820512,
-    "104": 0.1794871794871795,
+    "98": 0.16483516483516483,
+    "99": 0.1794871794871795,
+    "100": 0.28205128205128205,
+    "101": 0.24358974358974358,
+    "102": 0.20512820512820512,
+    "103": 0.1794871794871795,
+    "104": 0.23076923076923078,
     "105": 0.2948717948717949,
     "106": 0.2948717948717949,
     "107": 0.2727272727272727,
     "108": 0.21212121212121213,
     "109": 0.24242424242424243,
-    "110": 0.2545454545454545,
-    "111": 0.21818181818181817,
-    "112": 0.2909090909090909,
+    "110": 0.2909090909090909,
+    "111": 0.2545454545454545,
+    "112": 0.21818181818181817,
     "113": 0.2909090909090909,
-    "114": 0.2545454545454545,
-    "115": 0.2,
-    "116": 0.26666666666666666,
-    "117": 0.3333333333333333,
+    "114": 0.2909090909090909,
+    "115": 0.2545454545454545,
+    "116": 0.2,
+    "117": 0.26666666666666666,
     "118": 0.2222222222222222,
     "119": 0.2222222222222222,
     "120": 0.25,
@@ -3574,12 +3572,12 @@
     "123": 0.25,
     "124": 0.2222222222222222,
     "125": 0.38095238095238093,
-    "126": 0.3333333333333333,
-    "127": 0.2857142857142857,
-    "128": 0.26666666666666666,
+    "126": 0.2857142857142857,
+    "127": 0.26666666666666666,
+    "128": 0.4,
     "129": 0.4,
-    "130": 0.4,
-    "131": 0.5,
+    "130": 0.5,
+    "131": 1.0,
     "132": 1.0,
     "133": 1.0,
     "134": 1.0,
@@ -3608,8 +3606,7 @@
     "157": 1.0,
     "158": 1.0,
     "159": 1.0,
-    "160": 1.0,
-    "161": 1.0
+    "160": 1.0
   },
   "gods": [
     {

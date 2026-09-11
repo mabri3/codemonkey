@@ -1461,3 +1461,55 @@ control named and probed (quarantine, mechanical merge, evidence-cited
 reflection, byte-diffed injection, one-command revocation), the first R-A
 consolidation executed through a parity gate (four surfaces → two stores +
 one projection + one selector), and its live number honestly unclaimed.
+
+
+---
+
+# Loop 48 — Final Acceptance (CYCLE 116) — best-of-n's correct form
+
+**Date:** 2026-09-11 · **Entry:** R48 close-out (`dd0c307`); the arc
+authorized 2026-09-10 with the ordering waiver.
+
+| Cycle | Claim | Evidence |
+|---|---|---|
+| C113 | the refine pass — losers' evidence seeds ONE attempt | `bestofn.refine_seed` (bounded, marked truncation; grows with candidate count, never transcript size) + the exec branch: all candidates fail → one seeded refine → the SAME machine verifier decides (`bestofn.refine {candidates, refined:1, verified}`); candidate 1 passing costs ZERO extra calls; CLI `--refine-seeded` (off by default; usage error without `--best-of N>1`). 6 tests; `cycle113-probe.out` |
+| C114 | the tournament selector (tier-2, injected, machine-checked) | `select_by_tournament` (round-robin, ties → lower index; permutation-invariant on a strict order; malformed/raising comparison REFUSES naming the pair) + `run_compare_cmd` (first stdout line; crashes/timeouts = reason strings) + exec wiring (winner's tree restored; malformed → last tree KEPT) + `--tournament-compare`. 10 tests; `cycle114-probe.out` |
+| C115 | the cost gate — printed before the spend, enforced at the boundary | projection line before every candidate boundary + before the refine; declared-token crossing → exit 4, `budget.exhausted{stage:"bestofn-boundary"}`, resumable job, and the PROVIDER-CALL COUNT proves the crossing call never happened. 5 tests; `cycle115-probe.out`. Defect fixed: the C103 `resumable job:` line printed `None` (wrong dict key) — both call sites, verified live. |
+| C116 | loop 48 acceptance + report | this section; sweep below |
+
+## What `bestofn` KEEPS vs REPLACES — as delivered
+
+**Kept, verbatim:** the `--best-of N` / `--verify-command` surface and exit
+semantics; first-pass-wins (candidate 1 passing = zero extra calls, pinned);
+the zero-residue workspace reset; default OFF; the machine verifier as tier-1
+judge (the model's self-report is never a verdict).
+
+**Replaced, as chartered:** "verifier fails → return last tail" became "→ ONE
+seeded refine, then verdict"; opaque candidate text in the failure path
+became bounded structured evidence; the no-verifier case gained the
+injected-compare tournament (honest empty without a comparison) while
+remaining a usage error by default.
+
+## The one release-level discovery, recorded
+
+The exec group's variadic `prompt...` swallows every flag placed AFTER the
+positional (`exec "x" --flag` sends the flags as prompt text — spy-verified:
+`best_of=1, refine_seeded=False`, prompt containing the flags). Flags-first
+parses correctly. This is pre-existing across every exec flag, now pinned by
+a CLI test; re-ordering Click's parse is a CLI-contract change that belongs
+to its own cycle (recorded, not silently changed).
+
+## The live number — UNMEASURED-WITH-DATE
+
+The refine-vs-none and tournament-vs-verify ACCURACY deltas (the PDR
+figures' local analogues) need a live endpoint; `.176` is still
+connection-refused (re-probed during this acceptance). The mechanism is
+PROVEN-LIVE through the released surfaces; the field delta is not claimed.
+The measurement hook is the existing eval arms harness (loop 46/47) against
+a suite that exercises failing candidates — one run when a model answers.
+
+**LOOP 48 COMPLETE** — the compounding arc's fourth surface: best-of grew
+the two capabilities its lineage was missing (a sequential refine fed by its
+own failures; a machine-checked way to decide without a verifier), under a
+cost gate that refuses before the crossing call instead of reporting after
+it.

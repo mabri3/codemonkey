@@ -35,9 +35,9 @@
     "semantic_hash": "fa6f7d17d46f7b64d7dc9e843e387490"
   },
   "src/codemonkey/exec.py": {
-    "mtime": 1789102386.6557703,
-    "ast_hash": "4236918ef6d6ba6b4f3bb7dc323e6dfd",
-    "semantic_hash": "4236918ef6d6ba6b4f3bb7dc323e6dfd"
+    "mtime": 1789102633.4518108,
+    "ast_hash": "c595d4e40eacff16452a3bd0a50b8aae",
+    "semantic_hash": "c595d4e40eacff16452a3bd0a50b8aae"
   },
   "src/codemonkey/instructions.py": {
     "mtime": 1788373203.899547,
@@ -1128,5 +1128,10 @@
     "mtime": 1789102408.2930088,
     "ast_hash": "bba2ec6d4652a5dc85fb5fda2084a7c0",
     "semantic_hash": "bba2ec6d4652a5dc85fb5fda2084a7c0"
+  },
+  "tests/test_bestofn_costgate.py": {
+    "mtime": 1789102637.1145554,
+    "ast_hash": "00f55efb849f4bec56d7937b926b9ef3",
+    "semantic_hash": "00f55efb849f4bec56d7937b926b9ef3"
   }
 }

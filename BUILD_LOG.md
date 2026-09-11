@@ -3951,3 +3951,24 @@ them justifies waiving a row at v4.0.
   (wrong dict key → `None` in operator output), not a behavior change; the
   refusal path reuses the C103 resumability pattern (job + stderr + event).
 - **Next step:** CYCLE 116 — loop 48 acceptance + report.
+
+## 2026-09-10/11 — CYCLE 116 (loop48): loop 48 acceptance + report
+
+- **Files changed:** `build/BUILD_REPORT.md` (loop-48 section),
+  `build/acceptance_outputs/summary-loop48-close.txt` + run log, plan tick,
+  `features.html` (C113–C115 entries), register rows (final).
+- **Sweep (shipped form):** A1 `codemonkey 4.0.0`; offline rows exit 0;
+  nine live rows BLOCKED with reason (v4.0 exception list unchanged);
+  **A15: 924 passed, 5 skipped**. Post-sweep canonical suite: 924/5.
+- **Verdict:** **LOOP 48 COMPLETE.** `--best-of` kept its surface, fast
+  path, reset, default-OFF and machine verifier; gained the seeded refine
+  (PDR) and the injected-compare tournament (tier-2, honest empty without a
+  comparison); the cost gate refuses before the crossing call. The
+  refine-vs-none accuracy delta is **UNMEASURED-WITH-DATE** (endpoint
+  refused; the eval-arms hook is ready).
+- **Recorded for its own cycle:** the exec flags-order discovery (variadic
+  `prompt...` swallows trailing flags; pinned by a CLI test, not changed
+  here).
+- **Next step:** CYCLE R49 research (provenance-gated persistence: taint on
+  ToolResult, propagation through history/compaction/spill, metadata-only
+  admission), then CYCLE 117+.

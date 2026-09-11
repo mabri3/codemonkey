@@ -2102,13 +2102,22 @@ appended by its own research cycle, with loops 42-45 closed in parallel.
   from a dict keyed `id` and printed `None` — both call sites fixed, the
   C103 path verified live (probe §c: `resumable job: job-2026…`). Suite
   **924/5**.
-- [ ] CYCLE 116 — `loop48:` loop 48 acceptance + report: probe transcripts
+- [x] CYCLE 116 — `loop48:` loop 48 acceptance + report: probe transcripts
   named in the register; suite green; sweep shipped form; BUILD_REPORT
   loop-48 section; the refine-vs-none live delta named
   UNMEASURED-WITH-DATE with the hook command. | est: 40m |
   verify: `bash build/acceptance_sweep.sh` → offline rows exit 0, live rows
   BLOCKED-with-reason; `uv run pytest -q` → exit 0; register no
   UNVALIDATED row; report committed; no tag (v5.0 is loop 50's).
+  **DONE 2026-09-10.** Sweep shipped form: A1 `codemonkey 4.0.0`, offline
+  rows exit 0, nine live rows BLOCKED with reason (v4.0 exception list
+  unchanged), **A15 924/5** (`summary-loop48-close.txt`); post-sweep
+  canonical suite 924/5. Register: `bestofn` row carries C113–C115 evidence
+  with transcripts; `budgets` row carries the C103 fix note; no UNVALIDATED
+  row. BUILD_REPORT loop-48 section committed: KEEPS-vs-REPLACES as
+  delivered, the exec-flags order discovery recorded, the refine/tournament
+  live deltas named **UNMEASURED-WITH-DATE** with the eval-arms hook. No
+  tag (v5.0 is loop 50's).
 
 - [ ] CYCLE R49 — Loop 49 research: provenance-gated persistence — taint on
   `ToolResult`, propagation through history/compaction/spill, and a metadata-
