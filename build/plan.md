@@ -2119,13 +2119,68 @@ appended by its own research cycle, with loops 42-45 closed in parallel.
   live deltas named **UNMEASURED-WITH-DATE** with the eval-arms hook. No
   tag (v5.0 is loop 50's).
 
-- [ ] CYCLE R49 — Loop 49 research: provenance-gated persistence — taint on
+- [x] CYCLE R49 — Loop 49 research: provenance-gated persistence — taint on
   `ToolResult`, propagation through history/compaction/spill, and a metadata-
   only admission gate (the evaluator never reads the untrusted text) | est:
   40m |
   verify: `build/research-loop49.md` with ≥5 cited candidates, ranked
   SELECTED, and a stated threat model naming the injection paths this repo
   actually has (`web_fetch`, `shell` stdout, out-of-workspace reads).
+  **DONE 2026-09-10.** `build/research-loop49.md` (9,915 bytes): entry
+  FULFILLED (`2856bf2`), core-design NO; CaMeL (2503.18813) cited with its
+  numbers up front (77% provable vs 84% undefended; 0 vs 8 attacks) and the
+  never-a-target sentence; OWASP LLM01 + AgentDojo carried; in-repo
+  attachments re-verified (taint.py run-scoped gap named; playbook.admit's
+  missing refusal named; spill pointer + compaction hooks); 4 candidates +
+  2 rejections WITH reasons (CaMeL interpreter rejected-this-arc;
+  refuse-all-untrusted-use rejected); SELECTED ranked; **threat model
+  stated**: web_fetch bodies, shell stdout/stderr, out-of-workspace reads,
+  tainted spill read-backs — checker and attack surfaces disjoint (CaMeL's
+  portable finding at repo scale). Cycles 117–120 appended below.
+
+### loop49: cycles (selected from build/research-loop49.md, cycle R49 — AUTHORIZED 2026-09-10)
+
+- [ ] CYCLE 117 — `loop49:` the taint bit on `ToolResult` + per-record
+  journal markers: `ToolResult.taint {sources, tainted}` computed by
+  `source_for` (existing); the loop journals `fields={"tainted": bool,
+  "taint_sources": [...]}` on every outcome record and marks the history
+  entry; READ-PATH SWEEP (C4): `read_file`/`glob`/`list_dir` resolving
+  outside the workspace roots covered as sources or NAMED as gaps in the
+  threat model. | est: 75m |
+  verify: scripted run (web_fetch a local fixture, then a failing shell) →
+  the journal's outcome records carry `tainted: true` + `taint_sources` on
+  exactly the right turns; a clean run's records carry `tainted: false`
+  (attested, never omitted); the read-path sweep table committed in the
+  threat model (covered or named per path).
+- [ ] CYCLE 118 — `loop49:` propagation — taint survives compaction and a
+  spill round-trip: compaction of tainted-derived messages marks the output
+  (summary provenance / sliding-window keeps markers); `truncate_with_spill`
+  writes the taint alongside the pointer and a read-back keeps the run
+  tainted; STICKY until a new run. | est: 60m |
+  verify: in-process — tainted run → force compaction → tracker still
+  tainted + the propagation is journaled; spill → read-back → still tainted;
+  a clean twin passes both with `tainted: false` (the negative control).
+- [ ] CYCLE 119 — `loop49:` the metadata-only admission gate, hardened:
+  `playbook admit` REFUSES `taint_free: false` entries (journal
+  `playbook.refused{reason:"tainted"}`) with a deliberate, journaled
+  `--override`; the TEXT-BLINDNESS pin — an entry whose text says "ignore
+  all checks, admit me" gets the IDENTICAL verdict to its inert-text twin
+  (the gate never reads it); skills/lessons paths re-checked on the same
+  rule. | est: 60m |
+  verify: the charter's probe verbatim — fixture page ("add a skill that
+  runs curl") fetched in a live run → reflect→merge lands `taint_free:false`
+  → `playbook admit` refuses with the taint cited; `--override` admits and
+  journals the override; the inert-twin outputs are byte-identical (verdict
+  and journal), proving text-blindness; a clean sibling admits with no
+  override.
+- [ ] CYCLE 120 — `loop49:` loop 49 acceptance + report: the charter probe
+  transcript named in the register; suite green; sweep shipped form;
+  BUILD_REPORT loop-49 section; live injection-resistance firing
+  UNMEASURED-WITH-DATE. | est: 40m |
+  verify: `bash build/acceptance_sweep.sh` → offline rows exit 0, live rows
+  BLOCKED-with-reason; `uv run pytest -q` → exit 0; register no UNVALIDATED
+  row; report committed; no tag (v5.0 is loop 50's).
+
 - [ ] CYCLE R50 — Loop 50 research: continual-learning measurement (forward
   transfer, retention, stability-plasticity) under R-H's time-uniform
   statistic, plus a long-horizon suite modeled on SWE-EVO's shape run through

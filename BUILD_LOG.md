@@ -3972,3 +3972,26 @@ them justifies waiving a row at v4.0.
 - **Next step:** CYCLE R49 research (provenance-gated persistence: taint on
   ToolResult, propagation through history/compaction/spill, metadata-only
   admission), then CYCLE 117+.
+
+## 2026-09-10 — CYCLE R49 (research): provenance-gated persistence
+
+- **Files changed:** `build/research-loop49.md` (new, 9,915 bytes);
+  `build/plan.md` (R49 ticked + `### loop49: cycles` appended, C117–C120).
+- **Citations (web, real):** CaMeL — arXiv 2503.18813 (77% of AgentDojo
+  tasks with provable security vs 84% undefended; 0 successful attacks vs 8
+  for tool filtering; provenance-as-capabilities; checker away from the
+  attack surface); OWASP LLM01 + AgentDojo carried from R46/R47 chains.
+  Never-a-target sentence recorded.
+- **In-repo grounding (at `2856bf2`):** taint.py is run-scoped (the gap
+  named); playbook.admit lacks the taint refusal (the gap named); spill
+  pointer + compaction hooks identified as the propagation points;
+  `journal.record(fields=)` as the metadata-only carrier.
+- **Rejections with reasons:** CaMeL-style interpreter (different
+  architecture, this-arc scope); refuse-all-untrusted-use (the run must
+  read to work; only persistence is gated).
+- **Threat model stated (required):** web_fetch bodies · shell
+  stdout/stderr · out-of-workspace reads · tainted spill read-backs.
+- **Core-design: NO** — acceptance terms recorded.
+- **Tests run:** none (no src change); suite untouched at 924/5.
+- **Next step:** CYCLE 117 — the ToolResult taint bit + per-record markers
+  + the read-path sweep.
