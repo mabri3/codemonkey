@@ -151,6 +151,7 @@ def run_exec(
     verify_claims: bool = False,
     dry_run: bool = False,
     best_of: int = 1,
+    refine_seeded: bool = False,
     verify_command: Optional[str] = None,
     atomic_plan: bool = False,
 ) -> int:
@@ -686,6 +687,10 @@ def run_exec(
         raise ExecUsageError(
             "--best-of N>1 cannot combine with --dry-run: candidates never "
             "materialize for the verifier")
+    if refine_seeded and _eff_best_of <= 1:
+        raise ExecUsageError(
+            "--refine-seeded requires --best-of N>1: there are no failed "
+            "candidates to seed a refine from")
 
     def _run_once(_jrun):
         _unload_retried = False
@@ -759,6 +764,7 @@ def run_exec(
 
             _bo_snap = _bo_snapshot(workdir)
             _bo_tail = ""
+            _bo_failures: list = []
             for _bi in range(_eff_best_of):
                 if _bi > 0:
                     _bo_restore(workdir, _bo_snap)
@@ -773,13 +779,48 @@ def run_exec(
                           "ok": True, "index": _bi, "tries": _bi + 1,
                           "verify_tail": _bo_tail})
                     break
+                _bo_failures.append({"index": _bi, "tail": _bo_tail,
+                                     "text": getattr(turn, "content", "") or ""})
             else:
-                # Honest failure: the last attempt's tree and turn stand as
-                # the evidence; nothing is restored away.
-                _bestofn_ok = False
-                emit({"type": "bestofn.completed", "thread_id": thread_id,
-                      "ok": False, "index": None, "tries": _eff_best_of,
-                      "last_fail_tail": _bo_tail})
+                _bo_refined = False
+                if refine_seeded:
+                    # loop48 cycle 113: ONE seeded refine attempt — the
+                    # losers' bounded evidence becomes the seed (PDR), the
+                    # SAME machine check decides, and the refined tree stands.
+                    from .bestofn import SEED_HEADER as _BO_SEED_HEADER
+                    from .bestofn import refine_seed as _bo_seed
+
+                    history = list(_base_history) + [{
+                        "role": "user",
+                        "content": (_BO_SEED_HEADER + "\n\n"
+                                    + _bo_seed(_bo_failures)
+                                    + "\n\nProduce ONE corrected attempt."),
+                    }]
+                    turn = _run_once(f"{run_id}:refine")
+                    _ok2, _bo_tail = _bo_verify(_eff_verify, workdir)
+                    _bo_refined = True
+                    emit({"type": "bestofn.refine", "thread_id": thread_id,
+                          "candidates": _eff_best_of, "refined": 1,
+                          "verified": bool(_ok2), "verify_tail": _bo_tail})
+                    if _ok2:
+                        _bestofn_ok = True
+                        emit({"type": "bestofn.completed",
+                              "thread_id": thread_id, "ok": True,
+                              "index": None, "tries": _eff_best_of,
+                              "refined": True, "verify_tail": _bo_tail})
+                    else:
+                        _bestofn_ok = False
+                        emit({"type": "bestofn.completed",
+                              "thread_id": thread_id, "ok": False,
+                              "index": None, "tries": _eff_best_of,
+                              "refined": True, "last_fail_tail": _bo_tail})
+                else:
+                    # Honest failure: the last attempt's tree and turn stand as
+                    # the evidence; nothing is restored away.
+                    _bestofn_ok = False
+                    emit({"type": "bestofn.completed", "thread_id": thread_id,
+                          "ok": False, "index": None, "tries": _eff_best_of,
+                          "last_fail_tail": _bo_tail})
         else:
             turn = _run_once(run_id)
     finally:

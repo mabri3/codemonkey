@@ -123,3 +123,32 @@ def restore_tree(workdir: Path, snap: dict) -> None:
             p.rmdir()
         except OSError:
             pass
+
+
+# --- loop48 cycle 113: the refine seed --------------------------------------
+#
+# PDR (arXiv 2604.16529) finding this implements: the losers' failure modes are
+# the information a first-pass-wins loop discards. The seed below is the
+# bounded handoff — one block per failed candidate (index, verifier tail,
+# final-message excerpt), total size capped, so the refine prompt grows with
+# the CANDIDATE COUNT, never with transcript size.
+
+SEED_HEADER = ("Every candidate attempt above failed its machine check. "
+               "Bounded failure evidence:")
+
+
+def refine_seed(failures: list, *, tail_chars: int = 400,
+                text_chars: int = 300, max_chars: int = 4000) -> str:
+    """failure records [{index, tail, text}] -> one bounded seed block.
+    Deterministic; the truncation is marked, never silent."""
+    parts = []
+    for f in failures or []:
+        tail = " ".join(str(f.get("tail") or "").split())[:tail_chars]
+        text = " ".join(str(f.get("text") or "").split())[:text_chars]
+        parts.append(f"[candidate {int(f.get('index', 0)) + 1}] "
+                     f"verifier said: {tail or '(no tail)'}\n"
+                     f"final message: {text or '(empty)'}")
+    out = "\n\n".join(parts)
+    if len(out) > max_chars:
+        out = out[:max_chars] + "\n…(seed truncated — bounds are the point)"
+    return out

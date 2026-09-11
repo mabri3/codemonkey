@@ -1,0 +1,22 @@
+[edit] answer.txt (write_file)
+[notice] verify gate: failed — corrective turn granted
+[edit] answer.txt (write_file)
+[notice] verify gate: failed — corrective turn granted
+[edit] answer.txt (write_file)
+[agent] refined done
+--- A. released CLI surface (flags BEFORE the positional — the
+       exec group's variadic prompt swallows trailing flags; every
+       exec flag has this order, not just this one) ---
+  [PASS] --refine-seeded in exec --help
+  [PASS] flag without --best-of refuses exit 2 — exit=2
+  [PASS] refusal names the reason
+--- B. scripted refine run through REAL run_exec ---
+refined done
+  exit=0 answer='RIGHT'
+  refine event: {'type': 'bestofn.refine', 'thread_id': 'd76008a838b1', 'candidates': 2, 'refined': 1, 'verified': True, 'verify_tail': '', 'v': 1}
+  [PASS] exit 0 and the refined tree stands
+  [PASS] bestofn.refine: candidates=2 refined=1 verified=True
+  [PASS] completed carries refined=True
+  [PASS] the refine prompt carried both candidates' bounded evidence
+
+CYCLE113 PROBE: PASS

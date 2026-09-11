@@ -799,6 +799,10 @@ def exec(
         Optional[str],
         typer.Option("--verify-command", help="Machine verifier for --best-of N>1 (or config verify_command)."),
     ] = None,
+    refine_seeded: Annotated[
+        bool,
+        typer.Option("--refine-seeded", help="After --best-of N>1 exhausts failing candidates, ONE more attempt is seeded with their bounded failure evidence (PDR); the same verifier decides. Off by default."),
+    ] = False,
     atomic_plan: Annotated[
         bool,
         typer.Option("--atomic-plan", help="Opt-in atomic change plan (loop41): the run's edits land whole or roll back whole on declared failure. Off by default."),
@@ -855,6 +859,7 @@ def exec(
             job_id=job,
             dry_run=dry_run,
             best_of=best_of,
+            refine_seeded=refine_seeded,
             verify_command=verify_command,
             atomic_plan=atomic_plan,
         )

@@ -3872,3 +3872,31 @@ them justifies waiving a row at v4.0.
 - **Core-design: NO** — acceptance terms recorded.
 - **Tests run:** none (no src change); suite untouched at 903/5.
 - **Next step:** CYCLE 113 — the refine pass in the best-of path.
+
+## 2026-09-10 — CYCLE 113 (loop48): the refine pass — losers' evidence seeds one attempt
+
+- **Files changed:** `src/codemonkey/bestofn.py` (`SEED_HEADER`,
+  `refine_seed` — bounded, marked truncation), `src/codemonkey/exec.py`
+  (`refine_seeded` param + usage check + the refine branch: same machine
+  verifier decides, `bestofn.refine` + `completed{refined:true}`),
+  `src/codemonkey/cli.py` (`--refine-seeded`, flags-first order),
+  `tests/test_bestofn_refine.py` (new, 6), `build/probes/cycle113-probe.{py,out}`,
+  register `bestofn` row extended.
+- **Probe results (literal, R-I):** `cycle113-probe.py` → **PASS (7/7)** —
+  Part A (released CLI): `--refine-seeded` in help; without `--best-of N>1`
+  → **exit 2** with the reason. Part B (scripted provider through REAL
+  `run_exec`): attempts write WRONG1/WRONG2, the refine writes RIGHT →
+  exit 0, refined tree stands, `bestofn.refine {candidates:2, refined:1,
+  verified:true}`, both `[candidate N]` evidence blocks observed in the
+  prompt the provider received.
+- **Tests run:** 6/6 new; full suite **909 passed, 5 skipped** (was 903/5).
+- **Discovery (recorded, not silently changed):** the exec GROUP's variadic
+  `prompt...` swallows every flag placed AFTER the positional — `exec "x"
+  --flag` sends the flags as prompt TEXT (spy-verified: `best_of=1,
+  refine_seeded=False` while `prompt='x --dry-run --best-of 2 …'`).
+  Flags-first parses correctly (`dry_run/best_of/refine_seeded` all arrive).
+  This is a pre-existing property of the exec surface (affects --best-of,
+  --dry-run, --verify-command alike), now pinned by a CLI test; fixing the
+  parse order is a CLI-contract change that belongs to its own cycle.
+- **Next step:** CYCLE 114 — the tournament selector (offline, injected
+  compare; honest empty without one).

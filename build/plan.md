@@ -2039,6 +2039,19 @@ appended by its own research cycle, with loops 42-45 closed in parallel.
   refined=1, verified=True, and the workspace holds the refined tree;
   candidate-1-pass run makes ZERO extra calls (call count pinned); honest
   failure unchanged when refine also fails.
+  **DONE 2026-09-10.** `bestofn.refine_seed` (bounded, marked truncation);
+  `run_exec(refine_seeded=)` + the refine branch (same machine verifier
+  decides; `bestofn.refine` + `completed{refined:true}` events); CLI
+  `--refine-seeded` (OFF by default; usage error without `--best-of N>1`).
+  Probe `cycle113-probe.out` **PASS (7/7)**: all-fail→refine → exit 0,
+  refined tree stands, both `[candidate N]` blocks observed in the provider's
+  received prompt; candidate-1-pass → prov.n == 2 (zero extras); refine-
+  failure → ok False + refined True + last_fail_tail; CLI refusal exit 2.
+  Tests 6/6. **Discovery recorded:** the exec group's variadic `prompt...`
+  swallows EVERY flag placed after the positional (flags-first parses:
+  `dry_run/best_of/refine_seeded` all arrive) — a pre-existing CLI order
+  property shared by all exec flags, pinned by a CLI test, not changed in
+  this cycle. Suite **909/5**.
 - [ ] CYCLE 114 — `loop48:` the tournament selector (offline, injected) —
   no-verifier case: `bestofn.select_by_tournament(candidates, compare_fn)`
   deterministic pairwise structure; with a `compare_fn`, the winner is
