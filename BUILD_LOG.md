@@ -3423,3 +3423,21 @@ them justifies waiving a row at v4.0.
 - **Next step:** Gate 5 handoff delivered; R46 close-out + R47–R50 research,
   then the loop 46–50 build cycles (authorized 2026-09-10, ordering waived).
 
+
+## 2026-09-10 — CYCLE R46 close-out: research file verified + citation re-point
+
+- **Files changed:** `build/research-loop46.md` (close-out addendum: probe
+  verification at `dfde652`, entry condition FULFILLED, core-design NO, the
+  R-G never-a-target note, R-L attachment re-verification with one correction),
+  `build/plan.md` (R46 `[x]`; the two "(NOT AUTHORIZED)" markers replaced —
+  the arc authorization is the 2026-09-10 waiver, already recorded).
+- **Probe results (literal):** 8 candidate sections, **5 with URL + R-I probe
+  shape** (C1–C5 — the ≥5 floor), 14 URL lines, `## SELECTED` present,
+  `loop46:` cycles 82–87 in plan.md. R-L: every cited product module exists at
+  `dfde652`; one correction — `envquarantine.py` → `tests/envquarantine.py`
+  (cycle 81, test-only by design), so C85's taint rule attaches to the loop's
+  `ToolResult` path instead. Recorded, not silently re-pointed.
+- **Tests run:** none new (docs-only cycle); suite at this HEAD: **821 passed,
+  5 skipped**.
+- **Known issues:** none.
+- **Next step:** CYCLE 82 — skill artifact format + quarantined store.

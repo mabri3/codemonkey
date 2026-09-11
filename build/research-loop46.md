@@ -227,3 +227,49 @@ cycles are built, and a citation naming a module that no longer exists is a
 BLOCKING finding for that cycle, not a footnote. `build/research-loop45.md`
 was written 2026-09-04 22:00 citing a module cycle 81 deleted the same day —
 so this check has to be mechanical, not a habit.
+
+---
+
+## R46 close-out (2026-09-10, CYCLE R46)
+
+**Probe verified mechanically at `dfde652`** (the v4.0 close commit): 8
+candidate sections; **5 carry both a cited URL and an R-I probe shape**
+(C1–C5 — the "≥5" floor of this cycle's verify); C6 carries its SWE-EVO
+citation and an attachment but no probe *by design* (it folds into loop 50 as
+the evaluation regime, per its own ranking note); C7 and C8 are rejections
+recorded **with reasons**. A `## SELECTED` section exists (`:185`), and the
+`loop46:` cycles are appended to `build/plan.md` (82–87). The plan entry's
+"the loop46 cycles below appended to this file" resolved to plan.md — the
+cycles were never meant to live inside this research file.
+
+**Entry condition: FULFILLED.** The arc was authorized 2026-09-10 ("loops
+46-50 are AUTHORIZED"; ordering constraint waived — recorded in
+`build/plan.md` §Forward arc, `SPRINT.md`, and `build/loops-46-50-proposal.md`
+§D). Loops 38–44 all closed in writing; v4.0 shipped at `dfde652` (the
+waiver means v4.0's gate does not block these cycles, not that v4.0 did not
+ship).
+
+**Core-design: NO** for loop 46 as scoped (a quarantined skill store + gate +
+revocation surface built on existing modules). The core-design item in this
+space — self-modifying scaffold, C7 — stays REJECTED for this arc.
+
+**R-G note (never a target):** the anchors below (Live-SWE-agent 75.4% on
+SWE-bench Verified, ACE +10.6%, PDR 70.9→77.6%, SWE-EVO ~21–25%) are
+published on larger models and different harnesses. They are directions to
+test against, **never targets** for this repo's 27B-class endpoint; the
+loop-46 acceptance reports whatever transfer exists, including "none
+measurable".
+
+**R-L attachment re-verification (mechanical, at the moment the cycles are
+built):** all product modules cited above exist at `dfde652` —
+`tools/__init__.py`, `sandbox.py`, `lessons.py`, `journal.py`, `eval.py`,
+`rubrics.py`, `certify.py`, `checkpoints.py`, `strategies/__init__.py`,
+`bestofn.py`, `digest.py`, `branches.py`, `jobs.py`, `cost.py`, `budget.py`,
+`permissions.py`, `approvals.py`, `redact.py`, `claims.py`. **One re-point
+needed:** C4's attachment list names `envquarantine.py`; cycle 81 (`5ea507f`)
+moved it to `tests/envquarantine.py` as test-only support (no product entry
+point by design — see the register's Relocated note). C85's taint rule
+therefore does **not** attach there; its real attachment points are the
+loop's `ToolResult` path in `loop.py`/`exec.py`, plus `journal.py` (the
+refusal record) and `sandbox.py` (the same-gate principle). Recorded, not
+silently re-pointed.

@@ -1956,7 +1956,7 @@ commit, and 74 is not marked `[x]` until every probe below passes.
   after the commit; `grep -c "cycle 74" BUILD_LOG.md` → ≥1;
   `grep -c "graph_query" features.html` → ≥1.
 
-## Forward arc — loops 46-50, the compounding arc (PROPOSED 2026-09-04, ⚠️ NOT AUTHORIZED)
+## Forward arc — loops 46-50, the compounding arc (AUTHORIZED 2026-09-10; ordering waived)
 
 Charter: `build/loops-46-50-proposal.md`. Adds arc rules **R-J** (nothing the
 agent writes about itself is trusted until earned, and everything it writes is
@@ -1972,12 +1972,20 @@ The waiver is recorded here AND at the constraint's original site
 (`loops-46-50-proposal.md` §D). Build order: loop 46 → 50, each loop's cycles
 appended by its own research cycle, with loops 42-45 closed in parallel.
 
-- [ ] CYCLE R46 — Loop 46 research: the skill library — a run that makes the
+- [x] CYCLE R46 — Loop 46 research: the skill library — a run that makes the
   next run cheaper. WRITTEN: `build/research-loop46.md` (8 candidates, web
   citations, ranked SELECTED, 2 rejections recorded with reasons) | est: 40m |
   verify: `build/research-loop46.md` exists with ≥5 candidates each carrying a
   cited URL and an R-I probe shape, a SELECTED section, and the loop46 cycles
   below appended to this file.
+  **DONE 2026-09-10 (close-out).** Probe verified mechanically at `dfde652`:
+  8 candidate sections, 5 with URL + R-I probe shape (C1–C5; C6 folds into
+  loop 50 without one by design), SELECTED at `:185`, cycles 82–87 appended
+  to plan.md. Addendum block appended to the research file: entry condition
+  FULFILLED (arc authorized, ordering waived), core-design NO, the R-G
+  never-a-target note, and the R-L attachment re-verification — including one
+  correction (`envquarantine.py` moved to `tests/` by cycle 81; C85's taint
+  rule attaches to the loop's `ToolResult` path instead).
 - [ ] CYCLE R47 — Loop 47 research: the evolving playbook (ACE-style delta
   curation over the journal; generator/reflector/curator; brevity-bias and
   context-collapse regressions) INCLUDING an R-A consolidation verdict over
@@ -2008,7 +2016,7 @@ appended by its own research cycle, with loops 42-45 closed in parallel.
   SELECTED, and the exact arm structure (library-on vs library-off) the loop
   46-48 acceptance cycles will reuse.
 
-### loop46: cycles (selected from build/research-loop46.md, cycle R46 — ⚠️ NOT AUTHORIZED)
+### loop46: cycles (selected from build/research-loop46.md, cycle R46 — AUTHORIZED 2026-09-10)
 
 - [ ] CYCLE 82 — `loop46:` skill artifact format + quarantined store:
   `.codemonkey/skills/<name>/` holding `manifest.json` (name, one-line spec,
