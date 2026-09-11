@@ -2260,6 +2260,17 @@ appended by its own research cycle, with loops 42-45 closed in parallel.
   (`ARM_ENV` covers `playbook-on/off`, C112), `src/codemonkey/eval.py`
   (`run_suite`, `early_stop` replay), `src/codemonkey/certify.py`
   (`hoeffding_gate`).
+  **DONE 2026-09-11.** `run_skills_matrix(cl_protocol=)` + CLI
+  `--cl-protocol --retention` (exit 2 usage refusals: missing retention —
+  reason names it; same suite both halves). Sequential per-arm blocks
+  recorded against declared order (`results["order"][label][phase]`);
+  render prints `cl-protocol: sequential order verified N/N`; CLI verdict
+  treats a failed order check as a violation (exit 1). Probe
+  `cycle121-probe.out` **PASS (13/13)**: trace `[T-one,T-two,R-one,R-two]×2`
+  (no interleave), order ok 4/4 blocks, BLOCKED halves with `None` +
+  reason, arms measured, contamination checked, released-binary refusal
+  exit 2 with the `--retention` reason. Tests `test_cl_protocol.py` 5/5
+  (incl. the misfiled-order control). Suite **940/5**.
 - [ ] CYCLE 122 — `loop50:` the long-horizon suite + Fix Rate:
   `build/suites/long-horizon.yaml` — multi-step tasks, task N+1 REQUIRES
   task N's artifact (order-dependent by construction), machine-graded;

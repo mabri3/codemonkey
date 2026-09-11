@@ -429,6 +429,14 @@ def eval(
         float,
         typer.Option("--delta", help="Gate level for --early-stop (default 0.05)."),
     ] = 0.05,
+    cl_protocol: Annotated[
+        bool,
+        typer.Option("--cl-protocol", help="Continual-learning protocol (loop50): transfer suite in file order per arm, then retention for that arm; requires --retention to name a DIFFERENT suite."),
+    ] = False,
+    retention: Annotated[
+        Optional[str],
+        typer.Option("--retention", help="Earlier suite for the retention half of --cl-protocol."),
+    ] = None,
 ) -> None:
     """Run a golden evaluation suite against the real exec path."""
     if delegation_matrix:
@@ -444,16 +452,35 @@ def eval(
                for l in labels):
             from .skills_arms import render_skills_table, run_skills_matrix
 
-            retention = (Path(__file__).resolve().parents[2]
-                         / "build" / "suites" / "trivial.yaml")
-            results = run_skills_matrix(
-                suite, arms=labels,
-                retention_suite=retention if retention.is_file() else None,
-                out_dir=out_dir)
+            if retention:
+                retention_path: Optional[Path] = Path(retention)
+            elif cl_protocol:
+                # loop50 C121: retention is REQUIRED under the CL protocol —
+                # no silent default (a default would measure the wrong suite)
+                retention_path = None
+            else:
+                retention_path = (Path(__file__).resolve().parents[2]
+                                  / "build" / "suites" / "trivial.yaml")
+            try:
+                results = run_skills_matrix(
+                    suite, arms=labels,
+                    retention_suite=(retention_path
+                                     if retention_path and retention_path.is_file()
+                                     else None),
+                    cl_protocol=cl_protocol,
+                    out_dir=out_dir)
+            except ValueError as exc:
+                typer.echo(f"error: {exc}", err=True)
+                raise typer.Exit(2) from None
             typer.echo(render_skills_table(results))
             typer.echo(f"matrix written: {Path(out_dir) / 'skills_matrix.json'}")
             contaminated = bool(
                 (results.get("contamination") or {}).get("violations"))
+            if cl_protocol:
+                order = results.get("order") or {}
+                contaminated = contaminated or not order or any(
+                    not all(v.get("ok") for v in blk.values())
+                    for blk in order.values())
             raise typer.Exit(1 if contaminated else 0)
         from .matrix import render_f2p_table, run_f2p_matrix
 

@@ -155,13 +155,34 @@ def _run_suite_safe(suite, exec_fn) -> dict:
         return {"tasks": [], "error": f"{type(exc).__name__}: {str(exc)[:200]}"}
 
 
+def _task_order(raw: dict, suite_path: Path) -> dict:
+    """loop50 C121: executed order vs the suite file's DECLARED order."""
+    from .eval import load_suite
+
+    declared = [str(t.get("id") if isinstance(t, dict) else i + 1)
+                for i, t in enumerate(
+                    (load_suite(suite_path).get("tasks") or []))]
+    executed = [str(t.get("id") if isinstance(t, dict) else i + 1)
+                for i, t in enumerate(raw.get("tasks") or [])]
+    return {"declared": declared, "executed": executed,
+            "ok": bool(declared) and executed == declared}
+
+
 def run_skills_matrix(suite_path: Path, *, exec_fn=None,
                       arms: Optional[list] = None,
                       retention_suite: Optional[Path] = None,
+                      cl_protocol: bool = False,
                       store: Optional[Path] = None,
                       out_dir: Optional[Path] = None,
                       probe: Optional[Callable[[], str]] = None) -> dict:
     """Run the skills-on/skills-off arms and assemble the R-K report.
+
+    loop50 C121: `cl_protocol` turns this into the continual-learning
+    protocol (SWE-Bench-CL shape): the transfer suite runs IN FILE ORDER per
+    arm, then the retention suite for that same arm — sequential blocks, no
+    interleave — and the executed order is recorded against the declared
+    order for every block. Retention is REQUIRED and must differ from the
+    transfer suite (measuring one suite twice measures nothing).
 
     `probe` (injectable for tests) reports endpoint reachability; when it
     returns a reason, forward transfer and retention are BLOCKED with that
@@ -177,6 +198,15 @@ def run_skills_matrix(suite_path: Path, *, exec_fn=None,
         if label not in ARM_ENV:
             raise ValueError(f"unknown arm: {label!r} "
                              f"(want one of {list(ARM_ENV)})")
+    if cl_protocol:
+        if retention_suite is None:
+            raise ValueError(
+                "--cl-protocol requires --retention <suite>: retention is "
+                "the other half of the continual-learning measurement")
+        if Path(retention_suite).resolve() == Path(suite_path).resolve():
+            raise ValueError(
+                "the retention suite must differ from the transfer suite — "
+                "measuring one suite twice measures nothing")
     surface = "skills" if all(l.startswith("skills-") for l in arms) \
         else ("playbook" if all(l.startswith("playbook-") for l in arms)
               else "mixed")
@@ -194,17 +224,22 @@ def run_skills_matrix(suite_path: Path, *, exec_fn=None,
         for label in arms:
             key, val = ARM_ENV[label]
             os.environ[key] = val
-            results["arms"][label] = _summarize(
-                _run_suite_safe(suite_path, exec_fn))
+            _raw = _run_suite_safe(suite_path, exec_fn)
+            results["arms"][label] = _summarize(_raw)
+            _orders = {"transfer": _task_order(_raw, suite_path)}
             if retention_suite:
-                results["retention"][label] = _summarize(
-                    _run_suite_safe(retention_suite, exec_fn))
+                _raw_r = _run_suite_safe(retention_suite, exec_fn)
+                results["retention"][label] = _summarize(_raw_r)
+                _orders["retention"] = _task_order(_raw_r, retention_suite)
+            results.setdefault("order", {})[label] = _orders
     finally:
         for k, v in prior_env.items():
             if v is None:
                 os.environ.pop(k, None)
             else:
                 os.environ[k] = v
+
+    results["cl_protocol"] = bool(cl_protocol)
 
     reason = probe()
     results["endpoint"] = reason or "reachable"
@@ -269,6 +304,13 @@ def render_skills_table(results: dict) -> str:
     surface = results.get("surface", "skills")
     lines = [f"{surface} arms on {results.get('suite', '?')} "
              f"(statistic: {results.get('statistic', '?')})"]
+    if results.get("cl_protocol"):
+        order = results.get("order") or {}
+        n_ok = sum(1 for blk in order.values()
+                   if all(v.get("ok") for v in blk.values()))
+        lines.append(
+            f"cl-protocol: sequential order verified {n_ok}/{len(order)} "
+            f"arms (transfer then retention per arm, suite file order)")
     headers = ["arm", "pass_rate", "passed", "tasks", "tokens", "wall_s"]
     rows = []
     for name in results.get("arms", {}):

@@ -1,0 +1,18 @@
+--- 1. sequential blocks, file order, order check ---
+  [PASS] trace: per-arm blocks, no interleave — ['T-one', 'T-two', 'R-one', 'R-two', 'T-one', 'T-two', 'R-one', 'R-two']
+  [PASS] skills-on: transfer order ok (['t1', 't2'])
+  [PASS] skills-on: retention order ok (['r1', 'r2'])
+  [PASS] skills-off: transfer order ok (['t1', 't2'])
+  [PASS] skills-off: retention order ok (['r1', 'r2'])
+  [PASS] cl_protocol flag recorded
+  [PASS] render names the CL order line
+--- 2. BLOCKED halves; arms ran; contamination checked ---
+  [PASS] forward transfer BLOCKED with reason + None
+  [PASS] retention BLOCKED with reason + None
+  [PASS] arms produced real numbers anyway
+  [PASS] contamination still checked
+--- 3. released binary: usage refusal ---
+  [PASS] exit 2 — exit=2
+  [PASS] reason names --retention — error: --cl-protocol requires --retention <suite>: retention is the other half of the continual-lear
+
+CYCLE121 PROBE: PASS

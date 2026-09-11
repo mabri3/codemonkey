@@ -1179,39 +1179,6 @@
       "tests_test_strategies_test_valid_sets"
     ],
     "27": [
-      "src_codemonkey_journal_class_summary",
-      "src_codemonkey_journal_list_threads",
-      "src_codemonkey_journal_rationale_148",
-      "src_codemonkey_journal_rationale_75",
-      "src_codemonkey_journal_read_thread",
-      "src_codemonkey_journal_record",
-      "tests_test_journal",
-      "tests_test_journal_cli",
-      "tests_test_journal_cli_jhome",
-      "tests_test_journal_cli_py_fixture",
-      "tests_test_journal_cli_rationale_1",
-      "tests_test_journal_cli_run_cli",
-      "tests_test_journal_cli_test_class_summary_counts",
-      "tests_test_journal_cli_test_cli_list_and_show",
-      "tests_test_journal_cli_test_list_threads",
-      "tests_test_journal_cli_test_show_missing_thread_errors",
-      "tests_test_journal_cli_test_tail_shape",
-      "tests_test_journal_jhome",
-      "tests_test_journal_py_fixture",
-      "tests_test_journal_rationale_1",
-      "tests_test_journal_rationale_55",
-      "tests_test_journal_rationale_89",
-      "tests_test_journal_test_class_summary",
-      "tests_test_journal_test_intent_before_outcome_ordering",
-      "tests_test_journal_test_journal_survives_kill9",
-      "tests_test_journal_test_loop_writes_journal_records",
-      "tests_test_journal_test_thread_isolation_and_list",
-      "tests_test_journal_wiring_rationale_154",
-      "tests_test_journal_wiring_test_repl_turn_journals",
-      "tests_test_shell_observable_test_cmd_truncated_at_500",
-      "tests_test_shell_observable_test_none_needles_stores_no_cmd"
-    ],
-    "28": [
       "src_codemonkey_strategies_adaptivememory",
       "src_codemonkey_strategies_adaptivememory_rationale_1",
       "src_codemonkey_strategies_memory",
@@ -1244,7 +1211,7 @@
       "tests_test_memory_wiring_turn",
       "tests_test_memory_wiring_turn_init"
     ],
-    "29": [
+    "28": [
       "tests_test_cycle6",
       "tests_test_cycle6_fp_fixture",
       "tests_test_cycle6_py_fixture",
@@ -1277,7 +1244,7 @@
       "tests_test_cycle6_test_validate_wrong_type",
       "tests_test_cycle6_tmp_sessions"
     ],
-    "30": [
+    "29": [
       "connection",
       "src_codemonkey_strategies_session_state",
       "src_codemonkey_strategies_session_state_get_store",
@@ -1309,7 +1276,7 @@
       "src_codemonkey_strategies_session_state_sqlitestore_load",
       "src_codemonkey_strategies_session_state_sqlitestore_prior_created"
     ],
-    "31": [
+    "30": [
       "exception",
       "src_codemonkey_exec",
       "src_codemonkey_exec_execusageerror",
@@ -1341,7 +1308,7 @@
       "tests_test_bestofn_tournament_test_verify_less_bestof_still_usage_error_without_selector",
       "tests_test_r37_fixes_test_r37f3_invalid_schema_raises_schema_error"
     ],
-    "32": [
+    "31": [
       "src_codemonkey_adaptivemem",
       "src_codemonkey_adaptivemem_adaptive_select",
       "src_codemonkey_adaptivemem_rationale_1",
@@ -1373,7 +1340,7 @@
       "tests_test_r37_fixes_turn",
       "tests_test_r37_fixes_turn_init"
     ],
-    "33": [
+    "32": [
       "src_codemonkey_discover",
       "src_codemonkey_discover_discover_verify_command",
       "src_codemonkey_discover_py_path",
@@ -1405,7 +1372,7 @@
       "tests_test_discover_verify_writeprov_close",
       "tests_test_discover_verify_writeprov_init"
     ],
-    "34": [
+    "33": [
       "src_codemonkey_instructions",
       "src_codemonkey_instructions_build_project_context_block",
       "src_codemonkey_instructions_find_instructions_file",
@@ -1437,7 +1404,7 @@
       "tests_test_instructions_turn",
       "tests_test_instructions_turn_init"
     ],
-    "35": [
+    "34": [
       "src_codemonkey_repomap",
       "src_codemonkey_repomap_cache_path",
       "src_codemonkey_repomap_format_map",
@@ -1469,7 +1436,7 @@
       "tests_test_repomap_relevance_test_relevance_overrides_recency",
       "tests_test_repomap_relevance_test_score_counts_path_and_symbols"
     ],
-    "36": [
+    "35": [
       "src_codemonkey_stuck",
       "src_codemonkey_stuck_classify_outcome",
       "src_codemonkey_stuck_enabled",
@@ -1501,7 +1468,7 @@
       "tests_test_stuck_test_raised_and_plain_tool_error",
       "tests_test_stuck_test_rule_deny_maps_auth"
     ],
-    "37": [
+    "36": [
       "src_codemonkey_recovery",
       "src_codemonkey_recovery_consult",
       "src_codemonkey_recovery_failure_report",
@@ -1532,7 +1499,7 @@
       "tests_test_recovery_turn",
       "tests_test_recovery_turn_init"
     ],
-    "38": [
+    "37": [
       "src_codemonkey_changeplan",
       "src_codemonkey_changeplan_begin_plan",
       "src_codemonkey_changeplan_changeplan",
@@ -1561,6 +1528,36 @@
       "src_codemonkey_cli_rationale_335",
       "src_codemonkey_cli_rollback",
       "src_codemonkey_tools_base_save"
+    ],
+    "38": [
+      "src_codemonkey_digest",
+      "src_codemonkey_digest_build_digest",
+      "src_codemonkey_digest_cli",
+      "src_codemonkey_digest_cli_digest_cmd",
+      "src_codemonkey_digest_cli_rationale_1",
+      "src_codemonkey_digest_cli_rationale_15",
+      "src_codemonkey_digest_digest_recent",
+      "src_codemonkey_digest_rationale_1",
+      "src_codemonkey_digest_rationale_63",
+      "src_codemonkey_digest_render_digest",
+      "src_codemonkey_digest_render_multi",
+      "tests_test_digest",
+      "tests_test_digest_dhome",
+      "tests_test_digest_py_fixture",
+      "tests_test_digest_rationale_1",
+      "tests_test_digest_test_empty_thread_tolerance",
+      "tests_test_digest_test_failure_section",
+      "tests_test_digest_test_json_shape",
+      "tests_test_digest_test_render_header",
+      "tests_test_digest_test_route_fallback_flag",
+      "tests_test_digest_test_tool_counts",
+      "tests_test_watch_digest",
+      "tests_test_watch_digest_py_fixture",
+      "tests_test_watch_digest_rationale_1",
+      "tests_test_watch_digest_test_digest_recent_empty",
+      "tests_test_watch_digest_test_digest_recent_ordering",
+      "tests_test_watch_digest_test_render_multi_sections",
+      "tests_test_watch_digest_whome"
     ],
     "39": [
       "src_codemonkey_failclass",
@@ -2496,26 +2493,6 @@
       "tests_test_cost_test_render_summary_no_tools"
     ],
     "77": [
-      "src_codemonkey_digest",
-      "src_codemonkey_digest_build_digest",
-      "src_codemonkey_digest_cli",
-      "src_codemonkey_digest_cli_digest_cmd",
-      "src_codemonkey_digest_cli_rationale_1",
-      "src_codemonkey_digest_cli_rationale_15",
-      "src_codemonkey_digest_rationale_1",
-      "src_codemonkey_digest_render_digest",
-      "tests_test_digest",
-      "tests_test_digest_dhome",
-      "tests_test_digest_py_fixture",
-      "tests_test_digest_rationale_1",
-      "tests_test_digest_test_empty_thread_tolerance",
-      "tests_test_digest_test_failure_section",
-      "tests_test_digest_test_json_shape",
-      "tests_test_digest_test_render_header",
-      "tests_test_digest_test_route_fallback_flag",
-      "tests_test_digest_test_tool_counts"
-    ],
-    "78": [
       "src_codemonkey_impact",
       "src_codemonkey_impact_compare",
       "src_codemonkey_impact_graph_callers",
@@ -2534,6 +2511,26 @@
       "src_codemonkey_tools_search_python_search",
       "src_codemonkey_tools_search_rationale_1",
       "src_codemonkey_tools_search_run"
+    ],
+    "78": [
+      "src_codemonkey_journal_class_summary",
+      "src_codemonkey_journal_rationale_148",
+      "src_codemonkey_journal_rationale_75",
+      "src_codemonkey_journal_record",
+      "src_codemonkey_status_mod_collect_latest_sessions",
+      "src_codemonkey_status_mod_rationale_129",
+      "tests_test_journal_cli",
+      "tests_test_journal_cli_jhome",
+      "tests_test_journal_cli_py_fixture",
+      "tests_test_journal_cli_rationale_1",
+      "tests_test_journal_cli_run_cli",
+      "tests_test_journal_cli_test_class_summary_counts",
+      "tests_test_journal_cli_test_cli_list_and_show",
+      "tests_test_journal_cli_test_list_threads",
+      "tests_test_journal_cli_test_show_missing_thread_errors",
+      "tests_test_journal_cli_test_tail_shape",
+      "tests_test_journal_test_class_summary",
+      "tests_test_watch_digest_test_collect_latest_sessions_newest_first"
     ],
     "79": [
       "baseexception",
@@ -2725,6 +2722,24 @@
       "tests_test_grounding_test_symbol_index_defines"
     ],
     "89": [
+      "src_codemonkey_journal_list_threads",
+      "src_codemonkey_journal_read_thread",
+      "tests_test_journal",
+      "tests_test_journal_jhome",
+      "tests_test_journal_py_fixture",
+      "tests_test_journal_rationale_1",
+      "tests_test_journal_rationale_55",
+      "tests_test_journal_rationale_89",
+      "tests_test_journal_test_intent_before_outcome_ordering",
+      "tests_test_journal_test_journal_survives_kill9",
+      "tests_test_journal_test_loop_writes_journal_records",
+      "tests_test_journal_test_thread_isolation_and_list",
+      "tests_test_journal_wiring_rationale_154",
+      "tests_test_journal_wiring_test_repl_turn_journals",
+      "tests_test_shell_observable_test_cmd_truncated_at_500",
+      "tests_test_shell_observable_test_none_needles_stores_no_cmd"
+    ],
+    "90": [
       "src_codemonkey_permissions",
       "src_codemonkey_permissions_evaluate",
       "src_codemonkey_permissions_rationale_1",
@@ -2742,7 +2757,7 @@
       "tests_test_permissions_test_pattern_requires_subject",
       "tests_test_permissions_test_wildcard_tool"
     ],
-    "90": [
+    "91": [
       "src_codemonkey_routing",
       "src_codemonkey_routing_rationale_1",
       "src_codemonkey_routing_rationale_30",
@@ -2760,7 +2775,7 @@
       "tests_test_routing_test_route_recorded_in_journal",
       "tests_test_routing_test_route_stats_aggregation"
     ],
-    "91": [
+    "92": [
       "tests_test_idempotency",
       "tests_test_idempotency_ctx",
       "tests_test_idempotency_jhome",
@@ -2778,7 +2793,7 @@
       "tests_test_idempotency_turn",
       "tests_test_idempotency_turn_init"
     ],
-    "92": [
+    "93": [
       "src_codemonkey_cost",
       "src_codemonkey_cost_append_to_ledger",
       "src_codemonkey_cost_ledger_path",
@@ -2795,7 +2810,7 @@
       "tests_test_cost_test_summarize_totals",
       "tests_test_status_test_baseline_and_cost"
     ],
-    "93": [
+    "94": [
       "src_codemonkey_loop",
       "src_codemonkey_loop_native_specs",
       "src_codemonkey_loop_rationale_1",
@@ -2812,7 +2827,7 @@
       "src_codemonkey_protocol_rationale_128",
       "src_codemonkey_protocol_rationale_46"
     ],
-    "94": [
+    "95": [
       "tests_test_obsbudget",
       "tests_test_obsbudget_ctx",
       "tests_test_obsbudget_rationale_1",
@@ -2829,7 +2844,7 @@
       "tests_test_obsbudget_twofatoutputsprovider_chat",
       "tests_test_obsbudget_twofatoutputsprovider_init"
     ],
-    "95": [
+    "96": [
       "tests_test_sessions_persist",
       "tests_test_sessions_persist_pairs",
       "tests_test_sessions_persist_patch_provider",
@@ -2846,7 +2861,7 @@
       "tests_test_sessions_persist_test_single_run_stores_user_and_assistant",
       "tests_test_sessions_persist_tmp_sessions"
     ],
-    "96": [
+    "97": [
       "tests_test_skills_cli",
       "tests_test_skills_cli_admit",
       "tests_test_skills_cli_cli",
@@ -2863,7 +2878,7 @@
       "tests_test_skills_cli_turn",
       "tests_test_skills_cli_turn_init"
     ],
-    "97": [
+    "98": [
       "src_codemonkey_affinity",
       "src_codemonkey_affinity_batch_by_model",
       "src_codemonkey_affinity_rationale_1",
@@ -2879,7 +2894,7 @@
       "tests_test_batch_by_model_test_mixed_route_shapes",
       "tests_test_batch_by_model_test_order_preserved_within_group"
     ],
-    "98": [
+    "99": [
       "src_codemonkey_argvalidate",
       "src_codemonkey_argvalidate_rationale_1",
       "src_codemonkey_argvalidate_rationale_39",
@@ -2895,7 +2910,7 @@
       "tests_test_arg_validation_test_valid_pass_through",
       "tests_test_arg_validation_test_wrong_type_detected"
     ],
-    "99": [
+    "100": [
       "src_codemonkey_recovery_rationale_120",
       "src_codemonkey_recovery_rationale_126",
       "src_codemonkey_recovery_rationale_141",
@@ -2911,7 +2926,7 @@
       "src_codemonkey_recovery_recoverytracker_saved_vs_max_turns",
       "tests_test_enforced_stop_test_tracker_advisory_turn_defaults_none"
     ],
-    "100": [
+    "101": [
       "tests_test_config",
       "tests_test_config_clean_env",
       "tests_test_config_py_fixture",
@@ -2927,7 +2942,7 @@
       "tests_test_config_test_user_config_then_project_overrides",
       "tests_test_config_test_version_flag"
     ],
-    "101": [
+    "102": [
       "tests_test_parallel",
       "tests_test_parallel_ctx",
       "tests_test_parallel_parallelprovider",
@@ -2943,7 +2958,7 @@
       "tests_test_parallel_turn",
       "tests_test_parallel_turn_init"
     ],
-    "102": [
+    "103": [
       "tests_test_playbook_store",
       "tests_test_playbook_store_delta",
       "tests_test_playbook_store_rationale_1",
@@ -2959,7 +2974,7 @@
       "tests_test_playbook_store_test_tainted_provenance_is_recorded_not_sanitized",
       "tests_test_playbook_store_test_whitespace_normalization_is_the_identity"
     ],
-    "103": [
+    "104": [
       "tests_test_repomap",
       "tests_test_repomap_ctx",
       "tests_test_repomap_ctx_getattr",
@@ -2974,21 +2989,6 @@
       "tests_test_repomap_test_repo_map_tool_dispatch",
       "tests_test_repomap_test_repo_map_tool_pattern_filter",
       "tests_test_repomap_test_touch_invalidates_only_that_file"
-    ],
-    "104": [
-      "src_codemonkey_digest_digest_recent",
-      "src_codemonkey_digest_rationale_63",
-      "src_codemonkey_digest_render_multi",
-      "src_codemonkey_status_mod_collect_latest_sessions",
-      "src_codemonkey_status_mod_rationale_129",
-      "tests_test_watch_digest",
-      "tests_test_watch_digest_py_fixture",
-      "tests_test_watch_digest_rationale_1",
-      "tests_test_watch_digest_test_collect_latest_sessions_newest_first",
-      "tests_test_watch_digest_test_digest_recent_empty",
-      "tests_test_watch_digest_test_digest_recent_ordering",
-      "tests_test_watch_digest_test_render_multi_sections",
-      "tests_test_watch_digest_whome"
     ],
     "105": [
       "src_codemonkey_dryrun",
@@ -3529,18 +3529,18 @@
     "24": 0.12298387096774194,
     "25": 0.0967741935483871,
     "26": 0.0846774193548387,
-    "27": 0.1053763440860215,
-    "28": 0.1032258064516129,
-    "29": 0.06881720430107527,
-    "30": 0.12413793103448276,
-    "31": 0.09195402298850575,
-    "32": 0.09655172413793103,
-    "33": 0.10804597701149425,
-    "34": 0.11724137931034483,
-    "35": 0.12413793103448276,
-    "36": 0.09655172413793103,
-    "37": 0.08866995073891626,
-    "38": 0.1402116402116402,
+    "27": 0.1032258064516129,
+    "28": 0.06881720430107527,
+    "29": 0.12413793103448276,
+    "30": 0.09195402298850575,
+    "31": 0.09655172413793103,
+    "32": 0.10804597701149425,
+    "33": 0.11724137931034483,
+    "34": 0.12413793103448276,
+    "35": 0.09655172413793103,
+    "36": 0.08866995073891626,
+    "37": 0.1402116402116402,
+    "38": 0.12698412698412698,
     "39": 0.1349206349206349,
     "40": 0.09401709401709402,
     "41": 0.11396011396011396,
@@ -3579,8 +3579,8 @@
     "74": 0.18128654970760233,
     "75": 0.23976608187134502,
     "76": 0.13071895424836602,
-    "77": 0.20261437908496732,
-    "78": 0.1895424836601307,
+    "77": 0.1895424836601307,
+    "78": 0.1437908496732026,
     "79": 0.14705882352941177,
     "80": 0.19117647058823528,
     "81": 0.16911764705882354,
@@ -3591,22 +3591,22 @@
     "86": 0.20588235294117646,
     "87": 0.16911764705882354,
     "88": 0.175,
-    "89": 0.2,
-    "90": 0.175,
-    "91": 0.2,
-    "92": 0.22857142857142856,
-    "93": 0.19047619047619047,
-    "94": 0.24761904761904763,
-    "95": 0.26666666666666666,
-    "96": 0.2571428571428571,
-    "97": 0.27472527472527475,
-    "98": 0.21978021978021978,
-    "99": 0.15384615384615385,
-    "100": 0.1978021978021978,
-    "101": 0.24175824175824176,
+    "89": 0.175,
+    "90": 0.2,
+    "91": 0.175,
+    "92": 0.2,
+    "93": 0.22857142857142856,
+    "94": 0.19047619047619047,
+    "95": 0.24761904761904763,
+    "96": 0.26666666666666666,
+    "97": 0.2571428571428571,
+    "98": 0.27472527472527475,
+    "99": 0.21978021978021978,
+    "100": 0.15384615384615385,
+    "101": 0.1978021978021978,
     "102": 0.24175824175824176,
-    "103": 0.16483516483516483,
-    "104": 0.19230769230769232,
+    "103": 0.24175824175824176,
+    "104": 0.16483516483516483,
     "105": 0.19230769230769232,
     "106": 0.1794871794871795,
     "107": 0.2564102564102564,

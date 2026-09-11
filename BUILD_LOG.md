@@ -4096,3 +4096,24 @@ them justifies waiving a row at v4.0.
 - **Known issues:** none. Live CL figures are endpoint-gated → BLOCKED
   discipline applies to their rows.
 - **Next step:** CYCLE 121 — the CL protocol runner.
+
+## 2026-09-11 — CYCLE 121 (loop50): the CL protocol runner
+
+- **Files changed:** `src/codemonkey/skills_arms.py` (`cl_protocol` flag,
+  retention validations, `_task_order` executed-vs-declared, `results["order"]`,
+  CL line in the render), `src/codemonkey/cli.py` (`--cl-protocol`,
+  `--retention`; ValueError → exit 2; a failed order check → exit 1),
+  `tests/test_cl_protocol.py` (new, 5), `build/probes/cycle121-probe.{py,out}`,
+  register row.
+- **Probe results (literal, R-I):** `cycle121-probe.py` → **PASS (13/13)**:
+  trace `[T-one,T-two,R-one,R-two]×2` (per-arm sequential, no interleave),
+  order ok 4/4 blocks (declared == executed), CL flag + render line, BLOCKED
+  halves with `None` + "Connection refused" reason, arms measured (1.0/1.0),
+  contamination key present; released binary: `--cl-protocol` without
+  `--retention` → exit 2, reason names `--retention`.
+- **Tests run:** 5/5 new; full suite **940 passed, 5 skipped** (was 935/5).
+- **Notes:** one probe iteration went red for the WRONG reason (`--out-dir`
+  is not an option — the real flag is `--out`); fixed and re-run so the
+  refusal path itself is what exit 2 exercises. The misfiled-order control
+  shows the order check can see a reversed executed list.
+- **Next step:** CYCLE 122 — the long-horizon suite + Fix Rate.
