@@ -4065,3 +4065,19 @@ them justifies waiving a row at v4.0.
   distinct id). The lessons path's ADMIT door is the gate; un-verify stays
   free.
 - **Next step:** CYCLE 120 — loop 49 acceptance + report.
+
+## 2026-09-11 — CYCLE 120 (loop49): loop 49 acceptance + report
+
+- **Files changed:** `build/BUILD_REPORT.md` (loop-49 section),
+  `build/acceptance_outputs/summary-loop49-close.txt` + run log, plan tick,
+  `features.html` (C117–C119 entries), register rows (final).
+- **Sweep (shipped form):** A1 `codemonkey 4.0.0`; offline rows exit 0;
+  nine live rows BLOCKED with reason (v4.0 exception list unchanged);
+  **A15: 935 passed, 5 skipped**. Post-sweep canonical suite: 935/5.
+- **Verdict:** **LOOP 49 COMPLETE.** Provenance travels with the data
+  (per-record attestation, spill sidecars, compaction records) and the
+  persistence doors are metadata-guarded (tainted refused; override
+  deliberate, journaled, and in history; text-blind by pin). The live
+  model-behavior firing is **UNMEASURED-WITH-DATE** (endpoint refused).
+- **Next step:** CYCLE R50 research (continual-learning measurement +
+  long-horizon suite), then CYCLE 121+ and the v5.0 close.

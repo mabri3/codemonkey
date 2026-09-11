@@ -2208,13 +2208,21 @@ appended by its own research cycle, with loops 42-45 closed in parallel.
   + clean instruction-shaped sibling admitted; skills path refused before
   its probe with `--override` running it. Tests
   `test_admission_gate.py` 4/4. Suite **935/5**.
-- [ ] CYCLE 120 — `loop49:` loop 49 acceptance + report: the charter probe
+- [x] CYCLE 120 — `loop49:` loop 49 acceptance + report: the charter probe
   transcript named in the register; suite green; sweep shipped form;
   BUILD_REPORT loop-49 section; live injection-resistance firing
   UNMEASURED-WITH-DATE. | est: 40m |
   verify: `bash build/acceptance_sweep.sh` → offline rows exit 0, live rows
   BLOCKED-with-reason; `uv run pytest -q` → exit 0; register no UNVALIDATED
   row; report committed; no tag (v5.0 is loop 50's).
+  **DONE 2026-09-11.** Sweep shipped form: A1 `codemonkey 4.0.0`, offline
+  rows exit 0, nine live rows BLOCKED with reason (v4.0 exception list
+  unchanged), **A15 935/5** (`summary-loop49-close.txt`); post-sweep
+  canonical suite 935/5. Register: `taint` row carries C117–C118 evidence;
+  `playbook`/`skills` rows carry C119; no UNVALIDATED row. BUILD_REPORT
+  loop-49 section committed: the charter's probe shape delivered verbatim;
+  threat-model sweep table referenced; live injection-resistance firing
+  UNMEASURED-WITH-DATE. No tag (v5.0 is loop 50's).
 
 - [ ] CYCLE R50 — Loop 50 research: continual-learning measurement (forward
   transfer, retention, stability-plasticity) under R-H's time-uniform
