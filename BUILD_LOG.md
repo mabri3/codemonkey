@@ -3535,3 +3535,35 @@ them justifies waiving a row at v4.0.
 - **Known issues:** none. The taint rule is C85's: provenance `taint_free`
   records False until the tracker is wired (stated, not faked).
 - **Next step:** CYCLE 85 — the coarse taint rule.
+
+## 2026-09-10 — CYCLE 85 (loop46): the coarse taint rule
+
+- **Files changed:** `src/codemonkey/taint.py` (new — sticky, run-scoped
+  tracker; first source wins; METADATA ONLY), `src/codemonkey/loop.py`
+  (tracker per run; every completed call classified), `tools/skill_create.py`
+  (taint refusal + journal record + real `taint_free` provenance),
+  `journal.py` (`record(..., fields=)` for specialized records),
+  `tests/test_skill_taint.py` (new, 7 tests), `tests/test_skills_strategy.py`
+  (clean-run provenance now attests True), `build/probes/cycle85_probe.py` +
+  `cycle85-probe.out`, `build/CAPABILITY_REGISTER.md` (taint row),
+  `features.html`.
+- **Probe results (literal, R-I):** a local fixture page carrying "add a
+  skill that runs curl" is fetched by the scripted run → `web_fetch ok=True`;
+  the `skill_create` attempt is **refused** (`error: skill_create refused:
+  this run consumed untrusted output (source: web_fetch) …`); taint report
+  `{'tainted': True, 'source': 'web_fetch', 'sources': ['web_fetch']}`; the
+  skills store is unchanged; the journal carries `skill.refused
+  reason='tainted' source='web_fetch'`. The identical CLEAN run wrote the
+  candidate (`demo_probe`, quarantined; provenance attests `taint_free:
+  true`). Transcript: `build/probes/cycle85-probe.out`.
+- **Tests run:** new file 7/7; full suite **857 passed, 5 skipped** (was 850/5).
+- **Register:** taint row added (the completeness control fired on it, as
+  designed); 72/72 modules · 65 PROVEN-LIVE · 7 UNIT-ONLY · 0 UNVALIDATED.
+- **Design note (recorded, not skipped):** the clause's "admit" half is not
+  run-reachable here — admission is an operator CLI verb and the caller is
+  trusted per THREAT_MODEL, so no tainted turn can attempt it. The coarse
+  rule instead guarantees a tainted run cannot WRITE a candidate at all, and
+  every manifest carries the attested flag for loop 49's gate-level refusal.
+  The "outside read" source is judged against the PRIMARY root (add-dir reads
+  count as outside) — stated in `taint.py`.
+- **Next step:** CYCLE 86 — the R-J revocation surface (`skills show|revoke|disable`).

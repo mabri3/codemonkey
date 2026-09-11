@@ -118,6 +118,13 @@ def run_turns(
     from . import recovery as recovery_mod
 
     recovery_tracker = recovery_mod.RecoveryTracker(budget=recovery_budget)
+
+    # loop46 cycle 85: the coarse taint tracker — created once per context and
+    # sticky for the whole run. It holds SOURCE NAMES only; the untrusted text
+    # itself is never inspected or kept.
+    from . import taint as taint_mod
+
+    _taint = ctx.extra.setdefault("taint", taint_mod.TaintTracker())
     turn_tokens = 0
     turns_seen = 0
 
@@ -655,6 +662,15 @@ def run_turns(
                         pass
                 return (idx, name, False, f"error: {exc}",
                         {"raised": True, "_jkey": jkey})
+            # loop46 cycle 85: coarse taint — web_fetch output, shell stdout or
+            # an add-dir read marks the RUN (metadata only; content never seen).
+            try:
+                _src = taint_mod.source_for(
+                    name, call.get("args") or {}, ctx, result.output, result.ok)
+                if _src:
+                    _taint.note(_src)
+            except Exception:
+                pass
             if journal_thread and jkey:
                 try:
                     from .journal import record as _jr

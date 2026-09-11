@@ -28,7 +28,6 @@ from .base import ToolResult, _err
 SPEC = ("skill_create(name, spec, probe, params={}, tool_src) -> write a "
         "QUARANTINED candidate skill (requires strategies.skills=learn; "
         "admission is a separate mechanical gate)")
-
 PARAMS = {
     "type": "object",
     "properties": {
@@ -48,6 +47,21 @@ PARAMS = {
 }
 
 
+def _journal_taint_refusal(extra: dict, name: str, source: str) -> None:
+    """Journal a taint refusal with its source — metadata only, never the
+    untrusted text (the tracker does not even hold it)."""
+    try:
+        from .. import journal as journal_mod
+
+        thread = str((extra or {}).get("session_id") or "")
+        if thread:
+            journal_mod.record(thread, "skill.refused", tool="skill_create",
+                               key=name, status="tainted",
+                               fields={"reason": "tainted", "source": source})
+    except Exception:
+        pass
+
+
 def run(args: dict, ctx) -> ToolResult:
     from .. import skills as skills_mod
     from ..strategies import select_strategy
@@ -64,16 +78,33 @@ def run(args: dict, ctx) -> ToolResult:
                     f"library"),
             ok=False)
 
+    name = str(args.get("name", "")).strip()
+
+    # loop46 cycle 85: the coarse taint rule. A run that consumed untrusted
+    # output (web_fetch / shell stdout / an add-dir read) may not write into
+    # the skill store at all. The refusal names the SOURCE and journals it;
+    # the tracker holds source names only — this check reads metadata, never
+    # the untrusted text.
+    tracker = extra.get("taint")
+    if tracker is not None and getattr(tracker, "tainted", False):
+        source = getattr(tracker, "source", "") or "unknown"
+        _journal_taint_refusal(extra, name, source)
+        return ToolResult(
+            output=(f"error: skill_create refused: this run consumed untrusted "
+                    f"output (source: {source}) — a contaminated run cannot "
+                    f"produce a candidate with clean provenance (loop46 C85)"),
+            ok=False)
+
     prov = {
         "run_id": str(extra.get("run_id") or "unknown"),
         "session_id": str(extra.get("session_id") or ""),
-        # cycle 85 obligation: thread the turn's real taint state in here.
-        # Until a tracker attests cleanliness, the field says FALSE — never
-        # a claimed clean run.
-        "taint_free": bool(extra.get("taint_free", False)),
+        # Attested cleanliness requires BOTH: a tracker exists in this run AND
+        # it recorded no untrusted output. Absent tracker → False (a bare
+        # context cannot attest anything).
+        "taint_free": tracker is not None and not tracker.tainted,
     }
     man = {
-        "name": str(args.get("name", "")).strip(),
+        "name": name,
         "spec": str(args.get("spec", "")).strip(),
         "params": args.get("params") or {"type": "object", "properties": {}},
         "probe": str(args.get("probe", "")).strip(),

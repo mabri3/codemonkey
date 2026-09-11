@@ -151,8 +151,9 @@ def test_learn_run_writes_a_quarantined_skill_with_provenance(tmp_path, monkeypa
     assert [r["name"] for r in rows] == ["demo_new"]
     assert rows[0]["status"] == "quarantined"          # learned, NOT loaded
     man = skills.read_manifest(tmp_path, "demo_new")
+    # C85: this run consumed no untrusted output → the tracker attests clean.
     assert man["provenance"] == {"run_id": "r-run42", "session_id": "sess-9",
-                                 "taint_free": False}  # no tracker yet: never claim clean
+                                 "taint_free": True}
     assert skills.load_admitted(tmp_path) == []
     assert any(e.get("type") == "tool.completed" and e.get("name") == "skill_create"
                and e.get("ok") is True for e in events)

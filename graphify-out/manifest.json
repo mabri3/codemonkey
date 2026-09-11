@@ -45,9 +45,9 @@
     "semantic_hash": "dfbf3763c6db4d0823d5e630e8cfa48e"
   },
   "src/codemonkey/loop.py": {
-    "mtime": 1789099661.4772155,
-    "ast_hash": "5f444ef48f06656ffc0884cff219ef67",
-    "semantic_hash": "5f444ef48f06656ffc0884cff219ef67"
+    "mtime": 1789099979.2774377,
+    "ast_hash": "c4fb3a63500c50e2862f35088d24e96c",
+    "semantic_hash": "c4fb3a63500c50e2862f35088d24e96c"
   },
   "src/codemonkey/native.py": {
     "mtime": 1788476351.082512,
@@ -365,9 +365,9 @@
     "semantic_hash": "a9499ecc7b36774a85a11507fc264187"
   },
   "src/codemonkey/journal.py": {
-    "mtime": 1788590226.612584,
-    "ast_hash": "a8445383fbee0faa511c062a8cbc44d3",
-    "semantic_hash": "a8445383fbee0faa511c062a8cbc44d3"
+    "mtime": 1789099952.8059273,
+    "ast_hash": "cd74843995d99ebf011d89fc1539fb67",
+    "semantic_hash": "cd74843995d99ebf011d89fc1539fb67"
   },
   "src/codemonkey/journal_cli.py": {
     "mtime": 1788557516.356653,
@@ -1050,13 +1050,23 @@
     "semantic_hash": "9902f0dcc76d307e06ff6bc2ddf92719"
   },
   "src/codemonkey/tools/skill_create.py": {
-    "mtime": 1789099521.4753826,
-    "ast_hash": "c2fc0e2f6dde7be766137371c1269b53",
-    "semantic_hash": "c2fc0e2f6dde7be766137371c1269b53"
+    "mtime": 1789099978.0536277,
+    "ast_hash": "554a4e89b9d62a1353c858e616f3a8ce",
+    "semantic_hash": "554a4e89b9d62a1353c858e616f3a8ce"
   },
   "tests/test_skills_strategy.py": {
-    "mtime": 1789099662.1311197,
-    "ast_hash": "41cce803430625adb82c56ce2ff0fa13",
-    "semantic_hash": "41cce803430625adb82c56ce2ff0fa13"
+    "mtime": 1789099998.01957,
+    "ast_hash": "7fbdb3f04e78fcfc4bffa077bdf8b77f",
+    "semantic_hash": "7fbdb3f04e78fcfc4bffa077bdf8b77f"
+  },
+  "src/codemonkey/taint.py": {
+    "mtime": 1789099952.4556808,
+    "ast_hash": "24569b00d540b73a2f318f3ddcd61542",
+    "semantic_hash": "24569b00d540b73a2f318f3ddcd61542"
+  },
+  "tests/test_skill_taint.py": {
+    "mtime": 1789100021.1643841,
+    "ast_hash": "b7f1539c3c1303b8fce7ace7faec1e03",
+    "semantic_hash": "b7f1539c3c1303b8fce7ace7faec1e03"
   }
 }

@@ -93,6 +93,7 @@ difference; `pytest` alone never qualifies):
 | skills | PROVEN-LIVE | `codemonkey skills list` on a repo with no store → exit 0 honest empty; a hand-written quarantined skill listed with status `quarantined`; `skills.load_admitted('.') == []` (quarantined NOT loaded) (`build/probes/cycle82-probe.sh`, loop46 C82); `codemonkey skills admit` → demo_ok ADMITTED exit 0 / demo_bad refused exit 1 (stderr in the journal) / re-admit eviction (`build/probes/cycle83-probe.out`, C83) |
 | skills_cli | PROVEN-LIVE | same as skills (the `skills` command surface) |
 | skill_runner | PROVEN-LIVE | directly addressable: `python -m codemonkey.skill_runner TOOL_PY ARGS_JSON` → one JSON result line (`build/probes/cycle84-probe.out`); exercised end-to-end by a real `run_turns` skill call (`tests/test_skills_strategy.py::test_admitted_skill_runs_through_the_loop_and_readonly_is_denied`) |
+| taint | PROVEN-LIVE | coarse rule end-to-end in real `run_turns`: a web_fetch of the literal-payload fixture → `skill_create` refused, journal `skill.refused{reason:"tainted", source:"web_fetch"}`, store unchanged; the identical clean run writes (`build/probes/cycle85-probe.out`; `tests/test_skill_taint.py`, 7 tests incl. metadata-only and stickiness pins) |
 
 **Completeness is now CHECKED, not asserted (C106, 2026-09-10).** The rows
 above for loops 39-45 were added by an audit (`build/register_audit.py`) that
