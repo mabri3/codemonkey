@@ -1006,6 +1006,38 @@ The build contract is CLOSED.
 
 ---
 
+# Loop 39 — Final Acceptance (CYCLE loop39-final) — section reconstructed at the v4.0 close
+
+> **Ledger repair, 2026-09-10 (CYCLE loop45-final).** This section was owed and
+> missing: `loop39-final`'s verify promised a "BUILD_REPORT loop-39 section;
+> report committed", but the acceptance commit `0cdd65d` contains only
+> BUILD_LOG.md / build/plan.md / features.html (`git show --stat`). The
+> acceptance itself was real — entry probes re-run, suite 658/5 at the time —
+> and its checkbox stays ticked; what went missing is this record. It is
+> reconstructed below from the committed records only: the BUILD_LOG entries
+> for C88–C92 and `loop39-final`, and the plan's verbatim ASK decisions.
+
+**Date:** 2026-09-04 · **Suite at close:** 658 passed / 5 skipped · **Entry:** R38 closed (fulfilled).
+
+| Cycle | Claim | Evidence (as recorded at the time) |
+|---|---|---|
+| C88 | failure taxonomy over journal records | `failclass.py` maps (tool, error_class, output) onto the AgentRx frame — 4 categories per record; looping/recovery-failure reserved for the C89 trajectory counter; three categories documented unmappable; timeout/transport deliberately unmapped as transient. `journal show` prints the taxonomy rows on a scripted failing real-exec run. 11 tests. |
+| C89 | stuck detector (report-only) | `stuck.py` `StuckDetector`: same `(tool, error_class)` pair ×3 in a row, or K result-neutral turns, emits a `stuck` event + a system nudge naming the pair; never terminates. Code landed under the GATE-2 commit (`cf37b27`) due to concurrent workers; close-out entry + badge + graphify completed it. Suite 646/5. |
+| C90 | recovery policy + budget + typed report (report-only) | `recovery.py`: POLICY_TABLE (10 taxonomy rows), `RecoveryTracker` once-per-run budget verdict with would-have-saved turns+tokens from the run's own burn rate; `failure_report.consulted` / `failure_report.budget_exhausted` on the trace and in JSONL; the run always completes. 8 tests. Suite 654/5. |
+| C91 | ENFORCE the stop (ASK: evidence-capped) | Advisory + later failure ⇒ the run stops itself: exit **3** (spec §Safety), honest closing on stdout, `failure_report.gave_up` carrying advisory/failed/first-stuck turns + checkpoint + journal thread. 3 tests + R-I updates. Suite 658/5. |
+| C92 | suggest-only (ASK) | No auto-restore path built — the decision, not an omission. The suggest path is already real: every report names the checkpoint group; verified via the existing R-I traces. No code change by design. |
+| 91F1–91F4 | review gate over C91 (`build/critic-c91-review.md`, committed `b6cb7ff`) | F1: the evidence cap now requires the ADVISED-AGAINST pair to recur (an agent that obeys the advisory is no longer stopped). F2: a policy stop no longer emits a false `max_turns` error. F3: the missing discriminating test arm added (3 regression tests proved failing against unfixed HEAD `2de107c`). F4: research citations re-pointed off two modules cycle 81 deleted. |
+
+**ASK scope honored throughout** (decisions verbatim in `build/plan.md` at
+C91/C92/C94): evidence-capped stop as decided; C92 no-code; spec §Safety
+carries exit 3; the discovery-flip question deferred to loop 40 — no flip
+without a number.
+
+**LOOP 39 COMPLETE.**
+
+
+---
+
 # Loop 40 — Final Acceptance (CYCLE loop40-final)
 
 **Date:** 2026-09-05 · **Suite:** 690 passed / 5 skipped.
@@ -1249,3 +1281,81 @@ performed against the artifact (see table).
 **LOOP 44 COMPLETE** — budgets are enforced, the invariant is break-verified,
 code 4 is controlled end to end, and the declined half is recorded with its
 reason instead of quietly dropped.
+
+
+---
+
+# Loop 45 + v4.0.0 — CLOSING ACCEPTANCE (CYCLE loop45-final) — USER GATE 5 REQUESTED
+
+**Date:** 2026-09-10 · **Tag:** `v4.0.0` · **Version:** `codemonkey 4.0.0`
+(`--version` matches the tag) · **Suite:** **821 passed / 5 skipped**
+(verified twice: a standalone run and sweep A15).
+
+The loops 38–45 arc (utility arc: wire-or-delete the orphans, then failure taxonomy /
+recovery, repro-gate, atomic plans, ladder, published contract, enforced budgets,
+evidence packs) closes here. **Entry condition held:** loops 38–44 closed in
+writing — C104 declined under R-A, recorded with its revisit condition — and no
+open critic finding above LOW (`critic-c91-review.md` F1–F4 fixed by 91F1–91F4;
+`critic-102f4-review.md` F1 fixed by 102F5, its LOW F2 closed by 102F6).
+
+## Acceptance terms → literal results
+
+| Term | Result |
+|---|---|
+| `bash build/acceptance_sweep.sh` → all exit 0, zero BLOCKED **or an individually justified exception list** | **Shipped form** (the honest run; the endpoint was probed literally): 11 rows exit 0; nine live rows BLOCKED with reason (`.176` connection-refused; no fallback provider — the 6F4 guard is active). Transcripts: `build/acceptance_outputs/summary-v40-default.txt` + `sweep-v40-default.run.log`. **Acceptance form** (`SWEEP_ENDPOINT_STUB=1`, 102F10's method): **zero BLOCKED** — 9/9 endpoint-gated rows green **with a run behind each**, per-row exception list printed (5 rows carry no model clause at all; 4 keep a named residual). Transcripts: `summary-v40-stub.txt` + `sweep-v40-stub.run.log`. |
+| `uv run pytest -q` → exit 0 | **821 passed, 5 skipped** (57.5s). |
+| `uv run codemonkey --version` matches the tag | `codemonkey 4.0.0`; tag `v4.0.0` on this commit. |
+| Register: every row PROVEN-LIVE / UNIT-ONLY-with-reason / DEAD; no UNVALIDATED | 68 rows / 68 modules · 61 PROVEN-LIVE · 7 UNIT-ONLY · 0 UNVALIDATED — completeness is a control, break-verified. |
+| Every loop-38..44 row carries LOCAL / PUBLISHED / GAP + cost (R-G / R-F) | **NEW this cycle:** the register's R-G / R-F annotation table — 13 rows, the set DERIVED from git (first commit descending from the R38 boundary `2575515`, pinned to `v4.0.0` once it exists), re-derivable with `build/register_audit.py --triples`. Control break-verified on three branches (missing row / extra row / empty cell): `build/probes/loop45final-annotation-breaks.out`. |
+| Evidence pack from a real run verifies in a separate process with the model endpoint OFF | Re-run at this close: **`PACK VERIFIES`** with `CODEMONKEY_BASE_URL` on a dead port and a nonexistent model; tampered → exit 1, `internal: BROKEN`. Transcript: `build/probes/loop45final-evidence-endpoint-off.out`. |
+| THREAT_MODEL.md refreshed | Budgets + evidence-packs sections added; title now v4.0; "Operator guidance" gained the three operational rules; a truncated sentence the document shipped with is completed. |
+| Report committed | this section. |
+
+## The v4.0 exception list — NAMED per row (12 rows)
+
+No row is waived as a class, and a blanket "endpoint down" waiver is not an
+exception list. v2.0 and v3.0 shipped under the same "individually justified
+exception list" clause (`plan.md:1361`, `:1542`) — this is that precedent,
+restored at both v4.0 gate sites by 102F9, not a loosening. Every row is one
+clause with what would close it:
+
+**Four model-clause residuals** (spec rows whose endpoint-gated parts were
+retired with runs through the scripted endpoint — `sweep-classification.md`):
+1. **A4** — a live `/v1/models` listing from the configured box's own server. Closes: endpoint up, re-run A4 with no stub.
+2. **A5** — a real model obeying a one-word instruction. Closes: endpoint up, live A5.
+3. **A9** — a real 27B *choosing* the shell tool from a natural instruction. Closes: endpoint up, live A9.
+4. **A16** — review prose written by a real model. Closes: endpoint up, live A16.
+
+**Loop 42's three unmeasured rows:**
+5. **L1/L2/L3 ladder numbers on the 27B.** Closes: endpoint up, a ladder run with the numbers committed.
+6. **Segmentation ON vs OFF arms** (pass rate + malformed rate). Closes: endpoint up, both arms over the same suite.
+7. **The ceiling term itself.** Closes: only once 5 and 6 exist.
+
+**Loop 43's five advisory §3 clauses** (`contract.md` §3 is ADVISORY-UNTIL-PROBED; the closing condition is written at its heading — a conformance probe per clause, run against the released binary):
+8. text-mode stdout purity.
+9. `--output-last-message` contents.
+10. schema-violation exit 1.
+11. resume-continuation.
+12. pre-redaction of journaled command text.
+
+## Ledger repairs and truth fixes at this close
+
+- **Loop 39's BUILD_REPORT section was missing** although `loop39-final`'s
+  verify promised it and the checkbox was ticked: acceptance commit `0cdd65d`
+  contains only BUILD_LOG/plan/features (`git show --stat`). Reconstructed
+  above from the committed records; the tick stands — the acceptance ran, the
+  document went missing.
+- The register's **three pre-existing controls** (no-UNVALIDATED, row-status,
+  no-stale-name) were re-break-verified at this close:
+  `build/probes/loop45final-register-controls2.out`.
+- `features.html`'s known-limitations list still carried two claims that had
+  gone stale (loop 38 "in progress"; the register "has never existed") — both
+  corrected in this commit.
+
+## v4.0 in one line
+
+Budgets enforce, packs verify with the endpoint off, the contract is binding
+exactly where it has controls and says where it does not, and every claim
+above names its evidence: **codemonkey 4.0.0**, suite 821/5, tag `v4.0.0`,
+git range `2575515` → this commit. **Gate 5 (user acceptance) is now the only
+standing decision.**

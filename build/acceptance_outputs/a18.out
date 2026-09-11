@@ -49,6 +49,9 @@
 │ models         List models exposed by a provider endpoint.                   │
 │ sessions       List persisted sessions (thread id, updated time, first       │
 │                prompt).                                                      │
+│ evidence       Evidence pack (loop45, cycle 105): a run's claims bound to    │
+│                the journal                                                   │
+│                records behind them, hash-chained so edits fail verification. │
 │ branch         Worktree branches in .branches/.                              │
 │ journal        Execution-journal forensics.                                  │
 │ jobs           Durable, resumable job files.                                 │

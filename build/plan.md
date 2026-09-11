@@ -2614,12 +2614,40 @@ appended by its own research cycle, with loops 42-45 closed in parallel.
   passed. **This is 102F8's defect class in a second document** — a claim with
   no control behind it — found by asking the same question of a different file.
   Suite 816 → **820 passed, 5 skipped**.
-- [ ] CYCLE loop45-final — v4.0 closing acceptance: sweep zero BLOCKED **or
+- [x] CYCLE loop45-final — v4.0 closing acceptance: sweep zero BLOCKED **or
   an individually justified exception list** (GATE CORRECTION 2026-09-10 —
   clause restored, see :1727; each waived row named with reason + what would
   close it), suite green, version matches tag, THREAT_MODEL refreshed, report
   committed, tag v4.0, Gate 5 handoff. ENTRY: loops 38–44 closed,
   no critic finding above LOW.
+  **DONE 2026-09-10.** Version **4.0.0** in `pyproject.toml:3` +
+  `src/codemonkey/__init__.py:3`; `codemonkey --version` → `codemonkey 4.0.0`;
+  tag `v4.0.0` on the close commit. **Sweep, both honest forms:** shipped form
+  → 11 rows exit 0, nine live rows BLOCKED with reason (`.176`
+  connection-refused, re-probed literally; no fallback configured — the 6F4
+  guard is active); acceptance form (`SWEEP_ENDPOINT_STUB=1`) → **zero
+  BLOCKED**, 9/9 endpoint-gated rows green with a run behind each, the per-row
+  exception list printed. Transcripts:
+  `build/acceptance_outputs/summary-v40-{default,stub}.txt`. **The v4.0
+  exception list — 12 rows, named** (a blanket "endpoint down" waiver is not
+  an exception list): the four model-clause residuals (A4, A5, A9, A16 — close
+  with the endpoint up and that row re-run live); loop 42's three unmeasured
+  rows (L1–L3 ladder numbers on the 27B; segmentation ON/OFF arms; the ceiling
+  term — close with an endpoint, numbers committed); loop 43's five advisory
+  §3 clauses (text-mode stdout purity, `--output-last-message` contents,
+  schema-violation exit 1, resume-continuation, pre-redaction — each closes
+  with a conformance probe per clause against the binary). Suite **821 passed
+  / 5 skipped** (standalone + both sweep A15s). Register R-G/R-F annotation
+  table added (13 rows; set derived from git, not hand-picked; control
+  break-verified on all three branches —
+  `build/probes/loop45final-annotation-breaks.out`; the register's three
+  pre-existing controls re-break-verified —
+  `build/probes/loop45final-register-controls2.out`). THREAT_MODEL refreshed
+  (budgets + evidence packs; title now v4.0). Loop-39 BUILD_REPORT section
+  reconstructed (`0cdd65d` owed it; `git show --stat` proves it was missing).
+  Endpoint-off pack verification re-run green
+  (`build/probes/loop45final-evidence-endpoint-off.out`). Gate 5 handoff in
+  `build/BUILD_REPORT.md`.
 
 ### loop40: cycles (selected from build/research-loop40.md, cycle R40)
 

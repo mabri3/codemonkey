@@ -21,6 +21,7 @@
 <body>
 <h1>codemonkey</h1>
 <p class="accepted"><strong>✅ GATE 2: ACCEPTED</strong> — formally approved by the operator, 2026-09-03. All 37 charters closed, v3.0.0 released.</p>
+<p class="accepted"><strong>✅ v4.0.0 RELEASED</strong> — loops 38&ndash;45 shipped (utility arc): enforced autonomy budgets, evidence packs with a hash-chained journal verified with the endpoint OFF, a published caller contract (binding where it has controls; advisory where it does not), honest sweep classification, and the capability register under live controls. Tagged 2026-09-10; suite <strong>821 passed / 5 skipped</strong>. <strong>Gate 5 (user acceptance) requested</strong> — the evidence record incl. the 12-row, per-row-named exception list is in <code>build/BUILD_REPORT.md</code>.</p>
 <p>A scriptable coding-agent CLI (Python 3.11, uv, Typer, httpx) for
 OpenAI-style <em>and</em> Anthropic-style endpoints, defaulting to the local
 llama.cpp server (<code>http://192.168.50.176:8080/v1</code>,
@@ -116,7 +117,7 @@ llama.cpp server (<code>http://192.168.50.176:8080/v1</code>,
 uv run codemonkey --version
 uv run codemonkey config          # effective merged config (secrets masked)
 uv run codemonkey models          # list models from the active provider
-uv run pytest -q                  # unit suite (360 tests, no network)
+uv run pytest -q                  # unit suite (821 tests, no network)
 uv run codemonkey exec "your prompt"          # non-interactive exec (text mode)
 uv run codemonkey exec --json "your prompt"   # JSONL event stream on stdout
 uv run codemonkey exec --output-schema s.json -o out.json "..."  # validated structured output
@@ -130,8 +131,8 @@ uv run codemonkey journal list    # execution-journal threads (now written by re
 
 <h2>Known limitations</h2>
 <ul>
-  <li><strong>(loop 38 in progress) Seven of the ten loop-28&ndash;36 capability modules were not reachable from any entry point</strong> (closing-critic finding F7, <code>build/critic-r37.md</code>): <code>graphquery</code>, <code>certify</code>, <code>branches</code>, <code>bestofn</code>, <code>rubrics</code>, <code>adaptivemem</code> and <code>learnedctx</code> are written and unit-tested but imported by no source file, so they cannot affect a real run &mdash; there is no <code>graph_*</code> tool in the agent's tool set, <code>eval</code> prints no certificate, and no <code>--best-of</code> flag exists. Their loop-28&ndash;36 verify probes were written against unit tests rather than entry points. Proposed CYCLE R38 wires or deletes each one; until then, read the v3.0.0 capability list above as <em>libraries built</em>, not <em>features shipped</em>.</li>
-  <li><code>build/CAPABILITY_REGISTER.md</code>, referenced by 13 places including R37's own verify probe, has never existed (finding F8). Reconstructing it is part of the proposed R38/R45 work.</li>
+  <li><strong>RESOLVED (loop 38, C74&ndash;C81):</strong> the closing-critic finding F7 (<code>build/critic-r37.md</code>) &mdash; seven of the ten loop-28&ndash;36 capability modules were unreachable from any entry point (<code>graphquery</code>, <code>certify</code>, <code>branches</code>, <code>bestofn</code>, <code>rubrics</code>, <code>adaptivemem</code>, <code>learnedctx</code>) &mdash; is closed: each was wired behind a real entry point (<code>graph_*</code> tools + <code>graph</code> sub-command, <code>eval --early-stop</code> certificate, <code>branch</code> sub-command, <code>exec --best-of</code>, eval rubrics, memory <code>adaptive</code> strategy, context <code>learned</code> strategy), or deleted under R-A. All seven rows carry entry-point evidence in <code>build/CAPABILITY_REGISTER.md</code>.</li>
+  <li><strong>RESOLVED (loop 38, C81; completed C106/C-loop45-final):</strong> <code>build/CAPABILITY_REGISTER.md</code> (finding F8) exists and is under live controls &mdash; 68 rows / 68 modules, no UNVALIDATED row, completeness checked every suite run (<code>tests/test_register.py</code>, break-verified), plus the loops-38&ndash;45 R-G/R-F annotation table (13 rows, derived from git, break-verified).</li>
   <li>Streaming retries cover the response <em>status</em> only: once tokens have been handed to the caller a mid-stream failure propagates rather than replaying the turn.</li>
   <li><code>Retry-After</code> is honored in its delta-seconds form; the HTTP-date form falls back to jittered backoff.</li>
 
@@ -140,12 +141,17 @@ uv run codemonkey journal list    # execution-journal threads (now written by re
 </ul>
 
 <h2>Next planned features</h2>
-<p><strong>Loops 1&ndash;37 are complete</strong> and codemonkey is at
-<strong>v3.0.0</strong>. Suite: <strong>587 passed</strong> after the
-R37F1&ndash;R37F6 closing-critic fix pass. Gate 2 (final user acceptance)
-remains the user's decision; the evidence record is
-<code>build/BUILD_REPORT.md</code> plus <code>build/CAPABILITY_REGISTER.md</code>.</p>
+<p><strong>Loops 1&ndash;45 are complete</strong>; codemonkey is at
+<strong>v4.0.0</strong> (tagged 2026-09-10, suite 821/5). <strong>Gate 5
+(user acceptance of v4.0)</strong> is the user's decision; the evidence record
+&mdash; including the 12-row, per-row-named exception list and the loop-39
+report reconstruction &mdash; is <code>build/BUILD_REPORT.md</code>.</p>
 <ul>
+  <li class="done"><strong>CYCLE loop45-final &mdash; v4.0.0 RELEASED</strong>: version 4.0.0 (<code>--version</code> matches tag <code>v4.0.0</code>); sweep run in both honest forms (shipped: nine live rows BLOCKED with reason; acceptance form via scripted endpoint: <strong>zero BLOCKED</strong>, 9/9 endpoint-gated rows green with a run behind each); exception list named per row (12 rows); endpoint-off pack verification re-run green; THREAT_MODEL refreshed (budgets + evidence packs).</li>
+  <li class="done">CYCLE loop45-final &mdash; register R-G/R-F annotations: 13 rows (set derived from git &mdash; first commit descending from the R38 boundary &mdash; not hand-picked), each carrying LOCAL / PUBLISHED / GAP + cost; control break-verified on three branches (missing / extra / empty-cell row), plus the register's three older controls re-break-verified (UNVALIDATED / no-status / stale-name).</li>
+  <li class="done">CYCLE loop45-final &mdash; ledger repair: loop 39's BUILD_REPORT section reconstructed from the committed records (its acceptance commit <code>0cdd65d</code> owed it); <code>features.html</code>'s two stale known-limitation claims corrected.</li>
+  <li class="todo">Compounding arc <strong>loops 46&ndash;50</strong> &mdash; <em>AUTHORIZED 2026-09-10 (ordering constraint waived)</em>: 46 skill library (quarantined store, admission gate, revocation &mdash; R-J/R-K) &middot; 47 evolving playbook (ACE-style delta curation + the five-surface consolidation verdict) &middot; 48 parallel-distill-refine (the correct form of <code>--best-of</code>) &middot; 49 provenance-gated persistence (full taint propagation) &middot; 50 continual-learning measurement + long-horizon suite + v5.0 acceptance. R46 research is written; R47&ndash;R50 research and the build cycles follow.</li>
+  <li class="todo">The v4.0 exception list closes on the day the endpoint returns: re-run the four spec rows live (A4/A5/A9/A16), the ladder/segmentation arms, and the five advisory <code>contract.md</code> §3 conformance probes.</li>
   <li class="todo">CYCLES R38&ndash;R45 &mdash; <em>proposed 2026-09-04</em>; loop 38 <strong>AUTHORIZED and IN PROGRESS since 2026-09-04</strong> ("build loop 38-45"), 39&ndash;45 pending their turn</li>
   <li class="done">CYCLE 74 (loop 38) &mdash; graph tools live: <code>graph_query</code> / <code>graph_path</code> / <code>graph_explain</code> are now agent tools (read-only, staleness-checked against HEAD, honest when graphify-out/ is missing) and <code>codemonkey graph &lt;symbol&gt; [--to SYM]</code> is a sub-command. Finding F7's <code>graphquery</code> row is cleared, restoring loop 28's premise.</li>
   <li class="done">CYCLE 75 (loop 38) &mdash; strategy domain <code>context</code>: <code>static</code> (default, byte-identical block assembly) | <code>learned</code> (learnedctx fragment selection under <code>CODEMONKEY_CONTEXT_BUDGET</code>); <code>CODEMONKEY_STRATEGY_CONTEXT</code> + A19 <code>config</code> surface. Finding F7's <code>learnedctx</code> row is cleared.</li>

@@ -1,6 +1,6 @@
 {
   "cycle": "102F10",
-  "generated": "2026-09-10T17:42:49Z",
+  "generated": "2026-09-11T03:51:15Z",
   "method": "build/sweep_endpoint_gated.py \u2014 each row run end-to-end through the released binary against build/stub_provider.py, replies conditional on request content",
   "counts": {
     "blocked_rows_classified": 9,
@@ -76,7 +76,7 @@
       "row": "A11",
       "class": "ENDPOINT-GATED",
       "status": "PASS",
-      "detail": "exit=0 thread=840e9b662ec5 out='zebra' (rule fires only if the HISTORY reached the wire)",
+      "detail": "exit=0 thread=d7583635f6b3 out='zebra' (rule fires only if the HISTORY reached the wire)",
       "sweep_mirror": "exec resume",
       "evidence": "build/acceptance_outputs/sweep-A11.log",
       "residual_model_clause": null,

@@ -1,0 +1,14 @@
+# run exit 0, thread '8f8b9635d68f'
+$ codemonkey evidence pack 8f8b9635d68f --out pack.json
+[exit 0] wrote /var/folders/xb/kzc31shn1pz2s_5l2fy6d7rh0000gn/T/cm-evidence-ghyybg30/pack.json (2 records, 0 redactions, head c75cbd66aea75be4…) 
+$ codemonkey evidence verify pack.json
+[exit 0] internal: ok · journal: True · records 2
+PACK VERIFIES 
+$ (tampered record 0) codemonkey evidence verify pack.json
+[exit 1] internal: BROKEN · journal: True · records 2
+PACK DOES NOT VERIFY
+$ (endpoint switched off) codemonkey evidence verify pack-fresh.json
+[exit 0] internal: ok · journal: True · records 2
+PACK VERIFIES
+
+PROBE OK: pack → verify green, tampered pack → RED

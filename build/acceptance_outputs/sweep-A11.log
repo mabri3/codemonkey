@@ -1,21 +1,21 @@
 # CYCLE 102F10 — evidence for row A11 (ENDPOINT-GATED, PASS)
 # binary: /Users/bharris/Programs/CodeMonkey/.venv/bin/codemonkey
 # assertion mirrors acceptance_sweep.sh: 'exec resume'
-# verdict detail: exit=0 thread=840e9b662ec5 out='zebra' (rule fires only if the HISTORY reached the wire)
+# verdict detail: exit=0 thread=d7583635f6b3 out='zebra' (rule fires only if the HISTORY reached the wire)
 
-# scripted endpoint http://127.0.0.1:50050/v1
+# scripted endpoint http://127.0.0.1:60161/v1
 # script: {"model": "stub-model", "turns": ["NO-HISTORY-SENT"], "rules": [{"contains": "zebra", "reply": "zebra"}]}
 
 $ exec --json Remember this codeword: zebra. Reply with ok.
 [exit 0]
 --- stdout ---
-{"type": "thread.started", "thread_id": "840e9b662ec5", "v": 1}
-{"type": "turn.started", "thread_id": "840e9b662ec5", "v": 1}
+{"type": "thread.started", "thread_id": "d7583635f6b3", "v": 1}
+{"type": "turn.started", "thread_id": "d7583635f6b3", "v": 1}
 {"type": "turn.completed", "usage": {}, "v": 1}
-{"type": "item.completed", "thread_id": "840e9b662ec5", "item": {"id": "item_f37e365d", "type": "agent_message", "text": "zebra"}, "v": 1}
+{"type": "item.completed", "thread_id": "d7583635f6b3", "item": {"id": "item_388fd4ae", "type": "agent_message", "text": "zebra"}, "v": 1}
 --- stderr --- (empty)
 
-$ exec resume 840e9b662ec5 What codeword did I ask you to remember?
+$ exec resume d7583635f6b3 What codeword did I ask you to remember?
 [exit 0]
 --- stdout ---
 zebra
@@ -27,6 +27,175 @@ zebra[agent] zebra
 $ sessions
 [exit 0]
 --- stdout ---
+d7583635f6b3  2026-09-10 20:51  local/stub-model  4 msgs  Remember this codeword: zebra. Reply with ok.
+beecfaf01da8  2026-09-10 20:50  local/  0 msgs  
+e0938909a820  2026-09-10 20:50  local/  2 msgs  Reply with exactly the word pong and nothing else.
+ac3c70662a5e  2026-09-10 20:50  local/  2 msgs  hi
+96a171b88d16  2026-09-10 20:50  local/  2 msgs  some context  the question
+29c06ec2896a  2026-09-10 20:50  local/  2 msgs  Reply with exactly: banana
+7dbc7e2a2ec4  2026-09-10 20:50  local/  2 msgs  Reply with exactly the word pong and nothing else.
+c82bb634d977  2026-09-10 20:50  local/  2 msgs  Reply with exactly the word pong and nothing else.
+82c17cb93a9d  2026-09-10 20:50  local/  2 msgs  Reply with exactly the word pong and nothing else.
+a8e1dd473671  2026-09-10 20:50  local/  2 msgs  Reply with exactly the word pong and nothing else.
+91ca45c9c0ce  2026-09-10 20:50  local/stub-model  2 msgs  Reply with the single word: ok
+983c30526c2a  2026-09-10 20:50  local/stub-model  2 msgs  Reply with the single word: ok
+6ace40fc94a3  2026-09-10 20:50  local/stub-model  2 msgs  Reply with the single word: ok
+11dfb49ccc52  2026-09-10 20:50  local/stub-model  2 msgs  Reply with the single word: ok
+345d9e93c956  2026-09-10 20:50  local/unsloth/Qwen3.8-27B-GGUF  0 msgs  
+2b12e56af7ef  2026-09-10 20:50  local/unsloth/Qwen3.8-27B-GGUF  0 msgs  
+4e44ce03ef5c  2026-09-10 20:49  local/unsloth/Qwen3.8-27B-GGUF  0 msgs  
+7f8e42d91393  2026-09-10 20:45  local/  0 msgs  
+d7dc3dc493ca  2026-09-10 20:45  local/  2 msgs  Reply with exactly the word pong and nothing else.
+3ec2d741e021  2026-09-10 20:45  local/  2 msgs  hi
+ff065c1896e2  2026-09-10 20:45  local/  2 msgs  some context  the question
+e02f0526feca  2026-09-10 20:45  local/  2 msgs  Reply with exactly: banana
+919e64aea738  2026-09-10 20:45  local/  2 msgs  Reply with exactly the word pong and nothing else.
+ea096113c397  2026-09-10 20:45  local/  2 msgs  Reply with exactly the word pong and nothing else.
+271238a5c94e  2026-09-10 20:45  local/  2 msgs  Reply with exactly the word pong and nothing else.
+33b9087f7c25  2026-09-10 20:45  local/  2 msgs  Reply with exactly the word pong and nothing else.
+1df848dba8c5  2026-09-10 20:45  local/stub-model  2 msgs  Reply with the single word: ok
+db38691d5c61  2026-09-10 20:45  local/stub-model  2 msgs  Reply with the single word: ok
+709aef2fa3df  2026-09-10 20:45  local/stub-model  2 msgs  Reply with the single word: ok
+d5fb7787bb9d  2026-09-10 20:45  local/stub-model  2 msgs  Reply with the single word: ok
+f8381fa9a535  2026-09-10 20:45  local/unsloth/Qwen3.8-27B-GGUF  0 msgs  
+d6d2c2c32c6b  2026-09-10 20:45  local/unsloth/Qwen3.8-27B-GGUF  0 msgs  
+d7c8ee182e86  2026-09-10 20:45  local/unsloth/Qwen3.8-27B-GGUF  0 msgs  
+39386dd0e108  2026-09-10 18:44  local/unsloth/Qwen3.8-27B-GGUF  0 msgs  
+1a2c592c221e  2026-09-10 18:44  local/unsloth/Qwen3.8-27B-GGUF  0 msgs  
+21a261b41c1b  2026-09-10 18:44  local/unsloth/Qwen3.8-27B-GGUF  0 msgs  
+3ac42876f189  2026-09-10 17:37  local/  0 msgs  
+e09e8b8ce723  2026-09-10 17:37  local/  2 msgs  Reply with exactly the word pong and nothing else.
+96066e1eeb10  2026-09-10 17:37  local/  2 msgs  hi
+9b92548508de  2026-09-10 17:37  local/  2 msgs  some context  the question
+3c11f426c7ea  2026-09-10 17:37  local/  2 msgs  Reply with exactly: banana
+8c136bf8a09c  2026-09-10 17:37  local/  2 msgs  Reply with exactly the word pong and nothing else.
+9bc7825c0b0c  2026-09-10 17:37  local/  2 msgs  Reply with exactly the word pong and nothing else.
+d35e80d953cb  2026-09-10 17:37  local/  2 msgs  Reply with exactly the word pong and nothing else.
+7064807af322  2026-09-10 17:37  local/  2 msgs  Reply with exactly the word pong and nothing else.
+d7212cfc3438  2026-09-10 17:36  local/stub-model  2 msgs  Reply with the single word: ok
+20ec78f088da  2026-09-10 17:36  local/stub-model  2 msgs  Reply with the single word: ok
+7760666ed2c4  2026-09-10 17:36  local/stub-model  2 msgs  Reply with the single word: ok
+1863ef5ba752  2026-09-10 17:36  local/stub-model  2 msgs  Reply with the single word: ok
+d447a1eca52e  2026-09-10 17:36  local/unsloth/Qwen3.8-27B-GGUF  0 msgs  
+52e8bde99d8f  2026-09-10 17:36  local/unsloth/Qwen3.8-27B-GGUF  0 msgs  
+9f1184bfb28a  2026-09-10 17:36  local/unsloth/Qwen3.8-27B-GGUF  0 msgs  
+92324a03f34e  2026-09-10 17:33  local/  0 msgs  
+b9ad444260ce  2026-09-10 17:33  local/  2 msgs  Reply with exactly the word pong and nothing else.
+4b9698c2dbe2  2026-09-10 17:33  local/  2 msgs  hi
+3b13a5ad2765  2026-09-10 17:33  local/  2 msgs  some context  the question
+99a9b0b2cc7e  2026-09-10 17:33  local/  2 msgs  Reply with exactly: banana
+a1218a39b2d6  2026-09-10 17:33  local/  2 msgs  Reply with exactly the word pong and nothing else.
+2083ae9da8a0  2026-09-10 17:33  local/  2 msgs  Reply with exactly the word pong and nothing else.
+75a44455d5a7  2026-09-10 17:33  local/  2 msgs  Reply with exactly the word pong and nothing else.
+55499808d0ba  2026-09-10 17:33  local/  2 msgs  Reply with exactly the word pong and nothing else.
+2be71e98d683  2026-09-10 17:33  local/stub-model  2 msgs  Reply with the single word: ok
+8b501290a76d  2026-09-10 17:33  local/stub-model  2 msgs  Reply with the single word: ok
+343eb3d4b2d4  2026-09-10 17:33  local/stub-model  2 msgs  Reply with the single word: ok
+c1c40c8d958d  2026-09-10 17:33  local/stub-model  2 msgs  Reply with the single word: ok
+c6dfdc738583  2026-09-10 17:33  local/unsloth/Qwen3.8-27B-GGUF  0 msgs  
+afbe20592746  2026-09-10 17:33  local/unsloth/Qwen3.8-27B-GGUF  0 msgs  
+d423d5aeb06e  2026-09-10 17:33  local/unsloth/Qwen3.8-27B-GGUF  0 msgs  
+309532343805  2026-09-10 17:33  local/stub-model  2 msgs  Reply with the single word: ok
+8b469bc3d9e1  2026-09-10 17:33  local/stub-model  2 msgs  Reply with the single word: ok
+56a96bbed33a  2026-09-10 17:32  local/stub-model  2 msgs  Reply with the single word: ok
+211a4da924f0  2026-09-10 17:32  local/stub-model  2 msgs  Reply with the single word: ok
+40e3822da8fa  2026-09-10 17:32  local/unsloth/Qwen3.8-27B-GGUF  0 msgs  
+df574d318b3d  2026-09-10 17:32  local/unsloth/Qwen3.8-27B-GGUF  0 msgs  
+847f94f6634b  2026-09-10 17:32  local/unsloth/Qwen3.8-27B-GGUF  0 msgs  
+8956e44a42c4  2026-09-10 17:32  local/stub-model  2 msgs  Reply with the single word: ok
+c79697d53d04  2026-09-10 17:32  local/stub-model  2 msgs  Reply with the single word: ok
+b2144d598b03  2026-09-10 17:31  local/unsloth/Qwen3.8-27B-GGUF  0 msgs  
+e89d5c03a1b2  2026-09-10 17:31  local/unsloth/Qwen3.8-27B-GGUF  0 msgs  
+a114df08528b  2026-09-10 17:31  local/unsloth/Qwen3.8-27B-GGUF  0 msgs  
+da5b68e17757  2026-09-10 17:31  local/stub-model  2 msgs  Reply with the single word: ok
+b6c00e494816  2026-09-10 17:26  local/unsloth/Qwen3.8-27B-GGUF  0 msgs  
+4e7d261c43b7  2026-09-10 17:26  local/unsloth/Qwen3.8-27B-GGUF  0 msgs  
+13aa9ba2986d  2026-09-10 17:26  local/unsloth/Qwen3.8-27B-GGUF  0 msgs  
+53714b908ef3  2026-09-10 10:58  local/  0 msgs  
+2432d31d132f  2026-09-10 10:58  local/  2 msgs  Reply with exactly the word pong and nothing else.
+8ed6be2b4c0b  2026-09-10 10:58  local/  2 msgs  hi
+6dae15b5bc7e  2026-09-10 10:58  local/  2 msgs  some context  the question
+ee59ffddd7a5  2026-09-10 10:58  local/  2 msgs  Reply with exactly: banana
+25b76e0caf2a  2026-09-10 10:58  local/  2 msgs  Reply with exactly the word pong and nothing else.
+9bcd2bff01bf  2026-09-10 10:58  local/  2 msgs  Reply with exactly the word pong and nothing else.
+b1313f30c4a0  2026-09-10 10:58  local/  2 msgs  Reply with exactly the word pong and nothing else.
+ebe18db4a8c3  2026-09-10 10:58  local/  2 msgs  Reply with exactly the word pong and nothing else.
+6a4b3e559312  2026-09-10 10:58  local/stub-model  2 msgs  Reply with the single word: ok
+8311d3f81001  2026-09-10 10:58  local/stub-model  2 msgs  Reply with the single word: ok
+5d9db979b07a  2026-09-10 10:58  local/stub-model  2 msgs  Reply with the single word: ok
+b868ce98f15a  2026-09-10 10:58  local/stub-model  2 msgs  Reply with the single word: ok
+5d23f4c7c6f3  2026-09-10 10:58  local/unsloth/Qwen3.8-27B-GGUF  0 msgs  
+aa16a4d1806d  2026-09-10 10:58  local/unsloth/Qwen3.8-27B-GGUF  0 msgs  
+3ce20f5fdd04  2026-09-10 10:58  local/unsloth/Qwen3.8-27B-GGUF  0 msgs  
+5976056c0ee7  2026-09-10 10:54  local/  0 msgs  
+0dbe0d068fa3  2026-09-10 10:54  local/  2 msgs  Reply with exactly the word pong and nothing else.
+182e8eec3179  2026-09-10 10:54  local/  2 msgs  hi
+4e0eb73cb650  2026-09-10 10:54  local/  2 msgs  some context  the question
+94020282bac7  2026-09-10 10:54  local/  2 msgs  Reply with exactly: banana
+1617ee44c554  2026-09-10 10:54  local/  2 msgs  Reply with exactly the word pong and nothing else.
+bd108be8201d  2026-09-10 10:54  local/  2 msgs  Reply with exactly the word pong and nothing else.
+ca3918553900  2026-09-10 10:54  local/  2 msgs  Reply with exactly the word pong and nothing else.
+90701da790f8  2026-09-10 10:54  local/  2 msgs  Reply with exactly the word pong and nothing else.
+69aa15877091  2026-09-10 10:54  local/stub-model  2 msgs  Reply with the single word: ok
+ecbdda3ac8a2  2026-09-10 10:54  local/stub-model  2 msgs  Reply with the single word: ok
+10d6b07d6be9  2026-09-10 10:54  local/stub-model  2 msgs  Reply with the single word: ok
+a476540340c5  2026-09-10 10:54  local/stub-model  2 msgs  Reply with the single word: ok
+1b83d1055e75  2026-09-10 10:53  local/unsloth/Qwen3.8-27B-GGUF  0 msgs  
+6b8724e97749  2026-09-10 10:53  local/unsloth/Qwen3.8-27B-GGUF  0 msgs  
+2efa8a92cbbf  2026-09-10 10:53  local/unsloth/Qwen3.8-27B-GGUF  0 msgs  
+419024a31d6c  2026-09-10 10:53  local/stub-model  2 msgs  Reply with the single word: ok
+f71587053ac0  2026-09-10 10:53  local/stub-model  2 msgs  Reply with the single word: ok
+c33808baa2d8  2026-09-10 10:47  local/  0 msgs  
+e16b1bf9a02f  2026-09-10 10:47  local/  2 msgs  Reply with exactly the word pong and nothing else.
+baac391aae51  2026-09-10 10:47  local/  2 msgs  hi
+4367d7050f2b  2026-09-10 10:47  local/  2 msgs  some context  the question
+19b1fffb2c92  2026-09-10 10:47  local/  2 msgs  Reply with exactly: banana
+afa3b2c1b19b  2026-09-10 10:47  local/  2 msgs  Reply with exactly the word pong and nothing else.
+02b1cd190c31  2026-09-10 10:47  local/  2 msgs  Reply with exactly the word pong and nothing else.
+691534c7d302  2026-09-10 10:47  local/  2 msgs  Reply with exactly the word pong and nothing else.
+3065521f6dc7  2026-09-10 10:47  local/  2 msgs  Reply with exactly the word pong and nothing else.
+7c327eab44d8  2026-09-10 10:47  local/stub-model  2 msgs  Reply with the single word: ok
+06a166e1eed4  2026-09-10 10:47  local/stub-model  2 msgs  Reply with the single word: ok
+8c2c2222a9fd  2026-09-10 10:47  local/stub-model  2 msgs  Reply with the single word: ok
+8dafb8434d08  2026-09-10 10:47  local/stub-model  2 msgs  Reply with the single word: ok
+9412c36ba592  2026-09-10 10:47  local/unsloth/Qwen3.8-27B-GGUF  0 msgs  
+1c2c2e88325f  2026-09-10 10:47  local/unsloth/Qwen3.8-27B-GGUF  0 msgs  
+3f17d3f7faae  2026-09-10 10:47  local/unsloth/Qwen3.8-27B-GGUF  0 msgs  
+b43855a04586  2026-09-10 10:46  local/  0 msgs  
+f2975c469ccc  2026-09-10 10:46  local/  2 msgs  Reply with exactly the word pong and nothing else.
+180d6343f747  2026-09-10 10:46  local/  2 msgs  hi
+25ba4461d02e  2026-09-10 10:46  local/  2 msgs  some context  the question
+1bd11ad77f0c  2026-09-10 10:46  local/  2 msgs  Reply with exactly: banana
+13b0bf045e00  2026-09-10 10:46  local/  2 msgs  Reply with exactly the word pong and nothing else.
+140fee4dc271  2026-09-10 10:46  local/  2 msgs  Reply with exactly the word pong and nothing else.
+0070c74e6a50  2026-09-10 10:46  local/  2 msgs  Reply with exactly the word pong and nothing else.
+4076da86267a  2026-09-10 10:46  local/  2 msgs  Reply with exactly the word pong and nothing else.
+986baeb2d9d4  2026-09-10 10:46  local/stub-model  2 msgs  Reply with the single word: ok
+f1bcf6e651ae  2026-09-10 10:46  local/stub-model  2 msgs  Reply with the single word: ok
+ea40d1f795de  2026-09-10 10:46  local/stub-model  2 msgs  Reply with the single word: ok
+88a4b792ee1c  2026-09-10 10:46  local/stub-model  2 msgs  Reply with the single word: ok
+a1fbca83b0be  2026-09-10 10:46  local/unsloth/Qwen3.8-27B-GGUF  0 msgs  
+386beefe5326  2026-09-10 10:46  local/unsloth/Qwen3.8-27B-GGUF  0 msgs  
+f670fa7ff33f  2026-09-10 10:45  local/unsloth/Qwen3.8-27B-GGUF  0 msgs  
+ad59c61a3d54  2026-09-10 10:45  local/stub-model  2 msgs  Reply with the single word: ok
+6c17a1150e84  2026-09-10 10:45  local/stub-model  2 msgs  Reply with the single word: ok
+5c54e86b151e  2026-09-10 10:43  local/  0 msgs  
+bfbfeb3b0b2e  2026-09-10 10:43  local/  2 msgs  Reply with exactly the word pong and nothing else.
+f88fe05f328e  2026-09-10 10:43  local/  2 msgs  hi
+1e2631c949fa  2026-09-10 10:43  local/  2 msgs  some context  the question
+6303d13f91ed  2026-09-10 10:43  local/  2 msgs  Reply with exactly: banana
+9462fa03fb74  2026-09-10 10:43  local/  2 msgs  Reply with exactly the word pong and nothing else.
+d97389fb8e1a  2026-09-10 10:43  local/  2 msgs  Reply with exactly the word pong and nothing else.
+e788ea661cc3  2026-09-10 10:43  local/  2 msgs  Reply with exactly the word pong and nothing else.
+e6d5c742a704  2026-09-10 10:43  local/  2 msgs  Reply with exactly the word pong and nothing else.
+0eec8036345c  2026-09-10 10:43  local/unsloth/Qwen3.8-27B-GGUF  0 msgs  
+3b7586c4b2ac  2026-09-10 10:43  local/unsloth/Qwen3.8-27B-GGUF  0 msgs  
+a944d1e4e3a4  2026-09-10 10:43  local/unsloth/Qwen3.8-27B-GGUF  0 msgs  
+55e420f8177a  2026-09-10 10:42  local/stub-model  2 msgs  Fill the schema for a repository named codemonkey whose lang
+d18f03fef127  2026-09-10 10:42  local/stub-model  4 msgs  Use the shell tool to run: echo codemonkey_tool_test. Then r
+b2ee6f027350  2026-09-10 10:42  local/stub-model  2 msgs  Reply with exactly the word banana and nothing else.
+0a95ba3cf627  2026-09-10 10:42  local/stub-model  2 msgs  Reply with exactly the word pong and nothing else.
+6eba3e8b2f6b  2026-09-10 10:42  local/stub-model  2 msgs  Reply with exactly the word pong and nothing else.
 840e9b662ec5  2026-09-10 10:42  local/stub-model  4 msgs  Remember this codeword: zebra. Reply with ok.
 c81f6c848ffc  2026-09-10 10:42  local/stub-model  2 msgs  Fill the schema for a repository named codemonkey whose lang
 001a55ab4843  2026-09-10 10:42  local/stub-model  4 msgs  Use the shell tool to run: echo codemonkey_tool_test. Then r

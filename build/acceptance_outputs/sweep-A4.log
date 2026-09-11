@@ -3,7 +3,7 @@
 # assertion mirrors acceptance_sweep.sh: 'codemonkey models --provider local'
 # verdict detail: exit=0 listing='stub-model'
 
-# scripted endpoint http://127.0.0.1:50055/v1
+# scripted endpoint http://127.0.0.1:60167/v1
 # script: {"model": "stub-model", "turns": ["stub-model"], "rules": []}
 
 $ models --provider local

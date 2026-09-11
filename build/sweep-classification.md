@@ -1,6 +1,6 @@
 # Sweep classification — endpoint-gated vs model-gated (102F10)
 
-Generated 2026-09-10T17:42:49Z by `build/sweep_endpoint_gated.py — each row run end-to-end through the released binary against build/stub_provider.py, replies conditional on request content`.
+Generated 2026-09-11T03:51:15Z by `build/sweep_endpoint_gated.py — each row run end-to-end through the released binary against build/stub_provider.py, replies conditional on request content`.
 
 `build/acceptance_sweep.sh` reports one BLOCKED verdict for nine rows when no endpoint answers. That verdict conflates two different blockers, and only one of them is a reason to waive a row at v4.0.
 
@@ -22,7 +22,7 @@ Generated 2026-09-10T17:42:49Z by `build/sweep_endpoint_gated.py — each row ru
 | A7 | ENDPOINT-GATED | PASS | exit=0 out='banana' (rule fires only if stdin reached the wire) |
 | A9 | ENDPOINT-GATED | PASS | exit=0 stdout-has-sentinel=True stderr-has-command=True stderr-has-exit0=True |
 | A10 | ENDPOINT-GATED | PASS | exit=0 payload={'project_name': 'codemonkey', 'programming_languages': ['Python']} (rule fires only if the schema reached the wire) |
-| A11 | ENDPOINT-GATED | PASS | exit=0 thread=840e9b662ec5 out='zebra' (rule fires only if the HISTORY reached the wire) |
+| A11 | ENDPOINT-GATED | PASS | exit=0 thread=d7583635f6b3 out='zebra' (rule fires only if the HISTORY reached the wire) |
 | A12 | ENDPOINT-GATED | PASS | exit=0 thread-in-listing=True |
 | A16 | ENDPOINT-GATED | PASS | exit=0 chars=1110 (rule fires only if the DIFF content reached the wire) |
 

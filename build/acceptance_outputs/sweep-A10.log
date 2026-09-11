@@ -3,7 +3,7 @@
 # assertion mirrors acceptance_sweep.sh: '--output-schema build/schema-repo.json'
 # verdict detail: exit=0 payload={'project_name': 'codemonkey', 'programming_languages': ['Python']} (rule fires only if the schema reached the wire)
 
-# scripted endpoint http://127.0.0.1:50076/v1
+# scripted endpoint http://127.0.0.1:60189/v1
 # script: {"model": "stub-model", "turns": ["NO-SCHEMA-IN-PROMPT"], "rules": [{"contains": "project_name", "reply": "{\"project_name\": \"codemonkey\", \"programming_languages\": [\"Python\"]}"}]}
 
 $ exec --output-schema build/schema-repo.json --output-last-message /tmp/cm-repo.json Fill the schema for a repository named codemonkey whose languages are Python.

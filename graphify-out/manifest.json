@@ -1,13 +1,13 @@
 {
   "pyproject.toml": {
-    "mtime": 1788505427.9913855,
-    "ast_hash": "376c424dad6cb97f0fef0f96ccca3ccf",
-    "semantic_hash": "376c424dad6cb97f0fef0f96ccca3ccf"
+    "mtime": 1789098305.198473,
+    "ast_hash": "29237a011e7d04409c72a8ad98ae01a8",
+    "semantic_hash": "29237a011e7d04409c72a8ad98ae01a8"
   },
   "src/codemonkey/__init__.py": {
-    "mtime": 1788505427.9908433,
-    "ast_hash": "a883c1134d00d4da68ef6f01e1bff41a",
-    "semantic_hash": "a883c1134d00d4da68ef6f01e1bff41a"
+    "mtime": 1789098305.2074654,
+    "ast_hash": "dba4ebf8538ea34758d724b93730d4a2",
+    "semantic_hash": "dba4ebf8538ea34758d724b93730d4a2"
   },
   "src/codemonkey/approvals.py": {
     "mtime": 1788503992.5351481,
@@ -1020,8 +1020,8 @@
     "semantic_hash": "5607763bbd5fd2623dafdda6ab1e4ab3"
   },
   "tests/test_register.py": {
-    "mtime": 1789086951.5929878,
-    "ast_hash": "5efd518d9fc5cbf59710462397df6247",
-    "semantic_hash": "5efd518d9fc5cbf59710462397df6247"
+    "mtime": 1789098474.6009061,
+    "ast_hash": "c0905edf984ae603f5d08e877f56249b",
+    "semantic_hash": "c0905edf984ae603f5d08e877f56249b"
   }
 }

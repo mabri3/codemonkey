@@ -3,7 +3,7 @@
 # assertion mirrors acceptance_sweep.sh: 'echo codemonkey_tool_test'
 # verdict detail: exit=0 stdout-has-sentinel=True stderr-has-command=True stderr-has-exit0=True
 
-# scripted endpoint http://127.0.0.1:50071/v1
+# scripted endpoint http://127.0.0.1:60184/v1
 # script: {"model": "stub-model", "turns": ["codemonkey_tool_test"], "rules": [{"contains": "codemonkey_tool_test", "reply": "TOOL_CALL: {\"name\": \"shell\", \"arguments\": {\"command\": \"echo codemonkey_tool_test\"}}", "once": true}]}
 
 $ exec --sandbox workspace-write --approval never Use the shell tool to run: echo codemonkey_tool_test. Then reply with exactly the command output.

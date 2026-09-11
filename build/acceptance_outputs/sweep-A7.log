@@ -3,7 +3,7 @@
 # assertion mirrors acceptance_sweep.sh: 'uv run codemonkey exec -'
 # verdict detail: exit=0 out='banana' (rule fires only if stdin reached the wire)
 
-# scripted endpoint http://127.0.0.1:50067/v1
+# scripted endpoint http://127.0.0.1:60180/v1
 # script: {"model": "stub-model", "turns": ["NO-STDIN-PROMPT"], "rules": [{"contains": "banana", "reply": "banana"}]}
 
 $ exec -

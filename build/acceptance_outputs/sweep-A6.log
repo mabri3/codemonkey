@@ -3,14 +3,14 @@
 # assertion mirrors acceptance_sweep.sh: 'codemonkey exec --json'
 # verdict detail: exit=0 json-lines=4 unparseable=0 types=['item.completed', 'thread.started', 'turn.completed', 'turn.started']
 
-# scripted endpoint http://127.0.0.1:50063/v1
+# scripted endpoint http://127.0.0.1:60175/v1
 # script: {"model": "stub-model", "turns": ["NO-PROMPT-RECEIVED"], "rules": [{"contains": "pong", "reply": "pong"}]}
 
 $ exec --json Reply with exactly the word pong and nothing else.
 [exit 0]
 --- stdout ---
-{"type": "thread.started", "thread_id": "0a95ba3cf627", "v": 1}
-{"type": "turn.started", "thread_id": "0a95ba3cf627", "v": 1}
+{"type": "thread.started", "thread_id": "91bd92498462", "v": 1}
+{"type": "turn.started", "thread_id": "91bd92498462", "v": 1}
 {"type": "turn.completed", "usage": {}, "v": 1}
-{"type": "item.completed", "thread_id": "0a95ba3cf627", "item": {"id": "item_137aaa13", "type": "agent_message", "text": "pong"}, "v": 1}
+{"type": "item.completed", "thread_id": "91bd92498462", "item": {"id": "item_76c51b6f", "type": "agent_message", "text": "pong"}, "v": 1}
 --- stderr --- (empty)

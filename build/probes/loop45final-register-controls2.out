@@ -1,0 +1,18 @@
+baseline sha256: 02601b0ac09864c2e856aefac0aa6eba14602733b2be92f68bb582e5a84ef9ff
+=== BREAK D: 'stuck' row status -> UNVALIDATED ===
+FAILED tests/test_register.py::test_no_row_is_unvalidated - AssertionError: a...
+FAILED tests/test_register.py::test_every_row_carries_a_status - AssertionErr...
+2 failed, 3 passed in 0.11s
+=== BREAK E: 'stuck' row status -> a word that is no status ===
+=========================== short test summary info ============================
+FAILED tests/test_register.py::test_every_row_carries_a_status - AssertionErr...
+1 failed, 4 passed in 0.09s
+=== BREAK F: active row for a module that does not exist ===
+=========================== short test summary info ============================
+FAILED tests/test_register.py::test_no_active_row_names_a_module_that_does_not_exist
+1 failed, 4 passed in 0.09s
+restored sha256: 02601b0ac09864c2e856aefac0aa6eba14602733b2be92f68bb582e5a84ef9ff
+RESTORE OK (hash identical)
+=== final re-run on the restored artifact (must be green) ===
+.....                                                                    [100%]
+5 passed in 0.09s

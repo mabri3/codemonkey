@@ -3375,3 +3375,51 @@ them justifies waiving a row at v4.0.
 - **Tests run:** none new; suite **797 passed, 5 skipped**.
 - **Next step:** C105 — evidence pack + hash-chained journal.
 
+## 2026-09-10 — CYCLE loop45-final: v4.0 closing acceptance
+
+- **Files changed:** `pyproject.toml` + `src/codemonkey/__init__.py` (version
+  **4.0.0**, `uv.lock` refreshed), `THREAT_MODEL.md` (budgets + evidence-packs
+  sections; title now v4.0; truncated sentence completed; three operator
+  rules), `build/CAPABILITY_REGISTER.md` (R-G/R-F annotation table — 13 rows),
+  `build/register_audit.py` (arc-set derivation + `--triples`),
+  `tests/test_register.py` (+1 test: the arc annotation control),
+  `build/probes/loop45final-annotation-breaks.{sh,out}`,
+  `build/probes/loop45final-register-controls2.{sh,out}`,
+  `build/probes/loop45final-evidence-endpoint-off.out`,
+  `build/acceptance_outputs/summary-v40-{default,stub}.txt` + run logs,
+  `build/BUILD_REPORT.md` (v4.0 section + reconstructed loop-39 section),
+  `build/plan.md`, `features.html`.
+- **Probe results (literal, both sweep forms):** shipped form
+  (`bash build/acceptance_sweep.sh`): `A1 exit=0 out=codemonkey 4.0.0`; nine
+  live rows `BLOCKED (home llama.cpp wedged; no fallback provider
+  configured)` — the endpoint was probed literally; offline rows exit 0 incl.
+  `A15 exit=0 821 passed, 5 skipped`. Acceptance form
+  (`SWEEP_ENDPOINT_STUB=1 bash build/acceptance_sweep.sh`): **zero BLOCKED**;
+  printed `classified 9 BLOCKED rows: 9 endpoint-gated -> 9 green with a run
+  behind them (5 with no model clause, 4 with a named residual)` + the
+  four-row stub exception list; `A16 ENDPOINT-GATED PASS` (chars=1110);
+  `A15 821 passed, 5 skipped`.
+- **Endpoint-off pack verification (re-run at close):** `PACK VERIFIES`
+  (exit 0, `internal: ok · journal: True`) with `CODEMONKEY_BASE_URL` on a
+  dead port and a nonexistent model; tampered pack → exit 1, `internal:
+  BROKEN`, `PACK DOES NOT VERIFY`.
+- **Break runs (all against the real artifacts, restores hash-identical):**
+  the new annotation control ×3 branches — delete the `budgets` row → RED
+  naming `['budgets']`; add a row for `lessons` (outside the arc) → RED
+  naming the scope breach; blank `f2p`'s COST cell → RED naming position
+  `[4]`. The register's three pre-existing controls ×3 branches — `stuck`
+  → `UNVALIDATED` → RED; `stuck` → `BROKEN` (no status) → RED; a
+  `ghost_module` active row → RED. Final re-runs green.
+- **Tests run:** `uv run pytest -q` → **821 passed, 5 skipped** (57.6s) —
+  run after the last test edit; both sweep A15s agree (57.5s / 57.5s). New
+  count = 820 + the one annotation-control test.
+- **Ledger repairs:** loop-39's BUILD_REPORT section reconstructed from
+  committed records (its acceptance commit `0cdd65d` never contained it —
+  `git show --stat`); the tick stands, the record now exists. features.html's
+  two stale known-limitation claims corrected.
+- **Known issues:** the 12-row v4.0 exception list (named per row in
+  `build/BUILD_REPORT.md`) — 4 model-clause residuals (A4/A5/A9/A16), loop
+  42's 3 unmeasured rows, loop 43's 5 advisory §3 clauses. No other.
+- **Next step:** Gate 5 handoff delivered; R46 close-out + R47–R50 research,
+  then the loop 46–50 build cycles (authorized 2026-09-10, ordering waived).
+

@@ -1,0 +1,21 @@
+baseline sha256: 02601b0ac09864c2e856aefac0aa6eba14602733b2be92f68bb582e5a84ef9ff
+=== BREAK A: delete the 'budgets' annotation row (missing branch) ===
+/Users/bharris/Programs/CodeMonkey/tests/test_register.py:89: AssertionError: arc modules with no R-G / R-F annotation row: ['budgets'] — every row the loops-38..45 arc added needs LOCAL / PUBLISHED / GAP + cost
+=========================== short test summary info ============================
+FAILED tests/test_register.py::test_loop38_45_rows_carry_local_published_gap_cost
+1 failed, 4 passed in 0.11s
+=== BREAK B: add an annotation row for a module OUTSIDE the arc (extra branch) ===
+/Users/bharris/Programs/CodeMonkey/tests/test_register.py:93: AssertionError: R-G / R-F annotations for modules outside the loops-38..45 arc: ['lessons'] — this table is scoped to the arc; annotating later work here silently widens the claim
+=========================== short test summary info ============================
+FAILED tests/test_register.py::test_loop38_45_rows_carry_local_published_gap_cost
+1 failed, 4 passed in 0.09s
+=== BREAK C: blank the f2p COST cell (incomplete-cell branch) ===
+/Users/bharris/Programs/CodeMonkey/tests/test_register.py:100: AssertionError: f2p: empty R-G/R-F cell(s) at position(s) [4] (LOCAL/PUBLISHED/GAP/COST all required)
+=========================== short test summary info ============================
+FAILED tests/test_register.py::test_loop38_45_rows_carry_local_published_gap_cost
+1 failed, 4 passed in 0.09s
+restored sha256: 02601b0ac09864c2e856aefac0aa6eba14602733b2be92f68bb582e5a84ef9ff
+RESTORE OK (hash identical)
+=== final re-run on the restored artifact (must be green) ===
+.....                                                                    [100%]
+5 passed in 0.08s

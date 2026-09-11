@@ -100,6 +100,39 @@ control. `tests/test_register.py` now fails if a module in
 no longer exists. Deleted modules belong in the deletion-verdict table below,
 not in this one.
 
+## R-G / R-F annotations — the modules the loops 38–45 arc added
+
+The v4.0 acceptance terms (`build/loops-38-45-proposal.md` §R45; `CYCLE
+loop45-final`) require every loop-38..44 row to carry its LOCAL / PUBLISHED /
+GAP triple per R-G and its cost per R-F. The table below is that obligation,
+**13 rows**. The set is DERIVED, not hand-picked: every top-level
+`src/codemonkey/*.py` whose first commit descends from the R38 research
+commit `2575515` (one `git log --diff-filter=A` pass;
+`build/register_audit.py --triples` re-derives it, and
+`tests/test_register.py` fails when a row here is missing, extra, or has an
+empty cell — the release record is checked against the release, not against
+a copy of itself). `stuck.py`'s first commit rides the concurrent GATE-2
+commit `cf37b27` (cycle-89 work); the anomaly is recorded here so the
+derivation is not a mystery. The clause says 38–44; the set runs through
+loop 45's `evidence` because a boundary one module short of the arc's own
+last generation is exactly how coverage claims drift.
+
+| module (first add) | LOCAL | PUBLISHED | GAP | COST (R-F) |
+|---|---|---|---|---|
+| branches_cli (loop38 · C80) | scratch-repo CLI probe: create / list / diff / remove + exit-2 contract (loop38 report) | none — no published counterpart for the CLI surface (worktree isolation itself is standard git) | not applicable — mechanism row; no field rate claimed | local git ops only; no provider calls, no tokens |
+| failclass (loop39 · C88) | `journal show` taxonomy rows on a scripted failing run (register probe) | AgentRx nine-category framing; step repetition 17.14% of 1600+ traces (research-loop39) | 4 classes mapped by rule; the rest honestly unmapped — forced labels refused | journal post-processing; zero provider calls |
+| stuck (loop39 · C89) | conformance `gaveup` stub run → `stuck` event on the wire (released binary) | ignored-result moves 6.2% vs repaired baselines 1.2–4.9% (research-loop39) | deterministic (tool, class)×3 trigger; no local rate claimed | per-turn counter; nudges add ≤1 system message; no extra calls |
+| recovery (loop39 · C90) | conformance `budget` stub run → `failure_report.budget_exhausted` on the wire | 82% of failed trajectories burn remaining budget after lock-in (research-loop39) | would-have-saved figures are emitted per run; no aggregate exists (no endpoint population) | consult + counters per turn; zero extra calls |
+| repro (loop40 · C93) | conformance `verify` stub run → `repro.verdict` on the wire | generated-test reproduction literature (research-loop40) | F2P transitions measured in scripted runs only; live rate unmeasured | one run of the declared test command per gate event; no provider calls |
+| discover (loop40 · C94) | declared-repo auto-verify on the trace (in-process; the active row is UNIT-ONLY) | none — no headline number for test-command discovery; offline hit rate 18/18 | false-gate rate unmeasurable (endpoint down) → no flip; revisit condition recorded | startup file checks; no tokens |
+| f2p (loop40 · C95) | labels proven on a real `run_turns` trace (102F5); live arms BLOCKED with date | 63.0% F2P on TDD-Bench Verified, e-Otter++ (frontier reference, never a target) | **UNSTATED** — local rate unmeasurable without an endpoint | per-arm tokens/wall in `render_f2p_table`; live costs pending |
+| partial (loop41 · C96) | classifier + scope-in-output; baseline 56 threads, 0 multi-edit attempts, rate **None** | none — no agreed metric for partial application (research-loop41) | no published number to stand next to; local denominator is zero (None, never 0.0) | counter is free; the atomic-plan path adds 0.2s + 20MB + one verify |
+| changeplan (loop41 · C97) | induced mid-plan failure → byte-identical tree; `plan.rolled_back` on the wire (102F6) | none — atomic plan + rollback is a mechanism; no published counterpart | no field rate claimed (insurance row); shell-mediated paths named as outside the guarantee | opt-in `--atomic-plan`; 0.2s + 20MB + a second verify per plan |
+| impact (loop41 · C98/98F1) | live extract after 98F1: 2328 nodes / 4339 edges, 892 cross-file `calls`; graph-vs-search counts reported both ways | architecture-aware repo-level generation; ARISE localization+repair (research-loop41) | graph-only vs search-only counts both reported; no accuracy claim | local graph read per query; no tokens |
+| ladder (loop42 · C99/C100) | scripted L1–L3 runner green; LIVE ladder BLOCKED with date | BFCL ladder — frontier well above 27B-class (research-loop42) | **UNSTATED** — no local ladder numbers; the harness runs the moment a model answers | per-arm tokens/wall in eval renderers; live costs pending |
+| budgets (loop44 · C103) | conformance `budgetlimit` run → exit 4 + `budget.exhausted`; the boundary proven by provider-call count | none — no published counterpart for runtime-enforced budgets (loop44 report) | defaults uncalibrated against real runs — stated as unmeasured | zero provider calls added; counter + one job-file write per breach |
+| evidence (loop45 · C105/C106) | fresh pack verifies endpoint-off; tampered pack exits 1 (`build/evidence_probe.py`) | standards-track direction — tamper-evident trails / cryptographic tool-use binding (research-loop45); repo-scale version only | tamper-evident against casual editing, not a determined adversary — stated in THREAT_MODEL.md | local hashing; O(records); zero provider calls |
+
 ## Deletion verdicts (R-A, this cycle)
 
 | module | verdict | evidence |

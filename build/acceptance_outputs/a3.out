@@ -30,6 +30,7 @@ repo_map: false
 repo_map_budget: 4000
 context_budget: 600
 max_retries: 3
+budgets: {}
 permissions:
   rules: []
 fallback_provider: ''

@@ -66,3 +66,37 @@ def test_every_row_carries_a_status():
     for name, row in rows.items():
         assert any(s in row for s in ("PROVEN-LIVE", "UNIT-ONLY", "DEAD")), \
             f"{name}: row carries no status"
+
+
+def test_loop38_45_rows_carry_local_published_gap_cost():
+    """The v4.0 acceptance clause (loops-38-45-proposal §R45): every row the
+    loops-38..45 arc added carries its LOCAL / PUBLISHED / GAP triple per R-G
+    and its cost per R-F.
+
+    The module set is re-derived from git (first commit descending from the
+    R38 research boundary, pinned to the v4.0.0 tag once it exists) — not a
+    hand-maintained copy — and the check runs BOTH directions plus a floor, so
+    neither a missing annotation nor a broken derivation can read as covered.
+    """
+    a = _audit()
+    derived = a.arc_modules()
+    assert len(derived) >= a.ANNOTATION_FLOOR, (
+        f"arc derivation floor: only {len(derived)} modules derived from git "
+        f"(floor {a.ANNOTATION_FLOOR}) — the derivation itself is suspect "
+        f"before any coverage claim is made")
+    rows = a.annotation_rows(REGISTER.read_text())
+    missing = sorted(set(derived) - set(rows))
+    assert not missing, (
+        f"arc modules with no R-G / R-F annotation row: {missing} — every "
+        f"row the loops-38..45 arc added needs LOCAL / PUBLISHED / GAP + cost")
+    extra = sorted(set(rows) - set(derived))
+    assert not extra, (
+        f"R-G / R-F annotations for modules outside the loops-38..45 arc: "
+        f"{extra} — this table is scoped to the arc; annotating later work "
+        f"here silently widens the claim")
+    for name in derived:
+        cells = rows[name][1:]
+        empties = [i for i, c in enumerate(cells, 1) if not c or c == "-"]
+        assert not empties, (
+            f"{name}: empty R-G/R-F cell(s) at position(s) {empties} "
+            f"(LOCAL/PUBLISHED/GAP/COST all required)")
