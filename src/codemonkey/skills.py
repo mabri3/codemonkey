@@ -251,3 +251,113 @@ def set_status(workdir: str | Path, name: str, status: str,
     path = skill_dir(workdir, name) / "manifest.json"
     _atomic_write(path, json.dumps(man, indent=2, sort_keys=True) + "\n")
     return man
+
+
+# --- the admission gate (cycle 83) ------------------------------------------
+#
+# Promotion is a MECHANICAL question with one input: the candidate's own
+# self-probe, executed through the EXISTING sandbox at the admitting run's
+# level (never above it — a level that cannot run shell refuses the probe
+# instead of widening), decided by the process exit code alone. A model's
+# opinion is never an input: nothing on this path calls a provider. The
+# verdict is journaled with the probe's actual output, and an ADMITTED skill
+# whose probe later fails is evicted in the same motion (R-A) — an artifact
+# that outlives its evidence does not stay loaded.
+
+def skill_thread(workdir: str | Path) -> str:
+    """The journal thread for this workspace's skill events — deterministic
+    and readable, so \"the journal carries skill.admitted\" is checkable."""
+    name = Path(workdir).resolve().name or "workspace"
+    return f"skills-{name}"
+
+
+def _default_level() -> str:
+    try:
+        from .config import load_config
+
+        return str(load_config().get("sandbox") or "workspace-write")
+    except Exception:
+        return "workspace-write"
+
+
+def _excerpt(text: str, n: int = 400) -> str:
+    text = (text or "").strip()
+    return text if len(text) <= n else text[:n] + f"… (+{len(text) - n} chars)"
+
+
+def admit(workdir: str | Path, name: str, *, level: Optional[str] = None,
+          timeout: float = 60.0) -> dict:
+    """Run the candidate's self-probe and let the exit code decide.
+
+    Returns `{"name", "ok", "probe_exit", "status", "reason", "output",
+    "level", "thread"}`; the same verdict is journaled on the workspace's
+    skill thread (`skill.admitted` / `skill.refused` / `skill.evicted`, with
+    the exit code and a bounded excerpt of the probe output)."""
+    import subprocess
+
+    from . import journal as journal_mod
+    from . import sandbox as sandbox_mod
+
+    workdir = Path(workdir)
+    level = level or _default_level()
+    if level not in sandbox_mod.LEVELS:
+        raise SkillError(f"unknown sandbox level {level!r} "
+                         f"(valid: {list(sandbox_mod.LEVELS)})")
+    man = read_manifest(workdir, name)
+    thread = skill_thread(workdir)
+
+    def _journal(rtype: str, exit_code: object, output: str) -> None:
+        try:
+            journal_mod.record(thread, rtype, tool="skills", key=name,
+                               status=f"probe_exit:{exit_code}",
+                               output=_excerpt(output))
+        except Exception:  # journaling is best-effort by contract
+            pass
+
+    ctx = sandbox_mod.ToolContext(workdir=workdir, sandbox=level,
+                                  timeout=timeout)
+    try:
+        sandbox_mod.check("shell", ctx)
+    except sandbox_mod.SandboxError as exc:
+        reason = f"sandbox refuses to run a probe at level {level!r}: {exc}"
+        _journal("skill.refused", "sandbox", reason)
+        return {"name": name, "ok": False, "probe_exit": None,
+                "status": man["status"], "reason": reason, "output": "",
+                "level": level, "thread": thread}
+
+    try:
+        proc = subprocess.run(["bash", "-lc", man["probe"]], cwd=str(workdir),
+                              capture_output=True, text=True, timeout=timeout,
+                              stdin=subprocess.DEVNULL)
+        code: object = proc.returncode
+        combined = f"stdout: {proc.stdout.strip()}\nstderr: {proc.stderr.strip()}"
+    except subprocess.TimeoutExpired:
+        code = "timeout"
+        combined = f"probe exceeded {timeout}s and was killed"
+    except OSError as exc:
+        code = "spawn-error"
+        combined = f"probe could not be started: {exc}"
+
+    if code == 0:
+        updated = set_status(workdir, name, "admitted",
+                             reason=f"self-probe exit 0 at {level}")
+        _journal("skill.admitted", code, combined)
+        return {"name": name, "ok": True, "probe_exit": 0,
+                "status": updated["status"],
+                "reason": f"probe exit 0 at {level} — promoted",
+                "output": combined, "level": level, "thread": thread}
+
+    if man["status"] == "admitted":
+        updated = set_status(workdir, name, "evicted",
+                             reason=f"post-admission probe failed: exit {code}")
+        _journal("skill.evicted", code, combined)
+        return {"name": name, "ok": False, "probe_exit": code,
+                "status": updated["status"],
+                "reason": f"probe exit {code} AFTER admission — evicted (R-A)",
+                "output": combined, "level": level, "thread": thread}
+
+    _journal("skill.refused", code, combined)
+    return {"name": name, "ok": False, "probe_exit": code,
+            "status": man["status"],
+            "reason": f"probe exit {code} — stays {man['status']}",
+            "output": combined, "level": level, "thread": thread}

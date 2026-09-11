@@ -1,0 +1,36 @@
+=== admit demo_ok (expect exit 0) ===
+demo_ok: ADMITTED — probe exit 0 at workspace-write — promoted
+  stdout: gate_ok
+  stderr: 
+  journal: skills-tmp.Ai64qA4acd (probe_exit:0)
+exit=0
+=== admit demo_bad (expect exit 1, stays quarantined) ===
+demo_bad: QUARANTINED — probe exit 3 — stays quarantined
+  stdout: 
+  stderr: womp
+  journal: skills-tmp.Ai64qA4acd (probe_exit:3)
+exit=1
+=== skills list ===
+demo_bad	quarantined	fails its probe
+  probe: echo womp >&2; exit 3
+  provenance: run=r1 session=s1 taint_free=True
+demo_ok	admitted	passes its probe
+  probe: echo gate_ok
+  provenance: run=r1 session=s1 taint_free=True
+exit=0
+=== journal (skills-tmp.Ai64qA4acd) ===
+{"ts": 1789099318.310852, "type": "skill.admitted", "thread": "skills-tmp.Ai64qA4acd", "tool": "skills", "key": "demo_ok", "status": "probe_exit:0", "output": "stdout: gate_ok\nstderr:"}
+{"ts": 1789099318.492769, "type": "skill.refused", "thread": "skills-tmp.Ai64qA4acd", "tool": "skills", "key": "demo_bad", "status": "probe_exit:3", "output": "stdout: \nstderr: womp"}
+=== re-admit demo_ok after its probe is made to fail (expect eviction) ===
+demo_ok: EVICTED — probe exit 1 AFTER admission — evicted (R-A)
+  stdout: 
+  stderr: 
+  journal: skills-tmp.Ai64qA4acd (probe_exit:1)
+exit=1
+=== skills list (expect evicted) ===
+demo_bad	quarantined	fails its probe
+  probe: echo womp >&2; exit 3
+  provenance: run=r1 session=s1 taint_free=True
+demo_ok	evicted	passes its probe
+  probe: false
+  provenance: run=r1 session=s1 taint_free=True

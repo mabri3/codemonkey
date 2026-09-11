@@ -3472,3 +3472,33 @@ them justifies waiving a row at v4.0.
 - **Next step:** CYCLE 83 — the admission gate: a candidate's self-probe run
   through the EXISTING sandbox; promote on exit 0 only; evict on later
   failure (R-A); a model's opinion is never an input.
+
+## 2026-09-10 — CYCLE 83 (loop46): the admission gate
+
+- **Files changed:** `src/codemonkey/skills.py` (`admit()` — the gate:
+  self-probe through the EXISTING sandbox at the admitting level, exit code
+  decides, verdict journaled with the probe's real output; eviction of an
+  admitted skill whose probe later fails), `src/codemonkey/skills_cli.py`
+  (`skills admit <name> [--sandbox] [--timeout]`, exit 0/1/2),
+  `tests/test_skills_gate.py` (new, 7 tests), `build/probes/cycle83-probe.sh`
+  + `.out`, `features.html`, this entry.
+- **Probe results (literal, R-I):** `codemonkey skills admit demo_ok` →
+  `demo_ok: ADMITTED — probe exit 0 at workspace-write — promoted`, **exit 0**,
+  journal `{"type": "skill.admitted", "key": "demo_ok", "status":
+  "probe_exit:0"}`; `skills admit demo_bad` → `QUARANTINED — probe exit 3 —
+  stays quarantined`, **exit 1**, journal `skill.refused` carries the actual
+  `stderr: womp`; re-admit after the probe was made to fail → `EVICTED — probe
+  exit 1 AFTER admission — evicted (R-A)`, **exit 1**, and `skills list`
+  shows it evicted while `load_admitted` no longer returns it. Transcript:
+  `build/probes/cycle83-probe.out`.
+- **The discriminating cases are pinned in tests, not prose:** at
+  `read-only` the gate refuses BEFORE executing (probe side effect `pwned.txt`
+  asserted absent); a hanging probe is a failure (`probe_exit: "timeout"`),
+  never a pass; a poisoned endpoint env changes nothing (the gate has no
+  provider on its path).
+- **Tests run:** `uv run pytest -q tests/test_skills_gate.py` → **7 passed**;
+  full suite **843 passed, 5 skipped** (was 836/5).
+- **Known issues:** none. Nothing loads skills into runs yet (C84).
+- **Next step:** CYCLE 84 — `skill_create` tool + strategy domain `skills`
+  (`off` default | `use` | `learn`); admitted skills merge into SPECS/PARAMS
+  at run start.
